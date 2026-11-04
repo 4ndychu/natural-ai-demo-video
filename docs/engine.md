@@ -68,7 +68,10 @@ Each demo is a list of sections. Each section carries what the voice says, what 
 
 ## 6. Render and export
 
-- ffmpeg combines the recorded video, the voice takes and burned-in or sidecar captions.
+- ffmpeg combines the recorded video and the voice takes, then applies the demo's on-screen settings:
+  - **Captions:** burned in, sidecar `.srt` only, or off.
+  - **Corner label:** off by default; otherwise the user's text in the chosen corner. No other overlays (no watermark, no "Illustrative" tag) unless the user adds them.
+  - Both are render-only, so changing them never regenerates voice or re-records.
 - Outputs: 1080p MP4, `.srt` captions, a plain-text transcript, and an optional 720p preview.
 - Redos only regenerate and re-record the marked sections, then re-render.
 

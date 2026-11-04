@@ -36,6 +36,7 @@ No face on camera. No microphone. No robot voice.
 - [Install](#install)
 - [Use it](#use-it)
 - [Voice sliders](#voice-sliders)
+- [Captions and labels](#captions-and-labels)
 - [Privacy](#privacy)
 - [Costs](#costs)
 - [Project layout](#project-layout)
@@ -69,6 +70,7 @@ NAVI is a fourth option. It treats the voice like a real person talking: one rel
 | **Privacy first** | Keys, passwords and card numbers are always blurred. Emails, names and money are blurred unless you allow them. Every frame is checked again after recording. |
 | **Review like an editor** | A player with section ticks. Mark a moment ("sounds like AI", "needs a blur", "too fast") or type a note. Only marked sections are redone, with the cost shown first. |
 | **Learns your taste** | Your marks tune each voice's defaults for next time. |
+| **Your call on screen** | Captions burned in, as a separate file, or off. No watermark or corner label unless you add one (your brand name, top right, say). Change both in Review for free; only the render changes. |
 | **Export** | MP4, captions (.srt) and a transcript, plus an optional 720p preview. |
 | **Your data, your call** | Everything stays on your computer. Remove the key, forget logins, reset settings or delete everything from one page. |
 
@@ -122,7 +124,10 @@ These rules came out of five rounds of listening tests on real walkthroughs:
   </tr>
   <tr>
     <td><img src="docs/screens/privacy.png" alt="Privacy step with three tiers of blurring and warnings"><br><sub><b>Privacy.</b> Three tiers, with a warning when you choose to show something risky.</sub></td>
-    <td><img src="docs/screens/review-dark.png" alt="Review step: player, timeline with marks and per-section notes"><br><sub><b>Review.</b> Marks pinned to the playhead; only marked sections get redone.</sub></td>
+    <td><img src="docs/screens/review-dark.png" alt="Review step: player, timeline with marks, captions and corner label controls"><br><sub><b>Review.</b> Marks pinned to the playhead; captions and corner label change for free.</sub></td>
+  </tr>
+  <tr>
+    <td colspan="2"><img src="docs/screens/brief.png" alt="New demo brief: what to show, site, audience, length, voice, captions and corner label"><br><sub><b>New demo.</b> Say what to show; choose captions and an optional corner label up front.</sub></td>
   </tr>
 </table>
 
@@ -198,6 +203,17 @@ Every slider is locked to a narrow range that stays human. The faint mark on eac
 | Swearing | Off, One, A few | Fine for any audience | At natural reactions, never in instructions |
 
 Swears can be kept out of the captions with one switch.
+
+## Captions and labels
+
+Nothing is stamped on your video unless you ask for it.
+
+| Setting | Options | Default |
+|---|---|---|
+| Captions | Burned in, separate .srt file, or off | Burned in |
+| Corner label | Off, or your text in any corner | Off |
+
+Set defaults once in Settings, override them per demo in the brief, and change them in Review before exporting. Changing them never costs credits, because only the final render changes.
 
 ## Privacy
 

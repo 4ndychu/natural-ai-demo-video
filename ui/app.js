@@ -37,6 +37,7 @@ class Component extends DCLogic {
       { id: 'page', title: 'Write the product page', site: 'whop.com', len: 2, who: 0, voice: 'alex', kind: 'course', max: 3, cover: 'assets/cover-2.jpg', status: 'Recording 4 of 9', dot: '#E0A100', recorded: false, written: true, notes: {}, blurs: [] },
       { id: 'pay', title: 'Connect payouts', site: 'whop.com', len: 1, who: 0, voice: 'alex', kind: 'course', max: 5, cover: 'assets/cover-3.jpg', status: 'Exported Nov 2', dot: 'var(--okDot)', recorded: true, written: true, exported: true, notes: {}, blurs: [] },
       { id: 'posts', title: 'Schedule a week of posts', site: 'app.yourproduct.com', len: 2, who: 1, voice: 'jessica', kind: 'saas', max: 5, cover: 'assets/cover-4.jpg', status: 'Exported Oct 28', dot: 'var(--okDot)', recorded: true, written: true, exported: true, notes: {}, blurs: [] }];
+    demos.forEach((d) => Object.assign(d, { capMode: 'burn', corner: 'off', cornerText: '' }));
     const screen = start === 'voice' || start === 'review' ? 'demo' : start;
     this.state = {
       screen: screen, step: start === 'review' ? 4 : 1, cur: 'whop', demos: demos, theme: null, help: false,
@@ -48,6 +49,7 @@ class Component extends DCLogic {
       sel: 2, revT: 86, player: false, noteDraft: '', p720: false, recPos: 11, confirm: null,
       sites: [{ u: 'whop.com', note: 'Logged in to Demo Academy, saved Nov 4' }, { u: 'app.yourproduct.com', note: 'Saved Oct 28' }], siteDraft: '', cleared: {}, wipeConfirm: false,
       lib: false, libF: 'all', chat: [], chatDraft: '', chatAct: null,
+      defCap: 'burn', defCorner: 'off', defCornerText: '', bCap: 'burn', bCorner: 'off', bCornerText: '',
       bWhat: '', bSite: 'whop.com', bNew: '', bWho: 0, bLen: 2, bHide: '', bVoice: 'alex', editing: false,
       toast: '', toastUndo: null, toastGo: null, toastGoLabel: ''
     };
@@ -154,12 +156,19 @@ class Component extends DCLogic {
     const dataAct = {
       key: () => { this.setState({ keyOn: false }); this.say('Key removed', () => this.setState({ keyOn: true })); },
       logins: () => { const prev = st.sites; this.setState({ sites: [] }); this.say('All saved logins forgotten', () => this.setState({ sites: prev })); },
-      settings: () => { const prev = { vals: st.vals, hide: st.hide, shown: st.shown, defVoice: st.defVoice }; this.setState({ vals: Object.assign({}, this.presetVals.course), hide: [], shown: { email: false, phone: false, names: false, address: false, money: false, customers: false, counts: false, usage: true, prices: true, dates: true }, defVoice: 'alex' }); this.say('Settings reset', () => this.setState(prev)); }
+      settings: () => { const prev = { vals: st.vals, hide: st.hide, shown: st.shown, defVoice: st.defVoice, defCap: st.defCap, defCorner: st.defCorner, defCornerText: st.defCornerText }; this.setState({ vals: Object.assign({}, this.presetVals.course), hide: [], shown: { email: false, phone: false, names: false, address: false, money: false, customers: false, counts: false, usage: true, prices: true, dates: true }, defVoice: 'alex', defCap: 'burn', defCorner: 'off', defCornerText: '' }); this.say('Settings reset', () => this.setState(prev)); }
     };
     const keyMsg = st.keyRes === 'ok' ? 'Connected. Starter plan, ' + this.num(st.credits) + ' of 30,000 credits left. Saved in your Mac’s Keychain.' : st.keyRes === 'bad' ? 'That key didn’t work. Check you copied all of it and it has text to speech access.' : '';
     const videoCost = 4600; const leftAfter = Math.max(0, st.credits - (D.recorded ? 0 : videoCost));
     const chatClean = (m) => { let s = m.replace(/^(actually|no|ok|okay|wait)[,!.\s]*/i, '').replace(/^(make|do|change)( it| this)?( into)?( a)? demo (of|for|on|about)\s*/i, '').replace(/\s*instead[.!]*$/i, ''); return s.charAt(0).toUpperCase() + s.slice(1); };
     const dSel = (k) => ({ label: pretty(k), on: st.defVoice === k ? 'true' : 'false', pick: () => { this.setState({ defVoice: k }); this.say(pretty(k) + ' is now the default for new demos'); } });
+    const capOpts = [['burn', 'Burned in'], ['file', 'Separate file'], ['off', 'Off']];
+    const posOpts = [['off', 'Off'], ['tl', 'Top left'], ['tr', 'Top right'], ['bl', 'Bottom left'], ['br', 'Bottom right']];
+    const capName = { burn: 'burned in', file: 'as a separate file', off: 'off' };
+    const segOf = (opts, cur, fn) => opts.map((o) => ({ label: o[1], on: cur === o[0] ? 'true' : 'false', pick: () => fn(o[0]) }));
+    const posCss = { tl: 'left: 14px; top: 14px', tr: 'right: 14px; top: 14px', bl: 'left: 14px; bottom: 14px', br: 'right: 14px; bottom: 14px' };
+    const dCap = D.capMode || 'burn'; const dCorner = D.corner || 'off'; const dCornerText = D.cornerText || '';
+    const base = D.title.replace(/\u2026$/, '');
     return {
       themeClass: theme === 'dark' ? 't-dark' : 't-light', isDark: theme === 'dark', isLight: theme !== 'dark', themeAria: theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode', toggleTheme: () => this.setState({ theme: theme === 'dark' ? 'light' : 'dark' }),
       isWelcome: st.screen === 'welcome', inApp: st.screen !== 'welcome', isHome: st.screen === 'home', isDemo: st.screen === 'demo', isSettings: st.screen === 'settings', isNew: st.screen === 'new',
@@ -173,8 +182,8 @@ class Component extends DCLogic {
       toolsDot: st.tools === 'done' ? 'var(--okDot)' : 'var(--danger)', toolsStatus: st.tools === 'done' ? 'Recording tools ready' : 'Recording tools not installed',
       sitesStatus: st.sites.length ? st.sites.length + (st.sites.length === 1 ? ' saved login' : ' saved logins') : 'No saved logins',
       demoTitle: D.title, briefLine: D.site + ', about ' + ['1', '3', '5', '8'][D.len] + ' min', demoCover: D.cover,
-      newDemo: () => this.setState({ screen: 'new', editing: false, bWhat: '', bNew: '', bHide: '', bSite: st.sites[0] ? st.sites[0].u : '', bVoice: st.defVoice, bWho: 0, bLen: 2, help: false }),
-      editBrief: () => this.setState({ screen: 'new', editing: true, bWhat: D.what || 'How to build a course in Whop, from creating the whop to checking it on a phone', bSite: D.site, bNew: '', bWho: D.who, bLen: D.len, bVoice: D.voice }),
+      newDemo: () => this.setState({ screen: 'new', editing: false, bCap: st.defCap, bCorner: st.defCorner, bCornerText: st.defCornerText, bWhat: '', bNew: '', bHide: '', bSite: st.sites[0] ? st.sites[0].u : '', bVoice: st.defVoice, bWho: 0, bLen: 2, help: false }),
+      editBrief: () => this.setState({ screen: 'new', editing: true, bWhat: D.what || 'How to build a course in Whop, from creating the whop to checking it on a phone', bSite: D.site, bNew: '', bWho: D.who, bLen: D.len, bVoice: D.voice, bCap: dCap, bCorner: dCorner, bCornerText: dCornerText }),
       newTitle: st.editing ? 'Edit the brief' : 'New demo', briefCta: st.editing ? 'Update the script' : 'Write the script',
       briefHint: st.editing ? 'Claude only rewrites what changed.' : 'Takes about a minute. You can keep using the page.',
       bWhat: st.bWhat, onBWhat: (e) => this.setState({ bWhat: e.target.value }), bHide: st.bHide, onBHide: (e) => this.setState({ bHide: e.target.value }), bNew: st.bNew, onBNew: (e) => this.setState({ bNew: e.target.value }),
@@ -183,13 +192,24 @@ class Component extends DCLogic {
       bWho: ['Complete beginners', 'Some experience', 'Pros'].map((s, i) => ({ label: s, on: st.bWho === i ? 'true' : 'false', pick: () => this.setState({ bWho: i }) })),
       bLen: ['1 min', '3 min', '5 min', '8 min'].map((s, i) => ({ label: s, on: st.bLen === i ? 'true' : 'false', pick: () => this.setState({ bLen: i }) })),
       bVoices: st.mine.map((k) => ({ label: pretty(k), on: st.bVoice === k ? 'true' : 'false', pick: () => this.setState({ bVoice: k }) })),
+      bCaps: segOf(capOpts, st.bCap, (x) => this.setState({ bCap: x })),
+      bCorner: segOf(posOpts, st.bCorner, (x) => this.setState({ bCorner: x })),
+      bCornerText: st.bCornerText, onBCornerText: (e) => this.setState({ bCornerText: e.target.value }), bCornerOff: st.bCorner === 'off', bCornerOp: st.bCorner === 'off' ? 0.45 : 1,
+      bCornerPh: 'Text to show in the corner, e.g. your brand name',
+      revCaps: segOf(capOpts, dCap, (x) => { this.patchDemo({ capMode: x }); this.say('Captions ' + capName[x]); }),
+      revCorner: segOf(posOpts, dCorner, (x) => this.patchDemo({ corner: x })),
+      revCornerText: dCornerText, onRevCornerText: (e) => this.patchDemo({ cornerText: e.target.value }), revCornerOff: dCorner === 'off', revCornerOp: dCorner === 'off' ? 0.45 : 1,
+      showCapPreview: dCap === 'burn', cornerShown: dCorner !== 'off', cornerStyle: posCss[dCorner] || '', cornerTextShown: dCornerText.trim() || 'Your label here',
+      defCaps: segOf(capOpts, st.defCap, (x) => this.setState({ defCap: x })),
+      defCorner: segOf(posOpts, st.defCorner, (x) => this.setState({ defCorner: x })),
+      defCornerText: st.defCornerText, onDefCornerText: (e) => this.setState({ defCornerText: e.target.value }), defCornerOff: st.defCorner === 'off', defCornerOp: st.defCorner === 'off' ? 0.45 : 1,
       cancelBrief: () => this.setState({ screen: st.editing ? 'demo' : 'home' }),
       submitBrief: () => {
         const w = st.bWhat.trim(); if (!w) return; const t = w.length > 34 ? w.slice(0, 32).replace(/\s+\S*$/, '') + '…' : w; const site = st.bNew.trim() || st.bSite || 'whop.com';
         const newSite = st.bNew.trim() && !st.sites.some((s) => s.u === site);
-        if (st.editing) { this.patchDemo({ title: t, what: w, site: site, who: st.bWho, len: st.bLen, voice: st.bVoice, written: false }); this.setState({ screen: 'demo', step: 0, sites: newSite ? st.sites.concat([{ u: site, note: 'Saved Nov 4' }]) : st.sites }); this.later('write', 2200, () => { this.patchDemo({ written: true }); this.say('Script updated'); }); this.say('Updating the script'); return; }
+        if (st.editing) { this.patchDemo({ title: t, what: w, site: site, who: st.bWho, len: st.bLen, voice: st.bVoice, capMode: st.bCap, corner: st.bCorner, cornerText: st.bCornerText, written: false }); this.setState({ screen: 'demo', step: 0, sites: newSite ? st.sites.concat([{ u: site, note: 'Saved Nov 4' }]) : st.sites }); this.later('write', 2200, () => { this.patchDemo({ written: true }); this.say('Script updated'); }); this.say('Updating the script'); return; }
         const id = 'd' + Date.now();
-        const d = { id: id, title: t, what: w, site: site, len: st.bLen, who: st.bWho, voice: st.bVoice, kind: 'course', max: 0, cover: 'assets/cover-4.jpg', status: 'Writing script', dot: '#E0A100', recorded: false, written: false, notes: {}, blurs: [] };
+        const d = { id: id, title: t, what: w, site: site, len: st.bLen, who: st.bWho, voice: st.bVoice, kind: 'course', max: 0, cover: 'assets/cover-4.jpg', status: 'Writing script', dot: '#E0A100', recorded: false, written: false, notes: {}, blurs: [], capMode: st.bCap, corner: st.bCorner, cornerText: st.bCornerText };
         this.setState({ demos: [d].concat(st.demos), cur: id, screen: 'demo', step: 0, vals: this.recFor(st.bVoice, 'course'), sites: newSite ? st.sites.concat([{ u: site, note: 'Saved Nov 4' }]) : st.sites, recPos: 0 });
         this.say(newSite ? 'A browser opens so you can log in to ' + site + '. Then Claude writes the script.' : 'Claude is exploring ' + site + ' and writing the script');
         this.later('write', 2600, () => { this.setState({ demos: this.state.demos.map((x) => x.id === id ? Object.assign({}, x, { written: true, status: 'Script ready', dot: '#E0A100' }) : x) }); this.say('Script ready to read'); });
@@ -238,9 +258,9 @@ class Component extends DCLogic {
       togglePlayer: () => { if (st.player) { this.stop('player'); this.setState({ player: false }); return; } this.setState({ player: true }); this.every('player', 250, () => { const t = this.state.revT + 1; if (t >= this.total) { this.stop('player'); this.setState({ player: false, revT: this.total }); return; } let s = 0; for (let i = 0; i < this.secs.length; i++) if (t >= this.starts[i]) s = i; this.setState({ revT: t, sel: s }); }); },
       blurs: (D.blurs || []).map((b) => ({ t: b.t, what: b.what, unsure: !b.s, done: !!b.s, status: b.s === 'keep' ? 'Kept blurred' : 'Shown', keep: () => this.patchDemo({ blurs: D.blurs.map((x) => x.id === b.id ? Object.assign({}, x, { s: 'keep' }) : x) }), show: () => this.patchDemo({ blurs: D.blurs.map((x) => x.id === b.id ? Object.assign({}, x, { s: 'show' }) : x) }), undo: () => this.patchDemo({ blurs: D.blurs.map((x) => x.id === b.id ? Object.assign({}, x, { s: '' }) : x) }) })),
       autoBlurNote: (blurCount - 1) + ' other kinds of thing were blurred automatically wherever they appeared.',
-      files: [{ n: D.title.replace(/…$/, '') + '.mp4', s: '1080p, 4:58' }, { n: D.title.replace(/…$/, '') + '.srt', s: 'captions' }, { n: D.title.replace(/…$/, '') + '.txt', s: 'transcript' }].concat(st.p720 ? [{ n: D.title.replace(/…$/, '') + ' (720p).mp4', s: 'preview' }] : []),
+      files: [{ n: base + '.mp4', s: '1080p, 4:58' + (dCap === 'burn' ? ', captions in' : '') }].concat(dCap !== 'off' ? [{ n: base + '.srt', s: 'captions' }] : []).concat([{ n: base + '.txt', s: 'transcript' }]).concat(st.p720 ? [{ n: base + ' (720p).mp4', s: 'preview' }] : []),
       p720On: p.onStr, p720Track: p.track, p720X: p.x, toggle720: () => this.setState({ p720: !st.p720 }),
-      exportNote: 'Saved in your Videos folder. Your marks on this demo were used to tune ' + voicePretty + '’s defaults for next time.',
+      exportNote: 'Captions ' + capName[dCap] + (dCorner !== 'off' && dCornerText.trim() ? ', corner label \u201c' + dCornerText.trim() + '\u201d' : ', no corner label') + '. Saved in your Videos folder. Your marks on this demo were used to tune ' + voicePretty + '’s defaults for next time.',
       key: st.key, onKey: (e) => this.setState({ key: e.target.value, keyRes: null }), keyType: st.keyType, keyTypeLabel: st.keyType === 'password' ? 'Show' : 'Hide', toggleKeyType: () => this.setState({ keyType: st.keyType === 'password' ? 'text' : 'password' }),
       testKey: () => { const ok = st.key.trim().length > 8; this.setState({ keyRes: ok ? 'ok' : 'bad', keyOn: ok ? true : st.keyOn }); if (ok && st.screen === 'settings') this.later('keyclose', 1400, () => this.setState({ keyEdit: false, key: '', keyRes: null })); },
       keyMsg: keyMsg, keyMsgColor: st.keyRes === 'bad' ? 'var(--danger)' : 'var(--ok)',

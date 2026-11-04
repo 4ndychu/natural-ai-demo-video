@@ -45,7 +45,7 @@ Not for: desktop apps, videos with a real person on camera, voice cloning.
 
 ### 1. Brief
 
-Get, in as few questions as possible: what to show, which site, who's watching (beginners / some experience / pros), length (1, 3, 5 or 8 minutes), anything to keep off screen, and which voice. Use sensible defaults rather than asking about everything. A new site means a one-time login.
+Get, in as few questions as possible: what to show, which site, who's watching (beginners / some experience / pros), length (1, 3, 5 or 8 minutes), anything to keep off screen, and which voice. Captions and corner label come from the user's saved defaults (captions burned in, no corner label) unless they say otherwise. **Never add a watermark, brand name, "Illustrative" tag or any other overlay the user didn't ask for.** Use sensible defaults rather than asking about everything. A new site means a one-time login.
 
 If the user changes direction mid-way ("make it a demo of the payouts page instead"), keep the current demo as a draft and start a new brief from what they said.
 
@@ -89,7 +89,7 @@ Open the local app on the Review step. The user marks moments (sounds like AI, n
 
 ### 8. Export
 
-Render the MP4 (1080p), captions (.srt) and a transcript, plus an optional 720p preview, into the user's videos folder. Name the files after the demo title.
+Apply the demo's caption setting (burned in, separate .srt, or off) and corner label (off, or the user's text in the chosen corner); changing either is a re-render only, no credits. Render the MP4 (1080p), captions (.srt unless captions are off) and a transcript, plus an optional 720p preview, into the user's videos folder. Name the files after the demo title.
 
 ## Your data
 
