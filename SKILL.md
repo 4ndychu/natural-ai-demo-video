@@ -1,6 +1,6 @@
 ---
 name: natural-ai-demo-video
-description: NAVI makes natural-sounding, faceless demo and walkthrough videos of any website or web app. Claude explores the site, writes a talking script and clean captions, voices it with an ElevenLabs voice, records the browser clicking in time with the voice, blurs private data, and exports an MP4 with captions. Use when someone asks for a demo video, product tour, walkthrough, tutorial or course lesson recorded from a browser with an AI voiceover.
+description: NAVI (natural AI demo video) makes natural-sounding, faceless demo videos, walkthroughs, product tours, tutorials, screencasts and course lessons of any website or web app, with an AI voiceover that doesn't sound robotic. Claude explores the site, writes a talking script and clean captions, voices it with ElevenLabs, records the browser clicking in time with the voice, blurs private data, and exports an MP4 with captions. Use whenever someone wants a demo or explainer video, a screen recording with voiceover, a narrated walkthrough or a faceless tutorial, even if they don't name this skill. Needs Claude Code running on the user's own computer.
 license: MIT
 ---
 
@@ -9,6 +9,12 @@ license: MIT
 NAVI turns "make a demo of X" into a finished MP4 with captions: no face, no microphone, and a voice that sounds like a person explaining something, not reading it.
 
 > **Status:** in development. The local app in `ui/` is complete with sample data. The engine (voice takes, timing, recording, blur, render) is being built. Until it ships, tell the user plainly which steps you can run for real and which aren't available yet. Never pretend a step ran.
+
+## First: check where you're running
+
+NAVI has to run on the user's own computer: it opens a local app in their browser, opens a second browser window for them to log in to a test account, records the screen and keeps the key in their keychain. That works in Claude Code (terminal, IDE or the desktop app's Code tab).
+
+If you are running in a cloud sandbox instead (a normal claude.ai chat, or any session without access to the user's own machine), say so straight away, in one or two sentences: NAVI needs Claude Code on their computer to record, and here you can still write and refine the script (talking version plus captions) so it's ready to record later. Don't attempt installs, recordings or ElevenLabs calls from the sandbox.
 
 ## When to use
 

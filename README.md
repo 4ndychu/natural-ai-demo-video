@@ -130,7 +130,7 @@ These rules came out of five rounds of listening tests on real walkthroughs:
 
 ### What you need
 
-- [Claude Code](https://docs.claude.com/en/docs/claude-code/overview), or another Claude app that supports skills
+- [Claude Code](https://docs.claude.com/en/docs/claude-code/overview) on your own computer (terminal, IDE or the desktop app's Code tab)
 - An [ElevenLabs](https://elevenlabs.io) account (Starter plan or above) and an API key with text to speech access
 - macOS or Linux, Node.js 18+ and Python 3.10+ (NAVI installs Playwright, ffmpeg and the timing model for you after asking)
 
@@ -142,9 +142,11 @@ git clone https://github.com/4ndychu/natural-ai-demo-video.git ~/.claude/skills/
 
 Start Claude Code and ask for a demo video. Claude picks up the skill on its own.
 
-### Claude app
+### Why Claude Code, not a normal chat
 
-Download this repository as a ZIP (**Code → Download ZIP**) and add it to Claude as a custom skill.
+NAVI records your screen, opens a browser for you to log in, and keeps your key in your keychain, so it has to run on your computer. When you ask for a demo, Claude Code starts a small local server and opens the NAVI app in your browser (at a `localhost` address; nothing goes online). Claude writes the script in Claude Code, and you approve it, pick the voice and review the draft in the app.
+
+In a normal claude.ai chat the skill runs in a cloud sandbox, so Claude will tell you it needs Claude Code to record, and offer to write the script for you there instead.
 
 ### Just try the app
 
