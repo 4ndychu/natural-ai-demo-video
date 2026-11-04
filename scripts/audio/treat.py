@@ -51,6 +51,22 @@ def add_room_tone(voice, tone, sr, tone_lufs=-62.0, fade_in=0.4):
     return [v + t[i % len(t)] * min(1.0, i / fi if fi else 1.0) for i, v in enumerate(voice)]
 
 
+def synth_room_tone(sr, seconds=10.0, seed=7):
+    """Stand-in for a real room recording: steady pink-ish noise (Paul Kellet's filter on white noise).
+    Used only when no recording of a quiet room exists. add_room_tone band-limits and levels it."""
+    import random
+    rnd = random.Random(seed)
+    b0 = b1 = b2 = 0.0
+    out = []
+    for _ in range(int(seconds * sr)):
+        w = rnd.uniform(-1.0, 1.0)
+        b0 = 0.99765 * b0 + w * 0.0990460
+        b1 = 0.96300 * b1 + w * 0.2965164
+        b2 = 0.57000 * b2 + w * 1.0526913
+        out.append((b0 + b1 + b2 + w * 0.1848) * 0.05)
+    return out
+
+
 if __name__ == '__main__':
     x, sr = dsp.read_wav(sys.argv[1])
     y, info = treat(x, sr)

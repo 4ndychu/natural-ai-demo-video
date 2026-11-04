@@ -24,7 +24,8 @@
     "speed_default": 1.0,
     "never_speed_up_after": true,
     "never_pass_next_text": true,
-    "rank_takes_by": "finality of the last sentence (scripts/audio/finality.py), then ear"
+    "rank_takes_by": "pace closest to reference_pace_wps when set, else finality of the last sentence (scripts/audio/finality.py); the user can overrule by ear",
+    "reference_pace_wps": null
   },
   "audio_edit": {
     "trim_after_sentence": false,
@@ -171,7 +172,9 @@
       "tested": true,
       "gender": "m",
       "color": "#0000F2",
-      "adjust": {}
+      "adjust": {},
+      "voice_id": "hLygPNd2gK6Azddorc5W",
+      "elevenlabs_name": "Alex - Warm Conversational Business"
     },
     "jessica": {
       "status": "untested",

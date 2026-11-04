@@ -13,7 +13,7 @@ The method that won every listening test (see reference/voice-rules.md):
   section). If the file stops mid-word, the tail fades over 150 ms. Never add reverb to fake a decay.
 
 Input: a JSON file {"voice_id": "...", "sections": [{"name": "open", "talk": "[relaxed] ..."}, ...]}
-Output (in --out): <name>_take<k>.mp3/.json/.wav per take, voice_dry.wav, voice.wav (treated), voice.json
+Output (in --out): <name>_take<k>.mp3/.json/.wav per take, voice_dry.wav, voice.wav (treated, with room tone), voice.json
 (chosen takes, words with times, per-section windows).
 
 The key is read from the macOS Keychain (service "navi-elevenlabs") or the NAVI_ELEVENLABS_KEY environment
@@ -36,7 +36,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(HERE, '..', 'audio'))
 import dsp  # noqa: E402
 from finality import finality, words_from  # noqa: E402
-from treat import treat  # noqa: E402
+from treat import add_room_tone, synth_room_tone, treat  # noqa: E402
 
 MODEL, SR = 'eleven_v3', 44100
 MAX_PAUSE = 0.8          # walkthroughs: only silences over 0.8 s are shortened (voice-rules.md, section 4)
@@ -44,6 +44,7 @@ FINAL_MAX, SECTION_MAX = 0.45, 0.25
 FADE_END, FADE_CUT, XF = 0.08, 0.15, 0.03
 SECTION_GAP = 0.40       # last word to next section's first word (0.35 to 0.45 s)
 TAG_RE = re.compile(r'\[[^\]]+\]')
+CONFIG_REF_PACE = json.load(open(os.path.join(HERE, '..', '..', 'config', 'defaults.json')))['voice'].get('reference_pace_wps')
 # NAVI's ffmpeg lives next to its Python in .venv/bin (see scripts/setup/check.py); find it there first.
 os.environ['PATH'] = os.path.dirname(sys.executable) + os.pathsep + os.environ.get('PATH', '')
 
@@ -57,6 +58,24 @@ def get_key():
     if not key:
         sys.exit('No ElevenLabs key. Run the setup step to store it in the Keychain (service "navi-elevenlabs").')
     return key
+
+
+ROOM_TONE = os.path.expanduser('~/Library/Application Support/NAVI/room_tone.wav')
+
+
+def room_tone():
+    """A real recording of a quiet room if one is saved in NAVI's settings folder, else steady synthetic noise.
+    Either way it goes under the voice at about -62 LUFS, band-limited to 90 Hz to 2.5 kHz (voice-rules.md, 4)."""
+    if os.path.exists(ROOM_TONE):
+        x, sr = dsp.read_wav(ROOM_TONE)
+        if sr == SR:
+            return x, 'recorded'
+    return synth_room_tone(SR), 'synthetic'
+
+
+def pace(words):
+    """Words per second, first word start to last word start (v3's last-word end runs to the end of the file)."""
+    return (len(words) - 1) / max(0.1, words[-1]['start'] - words[0]['start']) if len(words) > 1 else 0.0
 
 
 def check_tags(text):
@@ -160,11 +179,16 @@ def main():
     ap.add_argument('--stability', type=float, default=0.7)
     ap.add_argument('--speed', type=float, default=1.0)
     ap.add_argument('--yes', action='store_true', help='actually spend credits')
+    ap.add_argument('--pick', default='', help='overrule the ranking by ear, e.g. "open=2,filter-and-clear=1"')
+    ap.add_argument('--reference-pace', type=float, default=None,
+                    help='words per second of an approved take; picks the take closest to it in pace')
     a = ap.parse_args()
     if not 0.6 <= a.stability <= 0.75:
         sys.exit('Stability must stay within 0.6 to 0.75 (config/defaults.json).')
     if not 0.94 <= a.speed <= 1.08:
         sys.exit('Speed must stay within 0.94 to 1.08 (config/defaults.json).')
+    picks = dict((n, int(k)) for n, k in (p.split('=') for p in a.pick.split(',') if p))
+    ref = a.reference_pace or CONFIG_REF_PACE
     sc = json.load(open(a.script))
     for s in sc['sections']:
         check_tags(s['talk'])
@@ -184,10 +208,18 @@ def main():
         for k in range(1, a.takes + 1):
             x, w = fetch(os.path.join(a.out, f'{s["name"]}_take{k}'), sc['voice_id'], s['talk'], settings, key)
             f = finality(x, SR, w)
-            score = (f['end_above_floor_st'] + max(0, f['last_word_db_vs_median'])) if f else 99
+            fin = (f['end_above_floor_st'] + max(0, f['last_word_db_vs_median'])) if f else 99
+            wps = pace(w)
+            score = (abs(wps - ref), fin) if ref else (fin,)
             cands.append((score, k, x, w, f))
-            report.append(f'{s["name"]} take{k}: {f}')
-        _, k, x, w, _ = min(cands, key=lambda c: c[0])
+            report.append(f'{s["name"]} take{k}: pace {wps:.2f} words/s, finality {f}')
+        if s['name'] in picks:
+            k = picks[s['name']]
+            _, k, x, w, _ = next(c for c in cands if c[1] == k)
+            how = 'picked by ear'
+        else:
+            _, k, x, w, _ = min(cands, key=lambda c: c[0])
+            how = f'closest to reference pace {ref:.2f}' if ref else 'most finished ending'
         seg, ws, tail, cuts = shape(x, w, final)
         if out:
             out += [0.0] * int(max(0.05, SECTION_GAP - prev_tail) * SR)
@@ -197,9 +229,11 @@ def main():
         windows.append({'section': s['name'], 'take': k, 'start': round(off, 3), 'end': round(len(out) / SR, 3)})
         words_all += [{'section': s['name'], 'w': v['w'], 'start': round(v['start'] + off, 3),
                        'end': round(v['end'] + off, 3)} for v in ws]
-        report.append(f'{s["name"]}: using take{k}; pause edits: {", ".join(cuts) or "none"}')
+        report.append(f'{s["name"]}: using take{k} ({how}); pause edits: {", ".join(cuts) or "none"}')
     dsp.write_wav(os.path.join(a.out, 'voice_dry.wav'), out, SR)
     treated, info = treat(out, SR)
+    tone, info['room_tone'] = room_tone()
+    treated = add_room_tone(treated, tone, SR, tone_lufs=-62.0)
     dsp.write_wav(os.path.join(a.out, 'voice.wav'), treated, SR)
     json.dump({'model': MODEL, 'voice_id': sc['voice_id'], 'settings': settings, 'treatment': info,
                'sections': windows, 'words': words_all, 'duration': round(len(out) / SR, 3)},

@@ -44,7 +44,17 @@ def finality(x, sr, words):
     fs = sorted(f for _, f in tr); floor = fs[len(fs) // 10]
     last = words[-1]
     lw = [(t, f) for t, f in tr if last['start'] <= t <= last['end'] + 0.08]
-    if len(lw) < 3: return None
+    if len(lw) < 3:
+        # eleven_v3's timings drift late at the end of a take, so the reported last word can sit on silence.
+        # Fall back to the last unbroken voiced run in the audio (3+ frames, gaps under 30 ms).
+        runs, run = [], tr[:1]
+        for p, q in zip(tr, tr[1:]):
+            if q[0] - p[0] <= 0.03: run.append(q)
+            else: runs.append(run); run = [q]
+        runs.append(run)
+        runs = [r for r in runs if len(r) >= 3]
+        if not runs: return None
+        lw = runs[-1]
     back = median([f for _, f in lw[len(lw) * 3 // 5:]])
     rms = lambda w: math.sqrt(sum(v * v for v in x[int(w['start'] * sr):int(w['end'] * sr)]) / max(1, int((w['end'] - w['start']) * sr)))
     word_db = [20 * math.log10(max(1e-9, rms(w))) for w in words]
