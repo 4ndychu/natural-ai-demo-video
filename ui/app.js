@@ -87,12 +87,16 @@ class Component extends DCLogic {
     const markedSecs = Object.keys(D.notes || {}).filter((k) => D.notes[k].length);
     const unsure = (D.blurs || []).filter((b) => !b.s).length;
     const blurCount = 7 + Object.keys(st.shown).filter((k) => !st.shown[k]).length + st.hide.length;
+    const baseSec = [60, 180, this.total, 480][D.len] || this.total;
+    const lengthSec = Math.round(baseSec * 100 / v.pace);
+    const lengthText = this.fmt(lengthSec);
+    const paceText = (v.pace / 100).toFixed(2) + 'x';
     const kindName = { course: 'course walkthrough', saas: 'quick SaaS demo', tour: 'product tour' }[D.kind];
     const S = [
       { name: 'Script', sub: D.written ? '11 sections' : 'Writing…', title: 'Read the script', help: 'Left is what the voice says, with the ums and restarts that make it sound human. Right is what the captions show. Want a change? Type it in the bar below.', cta: 'Script looks right' },
       { name: 'Voice', sub: voicePretty, title: 'Pick the voice', help: 'Tap a face to pick it and hear it. The recommended settings are already on. Drag any slider to change how it sounds.', cta: 'Use ' + voicePretty },
       { name: 'Privacy', sub: blurCount + ' things blurred', title: 'Check what gets blurred', help: 'Blurring happens before recording, then every frame is checked again. Anything it isn’t sure about shows up in Review.', cta: D.recorded ? 'Blurs look right' : 'Blurs look right, record' },
-      { name: 'Record', sub: D.recorded ? 'Done, 4:56' : (st.cur === D.id && st.recPos < 11 && st.step === 3 ? 'Recording…' : 'Not yet'), title: D.recorded ? 'Recorded' : 'Recording', help: 'The browser runs the clicks while ' + voicePretty + ' talks. You can walk away.', cta: 'Watch the draft', second: D.recorded ? 'Record again' : '' },
+      { name: 'Record', sub: D.recorded ? 'Done, ' + lengthText : (st.cur === D.id && st.recPos < 11 && st.step === 3 ? 'Recording…' : 'Not yet'), title: D.recorded ? 'Recorded' : 'Recording', help: 'The browser runs the clicks while ' + voicePretty + ' talks. You can walk away.', cta: 'Watch the draft', second: D.recorded ? 'Record again' : '' },
       { name: 'Review', sub: marks ? marks + (marks === 1 ? ' mark' : ' marks') : (D.recorded ? 'No marks' : 'Not yet'), title: 'Watch the draft', help: 'Pause on anything that’s off and tap a reason, or say it your way. Only marked sections get redone.', cta: 'Approve and export', second: marks ? 'Redo marked sections' : '' },
       { name: 'Export', sub: D.exported ? 'MP4 + captions' : 'Not yet', title: 'Exported', help: 'Your video and captions are ready.', cta: 'Open folder', second: 'Back to all demos' }
     ];
@@ -148,7 +152,7 @@ class Component extends DCLogic {
       redo: { text: 'Redo ' + markedSecs.length + (markedSecs.length === 1 ? ' section' : ' sections') + ' for about ' + this.num(markedSecs.length * 420) + ' credits?', no: 'Cancel', yes: 'Redo them', act: () => { if (this.needKey()) return; this.spend(markedSecs.length * 420); this.patchDemo({ notes: {} }); this.setState({ confirm: null }); this.say('Redoing ' + markedSecs.length + (markedSecs.length === 1 ? ' section' : ' sections') + '. Draft 2 will be here in a few minutes.'); } }
     };
     const cf = st.confirm ? confirms[st.confirm] : null;
-    const foot = cf ? { text: cf.text, dot: 'var(--danger)', color: 'var(--ink)' } : (st.step === 4 ? { text: marks ? 'Redo ' + markedSecs.length + ' sections, about ' + this.num(markedSecs.length * 420) + ' credits' : (unsure ? unsure + ' blurs to check' : 'Nothing marked'), dot: marks || unsure ? '#E5484D' : 'var(--okDot)', color: 'var(--ink2)' } : { text: [D.written ? 'Approved' : 'Claude is writing the script', voicePretty + ', ' + kindName + ' settings', blurCount + ' things will be blurred', D.recorded ? 'Recorded 4:56' : 'Recording ' + st.recPos + ' of 11', '', D.exported ? 'Done' : ''][st.step], dot: 'var(--okDot)', color: 'var(--ink2)' });
+    const foot = cf ? { text: cf.text, dot: 'var(--danger)', color: 'var(--ink)' } : (st.step === 4 ? { text: marks ? 'Redo ' + markedSecs.length + ' sections, about ' + this.num(markedSecs.length * 420) + ' credits' : (unsure ? unsure + ' blurs to check' : 'Nothing marked'), dot: marks || unsure ? '#E5484D' : 'var(--okDot)', color: 'var(--ink2)' } : { text: [D.written ? 'Approved' : 'Claude is writing the script', voicePretty + ', ' + kindName + ' settings', blurCount + ' things will be blurred', D.recorded ? 'Recorded ' + lengthText : 'Recording ' + st.recPos + ' of 11', '', D.exported ? 'Done' : ''][st.step], dot: 'var(--okDot)', color: 'var(--ink2)' });
     const wsw = (done) => ({ bg: done ? 'var(--ink)' : 'transparent', fg: done ? 'var(--sheet)' : 'var(--ink)' });
     const w1 = wsw(st.keyRes === 'ok'), w2 = wsw(st.tools === 'done'), w3 = wsw(st.logged);
     const a = sw(st.caps), l = sw(st.lock), p = sw(st.p720);
@@ -159,7 +163,7 @@ class Component extends DCLogic {
       settings: () => { const prev = { vals: st.vals, hide: st.hide, shown: st.shown, defVoice: st.defVoice, defCap: st.defCap, defCorner: st.defCorner, defCornerText: st.defCornerText }; this.setState({ vals: Object.assign({}, this.presetVals.course), hide: [], shown: { email: false, phone: false, names: false, address: false, money: false, customers: false, counts: false, usage: true, prices: true, dates: true }, defVoice: 'alex', defCap: 'burn', defCorner: 'off', defCornerText: '' }); this.say('Settings reset', () => this.setState(prev)); }
     };
     const keyMsg = st.keyRes === 'ok' ? 'Connected. Starter plan, ' + this.num(st.credits) + ' of 30,000 credits left. Saved in your Mac’s Keychain.' : st.keyRes === 'bad' ? 'That key didn’t work. Check you copied all of it and it has text to speech access.' : '';
-    const videoCost = 4600; const leftAfter = Math.max(0, st.credits - (D.recorded ? 0 : videoCost));
+    const videoCost = Math.round(4600 * baseSec / this.total / 10) * 10; const leftAfter = Math.max(0, st.credits - (D.recorded ? 0 : videoCost));
     const chatClean = (m) => { let s = m.replace(/^(actually|no|ok|okay|wait)[,!.\s]*/i, '').replace(/^(make|do|change)( it| this)?( into)?( a)? demo (of|for|on|about)\s*/i, '').replace(/\s*instead[.!]*$/i, ''); return s.charAt(0).toUpperCase() + s.slice(1); };
     const dSel = (k) => ({ label: pretty(k), on: st.defVoice === k ? 'true' : 'false', pick: () => { this.setState({ defVoice: k }); this.say(pretty(k) + ' is now the default for new demos'); } });
     const capOpts = [['burn', 'Burned in'], ['file', 'Separate file'], ['off', 'Off']];
@@ -189,7 +193,7 @@ class Component extends DCLogic {
       bWhat: st.bWhat, onBWhat: (e) => this.setState({ bWhat: e.target.value }), bHide: st.bHide, onBHide: (e) => this.setState({ bHide: e.target.value }), bNew: st.bNew, onBNew: (e) => this.setState({ bNew: e.target.value }),
       briefEmpty: !st.bWhat.trim(),
       bSites: st.sites.map((s) => ({ label: s.u, on: !st.bNew.trim() && st.bSite === s.u ? 'true' : 'false', pick: () => this.setState({ bSite: s.u, bNew: '' }) })),
-      bWho: ['Complete beginners', 'Some experience', 'Pros'].map((s, i) => ({ label: s, on: st.bWho === i ? 'true' : 'false', pick: () => this.setState({ bWho: i }) })),
+      bWho: ['Beginners', 'Some experience', 'Pros'].map((s, i) => ({ label: s, on: st.bWho === i ? 'true' : 'false', pick: () => this.setState({ bWho: i }) })),
       bLen: ['1 min', '3 min', '5 min', '8 min'].map((s, i) => ({ label: s, on: st.bLen === i ? 'true' : 'false', pick: () => this.setState({ bLen: i }) })),
       bVoices: st.mine.map((k) => ({ label: pretty(k), on: st.bVoice === k ? 'true' : 'false', pick: () => this.setState({ bVoice: k }) })),
       bCaps: segOf(capOpts, st.bCap, (x) => this.setState({ bCap: x })),
@@ -203,6 +207,9 @@ class Component extends DCLogic {
       defCaps: segOf(capOpts, st.defCap, (x) => this.setState({ defCap: x })),
       defCorner: segOf(posOpts, st.defCorner, (x) => this.setState({ defCorner: x })),
       defCornerText: st.defCornerText, onDefCornerText: (e) => this.setState({ defCornerText: e.target.value }), defCornerOff: st.defCorner === 'off', defCornerOp: st.defCorner === 'off' ? 0.45 : 1,
+      lengthText: lengthText, paceText: paceText,
+      scriptLenLine: this.secs.length + ' sections, about ' + lengthText + ' at ' + paceText + ' pace. Drag Pace in the Voice step and this length changes with it.',
+      lenHint: (() => { const w = st.bWhat.trim(); if (!w) return 'Type what to show and Claude suggests a length.'; const steps = 1 + (w.match(/,| then | and /gi) || []).length; const mins = Math.max(1, steps + (st.bWho === 0 ? 1 : st.bWho === 2 ? -1 : 0)); const opts = [1, 3, 5, 8]; let best = 0; opts.forEach((o, i) => { if (Math.abs(o - mins) < Math.abs(opts[best] - mins)) best = i; }); const chosen = opts[st.bLen]; return 'Suggested for this brief: about ' + opts[best] + ' min. ' + chosen + ' min is roughly ' + this.num(chosen * 150) + ' words of script at normal pace.'; })(),
       cancelBrief: () => this.setState({ screen: st.editing ? 'demo' : 'home' }),
       submitBrief: () => {
         const w = st.bWhat.trim(); if (!w) return; const t = w.length > 34 ? w.slice(0, 32).replace(/\s+\S*$/, '') + '…' : w; const site = st.bNew.trim() || st.bSite || 'whop.com';
@@ -246,7 +253,7 @@ class Component extends DCLogic {
       tier2: [row('email', 'Email addresses'), row('phone', 'Phone numbers'), row('names', 'Real names and profile photos'), row('address', 'Addresses'), row('money', 'Revenue and money figures'), row('customers', 'Customer details'), row('counts', 'Follower and member counts')],
       tier3: [row('usage', 'Usage stats, like token usage'), row('prices', 'Prices on public pages'), row('dates', 'Dates')],
       recBadge: D.recorded ? 'Recorded' : 'Recording live', recBadgeDot: D.recorded ? 'var(--okDot)' : '#FF5A4E',
-      recHead: D.recorded ? 'All 11 sections recorded' : 'Section ' + Math.min(11, st.recPos + 1) + ' of 11', recLeft: D.recorded ? '4:56' : 'about ' + Math.max(1, Math.ceil((11 - st.recPos) * 0.3)) + ' min left',
+      recHead: D.recorded ? 'All 11 sections recorded' : 'Section ' + Math.min(11, st.recPos + 1) + ' of 11', recLeft: D.recorded ? lengthText : 'about ' + Math.max(1, Math.ceil((11 - st.recPos) * 0.3)) + ' min left',
       recPct: (D.recorded ? 100 : st.recPos / 11 * 100) + '%', recNote: D.recorded ? 'Want a fresh take? Record again redoes every section.' : 'You can close this page. Claude will tell you in chat when the draft is ready.',
       recRows: this.secs.map((s, i) => { const done = D.recorded || i < st.recPos; const now = !D.recorded && i === st.recPos; return { n: s.n, mark: done ? '✓' : now ? '•' : '', c: done || now ? 'var(--ink)' : 'var(--ink2)' }; }),
       revSecs: revSecs, noteDraft: st.noteDraft, onNote: (e) => this.setState({ noteDraft: e.target.value }),
@@ -258,7 +265,7 @@ class Component extends DCLogic {
       togglePlayer: () => { if (st.player) { this.stop('player'); this.setState({ player: false }); return; } this.setState({ player: true }); this.every('player', 250, () => { const t = this.state.revT + 1; if (t >= this.total) { this.stop('player'); this.setState({ player: false, revT: this.total }); return; } let s = 0; for (let i = 0; i < this.secs.length; i++) if (t >= this.starts[i]) s = i; this.setState({ revT: t, sel: s }); }); },
       blurs: (D.blurs || []).map((b) => ({ t: b.t, what: b.what, unsure: !b.s, done: !!b.s, status: b.s === 'keep' ? 'Kept blurred' : 'Shown', keep: () => this.patchDemo({ blurs: D.blurs.map((x) => x.id === b.id ? Object.assign({}, x, { s: 'keep' }) : x) }), show: () => this.patchDemo({ blurs: D.blurs.map((x) => x.id === b.id ? Object.assign({}, x, { s: 'show' }) : x) }), undo: () => this.patchDemo({ blurs: D.blurs.map((x) => x.id === b.id ? Object.assign({}, x, { s: '' }) : x) }) })),
       autoBlurNote: (blurCount - 1) + ' other kinds of thing were blurred automatically wherever they appeared.',
-      files: [{ n: base + '.mp4', s: '1080p, 4:58' + (dCap === 'burn' ? ', captions in' : '') }].concat(dCap !== 'off' ? [{ n: base + '.srt', s: 'captions' }] : []).concat([{ n: base + '.txt', s: 'transcript' }]).concat(st.p720 ? [{ n: base + ' (720p).mp4', s: 'preview' }] : []),
+      files: [{ n: base + '.mp4', s: '1080p, ' + lengthText + (dCap === 'burn' ? ', captions in' : '') }].concat(dCap !== 'off' ? [{ n: base + '.srt', s: 'captions' }] : []).concat([{ n: base + '.txt', s: 'transcript' }]).concat(st.p720 ? [{ n: base + ' (720p).mp4', s: 'preview' }] : []),
       p720On: p.onStr, p720Track: p.track, p720X: p.x, toggle720: () => this.setState({ p720: !st.p720 }),
       exportNote: 'Captions ' + capName[dCap] + (dCorner !== 'off' && dCornerText.trim() ? ', corner label \u201c' + dCornerText.trim() + '\u201d' : ', no corner label') + '. Saved in your Videos folder. Your marks on this demo were used to tune ' + voicePretty + '’s defaults for next time.',
       key: st.key, onKey: (e) => this.setState({ key: e.target.value, keyRes: null }), keyType: st.keyType, keyTypeLabel: st.keyType === 'password' ? 'Show' : 'Hide', toggleKeyType: () => this.setState({ keyType: st.keyType === 'password' ? 'text' : 'password' }),

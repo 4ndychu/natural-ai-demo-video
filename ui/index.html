@@ -12,15 +12,22 @@
 [v-cloak]{display:none}
 
 body{margin:0}
-.t-light{--ground:#E4E4E1;--tray:#EDEDEB;--sheet:#FFFFFF;--ink:#111111;--ink2:#55554F;--line:#DEDEDA;--wash:rgba(17,17,17,0.06);--fill:rgba(17,17,17,0.13);--ok:#1D7A4A;--okDot:#1D9E5A;--warnBg:#FFF1D9;--warnInk:#6B4300;--markBg:#FFE3DC;--markInk:#9A2410;--danger:#B3261E;--screen:#0E0E10;color-scheme:light}
-.t-dark{--ground:#0C0C0E;--tray:#17171A;--sheet:#212125;--ink:#F2F2F0;--ink2:#AAAAA3;--line:#303035;--wash:rgba(242,242,240,0.07);--fill:rgba(242,242,240,0.15);--ok:#7FD9A2;--okDot:#3CCB7F;--warnBg:#3A2C10;--warnInk:#FFD892;--markBg:#3E1F18;--markInk:#FFB4A2;--danger:#FF8A80;--screen:#000000;color-scheme:dark}
+.t-light{--ground:#E4E4E1;--tray:#EDEDEB;--sheet:#FFFFFF;--ink:#111111;--ink2:#55554F;--line:#DEDEDA;--wash:rgba(17,17,17,0.06);--fill:rgba(17,17,17,0.13);--ok:#1D7A4A;--okDot:#1D9E5A;--warnBg:#FFF1D9;--warnInk:#6B4300;--markBg:#FFE3DC;--markInk:#9A2410;--danger:#B3261E;--screen:#0E0E10;--focus:#8A8A84;color-scheme:light}
+.t-dark{--ground:#0C0C0E;--tray:#17171A;--sheet:#212125;--ink:#F2F2F0;--ink2:#AAAAA3;--line:#303035;--wash:rgba(242,242,240,0.07);--fill:rgba(242,242,240,0.15);--ok:#7FD9A2;--okDot:#3CCB7F;--warnBg:#3A2C10;--warnInk:#FFD892;--markBg:#3E1F18;--markInk:#FFB4A2;--danger:#FF8A80;--screen:#000000;--focus:#6E6E76;color-scheme:dark}
 .wide{font-family:'Mona Sans',sans-serif;font-stretch:125%;font-weight:560;letter-spacing:-0.02em}
 .mono{font-family:'Geist Mono',ui-monospace,monospace;font-size:12px}
 button,input,textarea{font:inherit;color:inherit}
 button{cursor:pointer;transition:transform 90ms cubic-bezier(.22,1,.36,1),background-color 180ms ease,box-shadow 180ms ease,opacity 180ms ease}
 button:active{transform:scale(0.97)}
 button[disabled]{cursor:not-allowed}
-:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+:focus{outline:none}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+input:focus-visible,textarea:focus-visible{outline:none}
+input,textarea{transition:border-color 160ms ease,box-shadow 160ms ease}
+input:focus,textarea:focus{border-color:var(--focus)!important;box-shadow:0 0 0 3px var(--wash)}
+#chatin:focus{box-shadow:none}
+textarea{resize:none}
+::selection{background:var(--fill)}
 .tray{background:var(--tray);border-radius:26px;padding:6px}
 .sheet{background:var(--sheet);border-radius:20px}
 .foot{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 12px 8px 14px;min-height:48px}
@@ -41,7 +48,7 @@ button[disabled]{cursor:not-allowed}
 .bar .bv{position:absolute;right:14px;top:50%;transform:translateY(-50%);width:92px;text-align:right;white-space:nowrap;pointer-events:none}
 .bar .rec{position:absolute;top:8px;bottom:8px;width:2px;margin-left:-1px;background:var(--ink);opacity:0.35;pointer-events:none}
 .bar input{position:absolute;inset:0;width:100%;height:100%;margin:0;opacity:0;pointer-events:none}
-.bar:focus-within{outline:2px solid var(--ink);outline-offset:2px}
+.bar:focus-within{outline:2px solid var(--focus);outline-offset:2px}
 .sw{width:46px;height:28px;border-radius:14px;border:0;padding:3px;display:inline-flex;flex:none}
 .sw span{width:22px;height:22px;border-radius:11px;background:#FFFFFF;transition:transform 220ms cubic-bezier(.28,1.4,.36,1)}
 .chip{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 12px;border-radius:999px;background:var(--wash);font-size:14px}
@@ -214,6 +221,7 @@ button[disabled]{cursor:not-allowed}
 </div>
 </div>
 <div v-if="scriptReady" style="display: contents">
+<p style="margin: -8px 0 16px; padding: 10px 14px; border-radius: 12px; background: var(--wash)">{{scriptLenLine}}</p>
 <div style="display: grid; grid-template-columns: 70px 1fr 1fr; gap: 0 18px">
 <span class="mono" style="color: var(--ink2); padding-bottom: 8px">Time</span><span style="font-weight: 500; padding-bottom: 8px">{{voiceName}} says</span><span style="font-weight: 500; padding-bottom: 8px">Captions show</span>
 <div v-for="r in script" style="display: contents">
@@ -285,6 +293,7 @@ button[disabled]{cursor:not-allowed}
 </div>
 </div>
 <div class="tray"><div class="sheet" style="padding: 14px 16px">
+<div style="display: flex; justify-content: space-between; margin-bottom: 4px"><span>Video length</span><span class="mono" style="font-size: 13px">about {{lengthText}} at {{paceText}}</span></div>
 <div style="display: flex; justify-content: space-between"><span>This video</span><span class="mono" style="font-size: 13px">~{{videoCostText}} cr</span></div>
 <div style="display: flex; justify-content: space-between; margin-top: 4px; color: var(--ink2)"><span>Left after</span><span class="mono" style="font-size: 13px">{{leftAfterText}} of 30,000</span></div>
 <div style="display: flex; gap: 2px; height: 6px; margin-top: 10px"><span :style="'width: ' + (usedPct) + '; background: var(--ink); border-radius: 3px'"></span><span :style="'width: ' + (thisPct) + '; background: ' + (voiceColor) + '; border-radius: 3px'"></span><span style="flex: 1; background: var(--wash); border-radius: 3px"></span></div>
@@ -358,7 +367,7 @@ button[disabled]{cursor:not-allowed}
 <div v-for="t in ticks" style="display: contents"><span aria-hidden="true" :style="'position: absolute; top: 8px; left: ' + (t) + '; width: 1px; height: 12px; background: var(--ink2); pointer-events: none'"></span></div>
 <div v-for="m in markPins" style="display: contents"><span aria-hidden="true" :style="'position: absolute; top: 2px; left: ' + (m) + '; width: 10px; height: 10px; margin-left: -5px; border-radius: 5px; background: #E5484D; pointer-events: none'"></span></div>
 </div>
-<span class="mono" style="font-size: 13px; color: var(--ink2)">4:56</span>
+<span class="mono" style="font-size: 13px; color: var(--ink2)">{{lengthText}}</span>
 </div>
 <div style="margin-top: 16px; padding: 12px 14px; border-radius: 14px; background: var(--wash)">
 <div style="display: flex; justify-content: space-between; align-items: center; gap: 12px"><span style="font-weight: 500">On screen</span><span style="font-size: 13px; color: var(--ink2)">Free to change. Only the render changes, no credits.</span></div>
@@ -402,7 +411,7 @@ button[disabled]{cursor:not-allowed}
 
 <div v-if="st5" style="display: contents">
 <div style="display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 18px">
-<div style="position: relative; aspect-ratio: 16 / 9; border-radius: 16px; overflow: hidden"><img :src="(demoCover)" alt="" style="width: 100%; height: 100%; object-fit: cover"><span style="position: absolute; left: 14px; bottom: 14px; background: rgba(17,17,17,0.82); color: #FFF; padding: 6px 12px; border-radius: 999px; font-size: 13px">Final, 4:58</span></div>
+<div style="position: relative; aspect-ratio: 16 / 9; border-radius: 16px; overflow: hidden"><img :src="(demoCover)" alt="" style="width: 100%; height: 100%; object-fit: cover"><span style="position: absolute; left: 14px; bottom: 14px; background: rgba(17,17,17,0.82); color: #FFF; padding: 6px 12px; border-radius: 999px; font-size: 13px">Final, {{lengthText}}</span></div>
 <div>
 <div v-for="f in files" style="display: contents"><div class="row"><span class="dot" style="background: var(--okDot)"></span><span style="flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">{{f.n}}</span><span class="mono" style="color: var(--ink2)">{{f.s}}</span></div></div>
 <div class="row"><span id="p720" style="flex: 1">Also make a small 720p preview</span><button type="button" class="sw" role="switch" :aria-checked="(p720On)" aria-labelledby="p720" @click="toggle720($event)" :style="'background: ' + (p720Track)"><span :style="'transform: translateX(' + (p720X) + ')'"></span></button></div>
@@ -433,14 +442,14 @@ button[disabled]{cursor:not-allowed}
 <p style="margin: 0 4px 18px; color: var(--ink2); font-size: 17px">Tell Claude what to show. It explores the site, writes the script, then walks you through the rest.</p>
 <div class="tray">
 <div class="sheet" style="padding: 24px 26px; display: flex; flex-direction: column; gap: 20px">
-<div><label for="bw" style="display: block; font-weight: 500; margin-bottom: 8px">What should the demo show?</label><textarea id="bw" rows="3" :value="(bWhat)" @input="onBWhat($event)" @change="onBWhat($event)" placeholder="e.g. How to build a course in Whop, from creating the whop to checking it on a phone" style="width: 100%; box-sizing: border-box; border-radius: 12px; border: 1px solid var(--line); background: var(--sheet); padding: 12px 14px; font-size: 16px; resize: vertical"></textarea></div>
+<div><label for="bw" style="display: block; font-weight: 500; margin-bottom: 8px">What should the demo show?</label><textarea id="bw" rows="3" :value="(bWhat)" @input="onBWhat($event)" @change="onBWhat($event)" placeholder="e.g. How to build a course in Whop, from creating the whop to checking it on a phone" style="width: 100%; box-sizing: border-box; border-radius: 12px; border: 1px solid var(--line); background: var(--sheet); padding: 12px 14px; font-size: 16px; resize: none"></textarea></div>
 <div><div style="font-weight: 500; margin-bottom: 8px">Which site?</div>
 <div class="seg" role="group" aria-label="Saved sites"><div v-for="o in bSites" style="display: contents"><button type="button" :aria-pressed="(o.on)" @click="o.pick($event)">{{o.label}}</button></div></div>
 <div style="display: flex; gap: 8px; margin-top: 8px"><label for="bns" class="sr">Or a new site</label><input id="bns" type="text" :value="(bNew)" @input="onBNew($event)" @change="onBNew($event)" placeholder="Or type a new site, e.g. app.yourproduct.com" style="flex: 1; min-width: 0; height: 44px; border-radius: 12px; border: 1px solid var(--line); background: var(--sheet); padding: 0 14px; box-sizing: border-box"></div>
 <div style="font-size: 13px; color: var(--ink2); margin-top: 6px">A new site asks you to log in once, then it's saved.</div></div>
 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr)); gap: 20px">
-<div><div style="font-weight: 500; margin-bottom: 8px">Who's watching?</div><div class="seg" role="group" aria-label="Who's watching"><div v-for="o in bWho" style="display: contents"><button type="button" :aria-pressed="(o.on)" @click="o.pick($event)">{{o.label}}</button></div></div></div>
-<div><div style="font-weight: 500; margin-bottom: 8px">How long?</div><div class="seg" role="group" aria-label="How long"><div v-for="o in bLen" style="display: contents"><button type="button" :aria-pressed="(o.on)" @click="o.pick($event)">{{o.label}}</button></div></div></div>
+<div><div style="font-weight: 500; margin-bottom: 8px">Who's watching?</div><div class="seg" role="group" aria-label="Who's watching"><div v-for="o in bWho" style="display: contents"><button type="button" :aria-pressed="(o.on)" @click="o.pick($event)" style="min-width: 0">{{o.label}}</button></div></div></div>
+<div><div style="font-weight: 500; margin-bottom: 8px">How long?</div><div class="seg" role="group" aria-label="How long"><div v-for="o in bLen" style="display: contents"><button type="button" :aria-pressed="(o.on)" @click="o.pick($event)" style="min-width: 0">{{o.label}}</button></div></div><div style="font-size: 13px; color: var(--ink2); margin-top: 6px; min-height: 38px">{{lenHint}}</div></div>
 </div>
 <div><label for="bh" style="display: block; font-weight: 500; margin-bottom: 8px">Anything to keep off screen? <span style="font-weight: 400; color: var(--ink2)">Optional</span></label><input id="bh" type="text" :value="(bHide)" @input="onBHide($event)" @change="onBHide($event)" placeholder="e.g. the billing page, my real store name" style="width: 100%; height: 46px; box-sizing: border-box; border-radius: 12px; border: 1px solid var(--line); background: var(--sheet); padding: 0 14px"></div>
 <div><div style="font-weight: 500; margin-bottom: 8px">Voice</div><div class="seg" role="group" aria-label="Voice"><div v-for="o in bVoices" style="display: contents"><button type="button" :aria-pressed="(o.on)" @click="o.pick($event)">{{o.label}}</button></div></div><div style="font-size: 13px; color: var(--ink2); margin-top: 6px">You can fine-tune it in the Voice step.</div></div>
