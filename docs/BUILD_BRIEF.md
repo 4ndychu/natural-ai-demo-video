@@ -53,7 +53,7 @@ Build in this order. Stop at the end of each phase, report in plain words, and w
 
 ### Phase 5: render and export
 - ffmpeg render: video + takes + room tone. Captions burned in / .srt only / off. Corner label off by default, or the user's text in their chosen corner. No other overlays.
-- Export MP4 1080p, .srt (unless captions are off), transcript .txt, optional 720p preview. Name files after the demo title.
+- Export MP4 1080p, .srt (unless captions are off), transcript .txt, optional 720p preview. Name files after the demo title. Save them to the folder the user names in the brief or chat (for example their own project folder), defaulting to `~/Movies/NAVI`. Never inside the skill's repo.
 - Redo only the sections marked in Review.
 - **Check:** all three caption modes and a corner label render correctly. Changing them re-renders without new voice or recording.
 

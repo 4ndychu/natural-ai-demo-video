@@ -89,7 +89,7 @@ Open the local app on the Review step. The user marks moments (sounds like AI, n
 
 ### 8. Export
 
-Apply the demo's caption setting (burned in, separate .srt, or off) and corner label (off, or the user's text in the chosen corner); changing either is a re-render only, no credits. Render the MP4 (1080p), captions (.srt unless captions are off) and a transcript, plus an optional 720p preview, into the user's videos folder. Name the files after the demo title.
+Apply the demo's caption setting (burned in, separate .srt, or off) and corner label (off, or the user's text in the chosen corner); changing either is a re-render only, no credits. Render the MP4 (1080p), captions (.srt unless captions are off) and a transcript, plus an optional 720p preview, into the folder the user names (default `~/Movies/NAVI`), so a video can land straight in the project it belongs to. Name the files after the demo title.
 
 ## Your data
 
