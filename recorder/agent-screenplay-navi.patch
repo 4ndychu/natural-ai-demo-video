@@ -1,0 +1,207 @@
+diff --git a/src/direct/plan.ts b/src/direct/plan.ts
+index 078f33c..2ab1373 100644
+--- a/src/direct/plan.ts
++++ b/src/direct/plan.ts
+@@ -96,7 +96,7 @@ export function planTake(take: Take, scenario: Scenario, opts: PlanOptions): Pla
+ 
+   const emitCapture = (sEnd: number) => {
+     if (sEnd <= sp + 1e-6) return;
+-    const waits = mergeSpans(steps.flatMap((s) => s.waits)).filter(([a, b]) => b > sp && a < sEnd);
++    const waits = scenario.realtime ? [] : mergeSpans(steps.flatMap((s) => s.waits)).filter(([a, b]) => b > sp && a < sEnd);
+     let cur = sp;
+     for (const [a0, b0] of waits) {
+       const a = Math.max(a0, cur);
+@@ -132,7 +132,48 @@ export function planTake(take: Take, scenario: Scenario, opts: PlanOptions): Pla
+ 
+   const stepTimes: Plan["stepTimes"] = [];
+   const voice: VoiceClip[] = [];
+-  for (const st of steps) {
++  const schedule = scenario.schedule;
++  if (schedule) {
++    // Scheduled edit: each scheduled step's action lands at its given output time. Between two anchors the
++    // recording plays at normal speed and the frame is held just before the next cursor move when there is time
++    // to spare; when the recording is late the stretch is sped up evenly. Nothing else is cut.
++    const anchors: Array<{ s: number; o: number; hold: number }> = [{ s: 0, o: 0, hold: 0 }];
++    for (const st of steps) {
++      const target = schedule[st.index];
++      if (target === null || target === undefined) continue;
++      const s = st.actionAt ?? st.start;
++      const prev = anchors[anchors.length - 1];
++      if (s <= prev.s || target <= prev.o) continue;
++      anchors.push({ s, o: target, hold: Math.max(prev.s, Math.min(s, st.travelStart ?? st.start)) });
++    }
++    for (let k = 1; k < anchors.length; k++) {
++      const a = anchors[k - 1];
++      const b = anchors[k];
++      const ds = b.s - a.s;
++      const dO = b.o - a.o;
++      if (ds <= dO) {
++        const h = b.hold;
++        if (h > a.s) pieces.push({ kind: "capture", o0: op, o1: op + (h - a.s), s0: a.s, s1: h });
++        op += h - a.s;
++        const freeze = dO - ds;
++        if (freeze > 1e-3) pieces.push({ kind: "capture", o0: op, o1: op + freeze, s0: h, s1: h });
++        op += freeze;
++        if (b.s > h) pieces.push({ kind: "capture", o0: op, o1: op + (b.s - h), s0: h, s1: b.s });
++        op += b.s - h;
++      } else {
++        pieces.push({ kind: "capture", o0: op, o1: op + dO, s0: a.s, s1: b.s });
++        op += dO;
++      }
++    }
++    const last = anchors[anchors.length - 1].s;
++    if (take.duration > last) pieces.push({ kind: "capture", o0: op, o1: op + (take.duration - last), s0: last, s1: take.duration });
++    op += Math.max(0, take.duration - last);
++    sp = take.duration;
++    for (const st of steps) {
++      stepTimes[st.index] = { o0: srcToOut(st.start), o1: srcToOut(st.end), oAction: st.actionAt !== undefined ? srcToOut(st.actionAt) : undefined };
++    }
++  }
++  for (const st of schedule ? [] : steps) {
+     const audio = opts.audio.get(st.index);
+     if (st.card && opts.cards === false) {
+       // Cards are off: the step takes no time in the video. A video that started with one
+@@ -168,7 +209,7 @@ export function planTake(take: Take, scenario: Scenario, opts: PlanOptions): Pla
+     stepTimes[st.index] = { o0, o1: op, oAction: st.actionAt !== undefined ? srcToOut(st.actionAt) : undefined };
+     if (audio) voice.push({ file: audio.file, at: o0 + 0.05, duration: audio.duration });
+   }
+-  emitCapture(take.duration);
++  if (!schedule) emitCapture(take.duration);
+   const duration = op;
+   const frameCount = Math.max(1, Math.ceil(duration * opts.fps));
+ 
+diff --git a/src/drivers/web.ts b/src/drivers/web.ts
+index 7857c45..8edef9a 100644
+--- a/src/drivers/web.ts
++++ b/src/drivers/web.ts
+@@ -99,6 +99,18 @@ export async function runWeb(loaded: LoadedScenario, opts: WebRunOptions): Promi
+         else add();
+       });
+     }
++    if (scenario.css) {
++      await context.addInitScript((css: string) => {
++        const add = () => {
++          const style = document.createElement("style");
++          style.setAttribute("data-screenplay-css", "");
++          style.textContent = css;
++          (document.head ?? document.documentElement).appendChild(style);
++        };
++        if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", add);
++        else add();
++      }, scenario.css);
++    }
+     const page = await context.newPage();
+     page.setDefaultTimeout(ACTION_TIMEOUT_MS);
+ 
+@@ -151,6 +163,7 @@ export async function runWeb(loaded: LoadedScenario, opts: WebRunOptions): Promi
+     const checks: CheckStepResult[] = [];
+     await sleepIf(0.6);
+ 
++    let liveZero: number | undefined;
+     for (let i = 0; i < scenario.steps.length; i++) {
+       const step = scenario.steps[i];
+       const kind = stepKind(step);
+@@ -159,6 +172,16 @@ export async function runWeb(loaded: LoadedScenario, opts: WebRunOptions): Promi
+       navigated = false;
+       const ts: TakeStep = { index: i, kind, label, start: now(), end: 0, waits: [] };
+       const minDuration = opts.minDurations?.[i] ?? 0;
++      const startAt = record ? scenario.startAt?.[i] : undefined;
++      if (startAt !== null && startAt !== undefined) {
++        if (i === 0) liveZero = now();
++        else if (liveZero !== undefined) {
++          const late = now() - (liveZero + startAt);
++          if (late < 0) await sleepIf(-late);
++          else if (late > 0.05) log(`  step ${i + 1} starts ${late.toFixed(2)} s late`);
++        }
++        ts.start = now();
++      }
+       try {
+         cursor = await runStep(page, step, ts, cursor, {
+           record,
+@@ -168,6 +191,7 @@ export async function runWeb(loaded: LoadedScenario, opts: WebRunOptions): Promi
+           minDuration,
+           typingSpeed: scenario.typingSpeed ?? 1,
+           seed: i + 1,
++          dir: loaded.dir,
+         });
+       } catch (e) {
+         const err = e instanceof StepError ? e : new StepError(i, label, (e as Error).message);
+@@ -238,6 +262,8 @@ interface StepCtx {
+   minDuration: number;
+   typingSpeed: number;
+   seed: number;
++  /** The scenario's folder, for files chosen in a file chooser. */
++  dir: string;
+ }
+ 
+ async function runStep(page: Page, step: Step, ts: TakeStep, cursor: Point, ctx: StepCtx): Promise<Point> {
+@@ -308,6 +334,32 @@ async function runStep(page: Page, step: Step, ts: TakeStep, cursor: Point, ctx:
+       const { box, point } = await resolve(s.click);
+       const p = await travelTo(box, point);
+       ts.actionAt = now();
++      if (s.dragTo) {
++        const to = await resolve(s.dragTo);
++        if (!to.point) throw new StepError(ts.index, ts.label, "dragTo needs an element with a position.");
++        const dest = to.point;
++        await page.mouse.down();
++        const n = 24;
++        for (let k = 1; k <= n; k++) {
++          const e = easeInOut(k / n);
++          await page.mouse.move(p.x + (dest.x - p.x) * e, p.y + (dest.y - p.y) * e);
++          await sleep(28);
++        }
++        await sleep(120);
++        await page.mouse.up();
++        await settleAfterAction(page, ts, now, record);
++        return dest;
++      }
++      if (s.files) {
++        const files = (s.files as string[]).map((f) => path.resolve(ctx.dir, f));
++        const [chooser] = await Promise.all([
++          page.waitForEvent("filechooser", { timeout: ACTION_TIMEOUT_MS }),
++          page.mouse.click(p.x, p.y),
++        ]);
++        await chooser.setFiles(files);
++        await settleAfterAction(page, ts, now, record);
++        return p;
++      }
+       await page.mouse.click(p.x, p.y, { button: s.button ?? "left", clickCount: s.double ? 2 : 1 });
+       await settleAfterAction(page, ts, now, record);
+       return p;
+diff --git a/src/scenario/schema.ts b/src/scenario/schema.ts
+index d9193de..74cf625 100644
+--- a/src/scenario/schema.ts
++++ b/src/scenario/schema.ts
+@@ -69,6 +69,11 @@ const Click = z
+     click: Target,
+     button: z.enum(["left", "right"]).optional(),
+     double: z.boolean().optional(),
++    files: z
++      .array(z.string())
++      .optional()
++      .describe("Web: the click opens a file chooser; these files (relative to the scenario) are chosen in it."),
++    dragTo: Target.optional().describe("Web: press on the element and drag it onto this one instead of clicking."),
+     ...Common,
+   })
+   .strict();
+@@ -270,6 +275,20 @@ export const Scenario = z
+       .object({ storageState: z.string().describe("Path to a session saved by `screenplay login`.") })
+       .optional(),
+     hideScrollbars: z.boolean().optional().describe("Web: hide scrollbars (default true)."),
++    css: z.string().optional().describe("Web: a stylesheet added to every page (for example to blur private details)."),
++    schedule: z
++      .array(z.number().nullable())
++      .optional()
++      .describe(
++        "Output time (seconds) at which each step's action must land, one entry per step (null: not scheduled). The edit holds the frame when the recording is early and speeds it up when it is late; external narration is added afterwards.",
++      ),
++    startAt: z
++      .array(z.number().nullable())
++      .optional()
++      .describe(
++        "Web, recording to a voice track: wall-clock time (seconds after the first step starts) at which each step starts, one entry per step (null: as soon as the previous step ends). The browser waits live; nothing is retimed in the edit.",
++      ),
++    realtime: z.boolean().optional().describe("Edit: play the whole recording at normal speed (page loads and waits are not sped up). Default false."),
+     typingSpeed: z.number().min(0.2).max(5).optional().describe("Typing speed multiplier (default 1, about 14 characters/second)."),
+     style: Style.optional(),
+     voice: Voice.optional(),

@@ -10,7 +10,7 @@ You're building **NAVI**, a Claude skill that makes natural-sounding, faceless d
 4. `config/defaults.json`: every default value and slider range.
 5. `ui/`: the finished local app (open `ui/index.html`). It runs on sample data now; you'll wire it to the engine.
 
-Everything you need is in this repo. The rules in `reference/` were distilled from an earlier pilot; you don't need the pilot itself. Build NAVI from scratch, with generic code and generic examples.
+Everything you need is in this repo. Some pieces already exist and work: `scripts/audio/` (audio toolkit, take ranking, treatment), `scripts/voice/generate.py` (the voice method; adapted, not yet run against the API) and `recorder/` (agent-screenplay plus a patch that records live to the voice). Read their READMEs and build on them rather than rewriting them. The rules in `reference/` were distilled from an earlier pilot; you don't need the pilot itself. Build NAVI from scratch, with generic code and generic examples.
 
 ## Ground rules
 

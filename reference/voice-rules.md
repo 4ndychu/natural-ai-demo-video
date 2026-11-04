@@ -58,6 +58,8 @@ Each section has two versions: the **talking version** the voice reads, and a **
 | Speed | 1.0 (the pace slider moves it within 0.94 to 1.08) | Walkthroughs are never sped up afterwards. |
 | Takes | 2 per section; keep the one closest to the approved reference in pace and tone | The model varies a lot between takes. |
 | Word timings | Get them locally from the finished take (Whisper family), not from a second API call | Needed to time the clicks; avoids extra credits. |
+| Context | Never pass `next_text` or neighbouring text, and never generate sentences separately and stitch them | Both make every sentence sound like it's about to carry on, then stops. |
+| Picking takes | Rank by how finished the section's last sentence sounds (`scripts/audio/finality.py`), then confirm by ear | Pitch checks alone passed takes a listener heard as unfinished. |
 
 ---
 
@@ -76,8 +78,9 @@ Each section has two versions: the **talking version** the voice reads, and a **
 - **Never trim right after a sentence.** The tongue clicks and breaths live there. *(Round 3: the split version lost almost all of them to edge trimming.)*
 - Only shorten silences longer than 0.8 s, cutting from the middle and leaving at least 250 ms after the last word.
 - If a take ends while the last word is still sounding, add a short fade (about 150 ms) into room tone. Skip the fade if the take ends cleanly.
-- Gentle treatment only: de-ess, a small high-shelf cut (about −2.5 dB), light compression.
-- Faint room tone under everything, so gaps never drop to digital silence. **No music bed** in a walkthrough. *(v1 review.)*
+- Find the real end of speech from the audio, not the timing data: eleven_v3's timings run the last word to the end of the file. Never add reverb to fake a decay.
+- Gentle treatment only (`scripts/audio/treat.py`): de-ess 5 to 8 kHz, high shelf −2.5 dB above 8 kHz, light 2:1 compression, voice at −16.4 LUFS, limiter at −2.5 dBFS.
+- Faint room tone under everything (about −62 LUFS, band-limited to 90 Hz to 2.5 kHz), so gaps never drop to digital silence. **No music bed** in a walkthrough. *(v1 review.)*
 - Gap between sections: about 0.35 to 0.45 s, placed where the screen changes step.
 
 ---

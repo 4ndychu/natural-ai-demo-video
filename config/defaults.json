@@ -1,107 +1,244 @@
 {
   "_about": "NAVI defaults. Slider ranges are deliberately narrow so no setting can tip into AI slop. Values come from the W01 listening rounds; see reference/voice-rules.md. Every new review complaint should end up as a change here or a rule there.",
-
   "voice": {
     "model": "eleven_v3",
     "reads": "one continuous read per section",
     "takes_per_section": 2,
     "opening_tag": "[relaxed]",
-    "banned_tags": ["[inhales]", "[exhales]", "[clears throat]", "[coughs]", "[sighs]", "[casually]"],
-    "unreliable_tags": ["[short pause]"],
+    "banned_tags": [
+      "[inhales]",
+      "[exhales]",
+      "[clears throat]",
+      "[coughs]",
+      "[sighs]",
+      "[casually]"
+    ],
+    "unreliable_tags": [
+      "[short pause]"
+    ],
     "stability_default": 0.7,
-    "stability_window": [0.6, 0.75],
+    "stability_window": [
+      0.6,
+      0.75
+    ],
     "speed_default": 1.0,
-    "never_speed_up_after": true
+    "never_speed_up_after": true,
+    "never_pass_next_text": true,
+    "rank_takes_by": "finality of the last sentence (scripts/audio/finality.py), then ear"
   },
-
   "audio_edit": {
     "trim_after_sentence": false,
     "shorten_silences_longer_than_s": 0.8,
     "min_tail_after_last_word_ms": 250,
     "end_fade_ms_if_clipped": 150,
-    "section_gap_s": [0.35, 0.45],
-    "treatment": ["de-ess", "high shelf -2.5 dB", "light compression"],
+    "section_gap_s": [
+      0.35,
+      0.45
+    ],
+    "treatment": [
+      "de-ess",
+      "high shelf -2.5 dB",
+      "light compression"
+    ],
     "room_tone": true,
-    "music_bed": false
+    "music_bed": false,
+    "voice_lufs": -16.4,
+    "limiter_ceiling_dbfs": -2.5,
+    "room_tone_lufs": -62,
+    "room_tone_band_hz": [
+      90,
+      2500
+    ],
+    "find_speech_end_from_audio": true
   },
-
   "sliders": {
     "casual": {
       "label": "Casualness",
-      "min": 3, "max": 8,
+      "min": 3,
+      "max": 8,
       "drives": "script writing: contractions, 'gonna', 'kind of', run-on casual lines",
       "low": "Cleaner, can sound scripted",
       "high": "More 'gonna' and 'kind of'"
     },
     "energy": {
       "label": "Energy",
-      "min": 1, "max": 6,
-      "names": ["", "Very calm", "Calm", "Relaxed", "Warm", "Lively", "Upbeat"],
+      "min": 1,
+      "max": 6,
+      "names": [
+        "",
+        "Very calm",
+        "Calm",
+        "Relaxed",
+        "Warm",
+        "Lively",
+        "Upbeat"
+      ],
       "drives": "stability within the window (higher energy = lower stability) and word choice; tag stays [relaxed]",
       "low": "Steady, can go flat",
       "high": "Livelier, can sound overexcited"
     },
     "pace": {
       "label": "Pace",
-      "min": 94, "max": 108,
+      "min": 94,
+      "max": 108,
       "unit": "ElevenLabs speed x 100",
       "low": "Easy to follow, can drag",
       "high": "Snappy, can rush the clicks"
     },
     "hes": {
       "label": "Hesitations",
-      "min": 0, "max": 3,
-      "names": ["None", "A few", "Some", "More"],
+      "min": 0,
+      "max": 3,
+      "names": [
+        "None",
+        "A few",
+        "Some",
+        "More"
+      ],
       "drives": "fillers and restarts per section written into the talking script; restarts never more than one per section",
       "low": "Can sound too perfect",
       "high": "Human, but too many sounds nervous"
     },
     "breath": {
       "label": "Breaths",
-      "min": 0, "max": 2,
-      "names": ["Trimmed", "Natural", "Kept"],
+      "min": 0,
+      "max": 2,
+      "names": [
+        "Trimmed",
+        "Natural",
+        "Kept"
+      ],
       "drives": "how much of the model's own breathing survives the edit; never adds breaths",
       "low": "Can sound stitched together",
       "high": "Only natural breaths, never forced"
     },
     "swear": {
       "label": "Swearing",
-      "min": 0, "max": 2,
-      "names": ["Off", "One", "A few"],
+      "min": 0,
+      "max": 2,
+      "names": [
+        "Off",
+        "One",
+        "A few"
+      ],
       "drives": "light swears at natural reactions only, never inside an instruction",
       "low": "Fine for any audience",
       "high": "At natural reactions, never in instructions",
       "captions_clean_by_default": true
     }
   },
-
   "presets": {
-    "course": { "label": "Course walkthrough", "casual": 7, "energy": 3, "pace": 100, "hes": 1, "breath": 1, "swear": 0, "mumbles": false },
-    "saas":   { "label": "Quick SaaS demo",    "casual": 8, "energy": 5, "pace": 105, "hes": 2, "breath": 1, "swear": 1, "mumbles": true },
-    "tour":   { "label": "Product tour",       "casual": 5, "energy": 4, "pace": 100, "hes": 0, "breath": 1, "swear": 0, "mumbles": false }
+    "course": {
+      "label": "Course walkthrough",
+      "casual": 7,
+      "energy": 3,
+      "pace": 100,
+      "hes": 1,
+      "breath": 1,
+      "swear": 0,
+      "mumbles": false
+    },
+    "saas": {
+      "label": "Quick SaaS demo",
+      "casual": 8,
+      "energy": 5,
+      "pace": 105,
+      "hes": 2,
+      "breath": 1,
+      "swear": 1,
+      "mumbles": true
+    },
+    "tour": {
+      "label": "Product tour",
+      "casual": 5,
+      "energy": 4,
+      "pace": 100,
+      "hes": 0,
+      "breath": 1,
+      "swear": 0,
+      "mumbles": false
+    }
   },
-
   "voices": {
-    "alex":    { "status": "recommended", "tested": true,  "gender": "m", "color": "#0000F2", "adjust": {} },
-    "jessica": { "status": "untested",    "tested": false, "gender": "f", "color": "#C2300C", "adjust": { "energy": 1 } },
-    "george":  { "status": "untested",    "tested": false, "gender": "m", "color": "#0B4F37", "adjust": { "energy": -1, "pace": -2 } },
-    "brian":   { "status": "untested",    "tested": false, "gender": "m", "color": "#111111", "adjust": { "casual": 1 } },
-    "lily":    { "status": "untested",    "tested": false, "gender": "f", "color": "#4B22D6", "adjust": { "pace": 2, "energy": 1 } },
-    "matilda": { "status": "untested",    "tested": false, "gender": "f", "color": "#000091", "adjust": { "energy": -1 } },
+    "alex": {
+      "status": "recommended",
+      "tested": true,
+      "gender": "m",
+      "color": "#0000F2",
+      "adjust": {}
+    },
+    "jessica": {
+      "status": "untested",
+      "tested": false,
+      "gender": "f",
+      "color": "#C2300C",
+      "adjust": {
+        "energy": 1
+      }
+    },
+    "george": {
+      "status": "untested",
+      "tested": false,
+      "gender": "m",
+      "color": "#0B4F37",
+      "adjust": {
+        "energy": -1,
+        "pace": -2
+      }
+    },
+    "brian": {
+      "status": "untested",
+      "tested": false,
+      "gender": "m",
+      "color": "#111111",
+      "adjust": {
+        "casual": 1
+      }
+    },
+    "lily": {
+      "status": "untested",
+      "tested": false,
+      "gender": "f",
+      "color": "#4B22D6",
+      "adjust": {
+        "pace": 2,
+        "energy": 1
+      }
+    },
+    "matilda": {
+      "status": "untested",
+      "tested": false,
+      "gender": "f",
+      "color": "#000091",
+      "adjust": {
+        "energy": -1
+      }
+    },
     "_note": "Only Alex has been through listening rounds. Untested voices start from these guesses and must be judged by ear before being marked recommended."
   },
-
   "on_screen": {
     "captions": "burn",
-    "captions_options": ["burn", "file", "off"],
+    "captions_options": [
+      "burn",
+      "file",
+      "off"
+    ],
     "corner_label": "off",
-    "corner_options": ["off", "tl", "tr", "bl", "br"],
+    "corner_options": [
+      "off",
+      "tl",
+      "tr",
+      "bl",
+      "br"
+    ],
     "corner_text": "",
     "extra_overlays": "never, unless the user adds them"
   },
-
   "recording": {
-    "viewport": [1920, 1080],
+    "viewport": [
+      1920,
+      1080
+    ],
     "cursor": "standard black arrow",
     "click_feedback": "subtle dark grey",
     "zoom_on_click": "gentle",
@@ -111,7 +248,6 @@
     "record_live_to_voice": true,
     "retime_footage_after": false
   },
-
   "export": {
     "video": "1080p mp4",
     "captions_file": ".srt (unless captions are off)",
