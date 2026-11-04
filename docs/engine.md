@@ -1,6 +1,6 @@
 # NAVI engine
 
-How NAVI turns an approved script into a finished video. Status: **in development**; this document is the spec the engine is being built against.
+How NAVI turns an approved script into a finished video. Status: **in development**; this document is the spec the engine is being built against. The rules it must follow are in [`reference/`](../reference) and the default values in [`config/defaults.json`](../config/defaults.json).
 
 ## Pipeline
 
@@ -54,10 +54,12 @@ Each demo is a list of sections. Each section carries what the voice says, what 
 
 ## 4. Recording: the voice leads
 
-- Playwright runs the schedule against the real clock while the take plays (or against a virtual clock synced to it).
-- If an action finishes early, the next one waits for its word.
-- If an action runs long (a slow page load), the video **holds the last frame** for the gap instead of pausing the voice. The hold is cut or smoothed in the render.
-- The cursor moves along eased paths, and clicks get a short zoom so viewers can follow.
+- Each section's take is generated **before** recording. Playwright then runs the schedule live while the take plays, so every action starts at its word. The footage plays at normal speed under the voice.
+- **No retiming afterwards:** no held frames, no speed-ups, no jumps. Retiming footage to fit the voice was tried and looked glitchy.
+- Long waits (page loads, processing) are placed **at section boundaries**: the section's voice ends, the wait plays at real speed under room tone, and the next section starts once the page has settled.
+- The voice is never paused, cut or sped up to fit the screen.
+- Standard black cursor on eased paths, subtle click feedback, a gentle zoom on the clicked element.
+- Rules and the reasons behind them: [`reference/recording-rules.md`](../reference/recording-rules.md).
 
 ## 5. Privacy
 

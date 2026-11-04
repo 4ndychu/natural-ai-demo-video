@@ -60,7 +60,7 @@ Split the video into short sections (about 15 to 35 seconds each). For each sect
 - **Talking version** (what the voice says): how a person actually explains it out loud. Small restarts, reactions and opinions where the screen earns them; very few fillers.
 - **Caption version** (what's shown): clean, short, no fillers.
 
-Show both side by side and get approval before spending any credits.
+Follow `reference/voice-rules.md`. Show both side by side and get approval before spending any credits.
 
 ### 4. Voice
 
@@ -96,6 +96,11 @@ Apply the demo's caption setting (burned in, separate .srt, or off) and corner l
 From Settings the user can remove the key (remind them to revoke it at ElevenLabs too), forget saved logins, reset settings, or delete everything NAVI saved. Finished videos are never touched. Uninstalling means deleting this skill folder as well.
 
 ## Files
+
+- `reference/voice-rules.md`: how to write the talking script and generate a human-sounding voice. **Read before step 3.**
+- `reference/recording-rules.md`: how to record the screen in time with the voice. **Read before step 6.**
+- `reference/privacy.md`: the blur tiers and warnings. **Read before step 5.**
+- `config/defaults.json`: slider ranges, presets, per-voice settings and on-screen defaults
 
 - `ui/index.html`: the local app (open in a browser; `?start=home|voice|review|settings`, `&theme=light|dark`)
 - `ui/app.js`: screens, state and sample data

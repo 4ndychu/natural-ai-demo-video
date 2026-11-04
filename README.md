@@ -258,6 +258,9 @@ natural-ai-demo-video/
 │   ├── assets/         Voice statues and demo covers
 │   ├── fonts/          Mona Sans, Geist Mono
 │   └── vendor/         petite-vue
+├── reference/          Voice, recording and privacy rules from the listening tests
+├── config/
+│   └── defaults.json   Slider ranges, presets, per-voice settings
 ├── docs/
 │   ├── engine.md       How recording, timing and rendering work
 │   ├── banner.png
