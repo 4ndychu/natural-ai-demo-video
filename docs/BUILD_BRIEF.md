@@ -33,7 +33,7 @@ Build in this order. Stop at the end of each phase, report in plain words, and w
 - Generate one continuous take per section from a talking script, with the settings in `config/defaults.json` (`[relaxed]` only, stability 0.7, speed from the pace slider, no other tags).
 - 2 takes per section; save both; let Andy pick or auto-pick the one closest to a reference take in pace.
 - Audio edit exactly as `voice-rules.md` section 4: no trimming after sentences, shorten silences over 0.8 s from the middle, short fade only if clipped, light treatment, room tone, no music.
-- **Check:** a test script in generic content (not XRM), 3 short sections. **Andy listens and approves** before Phase 2.
+- **Check:** a test script with generic content, 3 short sections. **Andy listens and approves** before Phase 2.
 
 ### Phase 2: timing
 - Word timestamps from the finished take, locally (no API call).
