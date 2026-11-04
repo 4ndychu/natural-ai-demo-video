@@ -1,0 +1,19 @@
+<!doctype html><html><head><meta charset="utf-8"><style>
+@font-face{font-family:'Mona Sans';src:url(../ui/fonts/mona-sans.woff2) format('woff2');font-weight:200 900;font-stretch:75% 125%}
+@font-face{font-family:'Geist Mono';src:url(../ui/fonts/geist-mono-latin-400-normal.woff2) format('woff2')}
+body{margin:0;width:1600px;height:640px;background:#E4E4E1;font-family:'Mona Sans';color:#111;overflow:hidden}
+.wrap{display:grid;grid-template-columns:600px 1fr;height:100%;box-sizing:border-box;padding:56px 0 56px 72px;gap:40px}
+.w{font-stretch:125%;font-weight:620;letter-spacing:-0.04em;font-size:200px;line-height:.8;margin:30px 0 0}
+.t{font-size:30px;font-weight:500;line-height:1.2;margin:34px 0 0;max-width:20em;letter-spacing:-0.01em}
+.s{font-family:'Geist Mono';font-size:17px;color:#55554F;margin-top:22px}
+.row{display:flex;gap:16px;align-items:flex-end;margin-top:6px}
+.tray{background:#EDEDEB;border-radius:28px;padding:7px;flex:none}
+.pic{border-radius:22px;overflow:hidden}.pic img{display:block;width:100%;height:100%;object-fit:cover;object-position:50% 30%}
+.n{font-stretch:125%;font-weight:600;letter-spacing:-0.02em;font-size:22px;padding:12px 10px 6px}
+</style></head><body><div class="wrap">
+<div><div class="w">NAVI</div><div class="t">Natural AI demo videos.<br>No face, no mic, no robot voice.</div><div class="s">A Claude skill &nbsp; MIT &nbsp; ElevenLabs + Playwright + ffmpeg</div></div>
+<div class="row" id="r"></div></div>
+<script>
+const v=[['alex','#0000F2',300,420],['jessica','#C2300C',230,330],['george','#0B4F37',230,380],['lily','#4B22D6',230,300],['matilda','#000091',230,350],['brian','#111',230,410]];
+document.getElementById('r').innerHTML=v.map(([n,c,w,h])=>`<div class="tray"><div class="pic" style="width:${w}px;height:${h}px;background:${c}"><img src="../ui/assets/voice-${n}.png"></div><div class="n">${n.toUpperCase()}</div></div>`).join('');
+</script></body></html>

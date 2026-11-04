@@ -1,0 +1,15 @@
+# secrets: never commit keys
+*.key
+*_key.txt
+.env
+.env.*
+# outputs and caches
+output/
+renders/
+*.mp4
+*.webm
+*.wav
+*.mp3
+node_modules/
+__pycache__/
+.DS_Store
