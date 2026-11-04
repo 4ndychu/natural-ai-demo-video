@@ -252,6 +252,10 @@ def check_key():
         if c2 == 200:
             return report('WARN', 'ElevenLabs key', f'works ({where}), but it isn\'t allowed to read your credits',
                           'Optional: give the key "User: read" access at elevenlabs.io so NAVI can show credits left.')
+    if status == 'api_key_id_used_as_api_key':
+        return report('MISSING', 'ElevenLabs key', 'the Keychain holds the key\'s ID, not the key itself',
+                      'The key starts with "sk_" and is shown only once, when you create it at elevenlabs.io. '
+                      'Make a new key, copy it straight away, then run: sh scripts/setup/store-key.sh')
     if code == 0:
         return report('MISSING', 'ElevenLabs key', f'couldn\'t reach ElevenLabs ({sub.get("error")})',
                       'Check the internet connection and run the check again.')
