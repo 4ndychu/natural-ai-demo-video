@@ -1,0 +1,4 @@
+# NAVI's Python packages (installed into .venv by scripts/setup/install.sh)
+faster-whisper==1.2.1
+# faster-whisper 1.2.1 passes metadata_errors= to av.open(), which PyAV 16+ removed
+av==15.1.0

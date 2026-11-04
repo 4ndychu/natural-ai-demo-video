@@ -14,3 +14,8 @@ node_modules/
 __pycache__/
 .DS_Store
 output/
+.venv/
+recorder/agent-screenplay/
+# browser profiles and saved logins live outside the repo; never commit them
+*storage-state*.json
+profiles/

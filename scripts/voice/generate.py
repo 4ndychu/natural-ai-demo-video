@@ -44,6 +44,8 @@ FINAL_MAX, SECTION_MAX = 0.45, 0.25
 FADE_END, FADE_CUT, XF = 0.08, 0.15, 0.03
 SECTION_GAP = 0.40       # last word to next section's first word (0.35 to 0.45 s)
 TAG_RE = re.compile(r'\[[^\]]+\]')
+# NAVI's ffmpeg lives next to its Python in .venv/bin (see scripts/setup/check.py); find it there first.
+os.environ['PATH'] = os.path.dirname(sys.executable) + os.pathsep + os.environ.get('PATH', '')
 
 
 def get_key():

@@ -51,6 +51,12 @@
     ],
     "find_speech_end_from_audio": true
   },
+  "timing": {
+    "engine": "faster-whisper",
+    "model": "small.en",
+    "runs": "locally, no API call",
+    "word_timestamps": true
+  },
   "sliders": {
     "casual": {
       "label": "Casualness",
