@@ -28,3 +28,19 @@ Test 2 (`examples/experiments/2026-11-05-ending3b.json`), four lines after the s
 > 2 and 3 sound best.
 
 Key: line 1 "…just the two left now." (ends 0.2 st above floor), **line 2 "…just the two left now, so yeah." (4.1 st)**, **line 3 "…just the two left up top." (0.6 st)**, line 4 "…just the two left, okay." (3.4 st). Section 3 was regenerated with line 3 (picked blind twice, lower ending); both new takes ended low (2.6 and 3.3 st).
+
+## Ending test for section 1 ("so that's on the list now")
+
+Andy's note on the preview, verbatim:
+
+> The preview is good, no other complaints. One thing: "that's on the list now" sounds unnatural to me. Too enthusiastic, too upbeat, it doesn't match the rest. That's my opinion though. Feel free to find flaws in it or disagree, and tell me if the research or your measurements say otherwise.
+
+Measured: its last word ended low (1.3 st above floor) and its pitch level, peak and swing were no brighter than lines Andy liked, so pitch didn't explain it. Reading: the line announces the result of the action, which real narrators rarely do.
+
+Test (`examples/experiments/2026-11-05-ending1b.json`): full section 1 reads, three endings, unlabelled in random order. Andy's notes, verbatim:
+
+> Uh, 2 in one sound is the best, and I'm edging more towards two.
+
+> I meant and 1
+
+Key: **ending 2 "…and hit Enter, so that's one." (6.8 st above floor), picked first**; **ending 1 "…and hit Enter." (9.1 st), picked second**; ending 3 "…and hit Enter, so yeah." (2.1 st, the lowest), not picked. Section 1 now uses ending 2, take 2.
