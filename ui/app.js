@@ -114,7 +114,7 @@ class Component extends DCLogic {
     if (st.wipeConfirm && !inside('#wiperow')) this.setState({ wipeConfirm: false });
     if (st.chat.length && !inside('.chatinner')) this.setState({ chat: [], chatAct: null });
   }
-  say(msg, undo, go, goLabel) { if (undo) this.undoFrom = this.describe(document.activeElement); this.setState({ toast: msg, toastUndo: undo || null, toastGo: go || null, toastGoLabel: goLabel || '' }); this.later('toast', 4200, () => this.setState({ toast: '', toastUndo: null, toastGo: null })); }
+  say(msg, undo, go, goLabel) { if (undo) this.undoFrom = this.describe(document.activeElement); this.toastWhere = this.state.screen + '/' + this.state.step; this.setState({ toast: msg, toastUndo: undo || null, toastGo: go || null, toastGoLabel: goLabel || '' }); this.later('toast', 4200, () => this.setState({ toast: '', toastUndo: null, toastGo: null })); }
   fmt(t) { const m = Math.floor(t / 60); const s = Math.floor(t % 60); return m + ':' + (s < 10 ? '0' : '') + s; }
   num(n) { return n.toLocaleString('en-US'); }
   plural(n, w) { return n + ' ' + w + (n === 1 ? '' : 's'); }
@@ -237,7 +237,7 @@ class Component extends DCLogic {
       () => { if (!voiceOk) return; goStep(2); this.say(st.lock ? voicePretty + ' is set for every demo in this project' : 'Using ' + voicePretty + ' for this demo'); },
       () => { const fresh = !D.recorded && st.recPos === 0 && !this.timers.rec; if (fresh) { if (this.needKey()) return; this.setState({ confirm: 'record' }); this.focusLater('#cfyes'); return; } goStep(3); if (!D.recorded && !this.timers.rec && !st.recPaused && !st.recStopped) { if (this.needKey()) return; this.startRecording(st.recPos); } },
       () => goStep(4),
-      () => { if (marks) { this.setState({ confirm: 'redo' }); return; } if (unsure) { this.setState({ confirm: 'approve' }); return; } if (st.fromBatch) { batchApproveNext(); return; } goStep(5); },
+      () => { if (marks) { this.setState({ confirm: 'redo' }); return; } if (unsure) { this.setState({ confirm: 'approve' }); this.focusLater('#cfno'); return; } if (st.fromBatch) { batchApproveNext(); return; } goStep(5); },
       () => { if (!D.exported || D.dirty) doExport(); else this.say('Opening Movies/NAVI'); }
     ];
     const secondaryFor = [null, null, null, () => { if (this.needKey()) return; this.patchDemo({ recorded: false }); this.startRecording(); }, () => this.setState({ confirm: 'approve' }), () => this.say('Opening Movies/NAVI')];
@@ -246,7 +246,7 @@ class Component extends DCLogic {
       record: { text: 'Recording uses about ' + this.num(videoCost) + ' credits', no: 'Cancel', yes: 'Yes, record', act: () => { if (this.needKey()) return; this.setState({ confirm: null }); goStep(3); this.startRecording(0); } },
       redo: { text: 'Redo ' + this.plural(markedSecs.length, 'section') + ' for about ' + this.num(markedSecs.length * 420) + ' credits?', no: 'Cancel', yes: 'Redo them', act: () => { if (this.needKey()) return; this.spend(markedSecs.length * 420); const prev = D.notes; this.patchDemo({ notes: {} }); this.setState({ confirm: null }); this.say('Redoing ' + this.plural(markedSecs.length, 'section') + '. Draft 2 will be here in a few minutes.'); } }
     };
-    const batchApproveNext = () => { const bid = st.fromBatch; const bb = st.batches.find((x) => x.id === bid); if (!bb) return; const items = bb.items.map((x, k) => k === st.batchItem ? Object.assign({}, x, { st: 'approved' }) : x); this.patchBatch({ items: items }, bid); const next = items.findIndex((x) => x.st === 'recorded'); this.say('Approved “' + bb.items[st.batchItem].t + '”'); if (next >= 0) { const r = this.batchDemos(Object.assign({}, bb, { items: items }), next); this.setState({ demos: r.demos, cur: r.id, batchItem: next, revT: 0, markOpen: false, confirm: null }); } else this.setState({ screen: 'batch', fromBatch: null, batchItem: null, confirm: null }); };
+    const batchApproveNext = () => { const bid = st.fromBatch; const bb = st.batches.find((x) => x.id === bid); if (!bb) return; const items = bb.items.map((x, k) => k === st.batchItem ? Object.assign({}, x, { st: 'approved' }) : x); this.patchBatch({ items: items }, bid); const next = items.findIndex((x) => x.st === 'recorded'); this.say('Approved “' + bb.items[st.batchItem].t + '”'); if (next >= 0) { const r = this.batchDemos(Object.assign({}, bb, { items: items }), next); this.setState({ demos: r.demos, cur: r.id, batchItem: next, revT: 0, markOpen: false, confirm: null }); this.focusLater('#playbtn'); } else this.setState({ screen: 'batch', fromBatch: null, batchItem: null, confirm: null }); };
     const cf = st.confirm ? confirms[st.confirm] : null;
     const pvFoot = { strict: 'Strict', standard: 'Standard', test: 'Test account', custom: 'Custom' }[preset];
     const footTexts = [
@@ -495,7 +495,7 @@ class Component extends DCLogic {
       marks: allMarks.map((m) => ({ t: this.fmt(m.t), text: m.text, sec: this.secs[Number(m.k)].n, jumpAria: 'Jump to ' + this.fmt(m.t), jump: () => this.setState({ revT: m.t, player: false }), rmAria: 'Remove mark at ' + this.fmt(m.t),
         rm: () => { const prev = D.notes; const n = Object.assign({}, prev); n[m.k] = prev[m.k].filter((x, k) => k !== m.j); this.patchDemo({ notes: n }); this.say('Mark removed', () => this.patchDemo({ notes: prev })); } })),
       hasMarks: marks > 0, noMarks: marks === 0, marksCount: marks ? '(' + marks + ')' : '', revCover: D.cover,
-      hasUnsure: unsure > 0, unsureText: this.plural(unsure, 'blur') + ' to check', hasSkip: !!cur.skip && !st.confirm, skipLabel: cur.skip || '', doSkip: () => this.setState({ confirm: 'approve' }), blurOpen: st.blurOpen, toggleBlurs: () => this.setState({ blurOpen: !st.blurOpen }),
+      hasUnsure: unsure > 0, unsureText: this.plural(unsure, 'blur') + ' to check', hasSkip: !!cur.skip && !st.confirm, skipLabel: cur.skip || '', doSkip: () => { this.setState({ confirm: 'approve' }); this.focusLater('#cfno'); }, blurOpen: st.blurOpen, toggleBlurs: () => this.setState({ blurOpen: !st.blurOpen }),
       blurs: unsureBlurs.map((b) => ({ t: b.t, what: b.what, keep: () => { const prev = D.blurs; this.patchDemo({ blurs: D.blurs.map((x) => x.id === b.id ? Object.assign({}, x, { s: 'keep' }) : x) }); this.say('Kept blurred', () => this.patchDemo({ blurs: prev })); }, show: () => { const prev = D.blurs; this.patchDemo({ blurs: D.blurs.map((x) => x.id === b.id ? Object.assign({}, x, { s: 'show' }) : x) }); this.say('Will be shown', () => this.patchDemo({ blurs: prev })); } })),
       // export
       revCaps: segOf(capOpts, dCap, (x) => { this.patchDemo({ capMode: x, dirty: !!D.exported }); }),
@@ -576,7 +576,8 @@ class Component extends DCLogic {
     if (moved && !recent && comp.state.screen !== 'welcome') { if (comp.state.screen === 'new') { if (lost || !document.querySelector('main').contains(ae)) { const f = document.getElementById(comp.state.mode === 'batch' ? 'btt' : 'bw'); if (f) f.focus({ preventScroll: true }); } } else { const hd = comp.heading(); if (hd) hd.focus({ preventScroll: true }); } return; }
     if (lost && !recent && lastEl && (!lastEl.isConnected || lastEl.disabled || lastEl.offsetParent === null)) { const el = comp.findDesc(lastDesc) || comp.heading(); if (el) el.focus(); }
   }));
-  comp.setState = function (s) { Object.assign(comp.state, s); Object.assign(scope, comp.renderVals()); keepStepVisible(); if (s && 'toast' in s) requestAnimationFrame(placeToast); afterRender(); };
+  // An Undo belongs to the step it was offered on: leaving that step or screen drops the toast.
+  comp.setState = function (s) { Object.assign(comp.state, s); if (comp.state.toastUndo && comp.toastWhere && comp.toastWhere !== comp.state.screen + '/' + comp.state.step) Object.assign(comp.state, { toast: '', toastUndo: null, toastGo: null }); Object.assign(scope, comp.renderVals()); keepStepVisible(); if (s && 'toast' in s) requestAnimationFrame(placeToast); afterRender(); };
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && !e.defaultPrevented) { if (comp.escape()) e.preventDefault(); return; }
     if (e.key === 'Tab' && comp.state.lib) { const d = document.getElementById('libdlg'); if (!d) return; const f = [...d.querySelectorAll('button, input, [tabindex="0"]')].filter((x) => !x.disabled && x.offsetParent !== null); if (!f.length) return; const i = f.indexOf(document.activeElement); if (e.shiftKey && (i <= 0)) { e.preventDefault(); f[f.length - 1].focus(); } else if (!e.shiftKey && (i === f.length - 1 || i < 0)) { e.preventDefault(); f[0].focus(); } }

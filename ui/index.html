@@ -826,7 +826,7 @@ textarea{resize:none}
 <div v-if="showCapPreview" style="display: contents"><div class="capov" style="position: absolute; left: 50%; bottom: 30px; transform: translateX(-50%); max-width: 80%; width: max-content; background: rgba(17,17,17,0.88); color: #F2F2F2; border-radius: 8px; padding: 7px 14px; font-size: 15px; text-align: center">{{revCaption}}</div></div>
 </div>
 <div style="display: flex; align-items: center; gap: 14px; margin-top: 12px">
-<button type="button" @click="togglePlayer($event)" :aria-label="(playerAria)" style="width: 46px; height: 46px; border-radius: 23px; border: 0; background: var(--ink); color: var(--sheet); display: inline-flex; align-items: center; justify-content: center; flex: none">
+<button id="playbtn" type="button" @click="togglePlayer($event)" :aria-label="(playerAria)" style="width: 46px; height: 46px; border-radius: 23px; border: 0; background: var(--ink); color: var(--sheet); display: inline-flex; align-items: center; justify-content: center; flex: none">
 <div v-if="playerOn" style="display: contents"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="5" width="4" height="14"></rect><rect x="14" y="5" width="4" height="14"></rect></svg></div>
 <div v-if="playerOff" style="display: contents"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 4.5v15l12-7.5z"></path></svg></div>
 </button>
@@ -923,7 +923,7 @@ textarea{resize:none}
 <div class="foot stepfoot">
 <span class="ftext" :style="'color: ' + (footColor)"><span :class="'dot k-' + footDot"></span><span>{{footText}}<span v-if="footLinkOn"> <button type="button" class="link" @click="footLinkAct($event)">{{footLinkLabel}}</button></span></span></span>
 <span class="fbtns">
-<div v-if="confirming" style="display: contents"><button type="button" class="btn" @click="cancelConfirm($event)">{{confirmNo}}</button><button id="cfyes" type="button" class="pri" @click="doConfirm($event)">{{confirmYes}}</button></div>
+<div v-if="confirming" style="display: contents"><button id="cfno" type="button" class="btn" @click="cancelConfirm($event)">{{confirmNo}}</button><button id="cfyes" type="button" class="pri" @click="doConfirm($event)">{{confirmYes}}</button></div>
 <div v-if="notConfirming" style="display: contents">
 <div v-if="canBack" style="display: contents"><button type="button" class="btn ghost backbtn" @click="back($event)">Back</button></div>
 <div v-if="hasSkip" style="display: contents"><button type="button" class="btn" @click="doSkip($event)">Skip redos</button></div>
