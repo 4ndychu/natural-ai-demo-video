@@ -16,6 +16,13 @@
       "caption": "This is a simple to-do list. Type a task in the box at the top and press Enter to add it.",
       "actions": [
         {
+          "on": "start",
+          "do": "goto",
+          "kind": "wait",
+          "target": "https://demo.playwright.dev/todomvc",
+          "note": "page loads and settles before the voice starts"
+        },
+        {
           "on": "box",
           "do": "click",
           "kind": "click",
@@ -84,6 +91,18 @@
           "do": "click",
           "kind": "click",
           "target": "a[href='#/active']"
+        },
+        {
+          "on": "leave",
+          "do": "hover",
+          "kind": "explain",
+          "target": "a[href='#/active']"
+        },
+        {
+          "on": "finished",
+          "do": "hover",
+          "kind": "hunt",
+          "target": "footer.footer"
         },
         {
           "on": "where",
