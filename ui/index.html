@@ -191,6 +191,7 @@ textarea{resize:none}
 @media (min-width: 861px){.toastdemo{margin-left:133px}}
 .newtile{}
 @media (max-width: 860px){.newtile{min-height:64px!important;flex-direction:row!important;justify-content:flex-start!important;padding:10px 16px!important}.newtile > span:first-child{width:40px!important;height:40px!important}.newtile .wide{font-size:16px!important}}
+.recscreen{aspect-ratio:16/10}
 .recctl{display:grid;grid-template-columns:auto 1fr auto;row-gap:6px;column-gap:8px;align-items:center;min-height:72px;margin-top:16px}
 .t-dark{--segOn:#4A4A52;--knobOff:#A2A2A8}
 .t-dark .seg button[aria-pressed=true]{box-shadow:inset 0 0 0 1px rgba(242,242,240,0.28)}
@@ -200,7 +201,8 @@ textarea{resize:none}
 .t-light .pri[disabled]{background:color-mix(in srgb,var(--ink) 55%,var(--tray));color:#fff}
 .t-dark .pri[disabled]{background:color-mix(in srgb,var(--ink) 50%,var(--tray));color:var(--ground)}
 .scpanel{position:sticky;top:24px}
-.bv.chip{background:var(--tray);padding:2px 8px;border-radius:8px;z-index:2}
+.bv.chip{background:var(--track);padding:2px 8px;border-radius:8px;z-index:2;box-shadow:none}
+.t-light{--track:#F0F0F0}.t-dark{--track:#2F2F33}
 .sumrow > span:first-child{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .markrow{align-items:start!important;padding:8px 0}
 .batchrail .stepbtn{cursor:default}
@@ -208,6 +210,8 @@ textarea{resize:none}
 .waitlist{max-height:360px;overflow:auto}
 .bprimary{width:340px;overflow:hidden;text-overflow:ellipsis}
 .swslot{display:grid}
+@media (min-width: 861px){.caprow{border-top:0!important;padding-top:0!important}}
+.sumrow.open{background:transparent;box-shadow:inset 0 0 0 1px var(--line)}
 .fadebot{-webkit-mask-image:linear-gradient(#000 calc(100% - 32px),transparent);mask-image:linear-gradient(#000 calc(100% - 32px),transparent)}
 .swslot > *{grid-area:1/1}
 .chatpill:focus-within{box-shadow:0 0 0 2px var(--focus)!important}
@@ -237,20 +241,28 @@ textarea{resize:none}
 @media (max-width: 860px){
   .lg-only{display:none!important}
   .sc > div > .sclen{display:none}
+  .sc{gap:0}
+  .newtile .muted{display:none}
+  .filerow{flex-wrap:wrap}
+  .filerow > span:nth-child(2){flex:1 1 calc(100% - 40px)!important}
+  .filerow .btn{margin-left:auto}
+  .folderrow{flex-wrap:wrap;justify-content:flex-end}
+  .ftrow{flex-wrap:nowrap!important}
+  .sc > div:first-child:not(.scpanel){display:none}
   .scbtns{flex-wrap:nowrap!important}
   #scsel{appearance:none;-webkit-appearance:none;background:var(--wash) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2.4' stroke-linecap='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") no-repeat right 14px center;border:0;border-radius:999px;padding-right:36px}
-  .sumrow{height:auto;min-height:64px;padding:8px 8px 8px 14px}
-  .sumrow > span:first-child{white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+  .sumrow{height:88px;padding:8px 8px 8px 14px}
+  .sumrow > span:first-child{white-space:normal;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical}
   .sumrow .btn{min-width:0!important;background:var(--sheet)!important;text-decoration:none!important;padding:0 12px!important}
   .vmore{min-height:56px!important;grid-column:1 / -1;flex-direction:row!important}
   .phone-setup{background:transparent!important;padding:4px 2px!important;color:var(--ink2)!important}
   .dcard .meta{margin-top:0!important;margin-left:6px}
   .bprimary{width:auto}
-  .bpause{flex-basis:auto!important}
   .welcome-art{min-height:200px!important}
   .welcome-art img{object-position:50% 35%!important}
   .wfield{justify-content:flex-end}
   .recctl{min-height:72px}
+  .recnote{grid-column:1 / -1;white-space:nowrap}
   .swhide-sm{display:none!important}
   .swslot-sm{display:grid!important}
   .setrow,.list > div > .row,.list > .row{flex-wrap:wrap}
@@ -279,7 +291,6 @@ textarea{resize:none}
   .foot .ftext .dot{margin-top:7px}
   .foot .fbtns{flex-wrap:nowrap!important}
   .lg{display:none}
-  .sumrow .btn{min-width:0!important;background:transparent!important;padding:0 6px;text-decoration:underline;text-decoration-color:var(--fill);text-underline-offset:3px}
   .newtile .wide{white-space:nowrap}
   .vgrid{order:0}
   .ph-first{order:-1}
@@ -306,7 +317,6 @@ textarea{resize:none}
   .chatband{height:76px}
   .chatwrap.indemo .chatinner{transform:none;width:calc(100% - 24px)}
   .welcome-grid{grid-template-columns:minmax(0,1fr)!important}
-  .welcome-art img{object-position:50% 58%!important}
   .modeseg{width:100%!important}
   .capov{font-size:11px!important;bottom:18px!important}
   .phone-setup{display:flex;align-items:center;gap:8px;border:0;background:var(--tray);border-radius:14px;padding:10px 14px;text-align:left;font-size:14px;color:var(--ink)}
@@ -317,7 +327,6 @@ textarea{resize:none}
   .dcard .meta{flex:1;min-width:0;padding:8px 10px}
   .sclen{margin:8px 0 0!important}
 
-  .welcome-art{min-height:220px!important}
   .welcome-art .big{font-size:64px!important}
   .wfield{flex-wrap:wrap;margin-left:0!important}
   .wfield .inp{flex:1 1 100%!important}
@@ -365,7 +374,7 @@ textarea{resize:none}
 </div>
 
 <div style="border-top: 1px solid var(--line); padding: 16px 0">
-<div style="display: flex; align-items: center; gap: 12px; font-weight: 500; font-size: 17px"><span :class="(w3Cls)" class="disc">{{w3Mark}}</span>Log in to your test account <span class="muted small" style="font-weight: 400">optional</span></div>
+<div style="display: flex; align-items: center; gap: 12px; font-weight: 500; font-size: 17px"><span :class="(w3Cls)" class="disc">{{w3Mark}}</span><span>Log in to your test account <span class="muted small" style="font-weight: 400">optional</span></span></div>
 <div class="wfield" style="display: flex; gap: 8px; margin: 12px 0 0 40px">
 <label for="wsite" class="sr">Site you'll demo</label>
 <input id="wsite" class="inp" type="text" :value="(wSite)" @input="onWSite($event)" @change="onWSite($event)" placeholder="Site you'll demo, e.g. whop.com" style="flex: 1">
@@ -427,7 +436,7 @@ textarea{resize:none}
 <p class="muted" style="margin: 8px 0 0">Open one to carry on, or start a new one.</p>
 </div>
 <div class="cards">
-<button type="button" class="newtile" @click="newDemo($event)" style="min-height: 262px; border: 0; box-shadow: inset 0 0 0 1.5px var(--fill); border-radius: 26px; background: var(--sheet); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 16px"><span style="width: 56px; height: 56px; border-radius: 28px; background: var(--ink); color: var(--sheet); display: inline-flex; align-items: center; justify-content: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg></span><span class="wide caps" style="font-size: 20px">New demo</span><span class="muted">One video, or a whole batch</span></button>
+<button type="button" class="newtile" @click="newDemo($event)" style="min-height: 262px; border: 0; border-radius: 26px; background: var(--sheet); box-shadow: 0 0 0 6px var(--tray); margin: 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 16px"><span style="width: 56px; height: 56px; border-radius: 28px; background: var(--ink); color: var(--sheet); display: inline-flex; align-items: center; justify-content: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg></span><span class="wide caps" style="font-size: 20px">New demo</span><span class="muted">One video, or a whole batch</span></button>
 <div v-for="b in batchCards" style="display: contents">
 <button type="button" class="tray dcard" @click="b.open($event)">
 <span class="cover" style="height: 176px; display: grid; grid-template-columns: 1fr 1fr; gap: 4px; background: var(--tray)"><img src="assets/cover-3.jpg" alt="" style="border-radius: 14px 4px 4px 14px"><span style="display: grid; grid-template-rows: 1fr 1fr; gap: 4px; min-height: 0"><img src="assets/cover-1.jpg" alt="" style="border-radius: 4px 14px 4px 4px; min-height: 0"><img src="assets/cover-4.jpg" alt="" style="border-radius: 4px 4px 14px 4px; min-height: 0"></span></span>
@@ -499,7 +508,7 @@ textarea{resize:none}
 <p class="muted small sclen" style="margin: 12px 10px 0">{{scriptLenLine}}</p>
 </div>
 <div class="scpanel">
-<div class="scpick" style="margin-bottom: 12px"><p class="muted small sclen sm-only" style="margin: 0 0 8px">{{scriptLenLine}}</p><label for="scsel" class="sr">Section</label><select id="scsel" class="inp" @change="scPickSel($event)" style="appearance: auto"><option v-for="r in scList" :value="r.i" :selected="r.on === 'true'">{{r.i + 1}} · {{r.n}}</option></select></div>
+<div class="scpick" style="margin-bottom: 12px"><p class="muted small sclen sm-only" style="margin: 0 0 8px">{{scriptLenLine}}</p><label for="scsel" class="sr">Section</label><select id="scsel" class="inp" @change="scPickSel($event)"><option v-for="r in scList" :value="r.i" :selected="r.on === 'true'">{{r.i + 1}} · {{r.n}}</option></select></div>
 <div style="display: flex; align-items: center; gap: 8px; min-height: 40px">
 <span class="mono muted" style="flex: 1">{{scTime}}</span>
 <span class="muted hide-sm">{{scNum}}</span>
@@ -556,7 +565,7 @@ textarea{resize:none}
 
 
 <div style="margin-top: 22px">
-<div style="display: flex; align-items: center; gap: 12px; min-height: 40px; flex-wrap: wrap"><h2 class="h-sec">Fine-tune</h2><span class="muted small" style="white-space: nowrap">{{fineNote}}</span><div v-if="anyChanged" style="display: contents"><button type="button" class="btn sm" @click="resetAll($event)">Reset all</button></div><span style="flex: 1"></span><button type="button" class="link small" @click="toggleSliderHelp($event)" :aria-expanded="(sliderHelp)">{{sliderHelpLabel}}</button></div>
+<div class="ftrow" style="display: flex; align-items: center; gap: 12px; min-height: 40px; flex-wrap: wrap"><h2 class="h-sec">Fine-tune</h2><span class="muted small lg-only" style="white-space: nowrap">{{fineNote}}</span><div v-if="anyChanged" style="display: contents"><button type="button" class="btn sm" @click="resetAll($event)">Reset all</button></div><span style="flex: 1"></span><button type="button" class="link small" @click="toggleSliderHelp($event)" :aria-expanded="(sliderHelp)">{{sliderHelpLabel}}</button></div>
 <div class="sliders" style="margin-top: 10px">
 <div v-for="s in sliders" style="display: contents">
 <div>
@@ -660,7 +669,7 @@ textarea{resize:none}
 <div v-if="st3" style="display: contents">
 <div class="two">
 <div>
-<div class="screen">
+<div class="screen recscreen">
 <div class="art" aria-hidden="true"><img :src="(recCover)" alt="" style="filter: blur(6px) saturate(0.8); transform: scale(1.06)"></div>
 <span class="pill" style="left: 22px; top: 22px"><span class="dot" :style="'background: ' + (recBadgeDot)"></span>{{recBadge}}</span>
 </div>
@@ -686,7 +695,7 @@ textarea{resize:none}
 <div v-for="n in recNext" style="display: contents"><div style="margin: 4px 0 0 12px; font-size: 16px">{{n}}</div></div>
 </div>
 <div class="recctl">
-<div v-if="recControls" style="display: contents"><button type="button" class="btn" @click="pauseRec($event)">{{pauseLabel}}</button><span></span><button type="button" class="btn danger" @click="askStop($event)" style="justify-self: end">Stop</button><span></span><span></span><span class="muted small" style="justify-self: end">Asks first. Finished sections are kept.</span></div>
+<div v-if="recControls" style="display: contents"><button type="button" class="btn" @click="pauseRec($event)">{{pauseLabel}}</button><span></span><button type="button" class="btn danger" @click="askStop($event)" style="justify-self: end">Stop</button><span></span><span></span><span class="muted small recnote" style="justify-self: end">Asks first. Finished sections are kept.</span></div>
 <div v-if="recStopAsk" style="display: contents"><button type="button" class="btn" @click="cancelStop($event)">Keep recording</button><span></span><button type="button" class="btn danger" @click="doStop($event)" style="justify-self: end">Yes, stop</button><span></span><span></span><span class="small" style="justify-self: end; font-weight: 500">Stop? Finished sections are kept.</span></div>
 <div v-if="recStopped" style="display: contents"><button type="button" class="btn" @click="resumeStopped($event)">Carry on recording</button><span></span><span></span><span class="muted small" style="grid-column: 1 / 4">Stopped. Finished sections are kept.</span></div>
 </div>
@@ -774,7 +783,7 @@ textarea{resize:none}
 </div>
 </div>
 <div class="list" style="min-width: 0; display: flex; flex-direction: column">
-<div style="padding: 14px 0 16px; border-top: 1px solid var(--line)">
+<div class="caprow" style="padding: 14px 0 16px; border-top: 1px solid var(--line)">
 <h2 class="h-sec" style="font-size: 16px">Captions</h2>
 <div class="seg" role="group" aria-label="Captions" style="margin-top: 8px"><div v-for="o in revCaps" style="display: contents"><button type="button" :aria-pressed="(o.on)" @click="o.pick($event)">{{o.label}}</button></div></div>
 </div>
@@ -791,7 +800,7 @@ textarea{resize:none}
 <div style="margin-top: 18px">
 <h2 class="h-sec">{{filesHead}}</h2>
 <div class="list" style="margin-top: 4px">
-<div v-for="f in files" style="display: contents"><div class="row" style="min-height: 56px; padding: 6px 0"><span :class="fileMark ? 'disc done' : 'disc'" :style="'width: 20px; height: 20px; font-size: 11px; ' + (fileMark ? '' : 'box-shadow: inset 0 0 0 1.5px var(--line)')">{{fileMark}}</span><span style="flex: 1; min-width: 0"><span style="display: block; overflow-wrap: anywhere">{{f.n}}</span><span class="muted small">{{fileWill ? 'Will be saved' : f.s}}</span></span><div v-if="fileMark" style="display: contents"><button type="button" class="btn sm" @click="showInFinder($event)">Show in Finder</button></div></div></div>
+<div v-for="f in files" style="display: contents"><div class="row filerow" style="min-height: 56px; padding: 6px 0"><span :class="fileMark ? 'disc done' : 'disc'" :style="'width: 20px; height: 20px; font-size: 11px; ' + (fileMark ? '' : 'box-shadow: inset 0 0 0 1.5px var(--line)')">{{fileMark}}</span><span style="flex: 1; min-width: 0"><span style="display: block; overflow-wrap: anywhere">{{f.n}}</span><span class="muted small">{{fileWill ? 'Will be saved' : f.s}}</span></span><div v-if="fileMark" style="display: contents"><button type="button" class="btn sm" @click="showInFinder($event)">Show in Finder</button></div></div></div>
 </div>
 </div>
 </div>
@@ -831,7 +840,7 @@ textarea{resize:none}
 <div v-if="bSiteNew" style="display: contents"><div class="fade" style="margin-top: 10px"><label for="bns" class="sr">New site address</label><input id="bns" class="inp" type="text" :value="(bNew)" @input="onBNew($event)" @change="onBNew($event)" placeholder="The site’s address, e.g. app.yourproduct.com" :aria-invalid="bNewBad ? 'true' : 'false'"><div class="small" :style="'margin-top: 6px; min-height: 20px; color: ' + (bNewBad ? 'var(--danger)' : 'var(--ink2)')">{{bNewBad ? 'That doesn’t look like a web address.' : 'A browser opens so you can log in once. Then it’s saved.'}}</div></div></div>
 </div>
 <div>
-<div class="sumrow"><span style="flex: 1 1 260px; min-width: 0"><span v-if="bLess"><span class="muted">Using: </span><span class="lg-only">{{bSummary}}</span><span class="sm-only">{{bSummaryShort}}</span></span><span v-if="bMore" class="muted">For this demo only</span></span><button type="button" class="btn sm" @click="toggleMore($event)" :aria-expanded="bMore ? 'true' : 'false'" style="background: var(--sheet)">{{bMore ? 'Hide options' : 'Change'}}</button></div>
+<div :class="bMore ? 'sumrow open' : 'sumrow'"><span style="flex: 1 1 260px; min-width: 0"><span v-if="bLess"><span class="muted">Using: </span><span class="lg-only">{{bSummary}}</span><span class="sm-only">{{bSummaryShort}}</span></span><span v-if="bMore" class="muted">For this demo only</span></span><button type="button" class="btn sm" @click="toggleMore($event)" :aria-expanded="bMore ? 'true' : 'false'" style="background: var(--sheet)">{{bMore ? 'Hide options' : 'Change'}}</button></div>
 <div v-if="bMore" style="display: contents">
 <div class="fade form" style="margin-top: 18px">
 <span class="muted lbl">Who’s watching</span><div class="seg" role="group" aria-label="Who's watching"><div v-for="o in bWho" style="display: contents"><button type="button" :aria-pressed="(o.on)" @click="o.pick($event)">{{o.label}}</button></div></div>
@@ -856,7 +865,7 @@ textarea{resize:none}
 <div>
 <label for="btt" class="wide" style="display: block; font-size: 24px; line-height: 1.2; font-weight: 500">Which videos?</label>
 <p class="muted" style="margin: 6px 0 12px">One video per line, for example every lesson in a course. Or choose a course outline (.txt, .md or .csv).</p>
-<textarea id="btt" :rows="(btRows)" :value="(btText)" @input="onBtText($event)" @change="onBtText($event)" placeholder="Create your whop&#10;Add the Courses app&#10;Plan your modules" style="height: 206px; padding: 12px 16px 0; font-size: 16px; line-height: 24px" :class="btMore ? 'inp fadebot' : 'inp'"></textarea>
+<div style="border: 1px solid var(--line); border-radius: 12px; background: var(--sheet); overflow: hidden"><textarea id="btt" :rows="(btRows)" :value="(btText)" @input="onBtText($event)" @change="onBtText($event)" placeholder="Create your whop&#10;Add the Courses app&#10;Plan your modules" style="height: 204px; padding: 12px 16px 0; font-size: 16px; line-height: 24px; border: 0 !important; border-radius: 0; display: block" :class="btMore ? 'inp fadebot' : 'inp'"></textarea></div>
 <div style="display: flex; align-items: center; gap: 12px; margin-top: 10px; flex-wrap: wrap"><button type="button" class="btn sm" @click="pickFile($event)">Choose a file</button><input id="btfile" type="file" accept=".txt,.md,.csv,text/plain,text/markdown,text/csv" @change="onFile($event)" class="sr" tabindex="-1" aria-hidden="true"><span class="muted small">{{btHasFile ? 'From ' + btFileName + '. ' : ''}}{{btLinesText}}</span></div>
 </div>
 <div>
@@ -868,7 +877,7 @@ textarea{resize:none}
 <span class="muted lbl">Voice</span><div class="seg" role="group" aria-label="Voice"><div v-for="o in btVoices" style="display: contents"><button type="button" :aria-pressed="(o.on)" @click="o.pick($event)">{{o.label}}</button></div></div>
 <span class="muted lbl">Kind of demo</span><div><div class="seg" role="group" aria-label="Kind of demo"><div v-for="o in btKinds" style="display: contents"><button type="button" :aria-pressed="(o.on)" @click="o.pick($event)"><span class="lg-only">{{o.label}}</span><span class="sm-only">{{o.short || o.label}}</span></button></div></div><div class="muted small" style="margin-top: 6px">{{btKindHint}}</div></div>
 <span class="muted lbl">Privacy</span><div><div class="seg" role="group" aria-label="Privacy"><div v-for="o in btPresets" style="display: contents"><button type="button" :aria-pressed="(o.on)" @click="o.pick($event)"><span class="lg-only">{{o.label}}</span><span class="sm-only">{{o.short || o.label}}</span></button></div></div><div class="muted small" style="margin-top: 6px">{{btPresetHint}}</div></div>
-<label for="btf" class="muted lbl">Export folder</label><div style="display: flex; gap: 8px"><input id="btf" class="inp" type="text" :value="(btFolderVal)" @input="onBtFolder($event)" @change="onBtFolder($event)"><button type="button" class="btn" @click="chooseFolder($event)">Change folder</button></div>
+<label for="btf" class="muted lbl">Export folder</label><div class="folderrow" style="display: flex; gap: 8px"><input id="btf" class="inp lg-only" type="text" :value="(btFolderVal)" @input="onBtFolder($event)" @change="onBtFolder($event)"><span class="sm-only" style="flex: 1 1 100%; overflow-wrap: anywhere">{{btFolderVal}}</span><button type="button" class="btn" @click="chooseFolder($event)">Change folder</button></div>
 </div>
 </div>
 <div class="est" aria-live="polite">
@@ -963,7 +972,7 @@ textarea{resize:none}
 <div class="list">
 <div v-for="s in sites" style="display: contents"><div class="row" style="flex-wrap: wrap; padding: 8px 0"><span style="flex: 1 1 200px; min-width: 0"><span style="display: block">{{s.u}}</span><span class="muted small">{{s.note}}</span></span><span style="display: flex; gap: 6px; margin-left: auto"><button type="button" class="btn sm" @click="s.relog($event)">Log in again</button><button type="button" class="btn sm" @click="s.forget($event)">Forget</button></span></div></div>
 <div v-if="noSites" style="display: contents"><div class="row muted">No saved logins. Add a site below, or Claude asks when a demo needs one.</div></div>
-<div class="row" style="padding: 8px 0"><label for="ns" class="sr">New site</label><input id="ns" class="inp" type="text" :value="(siteDraft)" @input="onSiteDraft($event)" @change="onSiteDraft($event)" placeholder="Add a site, e.g. whop.com" style="flex: 1; height: 40px"><button type="button" class="btn sm" @click="addSite($event)" style="height: 40px">Add and log in</button></div>
+<div class="row" style="padding: 8px 0"><label for="ns" class="sr">New site</label><input id="ns" class="inp" type="text" :value="(siteDraft)" @input="onSiteDraft($event)" @change="onSiteDraft($event)" placeholder="Add a site" style="flex: 1; height: 40px"><button type="button" class="btn sm" @click="addSite($event)" style="height: 40px">Add and log in</button></div>
 </div>
 <div v-if="!noSites" style="display: flex; justify-content: flex-end; padding: 0 0 12px"><button type="button" class="btn sm" @click="forgetAll($event)">Forget all logins</button></div>
 </div></div>
