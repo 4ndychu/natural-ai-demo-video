@@ -12,7 +12,8 @@
 | `research/measure_speech.py` | Working | Measures a voice track like a real narrator: pace and pitch variation per phrase, pauses, fillers, repeats, breaths, clicks. Used for the research in `reference/research/` and for scoring new takes. |
 | `research/transcribe_verbatim.py` | Working | Verbatim transcript (CrisperWhisper 2.0, keeps uh/um/repeats) with word timings. Model is non-commercial-research only. |
 | `timing/timing.py` | Working (Phase 2) | Word timings from the finished voice track, locally (faster-whisper, one section at a time with its script as a hint, so restarts keep their real timing). Pins each action to its cue word, tags it explain / click / hunt / wait, checks every cue is heard, waits sit at section boundaries and the screen never sits still over 5 s. Writes `timing.json`, `timing.md` and, with `--preview`, a watchable `timing-preview.mp4`. |
-| recording, blur, render, app server | To build | See `docs/BUILD_BRIEF.md`. |
+| `record/record.py` | Working (Phase 3) | Records the browser live to the voice with the patched recorder: each step starts at a set time so its click or first key lands on its word; real-time footage, never retimed; the voice is laid over afterwards. Re-records (locally) to calibrate cursor travel, then runs the join checks. Writes `recording/recording.mp4` and `report.md`. |
+| blur, render, app server | To build | See `docs/BUILD_BRIEF.md`. |
 
 The recorder (agent-screenplay plus NAVI's patch) is in `../recorder/`.
 

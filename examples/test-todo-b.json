@@ -23,13 +23,19 @@
           "note": "page loads and settles before the voice starts"
         },
         {
+          "on": "this",
+          "do": "hover",
+          "kind": "explain",
+          "target": "placeholder=What needs to be done?"
+        },
+        {
           "on": "box",
           "do": "click",
           "kind": "click",
           "target": "placeholder=What needs to be done?"
         },
         {
-          "on": "dentist",
+          "on": "call",
           "do": "type",
           "kind": "click",
           "text": "Call the dentist"
@@ -48,24 +54,24 @@
       "caption": "Add a couple more tasks. When a task is done, click the circle next to it to tick it off.",
       "actions": [
         {
-          "on": "gas",
+          "on": "add",
+          "do": "click",
+          "kind": "click",
+          "target": "placeholder=What needs to be done?"
+        },
+        {
+          "on": "Pay",
           "do": "type",
           "kind": "click",
           "text": "Pay the gas bill",
           "then": "Enter"
         },
         {
-          "on": "train",
+          "on": "book the train",
           "do": "type",
           "kind": "click",
           "text": "Book the train tickets",
           "then": "Enter"
-        },
-        {
-          "on": "three",
-          "do": "highlight",
-          "kind": "explain",
-          "target": "ul.todo-list"
         },
         {
           "on": "circle",

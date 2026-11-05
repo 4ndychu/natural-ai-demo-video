@@ -85,7 +85,8 @@ def schedule(script, voice_dir):
             if kind not in KINDS:
                 problems.append(f"{sec['name']}: action on '{a['on']}' has unknown kind '{kind}'")
             row = {'section': sec['name'], 'on': a['on'], 'do': a['do'], 'kind': kind,
-                   'target': a.get('target'), 'text': a.get('text'), 'key': a.get('key')}
+                   'target': a.get('target'), 'text': a.get('text'), 'key': a.get('key'),
+                   'into': a.get('into'), 'then': a.get('then')}
             if a['on'] in ('start', 'end'):
                 row['t'] = round(speech0 if a['on'] == 'start' else speech1, 3)
                 row['heard'] = f"<section {a['on']}>"
@@ -108,11 +109,20 @@ def schedule(script, voice_dir):
         ts = [r['t'] for r in rows]
         if ts != sorted(ts):
             problems.append(f"{sec['name']}: actions are out of order")
-        marks = [speech0] + ts + [speech1]
+        # typing keeps the screen changing for about 0.09 s per character
+        busy = [r['t'] + (0.09 * len(r['text']) if r['do'] == 'type' and r.get('text') else 0) for r in rows]
+        marks = [speech0] + sorted(ts + busy) + [speech1]
         for a, b in zip(marks, marks[1:]):
             if b - a > max_still:
                 warnings.append(f"{sec['name']}: nothing happens on screen from {a:.1f} s to {b:.1f} s ({b - a:.1f} s)")
         out += rows
+    # still screen across section boundaries too: from one action to the next, anywhere in the video
+    ts = sorted([r['t'] for r in out] + [r['t'] + 0.09 * len(r['text']) for r in out if r['do'] == 'type' and r.get('text')])
+    for a, b in zip(ts, ts[1:]):
+        if b - a > max_still:
+            msg = f"nothing happens on screen from {a:.1f} s to {b:.1f} s ({b - a:.1f} s)"
+            if not any(msg in x for x in warnings):
+                warnings.append(f'across sections: {msg}')
     return {'track': os.path.join(voice_dir, 'voice.wav'), 'duration': vj['duration'], 'sections': vj['sections'],
             'words': words, 'actions': out, 'problems': problems, 'warnings': warnings}
 
