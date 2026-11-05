@@ -77,3 +77,47 @@ The stop rule was "every screen 8.5 from all three reviewers, or two rounds in a
 - **Phone widths:** the remaining nitpicks are wrapping, empty space on a few screens, and the footer buttons on New batch, Batch, Record and Review.
 - **The "nothing moves when you click" rule:** the chat bar sits centered on the content column on step screens, so it shifts sideways between Home and a demo. The judge kept it (it's a page change, not a click on the same page), but it's a taste call for Andy. The button press shrink and the card hover lift were removed.
 - **"Some":** the middle "Who's watching" option was shortened from "Some experience" to "Some". One reviewer finds it vague.
+
+---
+
+# Second climb (from 5 Nov 2026)
+
+New setup, following Andy's instructions:
+- The reviewers and the judge run on Claude Opus at high effort.
+- References are studied first (`docs/ui-references.md`), and the rubric and prompts are fixed (`docs/ui-review-rubric.md`).
+- The reviewers were calibrated on the reference sites (`docs/ui-review-calibration.md`).
+- Blind A/B comparisons decide what stays, with an overdesign guard on every round.
+- The interaction reviewer clicks through the real flows with Playwright.
+- Target: 9.5+ from every reviewer on every screen. Stop when that's reached, or after 3 rounds in a row with no comparison wins.
+
+**Baseline:** Andy's four fixes, applied before round 1:
+1. One sample demo, "Build it in Whop", on every step.
+2. The chat bar is pinned in one place.
+3. "Some experience" is back.
+4. No swearing by default, and no swear in the copy.
+
+## Round 1: baseline scores (no A/B yet)
+
+| Screen | User | Visual | QA | Min |
+|---|---|---|---|---|
+| welcome | 9.0 | 9.0 | 7.5 | 7.5 |
+| home | 8.5 | 8.5 | 8.0 | 8.0 |
+| new | 9.0 | 8.5 | 8.0 | 8.0 |
+| new-options | 8.0 | 8.0 | 8.5 | 8.0 |
+| new-batch | 8.5 | 8.0 | 8.5 | 8.0 |
+| batch | 8.0 | 8.0 | 6.5 | 6.5 |
+| script | 8.5 | 8.0 | 7.5 | 7.5 |
+| voice | 8.0 | 7.5 | 6.5 | 6.5 |
+| privacy | 9.0 | 8.0 | 6.5 | 6.5 |
+| record | 9.0 | 7.5 | 6.0 | 6.0 |
+| review | 8.5 | 8.0 | 6.5 | 6.5 |
+| export | 8.5 | 8.0 | 8.0 | 8.0 |
+| settings | 8.5 | 8.0 | 7.0 | 7.0 |
+
+Clicking through the real flows found bugs that the screenshots hid, and the judge reproduced all but one. Examples:
+- Privacy's cost confirm was skipped.
+- Batch "Watch" opened the wrong video.
+- Focus was lost after pop-ups closed.
+- Layout shifted on Voice and Record.
+
+The judge ranked 15 fixes for round 2, interaction bugs first.
