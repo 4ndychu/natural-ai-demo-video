@@ -46,7 +46,7 @@ Each section has two versions: the **talking version** the voice reads, and a **
 - Full stops fall. Commas lift slightly. Every comma tends to become a pause, so use fewer commas in lists and let casual lines run on. *(Stage 1 audit.)*
 - Don't use "…" for a hesitation. It stretches the word before it instead of adding a pause. *(Round 2 measurements.)*
 - Casual lines and "right?" can lift or trail. Only the last line of a section lands down. *(Round 3.)*
-- **The last line of a section is a plain statement that ends low.** Not a cheerful result ("and it's on the list"), but something that trails off with a place or a reason: "over on the right", "you don't really need to see what's done". The two lines Andy liked most for delivery both end this way, low and flat. *(A/B and research, 2026-11-05.)*
+- **The last line of a section is a plain statement that ends low.** Not a cheerful result ("and it's on the list"), but something that trails off with a place or a reason: "over on the right", "you don't really need to see what's done". The two lines Andy liked most for delivery both end this way, low and flat. *(A/B and research, 2026-11-05.)* Ending on a place is the most reliable: "…and it just goes on the list down here" landed low in both takes; "…so that's on the list now" in one of two. *(Ending test, 2026-11-05.)*
 
 ### Names the voice gets wrong
 - Respell brand or product names **in the talking version only** when the model mispronounces them, and keep the real spelling in captions. The model guesses pronunciation fresh each time, so the same take can say a name two ways. Test spellings by ear. *(Round 4 and 5: one brand name was said two different ways in one take until respelled.)*
