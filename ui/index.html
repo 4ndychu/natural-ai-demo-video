@@ -258,8 +258,8 @@ textarea{resize:none}
   .phone-setup{background:transparent!important;padding:4px 2px!important;color:var(--ink2)!important}
   .dcard .meta{margin-top:0!important;margin-left:6px}
   .bprimary{width:auto}
-  .welcome-art{min-height:200px!important}
-  .welcome-art img{object-position:50% 35%!important}
+  .welcome-art{min-height:320px!important}
+  .welcome-art img{object-position:50% 40%!important}
   .wfield{justify-content:flex-end}
   .recctl{min-height:72px}
   .recnote{grid-column:1 / -1;white-space:nowrap}
@@ -281,6 +281,7 @@ textarea{resize:none}
   .stepnav .brief{display:none}
   .stepnav .steplist{display:flex;overflow-x:auto;gap:2px;padding:6px!important;scrollbar-width:none;scroll-snap-type:x mandatory;scroll-padding-inline:6px;-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 10px,#000 calc(100% - 40px),transparent 100%);mask-image:linear-gradient(90deg,transparent 0,#000 10px,#000 calc(100% - 40px),transparent 100%)}
   .stepnav .steplist.at-start{-webkit-mask-image:linear-gradient(90deg,#000 0,#000 calc(100% - 40px),transparent 100%);mask-image:linear-gradient(90deg,#000 0,#000 calc(100% - 40px),transparent 100%)}
+  .stepnav .steplist::after{content:'';flex:0 0 48px}
   .stepnav .stepbtn{width:auto;min-height:44px;flex:none;padding:6px 12px 6px 6px;scroll-snap-align:start}
   .stepnav .stepbtn.now{box-shadow:none}
   .stepnav .stepbtn .sub{display:none!important}
@@ -327,7 +328,8 @@ textarea{resize:none}
   .dcard .meta{flex:1;min-width:0;padding:8px 10px}
   .sclen{margin:8px 0 0!important}
 
-  .welcome-art .big{font-size:64px!important}
+  .welcome-art .big{font-size:44px!important}
+  .welcome-art > div:last-child{padding:12px 18px 14px!important}
   .wfield{flex-wrap:wrap;margin-left:0!important}
   .wfield .inp{flex:1 1 100%!important}
   .wpad{margin-left:0!important}
