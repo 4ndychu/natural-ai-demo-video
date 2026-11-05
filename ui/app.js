@@ -189,8 +189,8 @@ class Component extends DCLogic {
       { k: 'swear', label: 'Swearing', f: (x) => ['Off', 'One', 'A few'][x], low: 'Off: fine for any audience.', high: 'On: at natural reactions, never in instructions.' }
     ].filter((d) => d.k !== 'pace' || model === 'v3').map((d) => Object.assign(d, { min: this.ranges[d.k][0], max: this.ranges[d.k][1] }));
     const chipFor = (d) => { const W = 300; const w = d.f(v[d.k]).length * 8.6; const lo = (W - 14 - w) / W * 100; const hi = (W - 10) / W * 100; const p1 = (v[d.k] - d.min) / (d.max - d.min) * 100; const p2 = (rec[d.k] - d.min) / (d.max - d.min) * 100; return (p1 > lo && p1 < hi) || (p2 > lo && p2 < hi); };
-    const sliders = defs.map((d) => ({ chip: false, label: d.label, min: d.min, max: d.max, value: v[d.k], display: d.f(v[d.k]), pct: ((v[d.k] - d.min) / (d.max - d.min) * 100) + '%', rec: ((rec[d.k] - d.min) / (d.max - d.min) * 100) + '%', off: v[d.k] !== rec[d.k], low: d.low, high: d.high, isSwear: d.k === 'swear',
-      reset: () => { const prev = this.state.vals; const n = Object.assign({}, prev); n[d.k] = rec[d.k]; setVals(n, d.label + ' back to recommended', prev); },
+    const sliders = defs.map((d) => ({ k: d.k, label: d.label, min: d.min, max: d.max, value: v[d.k], display: d.f(v[d.k]), pct: ((v[d.k] - d.min) / (d.max - d.min) * 100) + '%', rec: ((rec[d.k] - d.min) / (d.max - d.min) * 100) + '%', off: v[d.k] !== rec[d.k], low: d.low, high: d.high, isSwear: d.k === 'swear',
+      reset: () => { const prev = this.state.vals; const n = Object.assign({}, prev); n[d.k] = rec[d.k]; setVals(n, d.label + ' back to recommended', prev); this.focusLater('#rng-' + d.k); },
       onChange: (e) => setV(d.k, Number(e.target.value)),
       down: (e) => { this.dragKey = d.k; try { e.currentTarget.setPointerCapture(e.pointerId); } catch (x) {} drag(e, d); },
       move: (e) => { if (this.dragKey === d.k) drag(e, d); },
@@ -226,7 +226,7 @@ class Component extends DCLogic {
     const pvFoot = { strict: 'Strict', standard: 'Standard', test: 'Test account', custom: 'Custom' }[preset];
     const footTexts = [
       D.written ? (D.max > 0 ? 'Approved. Changing a line asks you to approve again.' : 'Not approved yet. ' + this.secs.length + ' sections, about ' + lengthText) : 'Claude is writing the script',
-      voiceOk ? voicePretty + (changed ? ', ' + changed + ' setting' + (changed === 1 ? '' : 's') + ' changed' : ', recommended for a ' + kindName) : voicePretty + ' isn’t trained for ' + (model === 'v4' ? 'Eleven v4' : 'Eleven v3'),
+      voiceOk ? voicePretty + (changed ? ', ' + changed + ' setting' + (changed === 1 ? '' : 's') + ' changed' : ', recommended for a ' + kindName) : voicePretty + ' needs Eleven ' + vInfo.models[0] + '. Pick another voice, or',
       pvFoot + (D.recorded ? '' : ' · recording uses about ' + this.num(videoCost) + ' credits'),
       D.recorded ? 'Recorded, ' + lengthText : (st.recStopped ? 'Stopped. Finished sections are kept.' : (st.recPaused ? (isPhone ? 'Paused.' : 'Paused. The draft is ready when recording finishes.') : (isPhone ? 'The draft comes when it’s done.' : 'The draft is ready when recording finishes.'))),
       marks ? 'Marked sections are redone, then you watch them again. About ' + this.num(markedSecs.length * 420) + ' credits.' : (unsure ? this.plural(unsure, 'blur') + ' to check' : 'Nothing marked'),
@@ -376,6 +376,7 @@ class Component extends DCLogic {
       primaryBlocked: (st.step === 0 && !D.written) || (st.step === 3 && !D.recorded) || (st.step === 1 && !voiceOk),
       confirming: !!cf, notConfirming: !cf, confirmNo: cf ? cf.no : '', confirmYes: cf ? cf.yes : '', cancelConfirm: () => { this.setState({ confirm: null }); this.focusLater('.stepfoot .pri'); }, doConfirm: () => { if (cf) cf.act(); },
       footText: foot.text, footDot: foot.dot, footColor: foot.color,
+      footLinkOn: !cf && footBad, footLinkLabel: 'switch back to ' + vInfo.models[0], footLinkAct: () => { this.patchDemo({ model: vInfo.models[0] }); this.say('Switched to Eleven ' + vInfo.models[0] + ' for ' + voicePretty); this.focusLater('.stepfoot .pri'); },
       // script
       scPickSel: (e) => this.setState({ scSel: Number(e.target.value), scChange: false, scDraft: '' }),
       scList: this.secs.map((s, i) => ({ i: i, t: this.fmt(this.starts[i]), n: s.n, on: st.scSel === i ? 'true' : 'false', edited: !!(D.lines && D.lines[i]), pick: () => this.setState({ scSel: i, scChange: false, scDraft: '' }) })),
@@ -394,20 +395,21 @@ class Component extends DCLogic {
         pick: () => { if (voice === k) return; const prevVoice = D.voice; const prevModel = model; const prevVals = st.vals; const switchModel = VO[k].models.indexOf(model) < 0; this.patchDemo({ voice: k, model: switchModel ? VO[k].models[0] : model }); this.setState({ vals: this.recFor(k, D.kind) }); this.say(switchModel ? 'Switched to Eleven ' + VO[k].models[0] + ' for ' + pretty(k) : 'Picked ' + pretty(k), () => { this.patchDemo({ voice: prevVoice, model: prevModel }); this.setState({ vals: prevVals }); }); },
         hear: () => { if (this.needKey()) return; const first = !st.heardVoices[k]; const h = Object.assign({}, st.heardVoices); h[k] = true; this.setState({ heardVoices: h }); if (first) this.spend(120); this.say('Playing ' + pretty(k) + (first ? ', 120 credits' : ', free replay')); } }; }),
       models: segOf([['v4', 'Eleven v4 (recommended)'], ['v3', 'Eleven v3']], model, (x) => this.patchDemo({ model: x })).map((o, i) => Object.assign(o, { short: ['v4 (recommended)', 'v3'][i] })),
-      voiceWarn: !voiceOk, voiceWarnText: voicePretty + ' needs Eleven ' + vInfo.models[0] + '. Pick another voice, or switch the model back.',
+      voiceWarn: !voiceOk,
       openLib: () => this.setState({ lib: true }), closeLib: () => this.setState({ lib: false }), libOpen: st.lib,
       libFilters: [['all', 'All'], ['f', 'Female'], ['m', 'Male']].map((o) => ({ label: o[1], on: st.libF === o[0] ? 'true' : 'false', pick: () => this.setState({ libF: o[0] }) })),
       lib: Object.keys(VO).filter((k) => st.libF === 'all' || VO[k].g === st.libF).map((k) => ({ name: VO[k].name, desc: VO[k].desc + ', ' + (VO[k].models.length === 2 ? 'v3 and v4' : VO[k].models[0] + ' only'), img: VO[k].img, c: VO[k].c, canAdd: st.mine.indexOf(k) < 0, added: st.mine.indexOf(k) >= 0, hearAria: 'Hear ' + VO[k].name,
         hear: () => { if (this.needKey()) return; const first = !st.heardVoices[k]; const h = Object.assign({}, st.heardVoices); h[k] = true; this.setState({ heardVoices: h }); if (first) this.spend(120); this.say('Playing ' + pretty(k) + (first ? ', 120 credits' : ', free replay')); },
         add: () => { this.setState({ mine: st.mine.concat([k]) }); this.say(pretty(k) + ' added to your voices', () => this.setState({ mine: this.state.mine.filter((x) => x !== k) })); } })),
       kinds: [['course', 'Course walkthrough'], ['saas', 'Quick SaaS demo'], ['tour', 'Product tour']].map((o) => ({ label: o[1], on: D.kind === o[0] ? 'true' : 'false', pick: () => { if (D.kind === o[0]) return; const prevV = st.vals; const prevK = D.kind; this.patchDemo({ kind: o[0] }); this.setState({ vals: this.recFor(voice, o[0]) }); this.say('Switched to ' + o[1].toLowerCase() + ' settings', () => { this.patchDemo({ kind: prevK }); this.setState({ vals: prevV }); }); } })),
-      fineNote: changed ? changed + ' changed' : 'All recommended', sliders: sliders, sliderHelp: st.sliderHelp, toggleSliderHelp: () => this.setState({ sliderHelp: !st.sliderHelp }), sliderHelpLabel: st.sliderHelp ? 'Hide what these do' : 'What do these do?',
-      resetAll: () => { const prev = st.vals; setVals(Object.assign({}, rec), 'Back to the recommended settings', prev); }, anyChanged: changed > 0,
+      fineNote: changed ? changed + ' changed' : 'All recommended', sliders: sliders.filter((x) => x.k !== 'pace' && x.k !== 'swear'), paceSliders: sliders.filter((x) => x.k === 'pace'),
+      swearPills: ['Off', 'One', 'A few'].map((l, i) => ({ label: l, on: v.swear === i ? 'true' : 'false', pick: () => setV('swear', i) })), swearHelp: 'Off: fine for any audience. On: at natural reactions, never in instructions.', sliderHelp: st.sliderHelp, toggleSliderHelp: () => this.setState({ sliderHelp: !st.sliderHelp }), sliderHelpLabel: st.sliderHelp ? 'Hide what these do' : 'What do these do?',
+      resetAll: () => { const prev = st.vals; setVals(Object.assign({}, rec), 'Back to the recommended settings', prev); this.focusLater('#slhelp'); }, anyChanged: changed > 0,
       capsOn: a.onStr, capsCls: a.cls, toggleCaps: () => this.setState({ caps: !st.caps }),
       playSample: () => { if (st.sampling) { this.stop('sample'); this.setState({ sampling: false }); return; } if (this.needKey()) return; const free = st.lastSample === sampleKey; if (!free) this.spend(300); this.setState({ sampling: true, lastSample: sampleKey }); this.later('sample', 6000, () => this.setState({ sampling: false })); },
       samplePlaying: st.sampling, sampleStopped: !st.sampling, playAria: st.sampling ? 'Stop sample' : 'Play sample', wvClass: st.sampling ? 'wv on' : 'wv',
       wbars: [30, 55, 40, 75, 50, 90, 62, 100, 48, 70, 36, 64, 88, 52, 96, 58, 44, 80, 50, 72, 34, 60, 92, 46, 70, 40, 66, 30].map((h, i) => ({ h: h + '%', d: (i % 7) * 70 + 'ms' })),
-      sampleCost: st.lastSample === sampleKey ? 'Replays are free.' : 'Hearing a voice the first time costs about 300 credits. Replays are free.', swearOn: v.swear > 0, isDefVoice: st.defVoice === voice, makeDefault: () => { const prev = st.defVoice; this.setState({ defVoice: voice }); this.say(voicePretty + ' is now your default voice', () => this.setState({ defVoice: prev })); },
+      sampleCost: st.lastSample === sampleKey ? 'Replays are free.' : 'Hearing a voice the first time costs about 300 credits. Replays are free.', swearOn: v.swear > 0, isDefVoice: st.defVoice === voice, makeDefault: () => { const prev = st.defVoice; if (prev === voice) { if (this.prevDef && this.prevDef !== voice) { this.setState({ defVoice: this.prevDef }); this.say(pretty(this.prevDef) + ' is the default again'); } return; } this.prevDef = prev; this.setState({ defVoice: voice }); this.say(voicePretty + ' is now your default voice', () => this.setState({ defVoice: prev })); },
       videoCostText: this.num(videoCost), leftAfterText: this.num(leftAfter), creditsNowText: this.num(st.credits), thisPct: (D.recorded || !st.credits ? 0 : Math.min(1, videoCost / st.credits) * 100) + '%', restPct: (D.recorded || !st.credits ? 100 : Math.max(0, 1 - videoCost / st.credits) * 100) + '%',
       lengthText: lengthText, paceText: paceText, isV3: model === 'v3',
       lockOn: l.onStr, lockCls: l.cls, toggleLock: () => this.setState({ lock: !st.lock }),

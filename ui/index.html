@@ -142,7 +142,15 @@ textarea{resize:none}
 .vimg img{width:100%;height:100%;object-fit:cover;object-position:50% 30%;display:block}
 .hear{position:absolute;right:15px;top:163px;height:32px;padding:0 12px;border-radius:16px;border:0;background:rgba(255,255,255,0.94);color:#111;display:inline-flex;align-items:center;gap:6px;font-size:13px}
 .vtag{display:inline-block;margin-top:4px;font-size:12px;padding:2px 8px;border-radius:999px;background:var(--wash);color:var(--ink2)}
-.sliders{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(250px,100%),1fr));gap:14px;align-items:start}
+.sliders{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;align-items:start}
+.paceslot{min-height:46px}
+.swrow{display:flex;align-items:center;justify-content:space-between;gap:8px;height:46px;padding:0 6px 0 14px;border-radius:12px;background:var(--wash);box-sizing:border-box}
+.swl{font-weight:450;white-space:nowrap}
+.mpills{display:flex;gap:2px}
+.mpills button{height:34px;padding:0 12px;border:0;border-radius:999px;background:transparent;color:var(--ink2);font-size:14px;white-space:nowrap}
+.mpills button[aria-pressed=true]{background:var(--segOn);color:var(--ink);font-weight:500;box-shadow:0 1px 2px rgba(0,0,0,0.14),inset 0 0 0 1px var(--fill)}
+@media (hover:hover){.mpills button[aria-pressed=false]:hover{color:var(--ink);background:var(--wash)}}
+.swcap{display:flex;align-items:center;justify-content:space-between;gap:10px;height:46px;margin-top:14px;padding:0 8px 0 14px;border-radius:12px;background:var(--wash);box-sizing:border-box}
 /* privacy */
 .presets{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
 .preset{border:0;text-align:left;background:var(--tray);border-radius:20px;padding:16px 16px 18px;display:flex;flex-direction:column;gap:6px;color:var(--ink)}
@@ -232,11 +240,9 @@ textarea{resize:none}
 .batchrail .stepbtn:not(.now):hover{background:transparent!important}
 .waitlist{max-height:360px;overflow:auto}
 .bprimary{width:340px;overflow:hidden;text-overflow:ellipsis}
-.swslot{display:grid}
 @media (min-width: 861px){.caprow{border-top:0!important;padding-top:0!important}}
 .sumrow.open{background:transparent;box-shadow:inset 0 0 0 1px var(--line)}
 .fadebot{-webkit-mask-image:linear-gradient(#000 calc(100% - 32px),transparent);mask-image:linear-gradient(#000 calc(100% - 32px),transparent)}
-.swslot > *{grid-area:1/1}
 .chatpill:focus-within{box-shadow:0 0 0 2px var(--focus)!important}
 .btn.line,.btn.strong{background:var(--wash);box-shadow:none}
 .tagq.solid{box-shadow:none;background:var(--wash);color:var(--ink)}
@@ -270,7 +276,7 @@ textarea{resize:none}
   .filerow > span:nth-child(2){flex:1 1 calc(100% - 40px)!important}
   .filerow .btn{margin-left:auto}
   .folderrow{flex-wrap:wrap;justify-content:flex-end}
-  .ftrow{flex-wrap:nowrap!important}
+  .ftrow{flex-wrap:nowrap!important;height:40px}
   .sc > div:first-child:not(.scpanel){display:none}
   .scbtns{flex-wrap:nowrap!important}
   #scsel{appearance:none;-webkit-appearance:none;background:var(--wash) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2.4' stroke-linecap='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") no-repeat right 14px center;border:0;border-radius:999px;padding-right:36px}
@@ -287,8 +293,7 @@ textarea{resize:none}
   .pquote{--ql:4;font-size:15px}
   .pausebtn{width:84px;padding:0 12px}
   .slide .slabel{right:8px}
-  .swhide-sm{display:none!important}
-  .swslot-sm{display:grid!important}
+  .sliders{grid-template-columns:minmax(0,1fr)}
   .setrow,.list > div > .row,.list > .row{flex-wrap:wrap}
   .page{padding:4px 12px 120px}
   .hdr{padding:0 8px 0 14px;gap:4px}
@@ -590,20 +595,33 @@ textarea{resize:none}
 
 
 <div style="margin-top: 22px">
-<div class="ftrow" style="display: flex; align-items: center; gap: 12px; min-height: 40px; flex-wrap: wrap"><h2 class="h-sec">Fine-tune</h2><span class="muted small lg-only" style="white-space: nowrap">{{fineNote}}</span><div v-if="anyChanged" style="display: contents"><button type="button" class="btn sm" @click="resetAll($event)">Reset all</button></div><span style="flex: 1"></span><button type="button" class="link small" @click="toggleSliderHelp($event)" :aria-expanded="(sliderHelp)">{{sliderHelpLabel}}</button></div>
-<div class="sliders" style="margin-top: 10px">
+<div class="ftrow" style="display: flex; align-items: center; gap: 12px; min-height: 40px; flex-wrap: wrap"><h2 class="h-sec" style="flex: none; white-space: nowrap">Fine-tune</h2><span class="muted small lg-only" style="white-space: nowrap">{{fineNote}}</span><div v-if="anyChanged" style="display: contents"><button id="resetall" type="button" class="btn sm" @click="resetAll($event)">Reset all</button></div><span style="flex: 1"></span><button id="slhelp" type="button" class="link small" @click="toggleSliderHelp($event)" :aria-expanded="(sliderHelp)">{{sliderHelpLabel}}</button></div>
+<p class="muted small" style="margin: 2px 0 0">Drag a bar or click anywhere on it. The small notch marks the recommended spot for {{voiceName}}.</p>
+<div class="sliders" style="margin-top: 12px">
 <div v-for="s in sliders" style="display: contents">
 <div>
 <div class="slwrap">
-<div class="bar" @pointerdown="s.down($event)" @pointermove="s.move($event)" @pointerup="s.up($event)" @pointercancel="s.up($event)"><span class="fill" :style="'width: ' + (s.pct)"></span><span class="rec" :style="'left: ' + (s.rec)"></span><span class="bl">{{s.label}}</span><span :class="s.chip ? 'bv chip' : 'bv'">{{s.display}}</span><input type="range" :aria-label="(s.label)" :min="(s.min)" :max="(s.max)" step="1" :value="(s.value)" @input="s.onChange($event)" @change="s.onChange($event)"></div>
+<div class="bar" @pointerdown="s.down($event)" @pointermove="s.move($event)" @pointerup="s.up($event)" @pointercancel="s.up($event)"><span class="fill" :style="'width: ' + (s.pct)"></span><span class="rec" :style="'left: ' + (s.rec)"></span><span class="bl">{{s.label}}</span><span class="bv">{{s.display}}</span><input type="range" :id="'rng-' + s.k" :aria-label="(s.label)" :min="(s.min)" :max="(s.max)" step="1" :value="(s.value)" @input="s.onChange($event)" @change="s.onChange($event)"></div>
 <div v-if="s.off" style="display: contents"><button type="button" class="reset" @click="s.reset($event)" :aria-label="s.label + ' back to recommended'" title="Back to recommended"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.4-5.7L4 8.5"></path><path d="M4 3.5v5h5"></path></svg></button></div>
 </div>
 <div v-if="sliderHelp" style="display: contents"><p class="muted small" style="margin: 6px 0 0">{{s.low}}<br>{{s.high}}</p></div>
 </div>
 </div>
-<div class="lg-only" :style="'visibility: ' + (swearOn ? 'visible' : 'hidden')"><div style="display: flex; align-items: center; justify-content: space-between; gap: 10px; height: 46px; padding: 0 8px 0 14px; border-radius: 12px; background: var(--wash); box-sizing: border-box"><span id="capsLbl">Swears in captions too</span><button type="button" :class="(capsCls)" role="switch" :aria-checked="(capsOn)" aria-labelledby="capsLbl" @click="toggleCaps($event)"><span></span></button></div></div>
+<div>
+<div class="swrow"><span class="swl" id="swlbl">Swearing</span><span class="mpills" role="group" aria-labelledby="swlbl"><div v-for="o in swearPills" style="display: contents"><button type="button" :aria-pressed="(o.on)" @click="o.pick($event)">{{o.label}}</button></div></span></div>
+<div v-if="sliderHelp" style="display: contents"><p class="muted small" style="margin: 6px 0 0">{{swearHelp}}</p></div>
 </div>
-<div class="swslot" style="margin-top: 12px; min-height: 46px"><p class="muted small" :style="'margin: 0; align-self: center; visibility: ' + (swearOn && isPhone ? 'hidden' : 'visible')">Drag a bar or click anywhere on it. The small notch marks the recommended spot for {{voiceName}}.</p><div class="sm-only" :style="'visibility: ' + (swearOn ? 'visible' : 'hidden')"><div style="display: flex; align-items: center; justify-content: space-between; gap: 10px; height: 46px; padding: 0 8px 0 14px; border-radius: 12px; background: var(--wash); box-sizing: border-box"><span id="capsLbl2">Swears in captions too</span><button type="button" :class="(capsCls)" role="switch" :aria-checked="(capsOn)" aria-labelledby="capsLbl2" @click="toggleCaps($event)"><span></span></button></div></div></div>
+<div class="paceslot"><div v-if="isV3" style="display: contents"><div v-for="s in paceSliders" style="display: contents">
+<div>
+<div class="slwrap">
+<div class="bar" @pointerdown="s.down($event)" @pointermove="s.move($event)" @pointerup="s.up($event)" @pointercancel="s.up($event)"><span class="fill" :style="'width: ' + (s.pct)"></span><span class="rec" :style="'left: ' + (s.rec)"></span><span class="bl">{{s.label}}</span><span class="bv">{{s.display}}</span><input type="range" :id="'rng-' + s.k" :aria-label="(s.label)" :min="(s.min)" :max="(s.max)" step="1" :value="(s.value)" @input="s.onChange($event)" @change="s.onChange($event)"></div>
+<div v-if="s.off" style="display: contents"><button type="button" class="reset" @click="s.reset($event)" :aria-label="s.label + ' back to recommended'" title="Back to recommended"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.4-5.7L4 8.5"></path><path d="M4 3.5v5h5"></path></svg></button></div>
+</div>
+<div v-if="sliderHelp" style="display: contents"><p class="muted small" style="margin: 6px 0 0">{{s.low}}<br>{{s.high}}</p></div>
+</div>
+</div></div></div>
+</div>
+<div class="swcap" :style="'visibility: ' + (swearOn ? 'visible' : 'hidden')"><span id="capsLbl">Swears in captions too</span><button type="button" :class="(capsCls)" role="switch" :aria-checked="(capsOn)" aria-labelledby="capsLbl" @click="toggleCaps($event)" :tabindex="swearOn ? null : '-1'"><span></span></button></div>
 </div>
 </div>
 
@@ -625,10 +643,10 @@ textarea{resize:none}
 </div>
 </div>
 <div class="tray"><div class="sheet" style="padding: 14px 16px">
-<div style="display: flex; justify-content: space-between; gap: 10px"><span>Video length</span><span>about <span class="mono">{{lengthText}}</span><span v-if="isV3" class="muted small"> at {{paceText}}</span></span></div>
+<div style="display: flex; justify-content: space-between; gap: 10px; white-space: nowrap"><span>Video length</span><span>about <span class="mono">{{lengthText}}</span><span v-if="isV3" class="muted small"> at {{paceText}}</span></span></div>
 <div style="display: flex; justify-content: space-between; gap: 10px; margin-top: 4px"><span>This video</span><span>about {{videoCostText}} credits</span></div>
 <div class="muted" style="display: flex; justify-content: space-between; gap: 10px; margin-top: 4px"><span>Credits</span><span>{{creditsNowText}} → about {{leftAfterText}}</span></div>
-<div style="border-top: 1px solid var(--line); margin-top: 12px; padding-top: 10px; display: flex; align-items: center; gap: 10px; min-height: 30px"><div v-if="isDefVoice" style="display: contents"><span class="muted">Default voice for new demos: {{voiceName}}</span></div><div v-if="!isDefVoice" style="display: contents"><span id="lockLbl" style="flex: 1">Make {{voiceName}} the default for new demos</span><button type="button" class="sw" role="switch" aria-checked="false" aria-labelledby="lockLbl" @click="makeDefault($event)"><span></span></button></div></div>
+<div style="border-top: 1px solid var(--line); margin-top: 12px; padding-top: 10px; display: flex; align-items: center; gap: 10px; min-height: 30px"><span id="lockLbl" style="flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">Use {{voiceName}} for new demos</span><button type="button" :class="isDefVoice ? 'sw on' : 'sw'" role="switch" :aria-checked="isDefVoice ? 'true' : 'false'" aria-labelledby="lockLbl" @click="makeDefault($event)"><span></span></button></div>
 </div>
 </div>
 </aside>
@@ -823,7 +841,7 @@ textarea{resize:none}
 </div>
 </div>
 <div class="foot stepfoot">
-<span class="ftext" :style="'color: ' + (footColor)"><span class="dot" :style="'background: ' + (footDot)"></span><span>{{footText}}</span></span>
+<span class="ftext" :style="'color: ' + (footColor)"><span class="dot" :style="'background: ' + (footDot)"></span><span>{{footText}}<span v-if="footLinkOn"> <button type="button" class="link" @click="footLinkAct($event)">{{footLinkLabel}}</button></span></span></span>
 <span class="fbtns">
 <div v-if="confirming" style="display: contents"><button type="button" class="btn" @click="cancelConfirm($event)">{{confirmNo}}</button><button id="cfyes" type="button" class="pri" @click="doConfirm($event)">{{confirmYes}}</button></div>
 <div v-if="notConfirming" style="display: contents">
