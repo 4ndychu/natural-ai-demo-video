@@ -159,6 +159,7 @@ class Component extends DCLogic {
     const lengthText = this.fmt(lengthSec);
     const paceText = (pace / 100).toFixed(2) + 'x';
     const kindName = { course: 'course walkthrough', saas: 'quick SaaS demo', tour: 'product tour' }[D.kind];
+    const isPhone = (() => { try { return window.matchMedia('(max-width: 860px)').matches; } catch (e) { return false; } })();
     const recording = !D.recorded && st.recPos < N && !st.recStopped;
     const voiceOk = vInfo.models.indexOf(model) >= 0;
     const S = [
@@ -226,7 +227,7 @@ class Component extends DCLogic {
       D.written ? (D.max > 0 ? 'Approved. Changing a line asks you to approve again.' : 'Not approved yet. ' + this.secs.length + ' sections, about ' + lengthText) : 'Claude is writing the script',
       voiceOk ? voicePretty + (changed ? ', ' + changed + ' setting' + (changed === 1 ? '' : 's') + ' changed' : ', recommended for a ' + kindName) : voicePretty + ' isn’t trained for ' + (model === 'v4' ? 'Eleven v4' : 'Eleven v3'),
       pvFoot + (D.recorded ? '' : ' · recording uses about ' + this.num(videoCost) + ' credits'),
-      D.recorded ? 'Recorded, ' + lengthText : (st.recStopped ? 'Stopped. Finished sections are kept.' : (st.recPaused ? 'Paused. The draft is ready when recording finishes.' : 'The draft is ready when recording finishes.')),
+      D.recorded ? 'Recorded, ' + lengthText : (st.recStopped ? 'Stopped. Finished sections are kept.' : (st.recPaused ? (isPhone ? 'Paused.' : 'Paused. The draft is ready when recording finishes.') : (isPhone ? 'The draft comes when it’s done.' : 'The draft is ready when recording finishes.'))),
       marks ? 'Marked sections are redone, then you watch them again. About ' + this.num(markedSecs.length * 420) + ' credits.' : (unsure ? this.plural(unsure, 'blur') + ' to check' : 'Nothing marked'),
       D.exported ? (D.dirty ? 'Changed. Export again to update the files.' : 'Exported Nov 2 · ' + this.plural(1 + ((D.capMode || 'burn') === 'file' ? 1 : 0) + 1 + (st.p720 ? 1 : 0), 'file')) : 'Free to change, no credits'
     ];
@@ -292,7 +293,7 @@ class Component extends DCLogic {
       themeClass: theme === 'dark' ? 't-dark' : 't-light', isDark: theme === 'dark', isLight: theme !== 'dark', themeAria: theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode', toggleTheme: () => this.setState({ theme: theme === 'dark' ? 'light' : 'dark' }),
       isWelcome: st.screen === 'welcome', inApp: st.screen !== 'welcome', isHome: st.screen === 'home', isDemo: st.screen === 'demo', isSettings: st.screen === 'settings', isNew: st.screen === 'new', isBatch: st.screen === 'batch',
       crumb: st.screen !== 'home', crumbBatch: st.screen === 'demo' && !!st.fromBatch, crumbBatchName: st.fromBatch ? (st.batches.find((x) => x.id === st.fromBatch) || {}).name : '', goBatch: () => this.setState({ screen: 'batch', fromBatch: null, batchItem: null }), crumbText: st.screen === 'demo' ? (st.fromBatch && B ? (B.items[st.batchItem] || {}).t : D.title) : st.screen === 'batch' ? (B ? B.name : '') : st.screen === 'new' ? (st.editing ? 'Edit brief' : 'New demo') : 'Settings',
-      showNewBtn: false, isPhone: (() => { try { return window.matchMedia('(max-width: 860px)').matches; } catch (e) { return false; } })(),
+      showNewBtn: false, isPhone: isPhone,
       goHome: () => this.setState({ screen: 'home', help: false, confirm: null }), goSettings: () => this.setState({ screen: 'settings', help: false }),
       helpOpen: st.help, toggleHelp: () => this.setState({ help: !st.help }),
       keyOn: st.keyOn, keyOff: !st.keyOn, creditsText: this.num(st.credits),  creditPct: (st.credits / 30000 * 100) + '%',
@@ -428,8 +429,9 @@ class Component extends DCLogic {
       recHeadWords: D.recorded ? 'All sections recorded' : st.recStopped ? 'Stopped after' : 'Section', recHeadNum: D.recorded ? '' : (st.recStopped ? st.recPos : Math.min(N, st.recPos + 1)) + ' of ' + N, recLeft: D.recorded ? lengthText : String(Math.max(1, Math.ceil((N - st.recPos) * 0.4))), recLeftWords: D.recorded ? '' : 'min left',
       recPct: (D.recorded ? 100 : st.recPos / N * 100) + '%',
       recNowName: this.secs[Math.min(N - 1, st.recPos)].n, recNowLine: lineOf(Math.min(N - 1, st.recPos)),
-      recNext: this.secs.slice(st.recPos + 1, st.recPos + 3).map((s) => s.n), hasRecNext: st.recPos < N - 1,
-      recDoneCount: st.recPos ? this.plural(st.recPos, 'section') : 'None yet', recDoneAll: this.secs.slice(0, st.recPos).map((s) => s.n), recDoneOpen: st.recDoneOpen, toggleRecDone: () => this.setState({ recDoneOpen: !st.recDoneOpen }),
+      recNext: [st.recPos + 1, st.recPos + 2].map((k) => ({ n: k < N ? this.secs[k].n : '' })),
+      recHeadLine: D.recorded ? 'All ' + N + ' sections recorded · ' + lengthText : st.recStopped ? 'Stopped after ' + st.recPos + ' of ' + N + ' sections' : 'Section ' + Math.min(N, st.recPos + 1) + ' of ' + N + ' · about ' + Math.max(1, Math.ceil((N - st.recPos) * 0.4)) + ' min left',
+      hasLastDone: st.recPos > 0, recLastDone: st.recPos > 0 ? this.secs[Math.min(N, st.recPos) - 1].n : '', recNowMark: st.recPaused || st.recStopped ? 'ring' : 'spin',
       recPaused: st.recPaused, recStopAsk: st.recStopAsk, recStopped: st.recStopped, recControls: !D.recorded && !st.recStopAsk && !st.recStopped,
       pauseLabel: st.recPaused ? 'Resume' : 'Pause',
       pauseRec: () => { if (st.recPaused) { this.setState({ recPaused: false }); this.startRecording(st.recPos); this.setState({ recPos: st.recPos }); } else { this.stop('rec'); this.setState({ recPaused: true }); this.patchDemo({ status: 'Paused at ' + (st.recPos + 1) + ' of ' + N }); } },

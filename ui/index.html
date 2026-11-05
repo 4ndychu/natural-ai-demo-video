@@ -192,6 +192,21 @@ textarea{resize:none}
 @media (max-width: 860px){.newtile{min-height:64px!important;flex-direction:row!important;justify-content:flex-start!important;padding:10px 16px!important}.newtile > span:first-child{width:40px!important;height:40px!important}.newtile .wide{font-size:16px!important}}
 .recscreen{aspect-ratio:16/10}
 .recctl{display:grid;grid-template-columns:auto 1fr auto;row-gap:6px;column-gap:8px;align-items:center;min-height:72px;margin-top:16px}
+.rphead{font-size:17px}
+.prog{list-style:none;margin:14px 0 0;padding:0;display:flex;flex-direction:column;gap:2px}
+.prog li{display:flex;align-items:center;gap:10px;min-height:36px;padding:0 4px}
+.prog .pn{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.prog .pdone{color:var(--ink2)}
+.prog .pnow{display:block;margin:4px 0;padding:12px 14px 14px;border-radius:14px;background:var(--sheet);box-shadow:inset 0 0 0 1px var(--line)}
+.pnowtop{display:flex;align-items:center;gap:10px;font-weight:500}
+.pquote{--ql:3;margin:8px 0 0;font-size:16px;line-height:1.45;height:calc(var(--ql) * 1.45em);overflow:hidden;display:-webkit-box;-webkit-line-clamp:var(--ql);-webkit-box-orient:vertical}
+.pmark{flex:none;width:16px;height:16px;border-radius:8px;box-sizing:border-box;position:relative}
+.pmark.tick{background:var(--ink2)}
+.pmark.tick::after{content:'';position:absolute;left:5.5px;top:3px;width:3px;height:7px;border:solid var(--sheet);border-width:0 1.6px 1.6px 0;transform:rotate(45deg)}
+.pmark.dash{border:1.5px dashed var(--ink2)}
+.pmark.ring{box-shadow:inset 0 0 0 1.5px var(--ink)}
+.pmark.spin{border:1.8px solid var(--fill);border-top-color:var(--ink);animation:spin 900ms linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
 .t-dark{--segOn:#4A4A52;--knobOff:#A2A2A8}
 .t-dark .seg button[aria-pressed=true]{box-shadow:inset 0 0 0 1px rgba(242,242,240,0.28)}
 .t-dark .stepbtn.now{background:var(--segOn)}
@@ -234,7 +249,7 @@ textarea{resize:none}
 .t-dark .capchip{background:#000;box-shadow:inset 0 0 0 1px var(--line)}
 .bar .bl{font-weight:450}
 .mono{font-weight:400}
-@media (prefers-reduced-motion: reduce){.wv.on span,.fade,.toast,.skel{animation:none}.bar .fill,button,.sw span,.disclose svg{transition:none}}
+@media (prefers-reduced-motion: reduce){.wv.on span,.fade,.toast,.skel,.pmark.spin{animation:none}.bar .fill,button,.sw span,.disclose svg{transition:none}}
 /* phone width */
 @media (min-width: 861px){.sm-only{display:none!important}}
 @media (max-width: 860px){
@@ -261,6 +276,7 @@ textarea{resize:none}
   .welcome-art img{object-position:50% 40%!important}
   .wfield{justify-content:flex-end}
   .recctl{min-height:72px}
+  .pquote{--ql:4;font-size:15px}
   .recnote{grid-column:1 / -1;white-space:nowrap}
   .swhide-sm{display:none!important}
   .swslot-sm{display:grid!important}
@@ -675,25 +691,15 @@ textarea{resize:none}
 </div>
 <div v-if="recDone" style="display: contents"><p class="muted" style="margin: 14px 0 0">{{recNote}}</p></div>
 </div>
-<div class="panel" aria-live="polite" style="display: flex; flex-direction: column; align-self: start">
-<div style="display: flex; justify-content: space-between; align-items: baseline; gap: 10px"><span style="font-size: 17px">{{recHeadWords}} <span style="font-weight: 500">{{recHeadNum}}</span></span><span>about <span class="mono" style="font-size: 15px">{{recLeft}}</span> {{recLeftWords}}</span></div>
+<div class="panel recpanel" aria-live="polite" style="display: flex; flex-direction: column; align-self: start">
+<div class="rphead">{{recHeadLine}}</div>
 <div style="height: 6px; border-radius: 3px; background: var(--fill); margin-top: 10px; overflow: hidden"><span :style="'display: block; width: ' + (recPct) + '; height: 6px; background: var(--ink); transition: width 400ms ease'"></span></div>
 <div v-if="isRecording" style="display: contents">
-<div style="margin-top: 14px; position: relative">
-<div class="muted small" style="font-weight: 500; margin-bottom: 4px">Done</div>
-<button type="button" class="link small" @click="toggleRecDone($event)" :aria-expanded="recDoneOpen ? 'true' : 'false'" style="text-decoration: none; display: inline-flex; align-items: center; gap: 6px"><span class="disc done" style="width: 18px; height: 18px; font-size: 10px">✓</span>{{recDoneCount}} <span aria-hidden="true">{{recDoneOpen ? '▾' : '▸'}}</span></button>
-<div v-if="recDoneOpen" style="display: contents"><div class="fade" style="position: absolute; z-index: 3; left: 0; right: 0; top: 30px; max-height: 220px; overflow-y: auto; padding: 10px 14px; border-radius: 14px; background: var(--sheet); border: 1px solid var(--line); box-shadow: 0 16px 36px -16px rgba(0,0,0,0.35)"><div v-for="n in recDoneAll" style="display: contents"><div class="muted small" style="margin-top: 2px">{{n}}</div></div></div></div>
-</div>
-<div class="muted small" style="font-weight: 500; margin: 12px 0 4px">Now</div>
-<div style="background: var(--sheet); border-radius: 14px; padding: 14px 14px 16px">
-<div style="display: flex; align-items: center; gap: 8px; font-weight: 600"><span class="dot" :style="'background: ' + (recBadgeDot)"></span>{{recNowName}}</div>
-<div class="muted small" style="margin-top: 8px">{{voiceName}} is saying</div>
-<p style="margin: 4px 0 0; font-size: 18px; line-height: 1.45; min-height: 2.9em">“{{recNowLine}}”</p>
-</div>
-<div style="margin-top: 12px">
-<div class="muted small" style="font-weight: 500">Next</div>
-<div v-for="n in recNext" style="display: contents"><div style="margin: 4px 0 0 12px; font-size: 16px">{{n}}</div></div>
-</div>
+<ol class="prog" aria-label="Sections">
+<li class="pdone" :style="hasLastDone ? '' : 'visibility: hidden'"><span class="pmark tick" aria-hidden="true"></span><span class="pn">{{recLastDone}}</span><span class="sr">, done</span></li>
+<li class="pnow"><div class="pnowtop"><span :class="'pmark ' + (recNowMark)" aria-hidden="true"></span><span class="pn">{{recNowName}}</span></div><p class="pquote">“{{recNowLine}}”</p></li>
+<div v-for="n in recNext" style="display: contents"><li class="pnext" :style="n.n ? '' : 'visibility: hidden'"><span class="pmark dash" aria-hidden="true"></span><span class="pn">{{n.n}}</span></li></div>
+</ol>
 <div class="recctl">
 <div v-if="recControls" style="display: contents"><button type="button" class="btn" @click="pauseRec($event)">{{pauseLabel}}</button><span></span><button type="button" class="btn danger" @click="askStop($event)" style="justify-self: end">Stop</button><span></span><span></span><span class="muted small recnote" style="justify-self: end">Asks first. Finished sections are kept.</span></div>
 <div v-if="recStopAsk" style="display: contents"><button type="button" class="btn" @click="cancelStop($event)">Keep recording</button><span></span><button type="button" class="btn danger" @click="doStop($event)" style="justify-self: end">Yes, stop</button><span></span><span></span><span class="small" style="justify-self: end; font-weight: 500">Stop? Finished sections are kept.</span></div>
