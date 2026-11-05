@@ -190,7 +190,13 @@ textarea{resize:none}
 .reasons{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
 .warnbtn{display:flex;align-items:center;gap:10px;width:100%;min-height:46px;padding:0 14px;border:0;border-radius:14px;background:var(--warnBg);color:var(--warnInk);text-align:left;font-weight:500}
 /* batch */
-.brow{display:grid;grid-template-columns:28px minmax(0,1fr) 64px 150px 96px;gap:12px;align-items:center;min-height:54px;border-top:1px solid var(--line)}
+.brow{display:grid;grid-template-columns:32px minmax(0,320px) 72px 160px minmax(0,1fr) 88px;gap:0 12px;align-items:center;min-height:54px;border-top:1px solid var(--line)}
+.brow > .bacts{grid-column:6}
+.bacts .btn{width:88px;padding:0}
+.bnone{display:inline-block;width:88px;text-align:center}
+.btable{max-height:calc(7.5 * 55px);overflow-y:auto;overscroll-behavior:contain}
+.bnote{min-height:22px}
+.bsecond{min-width:232px}
 .brow .mono{font-size:14px}
 .bacts{display:flex;gap:6px;justify-content:flex-end}
 .form{display:grid;grid-template-columns:150px minmax(0,1fr);gap:16px 18px;align-items:start}
@@ -246,7 +252,7 @@ textarea{resize:none}
 .batchrail .stepbtn{cursor:default}
 .batchrail .stepbtn:not(.now):hover{background:transparent!important}
 .waitlist{max-height:360px;overflow:auto}
-.bprimary{width:340px;overflow:hidden;text-overflow:ellipsis}
+.bprimary{min-width:160px;overflow:hidden;text-overflow:ellipsis}
 @media (min-width: 861px){.caprow{border-top:0!important;padding-top:0!important}}
 .sumrow.open{background:transparent;box-shadow:inset 0 0 0 1px var(--line)}
 .fadebot{-webkit-mask-image:linear-gradient(#000 calc(100% - 32px),transparent);mask-image:linear-gradient(#000 calc(100% - 32px),transparent)}
@@ -298,7 +304,11 @@ textarea{resize:none}
   .vmore{min-height:56px!important;grid-column:1 / -1;flex-direction:row!important}
   .phone-setup{background:transparent!important;padding:4px 2px!important;color:var(--ink2)!important}
   .dcard .meta{margin-top:0!important;margin-left:6px}
-  .bprimary{width:auto}
+  .bprimary{min-width:0}
+  .bsecond{min-width:0}
+  .btable{max-height:none;overflow:visible}
+  .bfoot .ftext > span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block!important}
+  .bacts .btn,.bnone{width:76px}
   .welcome-art{min-height:320px!important}
   .welcome-art img{object-position:50% 40%!important}
   .wfield{justify-content:flex-end}
@@ -956,15 +966,15 @@ textarea{resize:none}
 </nav>
 <section class="tray" aria-labelledby="batch-h">
 <div class="sheet stepsheet" style="min-height: 0">
-<h1 id="batch-h" tabindex="-1" class="h-step">{{bHead}}</h1>
-<p class="muted" style="margin: 8px 0 0; max-width: 70ch">{{bSub}}</p>
+<h1 id="batch-h" tabindex="-1" class="h-step">Your batch</h1>
+<p class="muted bsub" style="margin: 8px 0 0; max-width: 70ch">{{bHead}} {{bSub}}</p>
 <div style="display: flex; align-items: center; gap: 10px 14px; margin-top: 16px; flex-wrap: wrap">
 <span v-if="bRecLabel" class="muted small" style="white-space: nowrap">{{bRecLabel}}</span>
-<div style="flex: 1 1 200px; height: 6px; border-radius: 3px; background: var(--fill); overflow: hidden"><span :style="'display: block; height: 6px; background: var(--ink); width: ' + (bPct)"></span></div>
+<div style="flex: 1 1 100px; min-width: 80px; height: 6px; border-radius: 3px; background: var(--fill); overflow: hidden"><span :style="'display: block; height: 6px; background: var(--ink); width: ' + (bPct)"></span></div>
 <div v-if="hasBPause" class="bpause"><button type="button" class="btn sm" @click="bPause($event)" style="width: 168px">{{bPauseLabel}}</button></div>
 </div>
-<div v-if="hasBCreditNote" style="display: contents"><p class="note small"><span class="dot"></span><span>{{bCreditNote}}</span></p></div>
-<div :class="bAllOpenRaw ? 'list waitlist' : 'list'" style="margin-top: 14px">
+<div v-if="bCreditSlot" style="display: contents"><p class="note small bnote"><span class="dot" :style="hasBCreditNote ? '' : 'visibility: hidden'"></span><span>{{bCreditNote}}</span></p></div>
+<div class="list btable" style="margin-top: 14px">
 <div v-for="it in bItems" style="display: contents">
 <div class="brow">
 <span class="muted">{{it.n}}</span>
@@ -973,15 +983,15 @@ textarea{resize:none}
 <span class="bst small" style="display: inline-flex; align-items: center; gap: 6px; white-space: nowrap"><span :class="it.ring ? 'dot ring lg-only' : 'dot lg-only'" :style="'background: ' + (it.dot)"></span><span class="sm-only">{{it.min}} ·</span><span :class="it.ring ? 'dot ring sm-only' : 'dot sm-only'" :style="'background: ' + (it.dot)"></span>{{it.status}}</span>
 <span class="bacts">
 <div v-if="it.canOpen" style="display: contents"><button type="button" class="btn sm" @click="it.toggle($event)" :aria-expanded="(it.openStr)">{{it.open ? 'Close' : 'Read'}}</button></div>
-<div v-if="it.canWatch" style="display: contents"><button type="button" class="btn sm" @click="it.watch($event)">Watch</button></div>
+<div v-if="it.canWatch" style="display: contents"><button type="button" class="btn sm" @click="it.watch($event)" :aria-label="'Watch ' + it.t">Watch</button></div>
+<div v-if="it.noAct" style="display: contents"><span class="muted bnone" aria-hidden="true">–</span></div>
 </span>
 </div>
 <div v-if="it.open" style="display: contents"><div class="fade" style="padding: 4px 0 14px 42px"><p style="margin: 0; font-size: 17px">“{{it.preview}}”</p><p class="muted small" style="margin: 6px 0 0">Want changes? Tell Claude in the bar below, e.g. “make lesson {{it.n}} shorter”.</p></div></div>
 </div>
 </div>
-<div v-if="bShowToggle" style="display: contents"><div style="border-top: 1px solid var(--line); padding: 10px 0 0 0"><button type="button" class="link small" @click="bShowAll($event)" :aria-expanded="bAllOpenRaw ? 'true' : 'false'">{{bShowAllLabel}}</button></div></div>
 </div>
-<div class="foot"><span class="ftext muted">{{bFooter}}</span><span class="fbtns"><div v-if="hasBSecondary" style="display: contents"><button type="button" class="btn" @click="bSecondary($event)" :disabled="(bSecondaryOff)"><span class="lg-only">{{bSecondaryLabel}}</span><span class="sm-only">{{bSecondaryShort}}</span></button></div><button type="button" class="pri bprimary" @click="bPrimary($event)" :disabled="(bPrimaryOff)"><span class="lg-only">{{bPrimaryLabel}}</span><span class="sm-only">{{bPrimaryShort}}</span></button></span></div>
+<div class="foot bfoot"><span class="ftext muted"><span>{{bFooter}}</span></span><span class="fbtns"><div v-if="hasBSecondary" style="display: contents"><button type="button" class="btn bsecond" @click="bSecondary($event)" :disabled="(bSecondaryOff)"><span class="lg-only">{{bSecondaryLabel}}</span><span class="sm-only">{{bSecondaryShort}}</span></button></div><button type="button" class="pri bprimary" @click="bPrimary($event)" :disabled="(bPrimaryOff)"><span class="lg-only">{{bPrimaryLabel}}</span><span class="sm-only">{{bPrimaryShort}}</span></button></span></div>
 </section>
 </main>
 </div>
