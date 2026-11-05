@@ -105,7 +105,7 @@ class Component extends DCLogic {
   fitsText(n) { return 'Enough credits for about ' + this.plural(n, 'more video') + '. The batch pauses there until you top up. Nothing fails.'; }
   startRecording(from) {
     this.useScript(this.demo()); const N = this.secs.length;
-    this.setState({ recPos: from || 0, recPaused: false, recStopAsk: false, recStopped: false });
+    this.setState({ recPos: from || 0, recPaused: false, recStopped: false, recSlide: 0, recSliding: false });
     this.patchDemo({ status: 'Recording, section ' + ((from || 0) + 1) + ' of ' + N, dot: '#E0A100' });
     this.every('rec', 900, () => {
       const p = this.state.recPos + 1;
@@ -204,6 +204,7 @@ class Component extends DCLogic {
     const warns = { email: 'Real people’s emails would be visible to anyone watching.', money: 'Showing earnings in marketing can count as a claim you have to back up.', customers: 'This is other people’s data. Only show it if it’s fake.' };
     const row = (id, label) => { const on = st.shown[id]; const s = sw(on); const w = on && warns[id]; return { id: 'pv-' + id, label: label, warn: w || '', hasWarn: !!w, cls: s.cls, onStr: s.onStr, toggle: () => { const m = Object.assign({}, this.state.shown); m[id] = !on; this.setState({ shown: m }); } }; };
     const addMark = (text) => { const t = st.revT; const i = secAt(t); const n = Object.assign({}, D.notes); n[i] = (n[i] || []).concat([{ t: t, text: text }]); this.patchDemo({ notes: n }); this.setState({ markOpen: false, markOther: false, markDraft: '' }); this.say('Marked ' + this.fmt(t) + ': ' + text); };
+    const stopNow = () => { this.stop('rec'); this.setState({ recStopped: true, recPaused: false, recSlide: 0, recSliding: false }); this.patchDemo({ status: 'Stopped at ' + st.recPos + ' of ' + N, dot: '#E0A100' }); this.say('Stopped. ' + this.plural(st.recPos, 'finished section') + ' kept.'); this.focusLater('#reccarry'); };
     const goStep = (i) => { const p = { step: i, confirm: null, markOpen: false }; this.setState(p); if (D.max < i) this.patchDemo({ max: i }); };
     const doExport = () => { this.patchDemo({ exported: true, dirty: false, status: 'Exported Nov 5', dot: 'var(--okDot)', max: 5 }); this.setState({ confirm: null }); this.say('Exported to Movies/NAVI', null, () => this.say('Opening Movies/NAVI'), 'Open folder'); };
     const primaryFor = [
@@ -432,12 +433,15 @@ class Component extends DCLogic {
       recNext: [st.recPos + 1, st.recPos + 2].map((k) => ({ n: k < N ? this.secs[k].n : '' })),
       recHeadLine: D.recorded ? 'All ' + N + ' sections recorded · ' + lengthText : st.recStopped ? 'Stopped after ' + st.recPos + ' of ' + N + ' sections' : 'Section ' + Math.min(N, st.recPos + 1) + ' of ' + N + ' · about ' + Math.max(1, Math.ceil((N - st.recPos) * 0.4)) + ' min left',
       hasLastDone: st.recPos > 0, recLastDone: st.recPos > 0 ? this.secs[Math.min(N, st.recPos) - 1].n : '', recNowMark: st.recPaused || st.recStopped ? 'ring' : 'spin',
-      recPaused: st.recPaused, recStopAsk: st.recStopAsk, recStopped: st.recStopped, recControls: !D.recorded && !st.recStopAsk && !st.recStopped,
+      recPaused: st.recPaused, recStopped: st.recStopped, recControls: !D.recorded && !st.recStopped,
+      recSlidePct: String(st.recSlide || 0), recSlideNow: String(Math.round((st.recSlide || 0) * 100)), recSliding: !!st.recSliding,
+      slideDown: (e) => { const el = e.currentTarget; const tr = el.parentElement.getBoundingClientRect(); this.slideDrag = { x0: e.clientX - (st.recSlide || 0) * (tr.width - 48), travel: tr.width - 48 }; try { el.setPointerCapture(e.pointerId); } catch (x) {} this.setState({ recSliding: true }); },
+      slideMove: (e) => { const d = this.slideDrag; if (!d) return; const v = Math.max(0, Math.min(1, (e.clientX - d.x0) / d.travel)); this.setState({ recSlide: v }); },
+      slideUp: () => { if (!this.slideDrag) return; this.slideDrag = null; if ((this.state.recSlide || 0) >= 0.92) { this.setState({ recSliding: false, recSlide: 1 }); stopNow(); } else this.setState({ recSliding: false, recSlide: 0 }); },
+      slideKey: (e) => { const k = e.key; const v = this.state.recSlide || 0; if (k === 'Enter' || k === 'End') { e.preventDefault(); this.setState({ recSlide: 1 }); stopNow(); } else if (k === 'ArrowRight' || k === 'ArrowUp') { e.preventDefault(); const n = Math.min(1, v + 0.25); this.setState({ recSlide: n }); if (n >= 1) stopNow(); } else if (k === 'ArrowLeft' || k === 'ArrowDown') { e.preventDefault(); this.setState({ recSlide: Math.max(0, v - 0.25) }); } else if (k === 'Escape' || k === 'Home') { e.preventDefault(); e.stopPropagation(); this.setState({ recSlide: 0 }); } },
       pauseLabel: st.recPaused ? 'Resume' : 'Pause',
       pauseRec: () => { if (st.recPaused) { this.setState({ recPaused: false }); this.startRecording(st.recPos); this.setState({ recPos: st.recPos }); } else { this.stop('rec'); this.setState({ recPaused: true }); this.patchDemo({ status: 'Paused at ' + (st.recPos + 1) + ' of ' + N }); } },
-      askStop: () => this.setState({ recStopAsk: true }), cancelStop: () => this.setState({ recStopAsk: false }),
-      doStop: () => { this.stop('rec'); this.setState({ recStopAsk: false, recStopped: true, recPaused: false }); this.patchDemo({ status: 'Stopped at ' + st.recPos + ' of ' + N, dot: '#E0A100' }); this.say('Stopped. ' + this.plural(st.recPos, 'finished section') + ' kept.'); },
-      resumeStopped: () => { if (this.needKey()) return; this.startRecording(st.recPos); },
+      resumeStopped: () => { if (this.needKey()) return; this.startRecording(st.recPos); this.focusLater('#recpause'); },
       recNote: D.recorded ? 'Want a fresh take? Record again redoes every section.' : 'You can close this page. Claude tells you in chat when the draft is ready.',
       // review
       totalSec: String(this.total), revSec: String(st.revT), revCaption: this.secs[secAt(st.revT)].c, revTime: this.fmt(st.revT), revLeft: (st.revT / this.total * 100) + '%', revSecName: this.secs[secAt(st.revT)].n,

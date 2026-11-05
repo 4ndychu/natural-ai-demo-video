@@ -191,7 +191,16 @@ textarea{resize:none}
 .newtile{}
 @media (max-width: 860px){.newtile{min-height:64px!important;flex-direction:row!important;justify-content:flex-start!important;padding:10px 16px!important}.newtile > span:first-child{width:40px!important;height:40px!important}.newtile .wide{font-size:16px!important}}
 .recscreen{aspect-ratio:16/10}
-.recctl{display:grid;grid-template-columns:auto 1fr auto;row-gap:6px;column-gap:8px;align-items:center;min-height:72px;margin-top:16px}
+.recctl{display:flex;align-items:center;gap:8px;height:48px;margin-top:16px}
+.pausebtn{width:104px;flex:none}
+.slide{position:relative;flex:1;min-width:0;height:48px;border-radius:24px;background:var(--sheet);box-shadow:inset 0 0 0 1px var(--line);overflow:hidden;user-select:none;-webkit-user-select:none}
+.slide .sfill{position:absolute;left:1px;top:1px;bottom:1px;border-radius:23px;background:var(--wash);transition:width 220ms cubic-bezier(.22,1,.36,1)}
+.slide .slabel{position:absolute;left:52px;right:12px;top:0;bottom:0;display:flex;flex-direction:column;justify-content:center;line-height:1.2;pointer-events:none;white-space:nowrap;overflow:hidden}
+.slide .slt{font-size:14px;font-weight:500}
+.slide .sls{font-size:12px;color:var(--ink2);overflow:hidden;text-overflow:ellipsis}
+.shandle{position:absolute;top:4px;width:40px;height:40px;border-radius:20px;background:var(--danger);color:var(--sheet);display:inline-flex;align-items:center;justify-content:center;cursor:grab;touch-action:none;transition:left 220ms cubic-bezier(.22,1,.36,1)}
+.slide.dragging .shandle,.slide.dragging .sfill{transition:none}
+.slide.dragging .shandle{cursor:grabbing}
 .rphead{font-size:17px}
 .prog{list-style:none;margin:14px 0 0;padding:0;display:flex;flex-direction:column;gap:2px}
 .prog li{display:flex;align-items:center;gap:10px;min-height:36px;padding:0 4px}
@@ -275,9 +284,9 @@ textarea{resize:none}
   .welcome-art{min-height:320px!important}
   .welcome-art img{object-position:50% 40%!important}
   .wfield{justify-content:flex-end}
-  .recctl{min-height:72px}
   .pquote{--ql:4;font-size:15px}
-  .recnote{grid-column:1 / -1;white-space:nowrap}
+  .pausebtn{width:84px;padding:0 12px}
+  .slide .slabel{right:8px}
   .swhide-sm{display:none!important}
   .swslot-sm{display:grid!important}
   .setrow,.list > div > .row,.list > .row{flex-wrap:wrap}
@@ -701,9 +710,9 @@ textarea{resize:none}
 <div v-for="n in recNext" style="display: contents"><li class="pnext" :style="n.n ? '' : 'visibility: hidden'"><span class="pmark dash" aria-hidden="true"></span><span class="pn">{{n.n}}</span></li></div>
 </ol>
 <div class="recctl">
-<div v-if="recControls" style="display: contents"><button type="button" class="btn" @click="pauseRec($event)">{{pauseLabel}}</button><span></span><button type="button" class="btn danger" @click="askStop($event)" style="justify-self: end">Stop</button><span></span><span></span><span class="muted small recnote" style="justify-self: end">Asks first. Finished sections are kept.</span></div>
-<div v-if="recStopAsk" style="display: contents"><button type="button" class="btn" @click="cancelStop($event)">Keep recording</button><span></span><button type="button" class="btn danger" @click="doStop($event)" style="justify-self: end">Yes, stop</button><span></span><span></span><span class="small" style="justify-self: end; font-weight: 500">Stop? Finished sections are kept.</span></div>
-<div v-if="recStopped" style="display: contents"><button type="button" class="btn" @click="resumeStopped($event)">Carry on recording</button><span></span><span></span><span class="muted small" style="grid-column: 1 / 4">Stopped. Finished sections are kept.</span></div>
+<div v-if="recControls" style="display: contents"><button id="recpause" type="button" class="btn pausebtn" @click="pauseRec($event)">{{pauseLabel}}</button>
+<div class="slide" :class="recSliding ? 'slide dragging' : 'slide'"><span class="sfill" :style="'width: calc(' + (recSlidePct) + ' * (100% - 48px) + 46px)'"></span><span class="slabel"><span class="slt">Slide to stop</span><span class="sls"><span class="lg-only">Finished sections are kept</span><span class="sm-only">Finished parts are kept</span></span></span><span id="slidehandle" class="shandle" role="slider" tabindex="0" aria-label="Slide to stop recording. Finished sections are kept." aria-valuemin="0" aria-valuemax="100" :aria-valuenow="(recSlideNow)" :style="'left: calc(4px + ' + (recSlidePct) + ' * (100% - 48px))'" @pointerdown="slideDown($event)" @pointermove="slideMove($event)" @pointerup="slideUp($event)" @pointercancel="slideUp($event)" @keydown="slideKey($event)"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="5" y="5" width="14" height="14" rx="2"></rect></svg></span></div></div>
+<div v-if="recStopped" style="display: contents"><button id="reccarry" type="button" class="btn" @click="resumeStopped($event)">Carry on recording</button></div>
 </div>
 </div>
 <div v-if="recDone" style="display: contents"><p class="muted" style="margin: 14px 0 0">All sections are in. Watch the draft to check it.</p></div>
