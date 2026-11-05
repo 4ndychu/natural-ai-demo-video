@@ -121,3 +121,47 @@ Clicking through the real flows found bugs that the screenshots hid, and the jud
 - Layout shifted on Voice and Record.
 
 The judge ranked 15 fixes for round 2, interaction bugs first.
+
+## Round 2: the judge's 15 fixes, decided by blind A/B
+
+Each reviewer compared 44 shot pairs (old vs new, unlabelled, random order). The interaction reviewer also used two unlabelled copies of the app.
+
+| Screen | User | Visual | QA | Verdict |
+|---|---|---|---|---|
+| welcome | old | old | new | **Old wins: candidate reverted** |
+| home | new | new | same | New stays |
+| new | old | new | new | New stays |
+| new-options | new | new | guard loss | New stays |
+| new-batch | new | new | old | New stays |
+| batch | old | new | new | New stays |
+| script | old | new | new | New stays |
+| voice | new | new | new | New stays |
+| privacy | new | new | new | New stays |
+| record | old | new | new | New stays |
+| review | new | new | new | New stays |
+| export (before export) | new | new | same | New stays |
+| export | new | new | new | New stays |
+| settings | new | new | new | New stays |
+
+**Why Welcome lost:** a reserved empty band under the key field, and the card pinned high (far down a blank screen at 390). Round 3 restores the old Welcome layout and keeps the focus and Enter-key fixes.
+
+**Scores (candidate)**
+
+| Screen | User | Visual | QA | Min |
+|---|---|---|---|---|
+| welcome (reverted) | 8.0 | 8.0 | 8.5 | 8.0 |
+| home | 8.5 | 8.5 | 9.0 | 8.5 |
+| new | 8.5 | 8.5 | 8.5 | 8.5 |
+| new-options | 8.5 | 8.5 | 8.5 | 8.5 |
+| new-batch | 8.5 | 8.0 | 8.0 | 8.0 |
+| batch | 8.0 | 7.5 | 8.0 | 7.5 |
+| script | 8.5 | 8.5 | 8.5 | 8.5 |
+| voice | 8.0 | 8.0 | 8.0 | 8.0 |
+| privacy | 9.0 | 8.5 | 8.5 | 8.5 |
+| record | 8.0 | 8.5 | 9.0 | 8.0 |
+| review | 9.0 | 8.5 | 8.5 | 8.5 |
+| export (before export) | 8.5 | 8.5 | 8.5 | 8.5 |
+| export | 8.5 | 8.5 | 8.5 | 8.5 |
+| settings | 9.0 | 9.0 | 8.5 | 8.5 |
+
+The minimums moved from 6.0–8.0 to 7.5–8.5. Using the app, QA scored the new version much higher than the old one: record 6.0 → 9.0, review 5.5 → 8.5, batch 5.5 → 8.0. Round 3: the Welcome revert plus 12 ranked fixes.
