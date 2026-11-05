@@ -1,0 +1,64 @@
+{
+ "name": "A/B test-todo on eleven_v4",
+ "takes": 2,
+ "voice_id": "hLygPNd2gK6Azddorc5W",
+ "experiments": {
+  "AB-open": {
+   "about": "A = original text, B = version B; both eleven_v4, stability 0.7, raw takes",
+   "kind": "section",
+   "variants": [
+    {
+     "id": "A",
+     "text": "[relaxed] Okay, so this is a pretty basic to-do list. You type in the box up top, call the dentist, hit Enter and it's on the list.",
+     "model": "eleven_v4",
+     "stability": 0.7,
+     "reuse": "output/experiments/2026-11-05/takes/3566eb5fe3"
+    },
+    {
+     "id": "B",
+     "text": "[relaxed] So this is a pretty basic to-do list. I'm gonna type in the box up top, call the dentist, hit Enter and it's on the list.",
+     "model": "eleven_v4",
+     "stability": 0.7
+    }
+   ]
+  },
+  "AB-add-and-tick": {
+   "about": "A = original text, B = version B; both eleven_v4, stability 0.7, raw takes",
+   "kind": "section",
+   "variants": [
+    {
+     "id": "A",
+     "text": "[relaxed] I'll add a couple more so there's something to work with. Pay the gas bill, and book the, uh, book the train tickets. Okay, three. When you've done one you just click the little circle next to it and it gets crossed out.",
+     "model": "eleven_v4",
+     "stability": 0.7,
+     "reuse": "output/experiments/2026-11-05/takes/01700c961c"
+    },
+    {
+     "id": "B",
+     "text": "[relaxed] Right, so, I'll add a couple more so there's something to work with. Pay the gas bill, and book the, uh, book the train tickets. Okay, three. When you've done one you just click the, uh, little circle next to it and it gets crossed out.",
+     "model": "eleven_v4",
+     "stability": 0.7
+    }
+   ]
+  },
+  "AB-filter-and-clear": {
+   "about": "A = original text, B = version B; both eleven_v4, stability 0.7, raw takes",
+   "kind": "section",
+   "variants": [
+    {
+     "id": "A",
+     "text": "[relaxed] Down at the bottom you can switch to just the active ones or just the completed ones. I'd just leave it on Active, you don't really need to see what's done. And to clear out the finished ones there's, where is it, Clear completed, over on the right. Now it's just the two left.",
+     "model": "eleven_v4",
+     "stability": 0.7,
+     "reuse": "output/experiments/2026-11-05/takes/a331c3a1e4"
+    },
+    {
+     "id": "B",
+     "text": "[relaxed] Okay. So now, down at the bottom you can switch to just the active ones or just the completed ones. I'd just leave it on Active, you don't really need to see what's done. And to clear out the finished ones there's, where is it, Clear completed, over on the right. Now it's just the two left.",
+     "model": "eleven_v4",
+     "stability": 0.7
+    }
+   ]
+  }
+ }
+}

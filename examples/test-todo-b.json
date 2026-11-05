@@ -12,7 +12,7 @@
   "sections": [
     {
       "name": "open",
-      "talk": "[relaxed] Okay, so this is a pretty basic to-do list, the demo one at demo dot playwright dot dev. I'm, uh, I'm gonna type in the box up top, call the dentist, hit Enter and it's on the list.",
+      "talk": "[relaxed] So this is a pretty basic to-do list. I'm gonna type in the box up top, call the dentist, hit Enter and it's on the list.",
       "caption": "This is a simple to-do list. Type a task in the box at the top and press Enter to add it.",
       "actions": [
         {
