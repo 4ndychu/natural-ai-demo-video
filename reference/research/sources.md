@@ -45,6 +45,7 @@ Research pass of 5 November 2026 on how real people sound when they show or expl
 |---|---|---|
 | Bangerter, A. & Clark, H. H. (2003). Navigating joint projects with dialogue. *Cognitive Science* 27, 195–225. | doi:10.1207/s15516709cog2702_3 · web.stanford.edu/~clark/2000s/ | full text |
 | Bhatia, A. (2018). Interdiscursive performance in digital professions: the case of YouTube tutorials. *J. Pragmatics* 124, 106–120. | doi:10.1016/j.pragma.2017.11.001 | abstract |
+| Brown, G., Currie, K. L. & Kenworthy, J. (1980). *Questions of Intonation*. London: Croom Helm. | book, no DOI; cited in Hirschberg & Nakatani 1996 | **not read.** Only the claim as Hirschberg & Nakatani summarise it: new topics start high in the pitch range and topics end with the range compressed. |
 | Cavazza, N. & Guidetti, M. (2014). Swearing in political discourse: why vulgarity works. *J. Lang. Soc. Psych.* 33(5), 537–547. | doi:10.1177/0261927X14533198 | abstract |
 | Ćirić Ognjenović, G. (2023). The prosodic properties of clausal parentheticals in Serbian. *Živi jezici* 43(1). Used for its summary of Döring (2007), "Quieter, faster, lower, and set off by pauses?", in Dehé & Kavalova (eds.), *Parentheticals*, Benjamins. | doi:10.18485/zivjez.2023.43.1.1 | full text (Döring: secondary) |
 | Clark, H. H. & Krych, M. A. (2004). Speaking while monitoring addressees for understanding. *J. Memory & Language* 50, 62–81. | doi:10.1016/j.jml.2003.08.004 | full text |
