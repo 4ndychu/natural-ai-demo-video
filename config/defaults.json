@@ -53,7 +53,8 @@
     "never_speed_up_after": true,
     "never_pass_next_text": true,
     "rank_takes_by": "finality of the last sentence (scripts/audio/finality.py), or pace closest to reference_pace_wps when set; then the ear. measure_speech.py flags problems but must not pick takes: it disagreed with Andy on 4 of 7 experiments (2026-11-05)",
-    "reference_pace_wps": null
+    "reference_pace_wps": 3.16,
+    "reference_take": "output/test-todo-v4 (examples/test-todo-b.json, eleven_v4, Alex, approved by Andy 2026-11-05)"
   },
   "audio_edit": {
     "trim_after_sentence": false,
