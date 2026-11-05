@@ -196,7 +196,17 @@ textarea{resize:none}
 .markrow .icon:hover,.markrow .mono:hover{background:var(--fill)!important}
 .markrow{display:grid;grid-template-columns:auto minmax(0,1fr) 36px;gap:10px;align-items:center;min-height:58px;border-top:1px solid var(--line)}
 .reasons{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
-.warnbtn{display:flex;align-items:center;gap:10px;width:100%;min-height:46px;padding:0 14px;border:0;border-radius:14px;background:var(--warnBg);color:var(--warnInk);text-align:left;font-weight:500}
+.warnbtn{display:flex;align-items:center;gap:10px;width:100%;min-height:50px;padding:0 8px 0 14px;border:0;border-radius:14px;background:var(--tray);color:var(--ink);text-align:left}
+.warnbtn .wpill{display:inline-flex;align-items:center;height:32px;padding:0 14px;border-radius:999px;background:var(--sheet);font-size:14px}
+@media (hover:hover){.warnbtn:hover .wpill{background:var(--wash)}}
+.dot.k-ready{background:var(--dc,var(--ink))}
+.dot.k-wait{background:transparent;box-shadow:inset 0 0 0 1.5px var(--dc,var(--ink2))}
+.dot.k-done{width:10px;height:10px;background:transparent;position:relative}
+.dot.k-done::after{content:'';position:absolute;left:3px;top:0;width:3px;height:7px;border:solid var(--dc,var(--ink));border-width:0 1.8px 1.8px 0;transform:rotate(45deg)}
+.dot.k-busy{width:10px;height:10px;border-radius:5px;box-sizing:border-box;background:transparent;border:1.6px solid var(--fill);border-top-color:var(--dc,var(--ink));animation:spin 900ms linear infinite}
+.dot.k-bad{background:var(--danger)}
+.dot.k-rec{background:#FF5A4E}
+.pill{--dc:#FFFFFF}
 /* batch */
 .brow{display:grid;grid-template-columns:32px minmax(0,320px) 72px 160px minmax(0,1fr) 88px;gap:0 12px;align-items:center;min-height:54px;border-top:1px solid var(--line)}
 .brow > .bacts{grid-column:6}
@@ -288,7 +298,7 @@ textarea{resize:none}
 .t-dark .capchip{background:#000;box-shadow:inset 0 0 0 1px var(--line)}
 .bar .bl{font-weight:450}
 .mono{font-weight:400}
-@media (prefers-reduced-motion: reduce){.wv.on span,.fade,.toast,.skel,.pmark.spin{animation:none}.bar .fill,button,.sw span,.disclose svg{transition:none}}
+@media (prefers-reduced-motion: reduce){.wv.on span,.fade,.toast,.skel,.pmark.spin,.dot.k-busy{animation:none}.bar .fill,button,.sw span,.disclose svg{transition:none}}
 /* phone width */
 @media (min-width: 861px){.sm-only{display:none!important}}
 @media (max-width: 860px){
@@ -503,28 +513,28 @@ textarea{resize:none}
 <div v-for="b in batchCards" style="display: contents">
 <button type="button" class="tray dcard" @click="b.open($event)">
 <span class="cover" style="height: 176px; display: grid; grid-template-columns: 1fr 1fr; gap: 4px; background: var(--tray)"><img src="assets/cover-3.jpg" alt="" style="border-radius: 14px 4px 4px 14px"><span style="display: grid; grid-template-rows: 1fr 1fr; gap: 4px; min-height: 0"><img src="assets/cover-1.jpg" alt="" style="border-radius: 4px 14px 4px 4px; min-height: 0"><img src="assets/cover-4.jpg" alt="" style="border-radius: 4px 4px 14px 4px; min-height: 0"></span></span>
-<span class="meta"><span class="name" style="font-size: 16px">{{b.name}}</span><span class="muted">{{b.meta}}</span><span style="display: inline-flex; align-items: center; gap: 8px; margin-top: 4px"><span class="dot" style="background: var(--blueDot)"></span>{{b.next}}</span>
+<span class="meta"><span class="name" style="font-size: 16px">{{b.name}}</span><span class="muted">{{b.meta}}</span><span style="display: inline-flex; align-items: center; gap: 8px; margin-top: 4px"><span class="dot k-ready"></span>{{b.next}}</span>
 <span style="display: flex; align-items: center; gap: 10px; margin-top: 6px"><span style="flex: 1; height: 6px; border-radius: 3px; background: var(--fill); overflow: hidden"><span :style="'display: block; height: 6px; background: var(--ink); width: ' + (b.pct)"></span></span><span class="small" style="white-space: nowrap">{{b.status}}</span></span></span>
 </button>
 </div>
 <div v-for="d in demos" style="display: contents">
 <button type="button" class="tray dcard" @click="d.open($event)">
 <span class="cover" style="height: 176px; display: block"><img :src="(d.cover)" alt="" :style="d.tint ? 'filter: ' + d.tint : ''"></span>
-<span class="meta"><span class="name" style="font-size: 16px">{{d.title}}</span><span class="muted">{{d.meta}}</span><span style="display: inline-flex; align-items: center; gap: 8px; margin-top: 4px"><span class="dot" :style="'background: ' + (d.dot)"></span>{{d.status}}</span></span>
+<span class="meta"><span class="name" style="font-size: 16px">{{d.title}}</span><span class="muted">{{d.meta}}</span><span style="display: inline-flex; align-items: center; gap: 8px; margin-top: 4px"><span :class="'dot k-' + (d.dot || 'ready')"></span>{{d.status}}</span></span>
 </button>
 </div>
 </div>
 </section>
-<button type="button" class="phone-setup" @click="goSettings($event)"><span class="dot" :style="'background: ' + (keyDot)"></span>{{keyStatus}} · {{toolsStatus}} ›</button>
+<button type="button" class="phone-setup" @click="goSettings($event)"><span :class="'dot k-' + keyDot"></span>{{keyStatus}} · {{toolsStatus}} ›</button>
 <aside aria-label="Your setup" class="home-aside" style="display: flex; flex-direction: column; gap: 14px; margin-top: 98px">
 <div class="tray">
 <div :style="'position: relative; height: 260px; border-radius: 20px; overflow: hidden; background: ' + (defC)"><img :src="(defImg)" alt="" style="width: 100%; height: 100%; object-fit: cover; object-position: 50% 30%"></div>
 <div class="foot"><span><span class="muted small" style="display: block; margin-bottom: 4px">Default voice</span><span class="wide" style="display: block; font-size: 24px; line-height: 1">{{defName}}</span><span class="muted">New demos use {{defNamePretty}}</span></span><button type="button" class="btn sm" @click="goSettings($event)">Change voice</button></div>
 </div>
 <div class="tray"><div class="sheet list" style="padding: 4px 16px">
-<div class="row"><span class="dot" :style="'background: ' + (keyDot)"></span><span style="flex: 1">{{keyStatus}}</span><button type="button" class="btn sm" @click="goSettings($event)">{{keyAction}}</button></div>
-<div class="row"><span class="dot" :style="'background: ' + (toolsDot)"></span><span style="flex: 1">Recording tools</span><span class="muted small" style="width: 84px; text-align: center">{{toolsReady}}</span></div>
-<div class="row"><span class="dot" style="background: var(--okDot)"></span><span style="flex: 1">{{sitesStatus}}</span><button type="button" class="btn sm" @click="goSettings($event)">Manage</button></div>
+<div class="row"><span :class="'dot k-' + keyDot"></span><span style="flex: 1">{{keyStatus}}</span><button type="button" class="btn sm" @click="goSettings($event)">{{keyAction}}</button></div>
+<div class="row"><span :class="'dot k-' + toolsDot"></span><span style="flex: 1">Recording tools</span><span class="muted small" style="width: 84px; text-align: center">{{toolsReady}}</span></div>
+<div class="row"><span class="dot k-done"></span><span style="flex: 1">{{sitesStatus}}</span><button type="button" class="btn sm" @click="goSettings($event)">Manage</button></div>
 </div></div>
 </aside>
 </main>
@@ -745,7 +755,7 @@ textarea{resize:none}
 <div>
 <div class="screen recscreen">
 <div class="art" aria-hidden="true"><img :src="(recCover)" alt="" style="filter: blur(6px) saturate(0.8); transform: scale(1.06)"></div>
-<span class="pill" style="left: 22px; top: 22px"><span class="dot" :style="'background: ' + (recBadgeDot)"></span>{{recBadge}}</span>
+<span class="pill" style="left: 22px; top: 22px"><span :class="'dot k-' + recBadgeDot"></span>{{recBadge}}</span>
 </div>
 <div v-if="recDone" style="display: contents"><p class="muted" style="margin: 14px 0 0">{{recNote}}</p></div>
 </div>
@@ -815,7 +825,7 @@ textarea{resize:none}
 </div>
 <aside aria-label="Your marks" style="min-width: 0; display: flex; flex-direction: column; gap: 10px">
 <div v-if="hasUnsure" style="display: contents">
-<button type="button" class="warnbtn" @click="toggleBlurs($event)" :aria-expanded="(blurOpen)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l9.5 17h-19z"></path><path d="M12 10v4M12 17.5v.01"></path></svg><span style="flex: 1">{{unsureText}}<span class="lg-only"> before export</span></span><span class="small" style="text-decoration: underline; text-underline-offset: 3px">{{blurOpen ? 'Hide' : 'Show'}}</span></button>
+<button type="button" class="warnbtn" @click="toggleBlurs($event)" :aria-expanded="(blurOpen)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l9.5 17h-19z"></path><path d="M12 10v4M12 17.5v.01"></path></svg><span style="flex: 1">{{unsureText}}<span class="lg-only"> before export</span></span><span class="wpill">{{blurOpen ? 'Hide' : 'Show'}}</span></button>
 <div v-if="blurOpen" style="display: contents">
 <div class="fade panel list" style="padding: 6px 14px">
 <div v-for="b in blurs" style="display: contents"><div class="row" style="flex-wrap: wrap; padding: 8px 0"><span class="mono muted">{{b.t}}</span><span style="flex: 1 1 160px">{{b.what}}</span><span style="display: inline-flex; gap: 6px"><button type="button" class="btn sm" @click="b.keep($event)" style="background: var(--sheet)">Keep blurred</button><button type="button" class="btn sm" @click="b.show($event)" style="background: var(--sheet)">Show it</button></span></div></div>
@@ -873,7 +883,7 @@ textarea{resize:none}
 </div>
 </div>
 <div class="foot stepfoot">
-<span class="ftext" :style="'color: ' + (footColor)"><span class="dot" :style="'background: ' + (footDot)"></span><span>{{footText}}<span v-if="footLinkOn"> <button type="button" class="link" @click="footLinkAct($event)">{{footLinkLabel}}</button></span></span></span>
+<span class="ftext" :style="'color: ' + (footColor)"><span :class="'dot k-' + footDot"></span><span>{{footText}}<span v-if="footLinkOn"> <button type="button" class="link" @click="footLinkAct($event)">{{footLinkLabel}}</button></span></span></span>
 <span class="fbtns">
 <div v-if="confirming" style="display: contents"><button type="button" class="btn" @click="cancelConfirm($event)">{{confirmNo}}</button><button id="cfyes" type="button" class="pri" @click="doConfirm($event)">{{confirmYes}}</button></div>
 <div v-if="notConfirming" style="display: contents">
@@ -966,7 +976,7 @@ textarea{resize:none}
 </div>
 <div class="sheet steplist" style="padding: 8px">
 <div v-for="s in bStages" style="display: contents">
-<div :class="(s.cls)" :aria-current="s.now ? 'step' : null"><span :class="(s.dotCls)">{{s.mark}}</span><span><span style="display: block; font-weight: 500">{{s.n}}</span><span class="sub muted small" style="display: flex; align-items: center; gap: 6px"><span v-if="s.busy" class="dot" style="background: var(--amber)"></span>{{s.sub}}</span></span></div>
+<div :class="(s.cls)" :aria-current="s.now ? 'step' : null"><span :class="(s.dotCls)">{{s.mark}}</span><span><span style="display: block; font-weight: 500">{{s.n}}</span><span class="sub muted small" style="display: flex; align-items: center; gap: 6px"><span v-if="s.busy" class="dot k-busy"></span>{{s.sub}}</span></span></div>
 </div>
 </div>
 </nav>
@@ -986,7 +996,7 @@ textarea{resize:none}
 <span class="muted">{{it.n}}</span>
 <span style="min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">{{it.t}}</span>
 <span class="muted bmin" style="text-align: right">{{it.min}}</span>
-<span class="bst small" style="display: inline-flex; align-items: center; gap: 6px; white-space: nowrap"><span :class="it.ring ? 'dot ring lg-only' : 'dot lg-only'" :style="'background: ' + (it.dot)"></span><span class="sm-only">{{it.min}} ·</span><span :class="it.ring ? 'dot ring sm-only' : 'dot sm-only'" :style="'background: ' + (it.dot)"></span>{{it.status}}</span>
+<span class="bst small" style="display: inline-flex; align-items: center; gap: 6px; white-space: nowrap"><span :class="'dot lg-only k-' + it.dot"></span><span class="sm-only">{{it.min}} ·</span><span :class="'dot sm-only k-' + it.dot"></span>{{it.status}}</span>
 <span class="bacts">
 <div v-if="it.canOpen" style="display: contents"><button type="button" class="btn sm" @click="it.toggle($event)" :aria-expanded="(it.openStr)">{{it.open ? 'Close' : 'Read'}}</button></div>
 <div v-if="it.canWatch" style="display: contents"><button type="button" class="btn sm" @click="it.watch($event)" :aria-label="'Watch ' + it.t">Watch</button></div>

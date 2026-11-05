@@ -54,12 +54,12 @@ class Component extends DCLogic {
     };
     this.presetVals = { course: { casual: 7, energy: 3, pace: 100, hes: 1, breath: 1, swear: 0 }, saas: { casual: 8, energy: 5, pace: 105, hes: 2, breath: 1, swear: 0 }, tour: { casual: 5, energy: 4, pace: 100, hes: 0, breath: 1, swear: 0 } };
     this.ranges = { casual: [3, 8], energy: [1, 6], pace: [94, 108], hes: [0, 3], breath: [0, 2], swear: [0, 2] };
-    const whop = { id: 'whop', title: 'Build it in Whop', site: 'whop.com', len: 2, who: 0, voice: 'alex', model: 'v4', kind: 'course', max: 4, cover: 'assets/cover-1.jpg', status: 'Watch the draft →', dot: 'var(--blueDot)', recorded: true, written: true,
+    const whop = { id: 'whop', title: 'Build it in Whop', site: 'whop.com', len: 2, who: 0, voice: 'alex', model: 'v4', kind: 'course', max: 4, cover: 'assets/cover-1.jpg', status: 'Watch the draft →', dot: 'ready', recorded: true, written: true,
       notes: { 2: [{ t: 60, text: 'Too cheerful after Add app' }], 4: [{ t: 125, text: 'Too fast' }] },
       blurs: [{ id: 'b1', t: '1:58', what: 'A name inside the course cover image', s: '' }, { id: 'b2', t: '3:53', what: 'What might be a price in a banner', s: '' }] };
     const demos = [whop,
-      { id: 'pay', title: 'Connect payouts', site: 'whop.com', len: 0, who: 0, voice: 'alex', model: 'v4', kind: 'course', max: 5, cover: 'assets/cover-3.jpg', status: 'Exported Nov 2 · Open →', dot: 'var(--okDot)', recorded: true, written: true, exported: true, notes: {}, blurs: [] },
-      { id: 'posts', title: 'Schedule a week of posts', site: 'app.yourproduct.com', len: 1, who: 1, voice: 'jessica', model: 'v4', kind: 'saas', max: 5, cover: 'assets/cover-4.jpg', status: 'Exported Oct 28 · Open →', dot: 'var(--okDot)', recorded: true, written: true, exported: true, notes: {}, blurs: [] }];
+      { id: 'pay', title: 'Connect payouts', site: 'whop.com', len: 0, who: 0, voice: 'alex', model: 'v4', kind: 'course', max: 5, cover: 'assets/cover-3.jpg', status: 'Exported Nov 2 · Open →', dot: 'done', recorded: true, written: true, exported: true, notes: {}, blurs: [] },
+      { id: 'posts', title: 'Schedule a week of posts', site: 'app.yourproduct.com', len: 1, who: 1, voice: 'jessica', model: 'v4', kind: 'saas', max: 5, cover: 'assets/cover-4.jpg', status: 'Exported Oct 28 · Open →', dot: 'done', recorded: true, written: true, exported: true, notes: {}, blurs: [] }];
     demos.forEach((d) => Object.assign(d, { capMode: 'burn', corner: 'off', cornerText: '', lines: {} }));
     const batch = { id: 'b-whop2', name: 'Whop course, module 2', site: 'whop.com', voice: 'alex', kind: 'course', preset: 'standard', folder: '~/Movies/NAVI/Whop course, module 2', stage: 'recording', paused: false,
       items: COURSE.map((t, i) => ({ t: t, lesson: 'Lesson ' + (i + 1), min: [2, 3, 3, 4, 3, 2, 4, 3, 3, 2, 2, 2, 3, 3, 4, 2, 2, 3, 2, 2, 2, 3, 2][i], st: i < 2 ? 'approved' : i < 7 ? 'recorded' : i === 7 ? 'recording' : 'waiting' })) };
@@ -130,10 +130,10 @@ class Component extends DCLogic {
   startRecording(from) {
     this.useScript(this.demo()); const N = this.secs.length;
     this.setState({ recPos: from || 0, recPaused: false, recStopped: false, recSlide: 0, recSliding: false });
-    this.patchDemo({ status: 'Recording, section ' + ((from || 0) + 1) + ' of ' + N, dot: '#E0A100' });
+    this.patchDemo({ status: 'Recording, section ' + ((from || 0) + 1) + ' of ' + N, dot: 'busy' });
     this.every('rec', 900, () => {
       const p = this.state.recPos + 1;
-      if (p >= N) { this.stop('rec'); this.setState({ recPos: N }); this.patchDemo({ recorded: true, max: Math.max(this.demo().max, 4), status: 'Watch the draft →', dot: 'var(--blueDot)', blurs: [{ id: 'n1', t: '0:41', what: 'What might be an email in a sidebar', s: '' }] }); this.spend(4600); this.say('Draft 1 is ready', null, () => this.setState({ step: 4 }), 'Watch it'); }
+      if (p >= N) { this.stop('rec'); this.setState({ recPos: N }); this.patchDemo({ recorded: true, max: Math.max(this.demo().max, 4), status: 'Watch the draft →', dot: 'ready', blurs: [{ id: 'n1', t: '0:41', what: 'What might be an email in a sidebar', s: '' }] }); this.spend(4600); this.say('Draft 1 is ready', null, () => this.setState({ step: 4 }), 'Watch it'); }
       else { this.setState({ recPos: p }); this.patchDemo({ status: 'Recording, section ' + (p + 1) + ' of ' + N }); }
     });
   }
@@ -228,9 +228,9 @@ class Component extends DCLogic {
     const warns = { email: 'Real people’s emails would be visible to anyone watching.', money: 'Showing earnings in marketing can count as a claim you have to back up.', customers: 'This is other people’s data. Only show it if it’s fake.' };
     const row = (id, label) => { const on = st.shown[id]; const s = sw(on); const w = on && warns[id]; return { id: 'pv-' + id, label: label, warn: w || '', hasWarn: !!w, cls: s.cls, onStr: s.onStr, toggle: () => { const m = Object.assign({}, this.state.shown); m[id] = !on; this.setState({ shown: m }); } }; };
     const addMark = (text) => { const t = st.revT; const i = secAt(t); const n = Object.assign({}, D.notes); n[i] = (n[i] || []).concat([{ t: t, text: text }]); this.patchDemo({ notes: n }); this.setState({ markOpen: false, markOther: false, markDraft: '' }); this.focusLater('#markbtn'); this.say('Marked ' + this.fmt(t) + ': ' + text); };
-    const stopNow = () => { this.stop('rec'); this.setState({ recStopped: true, recPaused: false, recSlide: 0, recSliding: false }); this.patchDemo({ status: 'Stopped at ' + st.recPos + ' of ' + N, dot: '#E0A100' }); this.say('Stopped. ' + this.plural(st.recPos, 'finished section') + ' kept.'); this.focusLater('#reccarry'); };
+    const stopNow = () => { this.stop('rec'); this.setState({ recStopped: true, recPaused: false, recSlide: 0, recSliding: false }); this.patchDemo({ status: 'Stopped at ' + st.recPos + ' of ' + N, dot: 'wait' }); this.say('Stopped. ' + this.plural(st.recPos, 'finished section') + ' kept.'); this.focusLater('#reccarry'); };
     const goStep = (i) => { const p = { step: i, confirm: null, markOpen: false }; this.setState(p); if (D.max < i) this.patchDemo({ max: i }); };
-    const doExport = () => { this.patchDemo({ exported: true, dirty: false, status: 'Exported Nov 5', dot: 'var(--okDot)', max: 5 }); this.setState({ confirm: null }); this.say('Exported to Movies/NAVI', null, () => this.say('Opening Movies/NAVI'), 'Open folder'); };
+    const doExport = () => { this.patchDemo({ exported: true, dirty: false, status: 'Exported Nov 5', dot: 'done', max: 5 }); this.setState({ confirm: null }); this.say('Exported to Movies/NAVI', null, () => this.say('Opening Movies/NAVI'), 'Open folder'); };
     const primaryFor = [
       () => goStep(1),
       () => { if (!voiceOk) return; goStep(2); this.say(st.lock ? voicePretty + ' is set for every demo in this project' : 'Using ' + voicePretty + ' for this demo'); },
@@ -257,7 +257,8 @@ class Component extends DCLogic {
       D.exported ? (D.dirty ? 'Changed. Export again to update the files.' : 'Exported Nov 2 · ' + this.plural(1 + ((D.capMode || 'burn') === 'file' ? 1 : 0) + 1 + (st.p720 ? 1 : 0), 'file')) : 'Free to change, no credits'
     ];
     const footBad = (st.step === 1 && !voiceOk);
-    const foot = cf ? { text: cf.text, dot: 'var(--danger)', color: 'var(--ink)' } : { text: footTexts[st.step], dot: footBad ? '#E5484D' : (st.step === 3 && !D.recorded ? '#E0A100' : 'var(--okDot)'), color: footBad ? 'var(--ink)' : 'var(--ink2)' };
+    const footKinds = [D.written ? (D.max > 0 ? 'done' : 'ready') : 'busy', 'ready', 'ready', D.recorded ? 'done' : (st.recPaused || st.recStopped ? 'wait' : 'busy'), 'ready', D.exported && !D.dirty ? 'done' : 'ready'];
+    const foot = cf ? { text: cf.text, dot: 'ready', color: 'var(--ink)' } : { text: footTexts[st.step], dot: footBad ? 'bad' : footKinds[st.step], color: footBad ? 'var(--ink)' : 'var(--ink2)' };
     const wsw = (done) => done ? 'wnum done' : 'wnum';
     const l = sw(st.lock), p = sw(st.p720), a = sw(st.caps);
     const dataDefs = [{ id: 'settings', n: 'Voice, privacy and learned preferences', w: 'Stored on this Mac. You can undo a reset.', l: 'Reset to defaults' }, { id: 'videos', n: 'Finished videos', w: 'Movies/NAVI. Never deleted from here.', l: 'Open folder' }];
@@ -299,7 +300,7 @@ class Component extends DCLogic {
     const bFits = (() => { let c = st.credits, n = 0; for (const x of bToRecord) { const k = this.perVideo(x.min); if (c < k) break; c -= k; n++; } return n; })();
     const stLabel = { writing: 'Writing script', script: 'Script ready', waiting: 'Waiting', recording: 'Recording now', recorded: 'Ready to watch', approved: 'Approved', exported: 'Exported' };
     const bReady = cnt('recorded');
-    const stDot = { writing: '#E0A100', script: 'var(--blueDot)', waiting: 'transparent', recording: '#E0A100', recorded: 'var(--blueDot)', approved: 'var(--okDot)', exported: 'var(--okDot)' };
+    const stDot = { writing: 'busy', script: 'ready', waiting: 'wait', recording: 'busy', recorded: 'ready', approved: 'done', exported: 'done' };
     const bStageIdx = B ? ({ writing: 0, approve: 1, recording: 2, review: 3, done: 4 }[B.stage]) : 0;
     const nowIdx = bStageIdx === 2 && bReady > 0 ? 3 : bStageIdx;
     const bStages = [['Write scripts', B && B.stage === 'writing' ? 'Writing…' : 'Done'], ['Approve scripts', bStageIdx > 1 ? 'Done' : bStageIdx === 1 ? this.plural(cnt('script'), 'to read') : 'Not yet'], ['Record', bStageIdx < 2 ? 'Not yet' : bRecorded + ' of ' + bItems.length + ' recorded'], ['Review', bStageIdx < 2 ? 'Not yet' : (bReady ? bReady + ' ready to watch' : (bApproved + bExported) + ' approved')], ['Export', bExported ? bExported + ' exported' : (bApproved ? bApproved + ' approved' : 'Not yet')]].map((o, i) => { const done = i < Math.min(bStageIdx, 2) || (i === 2 && bRecorded === bItems.length && bItems.length > 0) || (i === 4 && bExported === bItems.length && bItems.length > 0); const now = i === nowIdx; return { n: o[0], sub: o[1], now: now, busy: i === 2 && B && B.stage === 'recording' && !B.paused && !now, cls: 'stepbtn' + (now ? ' now' : '') + (!done && !now && i > Math.max(bStageIdx, nowIdx) && !(i === 4 && bApproved > 0) ? ' locked' : ''), dotCls: 'stepdot' + (done ? ' done' : ''), mark: done ? '✓' : String(i + 1) }; });
@@ -326,8 +327,8 @@ class Component extends DCLogic {
       demos: st.demos.filter((d) => !d.batchOf).map((d) => ({ tint: d.tint || '', title: d.title, meta: d.site + ', ' + pretty(d.voice), status: d.status, dot: d.dot, cover: d.cover, open: () => { const s = d.exported ? 5 : Math.min(d.max, d.recorded ? 4 : d.max); this.setState({ screen: 'demo', cur: d.id, step: s, confirm: null, markOpen: false, scSel: 0, vals: this.recFor(d.voice, d.kind) }); } })),
       batchCards: st.batches.map((b) => { const r = b.items.filter((x) => ['recorded', 'approved', 'exported'].indexOf(x.st) >= 0).length; const rd = b.items.filter((x) => x.st === 'recorded').length; return { next: b.stage === 'approve' ? 'Approve the scripts →' : rd ? rd + ' ready to watch →' : 'See progress →', name: b.name, meta: 'Batch · ' + b.items.length + ' videos · ' + b.site, status: b.stage === 'writing' ? 'Writing scripts' : b.stage === 'approve' ? 'Scripts to approve' : b.paused ? 'Paused, ' + r + ' of ' + b.items.length : b.stage === 'done' ? 'All exported' : r + ' of ' + b.items.length + ' recorded', pct: (r / b.items.length * 100) + '%', open: () => this.openBatch(b.id) }; }),
       defNamePretty: pretty(st.defVoice), defImg: VO[st.defVoice].img, defC: VO[st.defVoice].c, defName: VO[st.defVoice].name,
-      keyDot: st.keyOn ? 'var(--okDot)' : 'var(--danger)', keyStatus: st.keyOn ? 'ElevenLabs connected' : 'ElevenLabs not connected', keyAction: st.keyOn ? 'Change' : 'Connect',
-      toolsDot: st.tools === 'done' ? 'var(--okDot)' : 'var(--danger)', toolsStatus: st.tools === 'done' ? 'Recording tools ready' : 'Recording tools not installed', toolsReady: st.tools === 'done' ? 'Ready' : 'Not installed',
+      keyDot: st.keyOn ? 'done' : 'bad', keyStatus: st.keyOn ? 'ElevenLabs connected' : 'ElevenLabs not connected', keyAction: st.keyOn ? 'Change' : 'Connect',
+      toolsDot: st.tools === 'done' ? 'done' : 'bad', toolsStatus: st.tools === 'done' ? 'Recording tools ready' : 'Recording tools not installed', toolsReady: st.tools === 'done' ? 'Ready' : 'Not installed',
       sitesStatus: st.sites.length ? this.plural(st.sites.length, 'saved login') : 'No saved logins',
       demoTitle: D.title, briefLine: D.site + ', about ' + ['1', '3', '5', '8'][D.len] + ' min', demoCover: D.cover,
       // ---- new demo ----
@@ -359,10 +360,10 @@ class Component extends DCLogic {
         const newSite = !st.sites.some((s) => s.u === site);
         if (st.editing) { this.patchDemo({ title: t, what: w, site: site, who: st.bWho, len: st.bLen, voice: st.bVoice, capMode: st.bCap, corner: st.bCorner, cornerText: st.bCornerText, written: false }); this.setState({ screen: 'demo', step: 0, sites: newSite ? st.sites.concat([{ u: site, note: 'Saved Nov 5' }]) : st.sites }); this.later('write', 2200, () => { this.patchDemo({ written: true }); this.say('Script updated'); }); this.say('Updating the script'); return; }
         const id = 'd' + Date.now();
-        const d = { id: id, title: t, what: w, site: site, len: st.bLen, who: st.bWho, voice: st.bVoice, model: 'v4', kind: st.bKind, max: 0, cover: 'assets/cover-4.jpg', status: 'Writing script', dot: '#E0A100', recorded: false, written: false, notes: {}, blurs: [], lines: {}, capMode: st.bCap, corner: st.bCorner, cornerText: st.bCornerText };
+        const d = { id: id, title: t, what: w, site: site, len: st.bLen, who: st.bWho, voice: st.bVoice, model: 'v4', kind: st.bKind, max: 0, cover: 'assets/cover-4.jpg', status: 'Writing script', dot: 'busy', recorded: false, written: false, notes: {}, blurs: [], lines: {}, capMode: st.bCap, corner: st.bCorner, cornerText: st.bCornerText };
         this.setState({ demos: [d].concat(st.demos), cur: id, screen: 'demo', step: 0, scSel: 0, vals: this.recFor(st.bVoice, st.bKind), sites: newSite ? st.sites.concat([{ u: site, note: 'Saved Nov 5' }]) : st.sites, recPos: 0, recStopped: false });
         this.say(newSite ? 'A browser opens so you can log in to ' + site + '. Then Claude writes the script.' : 'Claude is exploring ' + site + ' and writing the script');
-        this.later('write', 2600, () => { this.setState({ demos: this.state.demos.map((x) => x.id === id ? Object.assign({}, x, { written: true, status: 'Script ready', dot: '#E0A100' }) : x) }); this.say('Script ready to read'); });
+        this.later('write', 2600, () => { this.setState({ demos: this.state.demos.map((x) => x.id === id ? Object.assign({}, x, { written: true, status: 'Script ready', dot: 'ready' }) : x) }); this.say('Script ready to read'); });
       },
       // ---- new batch ----
       btText: st.btText, onBtText: (e) => this.setState({ btText: e.target.value }), btName: st.btName, onBtName: (e) => this.setState({ btName: e.target.value }), btNamePh: st.btFile ? btName : 'e.g. Whop course, module 3',
@@ -454,7 +455,7 @@ class Component extends DCLogic {
       tier2: [row('email', 'Email addresses'), row('phone', 'Phone numbers'), row('names', 'Real names and profile photos'), row('address', 'Addresses'), row('money', 'Revenue and money figures'), row('customers', 'Customer details'), row('counts', 'Follower and member counts')],
       tier3: [row('usage', 'Usage stats, like token usage'), row('prices', 'Prices on public pages'), row('dates', 'Dates')],
       // record
-      recBadge: D.recorded ? 'Recorded' : st.recStopped ? 'Stopped' : st.recPaused ? 'Paused' : 'Recording live', recCover: D.cover, recBadgeDot: D.recorded ? 'var(--okDot)' : st.recPaused || st.recStopped ? '#E0A100' : '#FF5A4E',
+      recBadge: D.recorded ? 'Recorded' : st.recStopped ? 'Stopped' : st.recPaused ? 'Paused' : 'Recording live', recCover: D.cover, recBadgeDot: D.recorded ? 'done' : st.recPaused || st.recStopped ? 'wait' : 'rec',
       isRecording: !D.recorded, recDone: !!D.recorded,
       recHeadWords: D.recorded ? 'All sections recorded' : st.recStopped ? 'Stopped after' : 'Section', recHeadNum: D.recorded ? '' : (st.recStopped ? st.recPos : Math.min(N, st.recPos + 1)) + ' of ' + N, recLeft: D.recorded ? lengthText : String(Math.max(1, Math.ceil((N - st.recPos) * 0.4))), recLeftWords: D.recorded ? '' : 'min left',
       recPct: (D.recorded ? 100 : st.recPos / N * 100) + '%',
@@ -469,7 +470,7 @@ class Component extends DCLogic {
       slideUp: () => { if (!this.slideDrag) return; this.slideDrag = null; if ((this.state.recSlide || 0) >= 0.92) { this.setState({ recSliding: false, recSlide: 1 }); stopNow(); } else this.setState({ recSliding: false, recSlide: 0 }); },
       slideKey: (e) => { const k = e.key; const v = this.state.recSlide || 0; if (k === 'Enter' || k === 'End') { e.preventDefault(); this.setState({ recSlide: 1 }); stopNow(); } else if (k === 'ArrowRight' || k === 'ArrowUp') { e.preventDefault(); const n = Math.min(1, v + 0.25); this.setState({ recSlide: n }); if (n >= 1) stopNow(); } else if (k === 'ArrowLeft' || k === 'ArrowDown') { e.preventDefault(); this.setState({ recSlide: Math.max(0, v - 0.25) }); } else if (k === 'Escape' || k === 'Home') { e.preventDefault(); e.stopPropagation(); this.setState({ recSlide: 0 }); } },
       pauseLabel: st.recPaused ? 'Resume' : 'Pause',
-      pauseRec: () => { if (st.recPaused) { this.setState({ recPaused: false }); this.startRecording(st.recPos); this.setState({ recPos: st.recPos }); } else { this.stop('rec'); this.setState({ recPaused: true }); this.patchDemo({ status: 'Paused at ' + (st.recPos + 1) + ' of ' + N }); } },
+      pauseRec: () => { if (st.recPaused) { this.setState({ recPaused: false }); this.startRecording(st.recPos); this.setState({ recPos: st.recPos }); } else { this.stop('rec'); this.setState({ recPaused: true }); this.patchDemo({ status: 'Paused at ' + (st.recPos + 1) + ' of ' + N, dot: 'wait' }); } },
       resumeStopped: () => { if (this.needKey()) return; this.startRecording(st.recPos); this.focusLater('#recpause'); },
       recNote: D.recorded ? 'Want a fresh take? Record again redoes every section.' : 'You can close this page. Claude tells you in chat when the draft is ready.',
       // review
@@ -509,7 +510,7 @@ class Component extends DCLogic {
       keyEnter: (e) => { if (e.key === 'Enter') { e.preventDefault(); this.state.key = e.target.value; this.renderVals().testKey(); } },
       wSiteKey: (e) => { if (e.key === 'Enter') { e.preventDefault(); this.state.wSite = e.target.value; this.renderVals().loginSite(); } },
       siteKey: (e) => { if (e.key === 'Enter') { e.preventDefault(); this.state.siteDraft = e.target.value; this.renderVals().addSite(); } },
-      keyMsg: keyMsg, keyMsgColor: st.keyRes === 'bad' || st.keyRes === 'empty' ? 'var(--danger)' : 'var(--ok)',
+      keyMsg: keyMsg, keyMsgColor: st.keyRes === 'bad' || st.keyRes === 'empty' ? 'var(--danger)' : 'var(--ink)',
       w1Cls: wsw(st.keyRes === 'ok'), w1Mark: st.keyRes === 'ok' ? '✓' : '1', w2Cls: wsw(st.tools === 'done'), w2Mark: st.tools === 'done' ? '✓' : '2', w3Cls: wsw(st.logged), w3Mark: st.logged ? '✓' : '3',
       toolsIdle: st.tools === 'idle', toolsAsking: st.tools === 'ask',
       toolsText: st.tools === 'done' ? 'Installed. NAVI can drive a browser and save video.' : st.tools === 'ask' ? 'Install now? About 300 MB, takes about 2 minutes, one time.' : st.tools === 'busy' ? 'Installing… about 2 minutes.' : 'Lets NAVI drive a browser and save video. About 300 MB, one time.',
