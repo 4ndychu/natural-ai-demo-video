@@ -7,7 +7,7 @@ const PRESETS = {
   standard: { email: false, phone: false, names: false, address: false, money: false, customers: false, counts: false, usage: true, prices: true, dates: true },
   test: { email: true, phone: true, names: true, address: true, money: false, customers: false, counts: false, usage: true, prices: true, dates: true }
 };
-const ITEM_NAMES = { email: 'emails', phone: 'phone numbers', names: 'names and photos', address: 'addresses', money: 'money', customers: 'customer details', counts: 'follower and member counts', usage: 'usage stats', prices: 'public prices', dates: 'dates' };
+const ITEM_NAMES = { email: 'emails', phone: 'phone numbers', names: 'names and photos', address: 'addresses', money: 'revenue and balances', customers: 'customer details', counts: 'follower and member counts', usage: 'usage stats', prices: 'public prices', dates: 'dates' };
 const COURSE = ['Welcome to the course', 'Create your whop', 'Add the Courses app', 'Plan your modules', 'Chapters and lessons', 'Pick a lesson type', 'Upload videos and files', 'Write lesson text', 'Add a quiz', 'Drip or open access', 'Brand your course', 'Set a cover image', 'Preview as a buyer', 'Check it on a phone', 'Write the product page', 'Set a price', 'Add a free trial', 'Connect payouts', 'Invite your first members', 'Post an announcement', 'Answer comments', 'Read your stats', 'What to do next'];
 class Component extends DCLogic {
   constructor(props) {
@@ -37,12 +37,12 @@ class Component extends DCLogic {
     };
     this.presetVals = { course: { casual: 7, energy: 3, pace: 100, hes: 1, breath: 1, swear: 0 }, saas: { casual: 8, energy: 5, pace: 105, hes: 2, breath: 1, swear: 1 }, tour: { casual: 5, energy: 4, pace: 100, hes: 0, breath: 1, swear: 0 } };
     this.ranges = { casual: [3, 8], energy: [1, 6], pace: [94, 108], hes: [0, 3], breath: [0, 2], swear: [0, 2] };
-    const whop = { id: 'whop', title: 'Build it in Whop', site: 'whop.com', len: 2, who: 0, voice: 'alex', model: 'v4', kind: 'course', max: 4, cover: 'assets/cover-1.jpg', status: 'Ready to watch', dot: 'var(--blueDot)', recorded: true, written: true,
+    const whop = { id: 'whop', title: 'Build it in Whop', site: 'whop.com', len: 2, who: 0, voice: 'alex', model: 'v4', kind: 'course', max: 4, cover: 'assets/cover-1.jpg', status: 'Watch the draft', dot: 'var(--blueDot)', recorded: true, written: true,
       notes: { 2: [{ t: 80, text: 'Too cheerful after Add app' }], 4: [{ t: 140, text: 'Too fast' }] },
       blurs: [{ id: 'b1', t: '1:58', what: 'A name inside the course cover image', s: '' }, { id: 'b2', t: '3:53', what: 'What might be a price in a banner', s: '' }] };
     const demos = [whop,
-      { id: 'trial', title: 'Set up a free trial', site: 'whop.com', len: 2, who: 0, voice: 'alex', model: 'v4', kind: 'course', max: 2, cover: 'assets/cover-2.jpg', status: 'Choosing blurs', dot: '#E0A100', recorded: false, written: true, notes: {}, blurs: [] },
-      { id: 'page', title: 'Write the product page', site: 'whop.com', len: 2, who: 0, voice: 'alex', model: 'v4', kind: 'course', max: 3, cover: 'assets/cover-2.jpg', status: 'Recording 5 of 11', dot: '#E0A100', recorded: false, written: true, notes: {}, blurs: [] },
+      { id: 'trial', title: 'Add your course to Whop', site: 'whop.com', len: 2, who: 0, voice: 'alex', model: 'v4', kind: 'course', max: 2, cover: 'assets/cover-2.jpg', tint: 'hue-rotate(150deg)', status: 'Choose blurs', dot: 'var(--blueDot)', recorded: false, written: true, notes: {}, blurs: [] },
+      { id: 'page', title: 'Course lessons in Whop', site: 'whop.com', len: 2, who: 0, voice: 'alex', model: 'v4', kind: 'course', max: 3, cover: 'assets/cover-2.jpg', status: 'Recording 5 of 11', dot: '#E0A100', recorded: false, written: true, notes: {}, blurs: [] },
       { id: 'pay', title: 'Connect payouts', site: 'whop.com', len: 1, who: 0, voice: 'alex', model: 'v4', kind: 'course', max: 5, cover: 'assets/cover-3.jpg', status: 'Exported Nov 2', dot: 'var(--okDot)', recorded: true, written: true, exported: true, notes: {}, blurs: [] },
       { id: 'posts', title: 'Schedule a week of posts', site: 'app.yourproduct.com', len: 2, who: 1, voice: 'jessica', model: 'v4', kind: 'saas', max: 5, cover: 'assets/cover-4.jpg', status: 'Exported Oct 28', dot: 'var(--okDot)', recorded: true, written: true, exported: true, notes: {}, blurs: [] }];
     demos.forEach((d) => Object.assign(d, { capMode: 'burn', corner: 'off', cornerText: '', lines: {} }));
@@ -63,7 +63,7 @@ class Component extends DCLogic {
       lib: false, libF: 'all', chat: [], chatDraft: '', chatAct: null,
       defCap: 'burn', defCorner: 'off', defCornerText: '',
       mode: 'one', bMore: false, bWhat: '', bSite: 'whop.com', bSiteNew: false, bNew: '', bWho: 0, bLen: 2, bHide: '', bVoice: 'alex', bCap: 'burn', bCorner: 'off', bCornerText: '', editing: false,
-      btText: '', btName: '', btFile: '', btSite: 'whop.com', btVoice: 'alex', btKind: 'course', btPreset: 'standard', btFolder: '', btOpen: null,
+      btSiteNew: false, btNew: '', btAll: false, fromBatch: null, batchItem: null, btText: '', btName: '', btFile: '', btSite: 'whop.com', btVoice: 'alex', btKind: 'course', btPreset: 'standard', btFolder: '', btOpen: null,
       toast: '', toastUndo: null, toastGo: null, toastGoLabel: ''
     };
     this.timers = {};
@@ -85,12 +85,13 @@ class Component extends DCLogic {
   needKey() { if (this.state.keyOn) return false; this.say('Connect your ElevenLabs key first', null, () => this.setState({ screen: 'settings', keyEdit: true }), 'Connect'); return true; }
   presetOf(shown) { const keys = Object.keys(PRESETS); for (let i = 0; i < keys.length; i++) { const p = PRESETS[keys[i]]; if (Object.keys(p).every((k) => p[k] === shown[k])) return keys[i]; } return 'custom'; }
   perVideo(min) { return Math.round(min * 930 / 10) * 10; }
+  fitsText(n) { return 'Enough credits for about ' + this.plural(n, 'more video') + '. The batch pauses there until you top up. Nothing fails.'; }
   startRecording(from) {
     this.setState({ recPos: from || 0, recPaused: false, recStopAsk: false, recStopped: false });
     this.patchDemo({ status: 'Recording ' + ((from || 0) + 1) + ' of 11', dot: '#E0A100' });
     this.every('rec', 900, () => {
       const p = this.state.recPos + 1;
-      if (p >= 11) { this.stop('rec'); this.setState({ recPos: 11 }); this.patchDemo({ recorded: true, max: Math.max(this.demo().max, 4), status: 'Ready to watch', dot: 'var(--blueDot)', blurs: [{ id: 'n1', t: '0:41', what: 'What might be an email in a sidebar', s: '' }] }); this.spend(4600); this.say('Draft 1 is ready', null, () => this.setState({ step: 4 }), 'Watch it'); }
+      if (p >= 11) { this.stop('rec'); this.setState({ recPos: 11 }); this.patchDemo({ recorded: true, max: Math.max(this.demo().max, 4), status: 'Watch the draft', dot: 'var(--blueDot)', blurs: [{ id: 'n1', t: '0:41', what: 'What might be an email in a sidebar', s: '' }] }); this.spend(4600); this.say('Draft 1 is ready', null, () => this.setState({ step: 4 }), 'Watch it'); }
       else { this.setState({ recPos: p }); this.patchDemo({ status: 'Recording ' + (p + 1) + ' of 11' }); }
     });
   }
@@ -139,17 +140,17 @@ class Component extends DCLogic {
     const recording = !D.recorded && st.recPos < 11 && !st.recStopped;
     const voiceOk = vInfo.models.indexOf(model) >= 0;
     const S = [
-      { name: 'Script', sub: D.written ? '11 sections' : 'Writing…', title: 'Read the script', help: 'Click a section to read what ' + voicePretty + ' says. Want something different? Use Change this line.', cta: D.max > 0 ? 'Next: Voice' : 'Script looks right' },
-      { name: 'Voice', sub: voicePretty + ', ' + (model === 'v4' ? 'Eleven v4' : 'Eleven v3'), title: 'Pick the voice', help: 'Click a face to pick it and hear it. The recommended settings are already on.', cta: 'Use ' + voicePretty },
+      { name: 'Script', sub: D.written ? (D.len === 2 ? 11 : [4, 6, 11, 14][D.len]) + ' sections' : 'Writing…', title: 'Read the script', help: 'Click a section to read it. Change one line here, or ask Claude below for bigger changes.', cta: D.max > 0 ? 'Next: Voice' : 'Approve script' },
+      { name: 'Voice', sub: voicePretty + ', ' + (model === 'v4' ? 'Eleven v4' : 'Eleven v3'), title: 'Pick the voice', help: 'Click a face to pick it. Press Hear to listen. The recommended settings are already on.', cta: 'Use ' + voicePretty },
       { name: 'Privacy', sub: presetName[preset], title: 'Choose what gets blurred', help: 'Blurring happens while recording, then every frame is checked again. Anything unclear shows up in Review.', cta: D.recorded ? 'Use these blurs' : 'Use these blurs and record' },
-      { name: 'Record', sub: D.recorded ? 'Done, ' + lengthText : (st.recStopped ? 'Stopped' : (recording && st.cur === D.id && D.max >= 3 ? 'Section ' + Math.min(11, st.recPos + 1) + ' of 11' : 'Not yet')), title: D.recorded ? 'Recorded' : (st.recStopped ? 'Recording stopped' : 'Recording'), help: D.recorded ? 'Every section is recorded. Watch the draft next.' : 'The browser does the clicks while ' + voicePretty + ' talks. You can close this page.', cta: 'Watch the draft', second: D.recorded ? 'Record again' : '' },
-      { name: 'Review', sub: marks ? this.plural(marks, 'mark') : (D.recorded ? 'No marks' : 'Not yet'), title: 'Watch the draft', help: 'Press Mark this moment when something is off. Only marked sections are redone.', cta: marks ? 'Redo ' + this.plural(markedSecs.length, 'marked section') : 'Approve', second: marks ? 'Approve without redoing' : '' },
-      { name: 'Export', sub: D.exported ? 'Exported' : 'Not yet', title: D.exported ? 'Exported' : 'Export', help: D.exported ? 'Saved in your Videos folder. Change anything below and export again, no credits.' : 'Choose how captions and the corner label look. Changing these costs no credits.', cta: D.exported ? (D.dirty ? 'Export again' : 'Open folder') : 'Export video', second: 'All demos' }
+      { name: 'Record', sub: D.recorded ? 'Done, ' + lengthText : (st.recStopped ? 'Stopped' : (recording && st.cur === D.id && D.max >= 3 ? 'Section ' + Math.min(11, st.recPos + 1) + ' of 11' : 'Not yet')), title: D.recorded ? 'Recorded' : (st.recStopped ? 'Recording stopped' : 'Recording'), help: D.recorded ? 'Every section is recorded. Watch the draft next.' : 'The browser does the clicks while ' + voicePretty + ' talks. You can close this page: NAVI keeps going and the draft shows up on All demos.', cta: 'Watch the draft', second: D.recorded ? 'Record again' : '' },
+      { name: 'Review', sub: marks ? this.plural(marks, 'mark') : (D.recorded ? 'No marks' : 'Not yet'), title: 'Watch the draft', help: 'Press Mark this moment when something is off. Only marked sections are redone.', cta: marks ? 'Redo ' + this.plural(markedSecs.length, 'marked section') : (st.fromBatch ? 'Approve and watch next' : 'Approve'), second: '', skip: marks ? 'Skip redo, keep as is' : '' },
+      { name: 'Export', sub: D.exported ? 'Exported' : 'Not yet', title: D.exported ? 'Exported' : 'Export', help: D.exported ? 'Saved to Movies/NAVI. Change captions or the label and export again. No credits.' : 'Choose how captions and the corner label look. Changing these costs no credits.', cta: D.exported ? (D.dirty ? 'Export again' : 'Open folder') : 'Export video', second: D.exported && D.dirty ? 'Open folder' : 'All demos' }
     ];
     const cur = S[st.step];
     const steps = S.map((s, i) => {
       const locked = i > D.max; const now = i === st.step; const done = (i < D.max && !(i === 3 && !D.recorded)) || (i === 5 && D.exported);
-      return { name: s.name, sub: s.sub, cur: now ? 'step' : 'false', locked: locked, cls: 'stepbtn' + (now ? ' now' : '') + (locked ? ' locked' : ''), tip: locked ? 'Finish the step before first' : '', mark: done && !now ? '✓' : String(i + 1), dotCls: 'stepdot' + (done && !now ? ' done' : ''), go: () => { if (!locked) this.setState({ step: i, confirm: null, markOpen: false }); } };
+      return { name: s.name, sub: s.sub, cur: now ? 'step' : 'false', locked: locked, cls: 'stepbtn' + (now ? ' now' : '') + (locked ? ' locked' : ''), tip: locked ? 'Finish the step before first' : '', mark: done ? '✓' : String(i + 1), dotCls: 'stepdot' + (done ? ' done' : ''), go: () => { if (!locked) this.setState({ step: i, confirm: null, markOpen: false }); } };
     });
     const setVals = (n, msg, prev) => { this.setState({ vals: n }); if (msg) this.say(msg, prev ? () => this.setState({ vals: prev }) : null); };
     const setV = (k, x) => { const n = Object.assign({}, this.state.vals); if (n[k] === x) return; n[k] = x; this.setState({ vals: n }); };
@@ -185,19 +186,22 @@ class Component extends DCLogic {
       () => { if (!voiceOk) return; goStep(2); this.say(st.lock ? voicePretty + ' is set for every demo in this project' : 'Using ' + voicePretty + ' for this demo'); },
       () => { goStep(3); if (!D.recorded && !recording) { if (this.needKey()) return; this.startRecording(); } else if (!D.recorded && !this.timers.rec && !st.recPaused) { this.startRecording(st.recPos); } },
       () => goStep(4),
-      () => { if (marks) { this.setState({ confirm: 'redo' }); return; } if (unsure) { this.setState({ confirm: 'approve' }); return; } goStep(5); },
+      () => { if (marks) { this.setState({ confirm: 'redo' }); return; } if (unsure) { this.setState({ confirm: 'approve' }); return; } if (st.fromBatch) { batchApproveNext(); return; } goStep(5); },
       () => { if (!D.exported || D.dirty) doExport(); else this.say('Opening your Videos folder'); }
     ];
-    const secondaryFor = [null, null, null, () => { if (this.needKey()) return; this.patchDemo({ recorded: false }); this.startRecording(); }, () => this.setState({ confirm: 'approve' }), () => this.setState({ screen: 'home' })];
+    const secondaryFor = [null, null, null, () => { if (this.needKey()) return; this.patchDemo({ recorded: false }); this.startRecording(); }, () => this.setState({ confirm: 'approve' }), () => { if (D.exported && D.dirty) this.say('Opening your Videos folder'); else this.setState({ screen: 'home' }); }];
     const confirms = {
-      approve: { text: [marks ? this.plural(marks, 'mark') : '', unsure ? this.plural(unsure, 'blur') + ' to check' : ''].filter(Boolean).join(' and ') + ' still open', no: 'Go back', yes: 'Approve anyway', act: () => goStep(5) },
+      approve: { text: [marks ? this.plural(marks, 'mark') + ' kept, not redone' : '', unsure ? this.plural(unsure, 'blur') + ' not checked' : ''].filter(Boolean).join(', '), no: 'Go back', yes: 'Approve anyway', act: () => { if (st.fromBatch) { this.setState({ confirm: null }); batchApproveNext(); } else goStep(5); } },
       redo: { text: 'Redo ' + this.plural(markedSecs.length, 'section') + ' for about ' + this.num(markedSecs.length * 420) + ' credits?', no: 'Cancel', yes: 'Redo them', act: () => { if (this.needKey()) return; this.spend(markedSecs.length * 420); const prev = D.notes; this.patchDemo({ notes: {} }); this.setState({ confirm: null }); this.say('Redoing ' + this.plural(markedSecs.length, 'section') + '. Draft 2 will be here in a few minutes.'); } }
     };
+    const batchApproveNext = () => { const bid = st.fromBatch; const bb = st.batches.find((x) => x.id === bid); if (!bb) return; const items = bb.items.map((x, k) => k === st.batchItem ? Object.assign({}, x, { st: 'approved' }) : x); this.patchBatch({ items: items }, bid); const next = items.findIndex((x) => x.st === 'recorded'); this.say('Approved “' + bb.items[st.batchItem].t + '”'); if (next >= 0) this.setState({ batchItem: next, revT: 0, markOpen: false, confirm: null }); else this.setState({ screen: 'batch', fromBatch: null, batchItem: null, confirm: null }); };
     const cf = st.confirm ? confirms[st.confirm] : null;
+    const videoCost = Math.round(4600 * baseSec / this.total / 10) * 10; const leftAfter = Math.max(0, st.credits - (D.recorded ? 0 : videoCost));
+    const pvFoot = { strict: 'Strict: all personal info, usage, prices and dates blurred', standard: 'Standard: personal info, revenue and counts blurred', test: 'Test account: revenue, customers and counts blurred', custom: 'Custom: you changed some items' }[preset];
     const footTexts = [
-      D.written ? (D.max > 0 ? 'Approved. ' : 'Not approved yet. ') + this.secs.length + ' sections, about ' + lengthText : 'Claude is writing the script',
-      voiceOk ? voicePretty + ' with ' + kindName + ' settings' : voicePretty + ' isn’t trained for ' + (model === 'v4' ? 'Eleven v4' : 'Eleven v3'),
-      presetName[preset] + ', ' + blurCount + ' kinds of thing blurred',
+      D.written ? (D.max > 0 ? 'Approved. Changing a line asks you to approve again.' : 'Not approved yet. ' + this.secs.length + ' sections, about ' + lengthText) : 'Claude is writing the script',
+      voiceOk ? voicePretty + ', recommended settings' + (changed ? ' with ' + changed + ' changed' : '') : voicePretty + ' isn’t trained for ' + (model === 'v4' ? 'Eleven v4' : 'Eleven v3'),
+      pvFoot + (D.recorded ? '' : '. Recording uses about ' + this.num(videoCost) + ' credits'),
       D.recorded ? 'Recorded, ' + lengthText : (st.recStopped ? 'Stopped. Finished sections are kept.' : (st.recPaused ? 'Paused at section ' + Math.min(11, st.recPos + 1) + ' of 11' : 'Recording section ' + Math.min(11, st.recPos + 1) + ' of 11. The draft is ready when it finishes.')),
       marks ? this.plural(marks, 'mark') + '. Redoing costs about ' + this.num(markedSecs.length * 420) + ' credits' : (unsure ? this.plural(unsure, 'blur') + ' to check' : 'Nothing marked'),
       D.exported ? (D.dirty ? 'Changed since the last export' : 'Exported') : 'Free to change, no credits'
@@ -206,26 +210,29 @@ class Component extends DCLogic {
     const foot = cf ? { text: cf.text, dot: 'var(--danger)', color: 'var(--ink)' } : { text: footTexts[st.step], dot: footBad ? '#E5484D' : (st.step === 3 && !D.recorded ? '#E0A100' : 'var(--okDot)'), color: footBad ? 'var(--ink)' : 'var(--ink2)' };
     const wsw = (done) => done ? 'wnum done' : 'wnum';
     const l = sw(st.lock), p = sw(st.p720), a = sw(st.caps);
-    const dataDefs = [{ id: 'logins', n: 'Saved logins', w: this.plural(st.sites.length, 'site') + ' saved', l: 'Forget all' }, { id: 'settings', n: 'Voice, privacy and learned preferences', w: 'In the skill’s settings folder', l: 'Reset' }, { id: 'videos', n: 'Finished videos', w: 'In your Videos folder. Never deleted from here.', l: '' }];
+    const dataDefs = [{ id: 'settings', n: 'Voice, privacy and learned preferences', w: 'Stored on this Mac', l: 'Reset' }, { id: 'videos', n: 'Finished videos', w: 'Movies/NAVI. Never deleted from here.', l: 'Open folder' }];
     const dataAct = {
       logins: () => { const prev = st.sites; this.setState({ sites: [] }); this.say('All saved logins forgotten', () => this.setState({ sites: prev })); },
+      videos: () => this.say('Opening Movies/NAVI'),
       settings: () => { const prev = { vals: st.vals, hide: st.hide, shown: st.shown, defVoice: st.defVoice, defCap: st.defCap, defCorner: st.defCorner, defCornerText: st.defCornerText }; this.setState({ vals: Object.assign({}, this.presetVals.course), hide: [], shown: Object.assign({}, PRESETS.standard), defVoice: 'alex', defCap: 'burn', defCorner: 'off', defCornerText: '' }); this.say('Settings reset', () => this.setState(prev)); }
     };
     const keyMsg = st.keyRes === 'ok' ? 'Connected. Starter plan, ' + this.num(st.credits) + ' of 30,000 credits left. Saved in your Mac’s Keychain.' : st.keyRes === 'bad' ? 'That key didn’t work. Check you copied all of it and it has text to speech access.' : '';
-    const videoCost = Math.round(4600 * baseSec / this.total / 10) * 10; const leftAfter = Math.max(0, st.credits - (D.recorded ? 0 : videoCost));
     const chatClean = (m) => { let s = m.replace(/^(actually|no|ok|okay|wait)[,!.\s]*/i, '').replace(/^(make|do|change)( it| this)?( into)?( a)? demo (of|for|on|about)\s*/i, '').replace(/\s*instead[.!]*$/i, ''); return s.charAt(0).toUpperCase() + s.slice(1); };
     const segOf = (opts, cur2, fn) => opts.map((o) => ({ label: o[1], on: cur2 === o[0] ? 'true' : 'false', pick: () => fn(o[0]) }));
     const capOpts = [['burn', 'Burned in'], ['file', 'Separate file'], ['off', 'Off']];
     const posOpts = [['off', 'Off'], ['tl', 'Top left'], ['tr', 'Top right'], ['bl', 'Bottom left'], ['br', 'Bottom right']];
     const capName = { burn: 'burned in', file: 'as a separate file', off: 'off' };
+    const cornerCtl = (cur2, set) => { const on = cur2 !== 'off'; return { on: on, onStr: on ? 'true' : 'false', cls: on ? 'sw on' : 'sw', toggle: () => set(on ? 'off' : (this.lastCorner || 'tr')), seg: [['tl', 'Top left'], ['tr', 'Top right'], ['bl', 'Bottom left'], ['br', 'Bottom right']].map((o) => ({ label: o[1], on: cur2 === o[0] ? 'true' : 'false', pick: () => { this.lastCorner = o[0]; set(o[0]); } })) }; };
     const posCss = { tl: 'left: 14px; top: 14px', tr: 'right: 14px; top: 14px', bl: 'left: 14px; bottom: 14px', br: 'right: 14px; bottom: 14px' };
     const dCap = D.capMode || 'burn'; const dCorner = D.corner || 'off'; const dCornerText = D.cornerText || '';
     const base = D.title.replace(/…$/, '');
     // ---- new demo ----
+    const siteOk = (u) => /^[a-z0-9-]+(\.[a-z0-9-]+)+(\/.*)?$/i.test((u || '').trim().replace(/^https?:\/\//i, ''));
     const lenOpts = [1, 3, 5, 8];
     const suggestLen = (() => { const w = st.bWhat.trim(); if (!w) return -1; const n = 1 + (w.match(/,| then | and /gi) || []).length; const mins = Math.max(1, n + (st.bWho === 0 ? 1 : st.bWho === 2 ? -1 : 0)); let best = 0; lenOpts.forEach((o, i) => { if (Math.abs(o - mins) < Math.abs(lenOpts[best] - mins)) best = i; }); return best; })();
     const bSiteVal = st.bSiteNew ? st.bNew.trim() : st.bSite;
-    const summaryParts = [['Beginners', 'Some experience', 'Pros'][st.bWho], 'about ' + lenOpts[st.bLen] + ' min', pretty(st.bVoice), 'captions ' + capName[st.bCap], st.bCorner === 'off' || !st.bCornerText.trim() ? 'no corner label' : 'corner label “' + st.bCornerText.trim() + '”'];
+    const posName = { tl: 'top left', tr: 'top right', bl: 'bottom left', br: 'bottom right' };
+    const summaryParts = ['For ' + ['beginners', 'people with some experience', 'pros'][st.bWho], 'about ' + lenOpts[st.bLen] + ' min', pretty(st.bVoice) + '’s voice', { burn: 'captions in the video', file: 'captions as a file', off: 'no captions' }[st.bCap], st.bCorner === 'off' ? 'no corner label' : 'label ' + posName[st.bCorner]];
     if (st.bHide.trim()) summaryParts.push('keep “' + st.bHide.trim() + '” off screen');
     // ---- batch (new) ----
     const btLines = st.btText.split(/\r?\n/).map((s) => s.replace(/^\s*(?:[-*•]|\d+[.)]|#+)\s*/, '').split(/\t|,(?=(?:[^"]*"[^"]*")*[^"]*$)/)[0].replace(/^"|"$/g, '').trim()).filter((s) => s && !/^(title|lesson|name)$/i.test(s));
@@ -240,24 +247,26 @@ class Component extends DCLogic {
     const bLeftCost = bToRecord.reduce((s, x) => s + this.perVideo(x.min), 0); const bLeftMin = bToRecord.reduce((s, x) => s + x.min * 3, 0);
     const bFits = (() => { let c = st.credits, n = 0; for (const x of bToRecord) { const k = this.perVideo(x.min); if (c < k) break; c -= k; n++; } return n; })();
     const stLabel = { writing: 'Writing script', script: 'Script ready', waiting: 'Waiting', recording: 'Recording now', recorded: 'Ready to watch', approved: 'Approved', exported: 'Exported' };
-    const stDot = { writing: '#E0A100', script: '#E0A100', waiting: 'var(--fill)', recording: '#E0A100', recorded: '#E5484D', approved: 'var(--okDot)', exported: 'var(--okDot)' };
+    const bReady = cnt('recorded');
+    const stDot = { writing: '#E0A100', script: 'var(--blueDot)', waiting: 'transparent', recording: '#E0A100', recorded: 'var(--blueDot)', approved: 'var(--okDot)', exported: 'var(--okDot)' };
     const bStageIdx = B ? ({ writing: 0, approve: 1, recording: 2, review: 3, done: 4 }[B.stage]) : 0;
-    const bStages = ['Write scripts', 'Approve scripts', 'Record', 'Review', 'Export'].map((n, i) => ({ n: n, cls: 'bstage' + (i < bStageIdx || (i === 3 && bApproved + bExported === bItems.length && bItems.length) ? ' done' : '') + (i === bStageIdx ? ' now' : ''), mark: i < bStageIdx ? '✓' : String(i + 1) }));
+    const bStages = [['Write scripts', B && B.stage === 'writing' ? 'Writing…' : 'Done'], ['Approve scripts', bStageIdx > 1 ? 'Done' : bStageIdx === 1 ? this.plural(cnt('script'), 'to read') : 'Not yet'], ['Record', bStageIdx < 2 ? 'Not yet' : bRecorded + ' of ' + bItems.length], ['Review', bStageIdx < 2 ? 'Not yet' : (bReady ? bReady + ' ready' : (bApproved + bExported) + ' approved')], ['Export', bExported ? bExported + ' exported' : (bApproved ? bApproved + ' approved' : 'Not yet')]].map((o, i) => { const done = i < Math.min(bStageIdx, 2) || (i === 2 && bRecorded === bItems.length && bItems.length > 0) || (i === 4 && bExported === bItems.length && bItems.length > 0); const now = i === bStageIdx || (bStageIdx === 2 && i === 3 && bReady > 0); return { n: o[0], sub: o[1], cls: 'stepbtn' + (now ? ' now' : '') + (!done && !now && i > bStageIdx ? ' locked' : ''), dotCls: 'stepdot' + (done ? ' done' : ''), mark: done ? '✓' : String(i + 1) }; });
     const bHead = !B ? '' : B.stage === 'writing' ? 'Claude is writing ' + this.plural(bItems.length, 'script') : B.stage === 'approve' ? this.plural(cnt('script'), 'script') + ' ready to approve' : B.paused === 'credits' ? 'Paused: credits ran low' : B.paused ? 'Paused at ' + bRecorded + ' of ' + bItems.length : (B.stage === 'recording' ? bRecorded + ' of ' + bItems.length + ' recorded' : bApproved + bExported + ' of ' + bItems.length + ' approved');
     const bSub = !B ? '' : B.stage === 'writing' ? 'Takes about a minute per script. Nothing records until you approve them.' : B.stage === 'approve' ? 'Open any script to read or change it, or approve them all.' : B.paused === 'credits' ? 'The next video needs about ' + this.num(this.perVideo((bToRecord[0] || { min: 3 }).min)) + ' credits and ' + this.num(st.credits) + ' are left. Top up at ElevenLabs, then resume. Nothing is lost.' : (B.stage === 'recording' ? 'About ' + Math.max(1, Math.round(bLeftMin / 60 * 10) / 10) + ' h left. You can watch and approve finished ones now, or leave it running overnight.' : 'Watch each one and approve it. Approved videos can be exported any time.');
-    const bCreditNote = B && B.stage === 'recording' && !B.paused && bFits < bToRecord.length ? 'Credits cover about ' + this.plural(bFits, 'more video') + '. It pauses there and waits for you.' : '';
+    const bCreditNote = B && B.stage === 'recording' && !B.paused && bFits < bToRecord.length ? this.fitsText(bFits) : '';
+    const watchItem = (i) => this.setState({ screen: 'demo', cur: 'whop', step: 4, markOpen: false, confirm: null, fromBatch: B.id, batchItem: i, revT: 0 });
     const approveItem = (i) => { const prev = B.items; const items = B.items.map((x, k) => k === i ? Object.assign({}, x, { st: 'approved' }) : x); this.patchBatch({ items: items }); this.say('Approved “' + B.items[i].t + '”', () => this.patchBatch({ items: prev })); };
     const bPrimary = !B ? { label: '', act: () => {}, off: true } : B.stage === 'writing' ? { label: 'Approve all scripts', off: true, act: () => {} } : B.stage === 'approve' ? { label: 'Approve all and record', off: false, act: () => { if (this.needKey()) return; const items = B.items.map((x, k) => Object.assign({}, x, { st: k === 0 ? 'recording' : 'waiting' })); this.patchBatch({ items: items, stage: 'recording', paused: false }); this.runBatch(); this.say('Recording ' + this.plural(items.length, 'video') + ', one after another'); } } : { label: bApproved ? 'Export ' + this.plural(bApproved, 'approved video') : 'Export approved videos', off: !bApproved, act: () => { const n = bApproved; const items = B.items.map((x) => x.st === 'approved' ? Object.assign({}, x, { st: 'exported' }) : x); const done = items.every((x) => x.st === 'exported'); this.patchBatch({ items: items, stage: done ? 'done' : B.stage }); this.say('Exported ' + this.plural(n, 'video') + ' and the list file to ' + B.folder.replace(/^~\/Movies\//, 'Movies/')); } };
     const bSecondary = !B || B.stage === 'writing' || B.stage === 'approve' || B.stage === 'done' ? null : (B.stage === 'recording' ? (B.paused ? { label: 'Resume', act: () => { this.patchBatch({ paused: false }); this.runBatch(); } } : { label: 'Pause', act: () => { this.patchBatch({ paused: true }); this.say('Paused. The video being recorded finishes first.'); } }) : null);
     return {
       themeClass: theme === 'dark' ? 't-dark' : 't-light', isDark: theme === 'dark', isLight: theme !== 'dark', themeAria: theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode', toggleTheme: () => this.setState({ theme: theme === 'dark' ? 'light' : 'dark' }),
       isWelcome: st.screen === 'welcome', inApp: st.screen !== 'welcome', isHome: st.screen === 'home', isDemo: st.screen === 'demo', isSettings: st.screen === 'settings', isNew: st.screen === 'new', isBatch: st.screen === 'batch',
-      crumb: st.screen !== 'home', crumbText: st.screen === 'demo' ? D.title : st.screen === 'batch' ? (B ? B.name : '') : st.screen === 'new' ? (st.editing ? 'Edit brief' : 'New demo') : 'Settings',
-      showNewBtn: st.screen === 'home' || st.screen === 'settings',
+      crumb: st.screen !== 'home', crumbBatch: st.screen === 'demo' && !!st.fromBatch, crumbBatchName: st.fromBatch ? (st.batches.find((x) => x.id === st.fromBatch) || {}).name : '', goBatch: () => this.setState({ screen: 'batch', fromBatch: null, batchItem: null }), crumbText: st.screen === 'demo' ? (st.fromBatch && B ? (B.items[st.batchItem] || {}).t : D.title) : st.screen === 'batch' ? (B ? B.name : '') : st.screen === 'new' ? (st.editing ? 'Edit brief' : 'New demo') : 'Settings',
+      showNewBtn: st.screen === 'settings', isPhone: (() => { try { return window.matchMedia('(max-width: 860px)').matches; } catch (e) { return false; } })(),
       goHome: () => this.setState({ screen: 'home', help: false, confirm: null }), goSettings: () => this.setState({ screen: 'settings', help: false }),
       helpOpen: st.help, toggleHelp: () => this.setState({ help: !st.help }),
       keyOn: st.keyOn, keyOff: !st.keyOn, creditsText: this.num(st.credits),  creditPct: (st.credits / 30000 * 100) + '%',
-      demos: st.demos.map((d) => ({ title: d.title, meta: d.site + ', ' + pretty(d.voice), status: d.status, dot: d.dot, cover: d.cover, open: () => { const s = d.exported ? 5 : Math.min(d.max, d.recorded ? 4 : d.max); this.setState({ screen: 'demo', cur: d.id, step: s, confirm: null, markOpen: false, scSel: 0, vals: this.recFor(d.voice, d.kind) }); } })),
+      demos: st.demos.map((d) => ({ tint: d.tint || '', title: d.title, meta: d.site + ', ' + pretty(d.voice), status: d.status, dot: d.dot, cover: d.cover, open: () => { const s = d.exported ? 5 : Math.min(d.max, d.recorded ? 4 : d.max); this.setState({ screen: 'demo', cur: d.id, step: s, confirm: null, markOpen: false, scSel: 0, vals: this.recFor(d.voice, d.kind) }); } })),
       batchCards: st.batches.map((b) => { const r = b.items.filter((x) => ['recorded', 'approved', 'exported'].indexOf(x.st) >= 0).length; return { name: b.name, meta: 'Batch of ' + b.items.length + ', ' + b.site + ', ' + pretty(b.voice), status: b.stage === 'writing' ? 'Writing scripts' : b.stage === 'approve' ? 'Scripts to approve' : b.paused ? 'Paused, ' + r + ' of ' + b.items.length : b.stage === 'done' ? 'All exported' : r + ' of ' + b.items.length + ' recorded', pct: (r / b.items.length * 100) + '%', open: () => this.openBatch(b.id) }; }),
       defImg: VO[st.defVoice].img, defC: VO[st.defVoice].c, defName: VO[st.defVoice].name,
       keyDot: st.keyOn ? 'var(--okDot)' : 'var(--danger)', keyStatus: st.keyOn ? 'ElevenLabs connected' : 'ElevenLabs not connected', keyAction: st.keyOn ? 'Change' : 'Connect',
@@ -268,24 +277,24 @@ class Component extends DCLogic {
       newDemo: () => this.setState({ screen: 'new', mode: 'one', bMore: false, editing: false, bCap: st.defCap, bCorner: st.defCorner, bCornerText: st.defCornerText, bWhat: '', bNew: '', bSiteNew: false, bHide: '', bSite: st.sites[0] ? st.sites[0].u : '', bVoice: st.defVoice, bWho: 0, bLen: 2, help: false, btSite: st.sites[0] ? st.sites[0].u : '', btVoice: st.defVoice }),
       editBrief: () => this.setState({ screen: 'new', mode: 'one', bMore: false, editing: true, bWhat: D.what || 'How to build a course in Whop, from creating the whop to checking it on a phone', bSite: D.site, bSiteNew: false, bNew: '', bWho: D.who, bLen: D.len, bVoice: D.voice, bCap: dCap, bCorner: dCorner, bCornerText: dCornerText }),
       newTitle: st.editing ? 'Edit the brief' : 'New demo', briefCta: st.editing ? 'Update the script' : 'Write the script',
-      briefHint: st.editing ? 'Claude only rewrites what changed.' : 'Takes about a minute.',
+      briefHint: st.editing ? 'Claude only rewrites what changed.' : 'Claude writes the script. Takes about a minute.',
       showModeSwitch: !st.editing, modeOne: st.mode === 'one', modeBatch: st.mode === 'batch',
       modes: segOf([['one', 'One demo'], ['batch', 'A batch']], st.mode, (x) => this.setState({ mode: x })),
       bWhat: st.bWhat, onBWhat: (e) => this.setState({ bWhat: e.target.value }), bHide: st.bHide, onBHide: (e) => this.setState({ bHide: e.target.value }), bNew: st.bNew, onBNew: (e) => this.setState({ bNew: e.target.value }),
       briefEmpty: !st.bWhat.trim() || (st.bSiteNew && !/^[a-z0-9-]+(\.[a-z0-9-]+)+(\/.*)?$/i.test(st.bNew.trim().replace(/^https?:\/\//i, ''))),
       briefWhy: !st.bWhat.trim() ? 'Say what to show first.' : (st.bSiteNew && !/^[a-z0-9-]+(\.[a-z0-9-]+)+(\/.*)?$/i.test(st.bNew.trim().replace(/^https?:\/\//i, '')) ? 'Type the new site’s address first.' : ''),
-      bSites: st.sites.map((s) => ({ label: s.u, on: !st.bSiteNew && st.bSite === s.u ? 'true' : 'false', pick: () => this.setState({ bSite: s.u, bSiteNew: false }) })).concat([{ label: '+ New site', on: st.bSiteNew ? 'true' : 'false', pick: () => { this.setState({ bSiteNew: true }); this.later('focusNew', 30, () => { const el = document.getElementById('bns'); if (el) el.focus(); }); } }]),
+      bSites: st.sites.map((s) => ({ label: s.u, on: !st.bSiteNew && st.bSite === s.u ? 'true' : 'false', pick: () => this.setState({ bSite: s.u, bSiteNew: false }) })),
+      openBNew: () => { this.setState({ bSiteNew: true }); requestAnimationFrame(() => { const el = document.getElementById('bns'); if (el) el.focus(); }); }, closeBNew: () => this.setState({ bSiteNew: false, bNew: '' }),
       bSiteNew: st.bSiteNew, bNewBad: st.bSiteNew && !!st.bNew.trim() && !/^[a-z0-9-]+(\.[a-z0-9-]+)+(\/.*)?$/i.test(st.bNew.trim().replace(/^https?:\/\//i, '')), 
-      bSummary: summaryParts.join(', '), bMore: st.bMore, bLess: !st.bMore, openMore: () => this.setState({ bMore: true }), closeMore: () => this.setState({ bMore: false }),
+      bSummary: summaryParts.join(' · '), bMore: st.bMore, bLess: !st.bMore, openMore: () => this.setState({ bMore: true }), closeMore: () => this.setState({ bMore: false }),
       bWho: ['Beginners', 'Some experience', 'Pros'].map((s, i) => ({ label: s, on: st.bWho === i ? 'true' : 'false', pick: () => this.setState({ bWho: i }) })),
-      bLen: ['1 min', '3 min', '5 min', '8 min'].map((s, i) => ({ label: s + (i === suggestLen ? ' ★' : ''), on: st.bLen === i ? 'true' : 'false', pick: () => this.setState({ bLen: i }) })),
+      bLen: ['1 min', '3 min', '5 min', '8 min'].map((s, i) => ({ label: s, star: i === suggestLen, on: st.bLen === i ? 'true' : 'false', pick: () => this.setState({ bLen: i }) })),
       bVoices: st.mine.map((k) => ({ label: pretty(k), on: st.bVoice === k ? 'true' : 'false', pick: () => this.setState({ bVoice: k }) })),
       bCaps: segOf(capOpts, st.bCap, (x) => this.setState({ bCap: x })),
-      bCornerPick: ['tl', 'tr', 'bl', 'br'].map((k) => ({ k: k, cls: 'cp cp-' + k + (st.bCorner === k ? ' on' : ''), on: st.bCorner === k ? 'true' : 'false', aria: { tl: 'Top left', tr: 'Top right', bl: 'Bottom left', br: 'Bottom right' }[k], pick: () => this.setState({ bCorner: k }) })),
-      bCornerOffOn: st.bCorner === 'off' ? 'true' : 'false', bCornerSetOff: () => this.setState({ bCorner: 'off' }), bCornerName: { off: 'No corner label', tl: 'Top left', tr: 'Top right', bl: 'Bottom left', br: 'Bottom right' }[st.bCorner],
+      bCorner: cornerCtl(st.bCorner, (x) => this.setState({ bCorner: x })),
       bCornerText: st.bCornerText, onBCornerText: (e) => this.setState({ bCornerText: e.target.value }), bCornerOff: st.bCorner === 'off',
       bCornerPh: 'Text for the corner, e.g. your brand name',
-      lenHint: suggestLen < 0 ? 'Type what to show and Claude suggests a length (★).' : '★ Suggested for this brief: about ' + lenOpts[suggestLen] + ' min. ' + lenOpts[st.bLen] + ' min is roughly ' + this.num(lenOpts[st.bLen] * 150) + ' words.',
+      lenHint: suggestLen < 0 ? '' : '★ Suggested for what you typed. ' + lenOpts[st.bLen] + ' min is roughly ' + this.num(lenOpts[st.bLen] * 150) + ' words.',
       cancelBrief: () => this.setState({ screen: st.editing ? 'demo' : 'home' }),
       submitBrief: () => {
         const w = st.bWhat.trim(); if (!w) return; const site = bSiteVal || 'whop.com'; if (!site) return; const t = w.length > 34 ? w.slice(0, 32).replace(/\s+\S*$/, '') + '…' : w;
@@ -299,29 +308,33 @@ class Component extends DCLogic {
       },
       // ---- new batch ----
       btText: st.btText, onBtText: (e) => this.setState({ btText: e.target.value }), btName: st.btName, onBtName: (e) => this.setState({ btName: e.target.value }), btNamePh: st.btFile ? btName : 'e.g. Whop course, module 3',
-      btFolder: st.btFolder, onBtFolder: (e) => this.setState({ btFolder: e.target.value }), btFolderPh: btFolder,
+      btFolder: st.btFolder, onBtFolder: (e) => this.setState({ btFolder: e.target.value }), btFolderPh: btFolder, btFolderVal: st.btFolder || btFolder, chooseFolder: () => this.say('A folder picker opens on your Mac'),
+      btRows: Math.max(4, Math.min(10, btCount + 1)), btKindHint: { course: 'Step by step, at a teaching pace.', saas: 'Short and lively, for a product page.', tour: 'A calm look around the main screens.' }[st.btKind],
       btFileName: st.btFile, btHasFile: !!st.btFile,
       pickFile: () => { const el = document.getElementById('btfile'); if (el) el.click(); },
       onFile: (e) => { const f = e.target.files && e.target.files[0]; if (!f) return; const r = new FileReader(); r.onload = () => { this.setState({ btText: String(r.result || ''), btFile: f.name }); this.say('Read ' + f.name); }; r.readAsText(f); e.target.value = ''; },
-      btSites: st.sites.map((s) => ({ label: s.u, on: st.btSite === s.u ? 'true' : 'false', pick: () => this.setState({ btSite: s.u }) })),
+      btSites: st.sites.map((s) => ({ label: s.u, on: !st.btSiteNew && st.btSite === s.u ? 'true' : 'false', pick: () => this.setState({ btSite: s.u, btSiteNew: false }) })),
+      btSiteNew: st.btSiteNew, btNew: st.btNew, onBtNew: (e) => this.setState({ btNew: e.target.value }), btNewBad: st.btSiteNew && !!st.btNew.trim() && !siteOk(st.btNew), openBtNew: () => { this.setState({ btSiteNew: true }); requestAnimationFrame(() => { const el = document.getElementById('btns'); if (el) el.focus(); }); }, closeBtNew: () => this.setState({ btSiteNew: false, btNew: '' }),
       btVoices: st.mine.map((k) => ({ label: pretty(k), on: st.btVoice === k ? 'true' : 'false', pick: () => this.setState({ btVoice: k }) })),
       btKinds: segOf([['course', 'Course walkthrough'], ['saas', 'Quick SaaS demo'], ['tour', 'Product tour']], st.btKind, (x) => this.setState({ btKind: x })),
       btPresets: segOf([['strict', 'Strict'], ['standard', 'Standard'], ['test', 'Test account']], st.btPreset, (x) => this.setState({ btPreset: x })),
-      btCount: btCount, btEmpty: !btCount, btCountText: btCount ? this.plural(btCount, 'video') : 'No videos yet', btMinText: 'about ' + btMin + ' min', btCostText: '~' + this.num(btCost) + ' credits', btLeftText: this.num(st.credits) + ' left',
-      btShort: btShort && btCount > 0, btShortText: 'Credits cover about ' + this.plural(btFits, 'video') + '. The batch pauses there and waits for you to top up. Nothing fails.',
+      btCount: btCount, btEmpty: !btCount || (st.btSiteNew && !siteOk(st.btNew)), btCountText: btCount ? this.plural(btCount, 'video') : 'No videos yet', btMinText: 'about ' + btMin + ' min (about 3 min each)', btCostText: 'about ' + this.num(btCost) + ' credits', btLeftText: 'You have ' + this.num(st.credits) + '.', btLinesText: btCount ? this.plural(btCount, 'line') + ' → ' + this.plural(btCount, 'video') : 'Nothing yet',
+      btShort: btShort && btCount > 0, btShortText: this.fitsText(btFits),
       btCta: btCount ? 'Write ' + this.plural(btCount, 'script') : 'Write the scripts',
       submitBatch: () => {
-        if (!btCount) return; const id = 'b' + Date.now();
-        const b = { id: id, name: btName, site: st.btSite, voice: st.btVoice, kind: st.btKind, preset: st.btPreset, folder: btFolder, stage: 'writing', paused: false, items: btLines.map((t, i) => ({ t: t, lesson: 'Lesson ' + (i + 1), min: 3, st: 'writing' })) };
+        if (!btCount || (st.btSiteNew && !siteOk(st.btNew))) return; const id = 'b' + Date.now();
+        const b = { id: id, name: btName, site: st.btSiteNew ? st.btNew.trim() : st.btSite, voice: st.btVoice, kind: st.btKind, preset: st.btPreset, folder: btFolder, stage: 'writing', paused: false, items: btLines.map((t, i) => ({ t: t, lesson: 'Lesson ' + (i + 1), min: 3, st: 'writing' })) };
         this.setState({ batches: [b].concat(st.batches), curBatch: id, screen: 'batch', btText: '', btName: '', btFile: '', btFolder: '' });
         this.later('bwrite', 2600, () => { this.patchBatch((x) => ({ stage: 'approve', items: x.items.map((it) => Object.assign({}, it, { st: 'script' })) }), id); this.say('All scripts are ready to approve'); });
       },
       // ---- batch screen ----
       bName: B ? B.name : '', bMeta: B ? [B.site, pretty(B.voice), { course: 'Course walkthrough', saas: 'Quick SaaS demo', tour: 'Product tour' }[B.kind], presetName[B.preset] + ' privacy'].join(', ') : '', bFolder: B ? B.folder : '',
       bStages: bStages, bHead: bHead, bSub: bSub, bPct: (bItems.length ? (B.stage === 'approve' || B.stage === 'writing' ? 0 : bRecorded / bItems.length * 100) : 0) + '%', bCreditNote: bCreditNote, hasBCreditNote: !!bCreditNote, bPausedCredits: !!(B && B.paused === 'credits'),
-      bItems: bItems.map((x, i) => ({ n: i + 1, t: x.t, lesson: x.lesson, min: x.min + ' min', status: stLabel[x.st], dot: stDot[x.st], open: st.btOpen === i, openStr: st.btOpen === i ? 'true' : 'false', canOpen: x.st === 'script', canWatch: x.st === 'recorded', canApprove: x.st === 'recorded', preview: 'Okay so… in this one we’re gonna ' + x.t.toLowerCase() + '. It’s, um, quicker than it looks.',
-        toggle: () => this.setState({ btOpen: st.btOpen === i ? null : i }), watch: () => this.setState({ screen: 'demo', cur: 'whop', step: 4, markOpen: false }), approve: () => approveItem(i) })),
-      bFooter: B ? (B.stage === 'done' ? 'Everything is in ' + B.folder + ', with list.csv (title, file name, lesson). Nothing is published.' : bApproved ? this.plural(bApproved, 'video') + ' approved and ready to export' : 'Exports go to ' + B.folder + '. Nothing is published.') : '',
+      bItems: bItems.map((x, i) => ({ i: i, n: i + 1, t: x.t, min: x.min + ' min', st: x.st, status: stLabel[x.st], dot: stDot[x.st], ring: x.st === 'waiting', open: st.btOpen === i, openStr: st.btOpen === i ? 'true' : 'false', canOpen: x.st === 'script', canWatch: x.st === 'recorded', preview: 'Okay so… in this one we’re gonna ' + x.t.toLowerCase() + '. It’s, um, quicker than it looks.',
+        toggle: () => this.setState({ btOpen: st.btOpen === i ? null : i }), watch: () => watchItem(i) })).filter((x) => st.btAll || x.st !== 'waiting' || x.i === bItems.findIndex((y) => y.st === 'waiting')),
+      bWaiting: cnt('waiting'), bWaitingCollapsed: !st.btAll && cnt('waiting') > 1, bShowAll: () => this.setState({ btAll: !st.btAll }), bShowAllLabel: st.btAll ? 'Show less' : 'Show all ' + cnt('waiting'), bAllOpen: st.btAll && cnt('waiting') > 1,
+      bReady: bReady, hasBReady: bReady > 0, bReadyText: this.plural(bReady, 'video') + ' ready to watch', bWatchFirst: () => { const k = bItems.findIndex((x) => x.st === 'recorded'); if (k >= 0) watchItem(k); },
+      bFooter: B ? (B.stage === 'done' ? 'Everything is in ' + B.folder + ', with list.csv (title, file name, lesson). Nothing is published.' : B.stage === 'approve' || B.stage === 'writing' ? 'Nothing records until you approve the scripts.' : 'Exports go to ' + B.folder + ' with a list file. Nothing is published.') : '',
       bPrimaryLabel: bPrimary.label, bPrimaryOff: bPrimary.off, bPrimary: bPrimary.act, hasBSecondary: !!bSecondary, bSecondaryLabel: bSecondary ? bSecondary.label : '', bSecondary: bSecondary ? bSecondary.act : () => {},
       // ---- demo steps ----
       steps: steps, cur: cur, st0: st.step === 0, st1: st.step === 1, st2: st.step === 2, st3: st.step === 3, st4: st.step === 4, st5: st.step === 5,
@@ -331,22 +344,24 @@ class Component extends DCLogic {
       confirming: !!cf, notConfirming: !cf, confirmNo: cf ? cf.no : '', confirmYes: cf ? cf.yes : '', cancelConfirm: () => this.setState({ confirm: null }), doConfirm: () => { if (cf) cf.act(); },
       footText: foot.text, footDot: foot.dot, footColor: foot.color,
       // script
-      scList: this.secs.map((s, i) => ({ t: this.fmt(this.starts[i]), n: s.n, on: st.scSel === i ? 'true' : 'false', edited: !!(D.lines && D.lines[i]), pick: () => this.setState({ scSel: i, scChange: false, scDraft: '' }) })),
+      scPickSel: (e) => this.setState({ scSel: Number(e.target.value), scChange: false, scDraft: '' }),
+      scList: this.secs.map((s, i) => ({ i: i, t: this.fmt(this.starts[i]), n: s.n, on: st.scSel === i ? 'true' : 'false', edited: !!(D.lines && D.lines[i]), pick: () => this.setState({ scSel: i, scChange: false, scDraft: '' }) })),
       scNum: (st.scSel + 1) + ' of ' + this.secs.length, scTime: this.fmt(this.starts[st.scSel]) + '–' + this.fmt(this.starts[st.scSel] + this.secs[st.scSel].d), scName: this.secs[st.scSel].n, scLine: lineOf(st.scSel), scCaption: this.secs[st.scSel].c,
       scCaps: st.scCaps, scCapsLabel: st.scCaps ? 'Hide captions' : 'Show captions', toggleScCaps: () => this.setState({ scCaps: !st.scCaps }),
       scChange: st.scChange, scDraft: st.scDraft, onScDraft: (e) => this.setState({ scDraft: e.target.value }), openScChange: () => { this.setState({ scChange: !st.scChange, scDraft: '' }); this.later('focusSc', 30, () => { const el = document.getElementById('scd'); if (el) el.focus(); }); },
       scPending: st.scPending === st.scSel, scPendingText: 'Rewriting this line…',
-      sendScChange: () => { const d = st.scDraft.trim(); if (!d) return; const i = st.scSel; const prevLines = D.lines || {}; this.setState({ scChange: false, scDraft: '', scPending: i }); this.later('scw', 1600, () => { const nl = Object.assign({}, prevLines); nl[i] = this.secs[i].v.replace(/\b(um|uh|kind of|basically|to be fair|well|like),?\s*/gi, '').replace(/\s+/g, ' ').replace(/^(\w)/, (m) => m.toUpperCase()); this.setState({ scPending: null }); this.patchDemo({ lines: nl }); this.say('Line rewritten', () => this.patchDemo({ lines: prevLines })); }); },
-      scKey: (e) => { if (e.key === 'Enter') { e.preventDefault(); const b = document.getElementById('scsend'); if (b) b.click(); } else if (e.key === 'Escape') this.setState({ scChange: false }); },
+      sendScChange: () => { const d = st.scDraft.trim(); if (!d) return; const i = st.scSel; const prevLines = D.lines || {}; this.setState({ scChange: false, scDraft: '', scPending: i }); requestAnimationFrame(() => { const b = document.getElementById('scopen'); if (b) b.focus(); }); this.later('scw', 1600, () => { const nl = Object.assign({}, prevLines); nl[i] = this.secs[i].v.replace(/\b(um|uh|kind of|basically|to be fair|well|like),?\s*/gi, '').replace(/\s+/g, ' ').replace(/^(\w)/, (m) => m.toUpperCase()); this.setState({ scPending: null }); this.patchDemo({ lines: nl }); this.say('Line rewritten', () => this.patchDemo({ lines: prevLines })); }); },
+      scKey: (e) => { if (e.key === 'Enter') { e.preventDefault(); const b = document.getElementById('scsend'); if (b) b.click(); } else if (e.key === 'Escape') { this.setState({ scChange: false }); requestAnimationFrame(() => { const b = document.getElementById('scopen'); if (b) b.focus(); }); } },
       scPrevOff: st.scSel === 0, scNextOff: st.scSel === this.secs.length - 1,
       scPrev: () => { if (st.scSel > 0) this.setState({ scSel: st.scSel - 1, scChange: false }); }, scNext: () => { if (st.scSel < this.secs.length - 1) this.setState({ scSel: st.scSel + 1, scChange: false }); },
       scriptLenLine: this.secs.length + ' sections, about ' + lengthText + (model === 'v3' ? ' at ' + paceText + ' pace' : ''),
       // voice
       voiceName: voicePretty, voiceColor: vInfo.c, line: line, caption: caption,
-      voices: st.mine.map((k) => { const ok = VO[k].models.indexOf(model) >= 0; return { name: VO[k].name, desc: VO[k].desc, img: VO[k].img, bg: VO[k].c, on: voice === k ? 'true' : 'false', cls: 'vcard' + (voice === k ? ' on' : '') + (ok ? '' : ' dim'), aria: 'Pick and hear ' + VO[k].name, badge: st.heardVoices[k] ? 'Replay' : 'Hear', modelTag: VO[k].models.length === 2 ? 'v3 and v4' : VO[k].models[0] + ' only',
-        pick: () => { if (this.needKey()) return; const first = !st.heardVoices[k]; const h = Object.assign({}, st.heardVoices); h[k] = true; const prevVoice = D.voice; const prevModel = model; const switchModel = VO[k].models.indexOf(model) < 0; this.patchDemo({ voice: k, model: switchModel ? VO[k].models[0] : model }); this.setState({ heardVoices: h, vals: this.recFor(k, D.kind) }); if (first) this.spend(120); if (switchModel) this.say(pretty(k) + ' is trained for ' + (VO[k].models[0] === 'v4' ? 'Eleven v4' : 'Eleven v3') + ', so the model switched', () => this.patchDemo({ voice: prevVoice, model: prevModel })); else this.say('Playing ' + pretty(k) + (first ? ', 120 credits' : ', free replay')); } }; }),
+      voices: st.mine.map((k) => { const ok = VO[k].models.indexOf(model) >= 0; const mName = (m) => m === 'v4' ? 'v4' : 'v3'; return { name: VO[k].name, desc: VO[k].desc, img: VO[k].img, bg: VO[k].c, on: voice === k ? 'true' : 'false', cls: 'vcard' + (voice === k ? ' on' : '') + (ok ? '' : ' dim'), aria: 'Pick ' + VO[k].name, hearAria: 'Hear ' + VO[k].name + (st.heardVoices[k] ? ', free replay' : ', about 120 credits'), badge: st.heardVoices[k] ? 'Replay' : 'Hear', modelTag: ok ? (VO[k].models.length === 2 ? 'v3 and v4' : mName(VO[k].models[0]) + ' only') : 'Needs ' + mName(VO[k].models[0]),
+        pick: () => { if (voice === k) return; const prevVoice = D.voice; const prevModel = model; const prevVals = st.vals; const switchModel = VO[k].models.indexOf(model) < 0; this.patchDemo({ voice: k, model: switchModel ? VO[k].models[0] : model }); this.setState({ vals: this.recFor(k, D.kind) }); this.say(switchModel ? pretty(k) + ' needs Eleven ' + VO[k].models[0] + '. Switched the model to ' + VO[k].models[0] + '.' : 'Picked ' + pretty(k), () => { this.patchDemo({ voice: prevVoice, model: prevModel }); this.setState({ vals: prevVals }); }); },
+        hear: () => { if (this.needKey()) return; const first = !st.heardVoices[k]; const h = Object.assign({}, st.heardVoices); h[k] = true; this.setState({ heardVoices: h }); if (first) this.spend(120); this.say('Playing ' + pretty(k) + (first ? ', 120 credits' : ', free replay')); } }; }),
       models: segOf([['v4', 'Eleven v4 (recommended)'], ['v3', 'Eleven v3']], model, (x) => this.patchDemo({ model: x })),
-      voiceWarn: !voiceOk, voiceWarnText: voicePretty + ' is only trained for ' + (vInfo.models[0] === 'v4' ? 'Eleven v4' : 'Eleven v3') + '. Pick another voice, or switch the model back.',
+      voiceWarn: !voiceOk, voiceWarnText: voicePretty + ' needs Eleven ' + vInfo.models[0] + '. Pick another voice, or switch the model back.',
       openLib: () => this.setState({ lib: true }), closeLib: () => this.setState({ lib: false }), libOpen: st.lib,
       libFilters: [['all', 'All'], ['f', 'Female'], ['m', 'Male']].map((o) => ({ label: o[1], on: st.libF === o[0] ? 'true' : 'false', pick: () => this.setState({ libF: o[0] }) })),
       lib: Object.keys(VO).filter((k) => st.libF === 'all' || VO[k].g === st.libF).map((k) => ({ name: VO[k].name, desc: VO[k].desc + ', ' + (VO[k].models.length === 2 ? 'v3 and v4' : VO[k].models[0] + ' only'), img: VO[k].img, c: VO[k].c, canAdd: st.mine.indexOf(k) < 0, added: st.mine.indexOf(k) >= 0, hearAria: 'Hear ' + VO[k].name,
@@ -359,30 +374,31 @@ class Component extends DCLogic {
       playSample: () => { if (st.sampling) { this.stop('sample'); this.setState({ sampling: false }); return; } if (this.needKey()) return; const free = st.lastSample === sampleKey; if (!free) this.spend(300); this.setState({ sampling: true, lastSample: sampleKey }); this.later('sample', 6000, () => this.setState({ sampling: false })); },
       samplePlaying: st.sampling, sampleStopped: !st.sampling, playAria: st.sampling ? 'Stop sample' : 'Play sample', wvClass: st.sampling ? 'wv on' : 'wv',
       wbars: [30, 55, 40, 75, 50, 90, 62, 100, 48, 70, 36, 64, 88, 52, 96, 58, 44, 80, 50, 72, 34, 60, 92, 46, 70, 40, 66, 30].map((h, i) => ({ h: h + '%', d: (i % 7) * 70 + 'ms' })),
-      sampleCost: st.lastSample === sampleKey ? 'free replay' : '~300 cr',
-      videoCostText: this.num(videoCost), leftAfterText: this.num(leftAfter), usedPct: ((30000 - st.credits) / 30000 * 100) + '%', thisPct: (D.recorded ? 0 : Math.min(videoCost, st.credits) / 30000 * 100) + '%',
+      sampleCost: st.lastSample === sampleKey ? 'Sample · free replay' : 'Sample · about 300 credits',
+      videoCostText: this.num(videoCost), leftAfterText: this.num(leftAfter), creditsNowText: this.num(st.credits), thisPct: (D.recorded || !st.credits ? 0 : Math.min(1, videoCost / st.credits) * 100) + '%', restPct: (D.recorded || !st.credits ? 100 : Math.max(0, 1 - videoCost / st.credits) * 100) + '%',
       lengthText: lengthText, paceText: paceText, isV3: model === 'v3',
       lockOn: l.onStr, lockCls: l.cls, toggleLock: () => this.setState({ lock: !st.lock }),
       // privacy
       always: ['API keys and tokens', 'Passwords', '2FA and recovery codes', 'Card and bank numbers', 'ID numbers', 'Private keys', 'Login links'],
       presets: [['strict', 'Strict', 'Blur all personal info, plus usage, prices and dates.'], ['standard', 'Standard', 'Blur personal info, money and counts. Show usage, prices and dates.'], ['test', 'Test account', 'Fake data, so names and emails can show. Money, customers and counts stay blurred.']].map((o) => ({ id: o[0], name: o[1], desc: o[2], rec: o[0] === 'standard', on: preset === o[0] ? 'true' : 'false', cls: 'preset' + (preset === o[0] ? ' on' : ''), pick: () => { const prev = st.shown; if (preset === o[0]) return; this.setState({ shown: Object.assign({}, PRESETS[o[0]]) }); this.say(o[1] + ' privacy', () => this.setState({ shown: prev })); } })),
       isCustom: preset === 'custom',
-      pvBlurLine: 'Blurred: ' + (blurredItems.length ? listText(blurredItems) + ', plus ' : '') + 'passwords, keys, card numbers and other secrets (always).',
-      pvShowLine: shownItems.length ? 'Shown: ' + listText(shownItems) + '.' : 'Shown: nothing personal.',
+      pvBlurLine: (blurredItems.length ? listText(blurredItems) + ', plus ' : '') + 'passwords, keys and card numbers (always).',
+      pvShowLine: shownItems.length ? listText(shownItems) + '.' : 'nothing that could be private.',
       pvMore: st.pvMore, togglePvMore: () => this.setState({ pvMore: !st.pvMore }), pvMoreLabel: 'Customize each item',
       hide: st.hide.map((w) => ({ w: w, aria: 'Remove ' + w, rm: () => { const prev = st.hide; this.setState({ hide: st.hide.filter((x) => x !== w) }); this.say('Removed “' + w + '”', () => this.setState({ hide: prev })); } })),
+      noHide: !st.hide.length, hideDup: !!st.hideDraft.trim() && st.hide.indexOf(st.hideDraft.trim()) >= 0, hideAddOff: !st.hideDraft.trim() || st.hide.indexOf(st.hideDraft.trim()) >= 0, alwaysText: 'API keys and tokens, passwords, 2FA and recovery codes, card and bank numbers, ID numbers, private keys and login links',
       hideDraft: st.hideDraft, onHideDraft: (e) => this.setState({ hideDraft: e.target.value }), addHide: () => { const w = st.hideDraft.trim(); if (w && st.hide.indexOf(w) < 0) { this.setState({ hide: st.hide.concat([w]), hideDraft: '' }); this.say('Will always blur “' + w + '”'); } },
       hideKey: (e) => { if (e.key === 'Enter') { e.preventDefault(); const w = st.hideDraft.trim(); if (w && st.hide.indexOf(w) < 0) { this.setState({ hide: st.hide.concat([w]), hideDraft: '' }); this.say('Will always blur “' + w + '”'); } } },
       tier2: [row('email', 'Email addresses'), row('phone', 'Phone numbers'), row('names', 'Real names and profile photos'), row('address', 'Addresses'), row('money', 'Revenue and money figures'), row('customers', 'Customer details'), row('counts', 'Follower and member counts')],
       tier3: [row('usage', 'Usage stats, like token usage'), row('prices', 'Prices on public pages'), row('dates', 'Dates')],
       // record
-      recBadge: D.recorded ? 'Recorded' : st.recStopped ? 'Stopped' : st.recPaused ? 'Paused' : 'Recording live', recBadgeDot: D.recorded ? 'var(--okDot)' : st.recPaused || st.recStopped ? '#E0A100' : '#FF5A4E',
+      recBadge: D.recorded ? 'Recorded' : st.recStopped ? 'Stopped' : st.recPaused ? 'Paused' : 'Recording live', recCover: D.cover, recBadgeDot: D.recorded ? 'var(--okDot)' : st.recPaused || st.recStopped ? '#E0A100' : '#FF5A4E',
       isRecording: !D.recorded, recDone: !!D.recorded,
-      recHead: D.recorded ? 'All 11 sections recorded' : st.recStopped ? 'Stopped after ' + st.recPos + ' of 11' : 'Section ' + Math.min(11, st.recPos + 1) + ' of 11', recLeft: D.recorded ? lengthText : 'about ' + Math.max(1, Math.ceil((11 - st.recPos) * 0.4)) + ' min left',
+      recHead: D.recorded ? 'All 11 sections recorded' : st.recStopped ? 'Stopped after ' + st.recPos + ' of 11' : 'Section ' + Math.min(11, st.recPos + 1) + ' of 11', recLeft: D.recorded ? lengthText : String(Math.max(1, Math.ceil((11 - st.recPos) * 0.4))), recLeftWords: D.recorded ? '' : 'min left',
       recPct: (D.recorded ? 100 : st.recPos / 11 * 100) + '%',
       recNowName: this.secs[Math.min(10, st.recPos)].n, recNowLine: lineOf(Math.min(10, st.recPos)),
       recNext: this.secs.slice(st.recPos + 1, st.recPos + 3).map((s) => s.n), hasRecNext: st.recPos < 10,
-      recDoneCount: st.recPos ? this.plural(st.recPos, 'section') + ' done' : 'None yet', recDoneLast: st.recPos ? this.secs.slice(Math.max(0, st.recPos - 2), st.recPos).map((s) => s.n).join(', ') : 'Finished sections show here.',
+      recDoneCount: st.recPos ? this.plural(st.recPos, 'section') + ' done' : 'None yet', recDoneList: this.secs.slice(0, st.recPos).map((s) => s.n).reverse().slice(0, 3), recDoneMore: st.recPos > 3 ? '+' + (st.recPos - 3) + ' more' : '',
       recPaused: st.recPaused, recStopAsk: st.recStopAsk, recStopped: st.recStopped, recControls: !D.recorded && !st.recStopAsk && !st.recStopped,
       pauseLabel: st.recPaused ? 'Resume' : 'Pause',
       pauseRec: () => { if (st.recPaused) { this.setState({ recPaused: false }); this.startRecording(st.recPos); this.setState({ recPos: st.recPos }); } else { this.stop('rec'); this.setState({ recPaused: true }); this.patchDemo({ status: 'Paused at ' + (st.recPos + 1) + ' of 11' }); } },
@@ -391,7 +407,7 @@ class Component extends DCLogic {
       resumeStopped: () => { if (this.needKey()) return; this.startRecording(st.recPos); },
       recNote: D.recorded ? 'Want a fresh take? Record again redoes every section.' : 'You can close this page. Claude tells you in chat when the draft is ready.',
       // review
-      revCaption: this.secs[secAt(st.revT)].c, revTime: this.fmt(st.revT), revLeft: (st.revT / this.total * 100) + '%', revSecName: this.secs[secAt(st.revT)].n,
+      totalSec: String(this.total), revSec: String(st.revT), revCaption: this.secs[secAt(st.revT)].c, revTime: this.fmt(st.revT), revLeft: (st.revT / this.total * 100) + '%', revSecName: this.secs[secAt(st.revT)].n,
       ticks: this.starts.slice(1).map((s) => (s / this.total * 100) + '%'),
       markPins: allMarks.map((m) => ({ left: (m.t / this.total * 100) + '%', label: this.fmt(m.t) + ', ' + m.text, jump: () => this.setState({ revT: m.t, player: false }) })),
       scrub: (e) => { const el = e.currentTarget; if (!el || !el.getBoundingClientRect) return; const r = el.getBoundingClientRect(); const t = Math.round(Math.max(0, Math.min(1, (e.clientX - r.left) / r.width)) * this.total); this.setState({ revT: t }); },
@@ -404,51 +420,48 @@ class Component extends DCLogic {
       markKey: (e) => { if (e.key === 'Enter') { e.preventDefault(); const d = (e.target.value || '').trim(); if (d) addMark(d); } else if (e.key === 'Escape') this.setState({ markOpen: false }); },
       marks: allMarks.map((m) => ({ t: this.fmt(m.t), text: m.text, sec: this.secs[Number(m.k)].n, jumpAria: 'Jump to ' + this.fmt(m.t), jump: () => this.setState({ revT: m.t, player: false }), rmAria: 'Remove mark at ' + this.fmt(m.t),
         rm: () => { const prev = D.notes; const n = Object.assign({}, prev); n[m.k] = prev[m.k].filter((x, k) => k !== m.j); this.patchDemo({ notes: n }); this.say('Mark removed', () => this.patchDemo({ notes: prev })); } })),
-      hasMarks: marks > 0, noMarks: marks === 0, marksCount: marks ? String(marks) : '',
-      hasUnsure: unsure > 0, unsureText: this.plural(unsure, 'blur') + ' to check', blurOpen: st.blurOpen, toggleBlurs: () => this.setState({ blurOpen: !st.blurOpen }),
+      hasMarks: marks > 0, noMarks: marks === 0, marksCount: marks ? '(' + marks + ')' : '', revCover: D.cover,
+      hasUnsure: unsure > 0, unsureText: this.plural(unsure, 'blur') + ' to check', hasSkip: !!cur.skip && !st.confirm, skipLabel: cur.skip || '', doSkip: () => this.setState({ confirm: 'approve' }), blurOpen: st.blurOpen, toggleBlurs: () => this.setState({ blurOpen: !st.blurOpen }),
       blurs: unsureBlurs.map((b) => ({ t: b.t, what: b.what, keep: () => { const prev = D.blurs; this.patchDemo({ blurs: D.blurs.map((x) => x.id === b.id ? Object.assign({}, x, { s: 'keep' }) : x) }); this.say('Kept blurred', () => this.patchDemo({ blurs: prev })); }, show: () => { const prev = D.blurs; this.patchDemo({ blurs: D.blurs.map((x) => x.id === b.id ? Object.assign({}, x, { s: 'show' }) : x) }); this.say('Will be shown', () => this.patchDemo({ blurs: prev })); } })),
       // export
       revCaps: segOf(capOpts, dCap, (x) => { this.patchDemo({ capMode: x, dirty: !!D.exported }); }),
-      revCorner: segOf(posOpts, dCorner, (x) => this.patchDemo({ corner: x, dirty: !!D.exported })),
-      revCornerPick: ['tl', 'tr', 'bl', 'br'].map((k) => ({ k: k, cls: 'cp cp-' + k + (dCorner === k ? ' on' : ''), on: dCorner === k ? 'true' : 'false', aria: { tl: 'Top left', tr: 'Top right', bl: 'Bottom left', br: 'Bottom right' }[k], pick: () => this.patchDemo({ corner: k, dirty: !!D.exported }) })),
-      revCornerOffOn: dCorner === 'off' ? 'true' : 'false', revCornerSetOff: () => this.patchDemo({ corner: 'off', dirty: !!D.exported }), revCornerName: { off: 'No corner label', tl: 'Top left', tr: 'Top right', bl: 'Bottom left', br: 'Bottom right' }[dCorner],
+      revCorner: cornerCtl(dCorner, (x) => this.patchDemo({ corner: x, dirty: !!D.exported })),
       revCornerText: dCornerText, onRevCornerText: (e) => this.patchDemo({ cornerText: e.target.value, dirty: !!D.exported }), revCornerOff: dCorner === 'off',
       showCapPreview: dCap === 'burn', cornerShown: dCorner !== 'off', cornerStyle: posCss[dCorner] || '', cornerTextShown: dCornerText.trim() || 'Your label here',
       files: [{ n: base + '.mp4', s: '1080p, ' + lengthText + (dCap === 'burn' ? ', captions in the video' : '') }].concat(dCap === 'file' ? [{ n: base + '.srt', s: 'Captions file' }] : []).concat([{ n: base + '.txt', s: 'Transcript' }]).concat(st.p720 ? [{ n: base + ' (720p).mp4', s: 'Small preview' }] : []),
-      filesHead: D.exported ? 'Saved files' : 'You’ll get', fileMark: D.exported ? '✓' : '',
+      filesHead: D.exported && !D.dirty ? 'Saved files' : 'You’ll get', fileMark: D.exported && !D.dirty ? '✓' : '', fileWill: D.exported && D.dirty,
       p720On: p.onStr, p720Cls: p.cls, toggle720: () => this.setState({ p720: !st.p720 }),
-      exportNote: 'Your marks on this demo tune ' + voicePretty + '’s defaults for next time.',
+      
       // settings / welcome
       defCaps: segOf(capOpts, st.defCap, (x) => this.setState({ defCap: x })),
-      defCornerPick: ['tl', 'tr', 'bl', 'br'].map((k) => ({ k: k, cls: 'cp cp-' + k + (st.defCorner === k ? ' on' : ''), on: st.defCorner === k ? 'true' : 'false', aria: { tl: 'Top left', tr: 'Top right', bl: 'Bottom left', br: 'Bottom right' }[k], pick: () => this.setState({ defCorner: k }) })),
-      defCornerOffOn: st.defCorner === 'off' ? 'true' : 'false', defCornerSetOff: () => this.setState({ defCorner: 'off' }), defCornerName: { off: 'No corner label', tl: 'Top left', tr: 'Top right', bl: 'Bottom left', br: 'Bottom right' }[st.defCorner],
+      defCorner: cornerCtl(st.defCorner, (x) => this.setState({ defCorner: x })),
       defCornerText: st.defCornerText, onDefCornerText: (e) => this.setState({ defCornerText: e.target.value }), defCornerOff: st.defCorner === 'off',
       key: st.key, onKey: (e) => this.setState({ key: e.target.value, keyRes: null }), keyType: st.keyType, keyTypeLabel: st.keyType === 'password' ? 'Show' : 'Hide', toggleKeyType: () => this.setState({ keyType: st.keyType === 'password' ? 'text' : 'password' }),
       testKey: () => { const ok = st.key.trim().length > 8; this.setState({ keyRes: ok ? 'ok' : 'bad', keyOn: ok ? true : st.keyOn }); if (ok && st.screen === 'settings') this.later('keyclose', 1400, () => this.setState({ keyEdit: false, key: '', keyRes: null })); },
       keyMsg: keyMsg, keyMsgColor: st.keyRes === 'bad' ? 'var(--danger)' : 'var(--ok)',
       w1Cls: wsw(st.keyRes === 'ok'), w1Mark: st.keyRes === 'ok' ? '✓' : '1', w2Cls: wsw(st.tools === 'done'), w2Mark: st.tools === 'done' ? '✓' : '2', w3Cls: wsw(st.logged), w3Mark: st.logged ? '✓' : '3',
       toolsIdle: st.tools === 'idle', toolsAsking: st.tools === 'ask',
-      toolsText: st.tools === 'done' ? 'Playwright, ffmpeg and the recorder are installed.' : st.tools === 'ask' ? 'Install Playwright, ffmpeg and the recorder? About 400 MB, once.' : st.tools === 'busy' ? 'Installing…' : 'Playwright, ffmpeg and the recorder. Installed once, after you say yes.',
+      toolsText: st.tools === 'done' ? 'Installed. NAVI can drive a browser and save video.' : st.tools === 'ask' ? 'Install now? About 300 MB, takes about 2 minutes, one time.' : st.tools === 'busy' ? 'Installing… about 2 minutes.' : 'Lets NAVI drive a browser and save video. About 300 MB, one time.',
       askTools: () => this.setState({ tools: 'ask' }), cancelTools: () => this.setState({ tools: 'idle' }), installTools: () => { this.setState({ tools: 'busy' }); this.later('tools', 1600, () => this.setState({ tools: 'done' })); },
       wSite: st.wSite, onWSite: (e) => this.setState({ wSite: e.target.value }),
       loginLabel: st.logged ? 'Logged in' : 'Open browser', loginSite: () => { const u = st.wSite.trim(); if (!u) { this.say('Type the site first, e.g. whop.com'); return; } this.setState({ logged: true, sites: st.sites.some((s) => s.u === u) ? st.sites : [{ u: u, note: 'Saved Nov 5' }].concat(st.sites) }); },
-      welcomeBlocked: !(st.keyRes === 'ok' && st.tools === 'done'), welcomeStatus: st.keyRes === 'ok' && st.tools === 'done' ? 'All set.' : 'Steps 1 and 2 are needed first.',
+      welcomeBlocked: !(st.keyRes === 'ok' && st.tools === 'done'), welcomeStatus: st.keyRes === 'ok' && st.tools === 'done' ? 'All set.' : ((st.keyRes === 'ok' ? 0 : 1) + (st.tools === 'done' ? 0 : 1)) + (((st.keyRes === 'ok' ? 0 : 1) + (st.tools === 'done' ? 0 : 1)) === 1 ? ' step left' : ' steps left'),
       finishWelcome: () => this.setState({ screen: 'home', keyOn: true, key: '', keyRes: null }),
       appear: [['system', 'Follow Mac'], ['light', 'Light'], ['dark', 'Dark']].map((o) => ({ label: o[1], on: (st.theme || 'system') === o[0] ? 'true' : 'false', pick: () => this.setState({ theme: o[0] === 'system' ? null : o[0] }) })),
       defVoices: st.mine.map((k) => ({ label: pretty(k), on: st.defVoice === k ? 'true' : 'false', pick: () => { this.setState({ defVoice: k }); this.say(pretty(k) + ' is now the default for new demos'); } })),
-      keyRow: st.keyOn ? 'Connected, ending …4f2a, ' + this.num(st.credits) + ' credits left' : 'Not connected. Demos can’t be voiced until you add one.', keyRowColor: st.keyOn ? 'var(--ink2)' : 'var(--danger)',
+      keyRow: st.keyOn ? 'Ending 4f2a · ' + this.num(st.credits) + ' credits left' : 'Not connected. Demos can’t be voiced until you add one.', keyRowColor: st.keyOn ? 'var(--ink2)' : 'var(--danger)',
       keyEdit: st.keyEdit, keyEditLabel: st.keyEdit ? 'Cancel' : (st.keyOn ? 'Change' : 'Add key'), toggleKeyEdit: () => this.setState({ keyEdit: !st.keyEdit, key: '', keyRes: null }),
       canRemoveKey: st.keyOn && !st.keyEdit, removeKey: () => { this.setState({ keyOn: false }); this.say('Key removed', () => this.setState({ keyOn: true })); },
       sites: st.sites.map((s) => ({ u: s.u, note: s.note, relog: () => this.say('A browser opens so you can log in to ' + s.u + ' again'), forget: () => { const prev = st.sites; this.setState({ sites: st.sites.filter((x) => x.u !== s.u) }); this.say('Forgot ' + s.u, () => this.setState({ sites: prev })); } })),
       noSites: !st.sites.length,
       siteDraft: st.siteDraft, onSiteDraft: (e) => this.setState({ siteDraft: e.target.value }), addSite: () => { const u = st.siteDraft.trim(); if (!u) return; this.setState({ sites: st.sites.concat([{ u: u, note: 'Saved Nov 5' }]), siteDraft: '' }); this.say('A browser opens so you can log in to ' + u); },
-      data: dataDefs.map((d) => ({ n: d.n, w: d.w, l: d.l, can: !!d.l && !(d.id === 'logins' && !st.sites.length), act: dataAct[d.id] || (() => {}) })),
+      data: dataDefs.map((d) => ({ n: d.n, w: d.w, l: d.l, can: !!d.l, act: dataAct[d.id] || (() => {}) })), forgetAll: dataAct.logins,
       wipeConfirm: st.wipeConfirm, notWipeConfirm: !st.wipeConfirm, askWipe: () => this.setState({ wipeConfirm: true }), cancelWipe: () => this.setState({ wipeConfirm: false }),
       doWipe: () => { this.setState({ wipeConfirm: false, keyOn: false, sites: [], hide: [], vals: Object.assign({}, this.presetVals.course), defVoice: 'alex', mine: ['alex', 'jessica', 'george'], heardVoices: {}, tools: 'idle' }); this.say('Everything this skill saved is gone. Your videos are untouched.', null, () => this.setState({ screen: 'welcome', keyRes: null, logged: false, wSite: '' }), 'Set up again'); },
       showWelcome: () => this.setState({ screen: 'welcome', keyRes: null, key: '', tools: st.tools === 'done' ? 'done' : 'idle', logged: false, wSite: '' }),
       // chat + toast
       chatOpen: st.chat.length > 0, chatDraft: st.chatDraft, onChat: (e) => this.setState({ chatDraft: e.target.value }),
-      chatPlaceholder: st.screen === 'demo' ? 'Tell Claude what to change, e.g. “make it about the payouts page instead”' : 'Ask Claude anything',
+      chatPlaceholder: (() => { try { if (window.matchMedia('(max-width: 860px)').matches) return 'Ask Claude…'; } catch (e) {} return null; })() || (st.screen === 'demo' ? 'Tell Claude what to change, e.g. “make it about the payouts page instead”' : 'Ask Claude anything'),
       chat: st.chat.map((m) => ({ text: m.t, side: m.me ? 'flex-end' : 'flex-start', bg: m.me ? 'var(--ink)' : 'var(--wash)', fg: m.me ? 'var(--sheet)' : 'var(--ink)' })),
       chatKey: (e) => { if (e.key === 'Enter') { e.preventDefault && e.preventDefault(); this.sendChatNow(); } },
       sendChat: () => this.sendChatNow(),
