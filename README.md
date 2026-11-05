@@ -93,7 +93,7 @@ flowchart LR
 3. **Script.** Claude writes two versions per section: the talking version for the voice and a clean version for captions.
 4. **Voice.** You pick a voice and adjust the sliders. The text preview updates for free; an audio sample costs a few credits.
 5. **Privacy.** NAVI blurs sensitive things in the page before recording, using the three privacy tiers below.
-6. **Record.** Each section's voice is generated as **one continuous take**. NAVI gets word-level timestamps for that take and schedules every click, scroll and type action at the right word. If an action runs long, the video holds a frame; the voice never pauses.
+6. **Record.** Each section's voice is generated as **one continuous take**. NAVI gets word-level timestamps for that take and schedules every click, scroll and type action at the right word. The browser is recorded live while the voice plays, so the footage is never retimed afterwards; slow page loads fall between sections, and the voice never pauses.
 7. **Review.** You watch the draft in the local app and mark anything that's off.
 8. **Export.** NAVI renders the final MP4 with captions and saves it to your folder.
 
@@ -105,7 +105,7 @@ These rules came out of five rounds of listening tests on real walkthroughs:
 
 - **The text matters more than the voice.** A separate talking script, written the way people actually explain things, beats any voice setting.
 - **One take per section.** Stitching sentence-sized clips kills breaths, mouth sounds and flow. NAVI never splits a take at cue words.
-- **The voice leads, the video follows.** Clicks are scheduled from word timestamps, and the video stretches or holds to fit. The audio is never paused or sped up.
+- **The voice leads, the video follows.** The browser is recorded live to the finished voice, each click starting on its word. Nothing is held, sped up or retimed afterwards. The audio is never paused or sped up.
 - **Very few fillers, only where the screen earns them.** Realism comes from pace, reactions, small restarts and opinions, not from "um" every sentence.
 - **Calm beats cheerful.** Slightly higher stability and a relaxed delivery; no bright one-word lines like "There it is!".
 - **No forced breaths.** Tagged breaths sound theatrical. The model's own unprompted breaths are kept, and sentence ends are never trimmed tight.
