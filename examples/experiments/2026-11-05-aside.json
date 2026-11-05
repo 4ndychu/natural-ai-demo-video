@@ -1,0 +1,31 @@
+{
+ "name": "Aside test: does eleven_v4 drop pitch for an aside?",
+ "takes": 2,
+ "voice_id": "hLygPNd2gK6Azddorc5W",
+ "experiments": {
+  "ASIDE": {
+   "about": "Same aside written three ways. Measured: pitch and speed of the aside words against the main line around them.",
+   "kind": "line",
+   "variants": [
+    {
+     "id": "commas",
+     "text": "[relaxed] So you click Export, which honestly took me ages to find, and pick MP4 from the list.",
+     "model": "eleven_v4",
+     "stability": 0.7
+    },
+    {
+     "id": "own-sentence",
+     "text": "[relaxed] So you click Export. Honestly took me ages to find that. And then you pick MP4 from the list.",
+     "model": "eleven_v4",
+     "stability": 0.7
+    },
+    {
+     "id": "dashes",
+     "text": "[relaxed] So you click Export — honestly took me ages to find — and pick MP4 from the list.",
+     "model": "eleven_v4",
+     "stability": 0.7
+    }
+   ]
+  }
+ }
+}

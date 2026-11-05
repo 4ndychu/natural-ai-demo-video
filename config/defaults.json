@@ -169,10 +169,23 @@
         "One",
         "A few"
       ],
-      "drives": "light swears at natural reactions only, never inside an instruction",
+      "drives": "light swears only at a slip or a surprise, or emphasis aimed at the product; never inside an instruction, number or warning, never at the viewer",
       "low": "Fine for any audience",
-      "high": "At natural reactions, never in instructions",
-      "captions_clean_by_default": true
+      "high": "Only at a slip or a surprise, never in instructions",
+      "captions_clean_by_default": true,
+      "caps": {
+        "1": "one per video",
+        "2": "at most one per 2 minutes, never more than 2 in a video"
+      },
+      "allowed_kinds": [
+        "saas"
+      ],
+      "never": [
+        "course",
+        "tour",
+        "sponsored or brand videos"
+      ],
+      "default": 0
     }
   },
   "presets": {
@@ -193,7 +206,7 @@
       "pace": 105,
       "hes": 2,
       "breath": 1,
-      "swear": 1,
+      "swear": 0,
       "mumbles": true
     },
     "tour": {
@@ -303,5 +316,24 @@
     "captions_file": ".srt (unless captions are off)",
     "transcript": ".txt",
     "preview_720p": false
+  },
+  "script": {
+    "first_mention": "name plus where it is or what it looks like; after that the bare name",
+    "checks_on_tricky_steps": true,
+    "provisional": {
+      "_note": "Starting values from our own coding of 18 demos (one coder, small sample); not yet judged by ear. See voice-rules.md section 1.",
+      "asides_per_min": {
+        "saas": 1.0,
+        "course": 0.4,
+        "tour": "about 1 per video"
+      },
+      "max_asides_per_section": 1,
+      "examples": {
+        "saas": "at most 1 per video under 5 min, personal only from the brief",
+        "course": "1 per module",
+        "tour": "user-centred, never first person"
+      },
+      "tangents": 0
+    }
   }
 }

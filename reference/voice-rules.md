@@ -48,6 +48,34 @@ Each section has two versions: the **talking version** the voice reads, and a **
 - Casual lines and "right?" can lift or trail. Only the last line of a section lands down. *(Round 3.)*
 - **The last line of a section is a plain statement that ends low.** Not a cheerful result ("and it's on the list"), but something that trails off with a place or a reason: "over on the right", "you don't really need to see what's done". The two lines Andy liked most for delivery both end this way, low and flat. *(A/B and research, 2026-11-05.)* Ending on a place is the most reliable: "…and it just goes on the list down here" landed low in both takes; "…so that's on the list now" in one of two. *(Ending test, 2026-11-05.)*
 
+### Naming things on screen
+- **The first time something comes up, give its name plus where it is or what it looks like:** "Export, the little arrow top right". After that, just the name: "hit Export". Real explainers do this for newcomers and drop it as they go (words per item fell from about 16 to 6); listeners don't mind the extra detail. *(Isaacs & Clark 1987, Engelhardt et al. 2006; reference/research/asides-and-examples.md.)*
+- **Add a check on tricky steps:** "you should see a green tick", "if it's greyed out, you haven't saved yet". A video is the case where nobody can ask, and recorded instructions went wrong 39% of the time against 5% face to face. *(Clark & Krych 2004.)*
+- Course walkthroughs keep the fuller descriptions longer and add one recap per module. Product tours give one clear description per feature, with no repeats.
+
+### Asides, tangents and examples (PROVISIONAL)
+**Starting values, not settled rules.** They rest on our own coding of 18 demo videos (one coder, small sample) plus the research in reference/research/asides-and-examples.md, and haven't been judged by ear yet. Change them freely after the first listening.
+
+| | Quick SaaS demo | Course walkthrough | Product tour |
+|---|---|---|---|
+| **Asides** | About one per minute, at most one per section. One clause, about 4 s, **right after an action**, reacting to it. | About one every 2 to 3 minutes, flagged ("quick side note,"). | About one per video. |
+| **What an aside says** | An opinion, a reason, a warning or a shortcut about what's on screen. Never padding. | A reason or a warning. | A reason or a benefit, plainly. |
+| **Way back** | "but", "so" or "anyway", then straight to the next action. | "so" or "anyway". | No marker needed. |
+| **Real-world examples** | At most one per video under 5 minutes, one sentence. Personal ("I use this for…") **only if the user's brief gives it.** | One per module: a user or customer case ("say you're a teacher…"), or a personal one from the brief. | About the user ("say you run a small shop…"), never "I". |
+| **Tangents** | None in a video under 5 minutes. | None. | None. |
+
+- **Never invent personal history.** A first-person story the user didn't give is a made-up claim in their voice.
+- Say "I think" and "you know" inside the phrase, not set off by commas ("it's I think the second tab"): three-quarters of real ones are. *(Dehé 2009.)*
+- Real casual narrators: 0.7 asides, 0.25 examples and 0.08 tangents per minute (scripted: 0.2, 0.4, 0.04). Tangents run about 28 s, far past the 4 to 5 s screen-change rule, which is why there are none.
+- How to write an aside: see the aside test in section 2.
+
+### Swearing
+- **Off by default in every kind of demo.** Real screen-demo narrators almost never swear (one "suck" in 48 minutes of casual demos), and in how-to videos each swear cut engagement by up to 6.5%. *(reference/research/swearing.md.)*
+- When the user turns it on: **One** means one per video. **A few** means at most one per 2 minutes, and never more than 2 in a video.
+- **Only at a slip or a surprise** ("oh, damn, it's moved"), or for emphasis aimed at the product or the step ("it would suck to lose all that"). In real speech, most swears come right as the speaker catches their own mistake. Never inside an instruction, a number or a warning, and never at the viewer.
+- **Quick SaaS demos only.** Course walkthroughs, product tours and sponsored or brand videos: never.
+- Mild words only (damn, hell, sucks, "oh my god"). Captions stay clean.
+
 ### Names the voice gets wrong
 - Respell brand or product names **in the talking version only** when the model mispronounces them, and keep the real spelling in captions. The model guesses pronunciation fresh each time, so the same take can say a name two ways. Test spellings by ear. *(Round 4 and 5: one brand name was said two different ways in one take until respelled.)*
 - Read web addresses the way people say them: "whop dot com slash start".
@@ -68,6 +96,7 @@ Each section has two versions: the **talking version** the voice reads, and a **
 | Word timings | Get them locally from the finished take (Whisper family), not from a second API call | Needed to time the clicks; avoids extra credits. |
 | Context | Never pass `next_text` or neighbouring text, and never generate sentences separately and stitch them | Both make every sentence sound like it's about to carry on, then stops. |
 | Picking takes | Rank by how finished the section's last sentence sounds (`scripts/audio/finality.py`), then confirm by ear | Pitch checks alone passed takes a listener heard as unfinished. |
+| Asides | **Write an aside between commas, inside the sentence:** "So you click Export, which honestly took me ages to find, and pick MP4 from the list." Use its own sentence only when it should stand apart more. | Aside test, 2026-11-05 (2 takes each, eleven_v4; measured, not yet judged by ear): in every take the aside dropped 2.7 to 4.0 semitones below the main line, its pitch swing halved (about 5 st against 10), and the voice stepped back up 2 to 4 st after it, as real asides do. Between commas it ran straight in with no pause and slightly faster than the main line, the closest to real speech; as its own sentence it dropped most but added 0.4 to 0.6 s pauses either side; dashes sat in between. |
 | Measuring takes | `scripts/research/measure_speech.py` flags problems (a clean line that's fast with a wide pitch swing, no pauses, no breaths). It doesn't pick the best take. | 2026-11-05: it agreed with Andy's top pick in only 3 of 7 experiments. On short lines it rewards flat and slow, which isn't the same as natural. |
 
 ---
@@ -100,7 +129,7 @@ Each section has two versions: the **talking version** the voice reads, and a **
 | Kind | Feel | Human touches |
 |---|---|---|
 | Course walkthrough | Calm, clear, a little more structured | Restarts and reactions yes; few fillers; no mumbling |
-| Quick SaaS demo | Casual, a bit quicker, like showing a friend | More hesitations; a quick mumble at a real hunt is fine; one light swear at a natural reaction if the user allows it |
+| Quick SaaS demo | Casual, a bit quicker, like showing a friend | More hesitations; a quick mumble at a real hunt is fine; a light swear only if the user turns it on (section 1, Swearing) |
 | Product tour | Cleanest takes, fewest mistakes | Still breaths, mouth sounds and the odd reaction; almost no fillers |
 
 In every kind, the human things (breath, voice texture, small restarts, thought changes) stay. Cleaner means fewer mistakes, not a different person. *(Round 5 note.)*
