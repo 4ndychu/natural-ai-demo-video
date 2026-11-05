@@ -13,6 +13,8 @@ Research pass, 5 November 2026. **Findings only: nothing here has been applied t
 - **From the audio:** phrases are stretches between pauses over 0.3 s. Pace = words per second per phrase. Pitch tracked every 10 ms. Breaths and tongue clicks found inside pauses (rough; see caveats).
 - **Baseline:** the Phase 1 Alex take (`examples/test-todo.json`, 40 s), measured the same way.
 
+**Correction (research pass 2):** two of the casual videos are not one person narrating a screen: "Canvas Mobile Annotations Quick Demo" is a webinar Q&A with several speakers and "Totally Unscripted: Episode 4" is a two-host show. Without them, the casual medians barely change: pace variation 0.25 (same), phrase-to-phrase pitch 2.28 st (was 2.35), pitch swing inside a phrase 5.35 st (was 5.25), fillers 2.82 per 100 words (same), breaths 11.1 per min (was 10.3). The conclusions stand.
+
 Flags: Sascha D. Kasper's Obsidian video sounds partly read, and CMU's Zotero video had no fillers at all; both are counted as casual as planned, and both sit at the polished end of the casual range.
 
 ## The numbers
