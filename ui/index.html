@@ -269,7 +269,24 @@ textarea{resize:none}
 .waitlist{max-height:360px;overflow:auto}
 .bprimary{min-width:160px;overflow:hidden;text-overflow:ellipsis}
 @media (min-width: 861px){.caprow{border-top:0!important;padding-top:0!important}}
-.sumrow.open{background:transparent;box-shadow:inset 0 0 0 1px var(--line)}
+.srows{display:flex;flex-direction:column}
+.srow{display:flex;align-items:center;justify-content:space-between;gap:10px 20px;min-height:64px;padding:10px 0;border-top:1px solid var(--line);box-sizing:border-box}
+.srows > .srow:first-child{border-top:0}
+.srow.swrap{flex-wrap:wrap}
+.srow .sl{flex:1 1 200px;min-width:0;display:flex;flex-direction:column;gap:2px}
+.slab{color:var(--ink)}
+.pills{display:inline-flex;flex-wrap:wrap;justify-content:flex-end;gap:2px;padding:2px;border-radius:20px;background:var(--wash);flex:none;max-width:100%;box-sizing:border-box}
+.pills button{height:36px;padding:0 14px;border:0;border-radius:18px;background:transparent;color:var(--ink2);font-size:14px;white-space:nowrap}
+.pills button[aria-pressed=true]{background:var(--segOn);color:var(--ink);font-weight:500;box-shadow:0 1px 2px rgba(0,0,0,0.14),inset 0 0 0 1px var(--fill)}
+@media (hover:hover){.pills button[aria-pressed=false]:hover{color:var(--ink);background:var(--wash)}}
+.pills .star{margin-left:4px}
+.srow .sctl{flex:0 1 360px;min-width:0}
+.srow .sctl2{flex:0 1 auto;display:flex;flex-direction:column;align-items:flex-end;min-width:0;max-width:100%}
+.srow .sctl2 .chips{justify-content:flex-end}
+.sexpand{flex:1 1 100%;display:grid;gap:8px;padding-top:4px}
+.sumrow.open{background:transparent!important;box-shadow:inset 0 -1px 0 var(--line)!important;border-radius:0;padding-left:0}
+.sumrow.open .btn{background:var(--wash)!important}
+.t-dark .pills button[aria-pressed=true]{box-shadow:inset 0 0 0 1px rgba(242,242,240,0.28)}
 .fadebot{-webkit-mask-image:linear-gradient(#000 calc(100% - 32px),transparent);mask-image:linear-gradient(#000 calc(100% - 32px),transparent)}
 .chatpill:focus-within{box-shadow:0 0 0 2px var(--focus)!important}
 .btn.line,.btn.strong{background:var(--wash);box-shadow:none}
@@ -407,6 +424,16 @@ textarea{resize:none}
   .wfoot .pri{flex:1 1 100%}
   .setrow{flex-wrap:wrap;padding:12px 0}
   .setrow .ctl{flex:1 1 100%!important;width:auto!important}
+  .srow{flex-direction:column;align-items:stretch;gap:8px}
+  .srow .sl{flex:none}
+  .srow > .pills,.srow > .sctl2{align-self:flex-end}
+  .srow .sctl{flex:none;width:100%}
+  .srow.swrap{flex-direction:row;align-items:center}
+  .srow.swrap > .sl{flex:1 1 0}
+  .srow > .pills{align-self:stretch;display:grid;grid-auto-flow:column;grid-auto-columns:1fr}
+  .pills button{white-space:normal;height:auto;min-height:36px;padding:4px 8px;line-height:1.15}
+  .srow.swrap > .sctl2{flex:1 1 100%;align-items:flex-start}
+  .srow.swrap > .sctl2 .chips{justify-content:flex-start}
 }
 </style>
 </head>
@@ -917,15 +944,14 @@ textarea{resize:none}
 <div>
 <div :class="bMore ? 'sumrow open' : 'sumrow'"><span style="flex: 1 1 260px; min-width: 0"><span v-if="bLess"><span class="muted">Using: </span><span class="lg-only">{{bSummary}}</span><span class="sm-only">{{bSummaryShort}}</span></span><span v-if="bMore" class="muted">For this demo only</span></span><button type="button" class="btn sm" @click="toggleMore($event)" :aria-expanded="bMore ? 'true' : 'false'" style="background: var(--sheet)">{{bMore ? 'Hide options' : 'Change'}}</button></div>
 <div v-if="bMore" style="display: contents">
-<div class="fade form" style="margin-top: 18px">
-<span class="muted lbl">Who’s watching</span><div class="seg" role="group" aria-label="Who's watching"><div v-for="o in bWho" style="display: contents"><button type="button" :aria-pressed="(o.on)" @click="o.pick($event)">{{o.label}}</button></div></div>
-<span class="muted lbl">Kind of demo</span><div><div class="seg" role="group" aria-label="Kind of demo"><div v-for="o in bKinds" style="display: contents"><button type="button" :aria-pressed="(o.on)" @click="o.pick($event)"><span class="lg-only">{{o.label}}</span><span class="sm-only">{{o.short || o.label}}</span></button></div></div><div class="muted small" style="margin-top: 6px">{{bKindHint}}</div></div>
-<span class="muted lbl">Length</span><div><div class="seg" role="group" aria-label="How long"><div v-for="o in bLen" style="display: contents"><button type="button" :aria-pressed="(o.on)" @click="o.pick($event)">{{o.label}}<span v-if="o.star" class="star" aria-label="suggested">★</span></button></div></div><div class="muted small" style="margin-top: 6px">{{lenHint}}</div></div>
-<span class="muted lbl">Voice</span><div class="seg" role="group" aria-label="Voice"><div v-for="o in bVoices" style="display: contents"><button type="button" :aria-pressed="(o.on)" @click="o.pick($event)">{{o.label}}</button></div></div>
-<label for="bh" class="muted lbl">Pages to avoid</label><div><input id="bh" class="inp" type="text" :value="(bHide)" @input="onBHide($event)" @change="onBHide($event)" placeholder="e.g. the billing page"><div class="muted small" style="margin-top: 6px">Pages the browser should never open.</div></div>
-<span class="muted lbl">Captions</span><div class="seg" role="group" aria-label="Captions"><div v-for="o in bCaps" style="display: contents"><button type="button" :aria-pressed="(o.on)" @click="o.pick($event)"><span class="lg-only">{{o.label}}</span><span class="sm-only">{{o.short || o.label}}</span></button></div></div>
-<span class="muted lbl" id="bclbl">Corner label</span><div><div style="display: flex; align-items: center; gap: 12px; min-height: 44px"><span class="muted small" style="flex: 1">Your name or brand in a corner of the video</span><button type="button" :class="(bCorner.cls)" role="switch" :aria-checked="(bCorner.onStr)" aria-labelledby="bclbl" @click="bCorner.toggle($event)"><span></span></button></div>
-<div v-if="bCorner.on" style="display: contents"><div class="fade" style="margin-top: 8px; display: grid; gap: 8px"><label for="bct" class="sr">Label text</label><input id="bct" class="inp" type="text" :value="(bCornerText)" @input="onBCornerText($event)" @change="onBCornerText($event)" placeholder="Label text, e.g. your logo name"><div class="seg seg4" role="group" aria-label="Corner"><div v-for="o in bCorner.seg" style="display: contents"><button type="button" :aria-pressed="(o.on)" @click="o.pick($event)">{{o.label}}</button></div></div></div></div></div>
+<div class="fade srows" style="margin-top: 6px">
+<div class="srow"><span class="sl"><span class="slab">Who’s watching</span></span><div class="pills" role="group" aria-label="Who's watching"><div v-for="o in bWho" style="display: contents"><button type="button" :aria-pressed="(o.on)" @click="o.pick($event)">{{o.label}}</button></div></div></div>
+<div class="srow"><span class="sl"><span class="slab">Kind of demo</span><span class="muted small shelp">{{bKindHint}}</span></span><div class="pills" role="group" aria-label="Kind of demo"><div v-for="o in bKinds" style="display: contents"><button type="button" :aria-pressed="(o.on)" @click="o.pick($event)">{{o.label}}</button></div></div></div>
+<div class="srow"><span class="sl"><span class="slab">Length</span><span class="muted small shelp">{{lenHint}}</span></span><div class="pills" role="group" aria-label="How long"><div v-for="o in bLen" style="display: contents"><button type="button" :aria-pressed="(o.on)" @click="o.pick($event)">{{o.label}}<span v-if="o.star" class="star" aria-label="suggested">★</span></button></div></div></div>
+<div class="srow"><span class="sl"><span class="slab">Voice</span></span><div class="pills" role="group" aria-label="Voice"><div v-for="o in bVoices" style="display: contents"><button type="button" :aria-pressed="(o.on)" @click="o.pick($event)">{{o.label}}</button></div></div></div>
+<div class="srow"><span class="sl"><label for="bh" class="slab">Pages to avoid</label><span class="muted small shelp">Pages the browser should never open.</span></span><input id="bh" class="inp sctl" type="text" :value="(bHide)" @input="onBHide($event)" @change="onBHide($event)" placeholder="e.g. the billing page"></div>
+<div class="srow"><span class="sl"><span class="slab">Captions</span></span><div class="pills" role="group" aria-label="Captions"><div v-for="o in bCaps" style="display: contents"><button type="button" :aria-pressed="(o.on)" @click="o.pick($event)">{{o.label}}</button></div></div></div>
+<div class="srow swrap"><span class="sl"><span class="slab" id="bclbl">Corner label</span><span class="muted small shelp">Your name or brand in a corner of the video</span></span><button type="button" :class="(bCorner.cls)" role="switch" :aria-checked="(bCorner.onStr)" aria-labelledby="bclbl" @click="bCorner.toggle($event)"><span></span></button><div v-if="bCorner.on" style="display: contents"><div class="fade sexpand"><label for="bct" class="sr">Label text</label><input id="bct" class="inp" type="text" :value="(bCornerText)" @input="onBCornerText($event)" @change="onBCornerText($event)" placeholder="Label text, e.g. your logo name"><div class="seg seg4" role="group" aria-label="Corner"><div v-for="o in bCorner.seg" style="display: contents"><button type="button" :aria-pressed="(o.on)" @click="o.pick($event)">{{o.label}}</button></div></div></div></div></div>
 </div>
 </div>
 </div>
@@ -944,15 +970,14 @@ textarea{resize:none}
 <div style="display: flex; align-items: center; gap: 12px; margin-top: 10px; flex-wrap: wrap"><button type="button" class="btn sm" @click="pickFile($event)">Choose a file</button><input id="btfile" type="file" accept=".txt,.md,.csv,text/plain,text/markdown,text/csv" @change="onFile($event)" class="sr" tabindex="-1" aria-hidden="true"><span class="muted small">{{btHasFile ? 'From ' + btFileName + '. ' : ''}}{{btLinesText}}</span></div>
 </div>
 <div>
-<h2 class="h-sec" style="margin-bottom: 12px">Shared settings</h2>
-<div class="form">
-<label for="btn" class="muted lbl">Batch name</label><input id="btn" class="inp" type="text" :value="(btName)" @input="onBtName($event)" @change="onBtName($event)" :placeholder="(btNamePh)">
-<span class="muted lbl">Site</span><div><div class="chips" role="group" aria-label="Site"><div v-for="o in btSites" style="display: contents"><button type="button" :aria-pressed="(o.on)" @click="o.pick($event)">{{o.label}}</button></div><button type="button" id="btnewchip" class="newchip" :aria-expanded="btSiteNew ? 'true' : 'false'" @click="openBtNew($event)">+ New site</button></div>
-<div v-if="btSiteNew" style="display: contents"><div class="fade" style="margin-top: 8px"><label for="btns" class="sr">New site address</label><input id="btns" class="inp" type="text" :value="(btNew)" @input="onBtNew($event)" @change="onBtNew($event)" placeholder="e.g. app.yourproduct.com" :aria-invalid="btNewBad ? 'true' : 'false'"><div class="small" :style="'margin-top: 6px; min-height: 20px; color: ' + (btNewBad ? 'var(--danger)' : 'var(--ink2)')">{{btNewBad ? 'That doesn’t look like a web address.' : 'You log in once before the batch starts.'}}</div></div></div></div>
-<span class="muted lbl">Voice</span><div class="seg" role="group" aria-label="Voice"><div v-for="o in btVoices" style="display: contents"><button type="button" :aria-pressed="(o.on)" @click="o.pick($event)">{{o.label}}</button></div></div>
-<span class="muted lbl">Kind of demo</span><div><div class="seg" role="group" aria-label="Kind of demo"><div v-for="o in btKinds" style="display: contents"><button type="button" :aria-pressed="(o.on)" @click="o.pick($event)"><span class="lg-only">{{o.label}}</span><span class="sm-only">{{o.short || o.label}}</span></button></div></div><div class="muted small" style="margin-top: 6px">{{btKindHint}}</div></div>
-<span class="muted lbl">Privacy</span><div><div class="seg" role="group" aria-label="Privacy"><div v-for="o in btPresets" style="display: contents"><button type="button" :aria-pressed="(o.on)" @click="o.pick($event)"><span class="lg-only">{{o.label}}</span><span class="sm-only">{{o.short || o.label}}</span></button></div></div><div class="muted small" style="margin-top: 6px">{{btPresetHint}}</div></div>
-<label for="btf" class="muted lbl">Export folder</label><div class="folderrow" style="display: flex; gap: 8px"><input id="btf" class="inp lg-only" type="text" :value="(btFolderVal)" @input="onBtFolder($event)" @change="onBtFolder($event)"><span class="sm-only" style="flex: 1 1 100%; overflow-wrap: anywhere">{{btFolderVal}}</span><button type="button" class="btn" @click="chooseFolder($event)">Change folder</button></div>
+<h2 class="h-sec" style="margin-bottom: 4px">Shared settings</h2>
+<div class="srows">
+<div class="srow"><span class="sl"><label for="btn" class="slab">Batch name</label></span><input id="btn" class="inp sctl" type="text" :value="(btName)" @input="onBtName($event)" @change="onBtName($event)" :placeholder="(btNamePh)"></div>
+<div class="srow swrap"><span class="sl"><span class="slab">Site</span></span><div class="sctl2"><div class="chips" role="group" aria-label="Site"><div v-for="o in btSites" style="display: contents"><button type="button" :aria-pressed="(o.on)" @click="o.pick($event)">{{o.label}}</button></div><button type="button" id="btnewchip" class="newchip" :aria-expanded="btSiteNew ? 'true' : 'false'" @click="openBtNew($event)">+ New site</button></div><div v-if="btSiteNew" style="display: contents"><div class="fade" style="margin-top: 8px"><label for="btns" class="sr">New site address</label><input id="btns" class="inp" type="text" :value="(btNew)" @input="onBtNew($event)" @change="onBtNew($event)" placeholder="e.g. app.yourproduct.com" :aria-invalid="btNewBad ? 'true' : 'false'"><div class="small" :style="'margin-top: 6px; min-height: 20px; color: ' + (btNewBad ? 'var(--danger)' : 'var(--ink2)')">{{btNewBad ? 'That doesn’t look like a web address.' : 'You log in once before the batch starts.'}}</div></div></div></div></div>
+<div class="srow"><span class="sl"><span class="slab">Voice</span></span><div class="pills" role="group" aria-label="Voice"><div v-for="o in btVoices" style="display: contents"><button type="button" :aria-pressed="(o.on)" @click="o.pick($event)">{{o.label}}</button></div></div></div>
+<div class="srow"><span class="sl"><span class="slab">Kind of demo</span><span class="muted small shelp">{{btKindHint}}</span></span><div class="pills" role="group" aria-label="Kind of demo"><div v-for="o in btKinds" style="display: contents"><button type="button" :aria-pressed="(o.on)" @click="o.pick($event)">{{o.label}}</button></div></div></div>
+<div class="srow"><span class="sl"><span class="slab">Privacy</span><span class="muted small shelp">{{btPresetHint}}</span></span><div class="pills" role="group" aria-label="Privacy"><div v-for="o in btPresets" style="display: contents"><button type="button" :aria-pressed="(o.on)" @click="o.pick($event)">{{o.label}}</button></div></div></div>
+<div class="srow"><span class="sl"><label for="btf" class="slab">Export folder</label></span><div class="folderrow sctl" style="display: flex; gap: 8px"><input id="btf" class="inp lg-only" type="text" :value="(btFolderVal)" @input="onBtFolder($event)" @change="onBtFolder($event)"><span class="sm-only" style="flex: 1 1 100%; overflow-wrap: anywhere">{{btFolderVal}}</span><button type="button" class="btn" @click="chooseFolder($event)">Change folder</button></div></div>
 </div>
 </div>
 <div class="est" aria-live="polite">
