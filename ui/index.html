@@ -810,7 +810,7 @@ textarea{resize:none}
 <div class="foot stepfoot">
 <span class="ftext" :style="'color: ' + (footColor)"><span class="dot" :style="'background: ' + (footDot)"></span><span>{{footText}}</span></span>
 <span class="fbtns">
-<div v-if="confirming" style="display: contents"><button type="button" class="btn" @click="cancelConfirm($event)">{{confirmNo}}</button><button type="button" class="pri" @click="doConfirm($event)">{{confirmYes}}</button></div>
+<div v-if="confirming" style="display: contents"><button type="button" class="btn" @click="cancelConfirm($event)">{{confirmNo}}</button><button id="cfyes" type="button" class="pri" @click="doConfirm($event)">{{confirmYes}}</button></div>
 <div v-if="notConfirming" style="display: contents">
 <div v-if="canBack" style="display: contents"><button type="button" class="btn ghost backbtn" @click="back($event)">Back</button></div>
 <div v-if="hasSkip" style="display: contents"><button type="button" class="btn" @click="doSkip($event)">Skip redos</button></div>
