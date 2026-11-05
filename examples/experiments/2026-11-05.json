@@ -1,0 +1,253 @@
+{
+ "name": "2026-11-05 wording and model experiments",
+ "takes": 2,
+ "voice_id": "hLygPNd2gK6Azddorc5W",
+ "experiments": {
+  "E0": {
+   "about": "eleven_v3 vs eleven_v4, same text and stability 0.7 (v4 has no speed setting). v3 side reuses the Phase 1 takes.",
+   "kind": "section",
+   "variants": [
+    {
+     "id": "v3-open",
+     "text": "[relaxed] Okay, so this is a pretty basic to-do list. You type in the box up top, call the dentist, hit Enter and it's on the list.",
+     "model": "eleven_v3",
+     "stability": 0.7,
+     "reuse": "output/test-todo/open",
+     "speed": 1.0
+    },
+    {
+     "id": "v3-add-and-tick",
+     "text": "[relaxed] I'll add a couple more so there's something to work with. Pay the gas bill, and book the, uh, book the train tickets. Okay, three. When you've done one you just click the little circle next to it and it gets crossed out.",
+     "model": "eleven_v3",
+     "stability": 0.7,
+     "reuse": "output/test-todo/add-and-tick",
+     "speed": 1.0
+    },
+    {
+     "id": "v3-filter-and-clear",
+     "text": "[relaxed] Down at the bottom you can switch to just the active ones or just the completed ones. I'd just leave it on Active, you don't really need to see what's done. And to clear out the finished ones there's, where is it, Clear completed, over on the right. Now it's just the two left.",
+     "model": "eleven_v3",
+     "stability": 0.7,
+     "reuse": "output/test-todo/filter-and-clear",
+     "speed": 1.0
+    },
+    {
+     "id": "v4-open",
+     "text": "[relaxed] Okay, so this is a pretty basic to-do list. You type in the box up top, call the dentist, hit Enter and it's on the list.",
+     "model": "eleven_v4",
+     "stability": 0.7
+    },
+    {
+     "id": "v4-add-and-tick",
+     "text": "[relaxed] I'll add a couple more so there's something to work with. Pay the gas bill, and book the, uh, book the train tickets. Okay, three. When you've done one you just click the little circle next to it and it gets crossed out.",
+     "model": "eleven_v4",
+     "stability": 0.7
+    },
+    {
+     "id": "v4-filter-and-clear",
+     "text": "[relaxed] Down at the bottom you can switch to just the active ones or just the completed ones. I'd just leave it on Active, you don't really need to see what's done. And to clear out the finished ones there's, where is it, Clear completed, over on the right. Now it's just the two left.",
+     "model": "eleven_v4",
+     "stability": 0.7
+    }
+   ]
+  },
+  "E1": {
+   "about": "Delivery of an instruction line (main lever: slower, flatter)",
+   "variants": [
+    {
+     "id": "a-original",
+     "text": "[relaxed] When you've done one you just click the little circle next to it and it gets crossed out.",
+     "model": "eleven_v3",
+     "stability": 0.7,
+     "speed": 1.0
+    },
+    {
+     "id": "b-if-I-click",
+     "text": "[relaxed] When I've done one, if I click the little circle next to it, it just gets crossed out.",
+     "model": "eleven_v3",
+     "stability": 0.7,
+     "speed": 1.0
+    },
+    {
+     "id": "c-filler-before-noun",
+     "text": "[relaxed] When you've done one you just click the, uh, little circle next to it and it gets crossed out.",
+     "model": "eleven_v3",
+     "stability": 0.7,
+     "speed": 1.0
+    },
+    {
+     "id": "d-flat-trailing",
+     "text": "[relaxed] When you've done one you just click the little circle next to it, and yeah, it's crossed out.",
+     "model": "eleven_v3",
+     "stability": 0.7,
+     "speed": 1.0
+    }
+   ]
+  },
+  "E2": {
+   "about": "Which wording makes the model breathe",
+   "variants": [
+    {
+     "id": "a-short-sentences",
+     "text": "[relaxed] Open the settings. Find the billing tab. Click it. Your plan is at the top. The invoices are under that.",
+     "model": "eleven_v3",
+     "stability": 0.7,
+     "speed": 1.0
+    },
+    {
+     "id": "b-run-on-then-stop",
+     "text": "[relaxed] So the settings are tucked away in the bottom left corner, and once you open them you'll see the billing tab sitting right at the top of the list. So that's where your plan and your invoices live.",
+     "model": "eleven_v3",
+     "stability": 0.7,
+     "speed": 1.0
+    },
+    {
+     "id": "c-web-address",
+     "text": "[relaxed] If you haven't got an account yet, it's free to make one at to do app dot com slash start. Then you just come back here and log in.",
+     "model": "eleven_v3",
+     "stability": 0.7,
+     "speed": 1.0
+    }
+   ]
+  },
+  "E3": {
+   "about": "Which opening of a new step gets a mouth click",
+   "variants": [
+    {
+     "id": "a-okay-so-now",
+     "text": "[relaxed] And that's the list saved. Okay. So now, the filters at the bottom.",
+     "model": "eleven_v3",
+     "stability": 0.7,
+     "speed": 1.0
+    },
+    {
+     "id": "b-so-now",
+     "text": "[relaxed] And that's the list saved. So now, the filters at the bottom.",
+     "model": "eleven_v3",
+     "stability": 0.7,
+     "speed": 1.0
+    },
+    {
+     "id": "c-right-so",
+     "text": "[relaxed] And that's the list saved. Right, so, the filters at the bottom.",
+     "model": "eleven_v3",
+     "stability": 0.7,
+     "speed": 1.0
+    }
+   ]
+  },
+  "E4": {
+   "about": "Restarts on other small words",
+   "variants": [
+    {
+     "id": "a-its-its",
+     "text": "[relaxed] And the due date, it's, it's in the left column, under the name.",
+     "model": "eleven_v3",
+     "stability": 0.7,
+     "speed": 1.0
+    },
+    {
+     "id": "b-im-uh-im",
+     "text": "[relaxed] So I'm, uh, I'm gonna add a due date to this one.",
+     "model": "eleven_v3",
+     "stability": 0.7,
+     "speed": 1.0
+    },
+    {
+     "id": "c-you-cut-off",
+     "text": "[relaxed] You- you just drag the handle to move it up the list.",
+     "model": "eleven_v3",
+     "stability": 0.7,
+     "speed": 1.0
+    },
+    {
+     "id": "d-the-the",
+     "text": "[relaxed] Then you open the, the menu on the right and pick Edit.",
+     "model": "eleven_v3",
+     "stability": 0.7,
+     "speed": 1.0
+    }
+   ]
+  },
+  "E5": {
+   "about": "Unsure tone while hunting",
+   "variants": [
+    {
+     "id": "a-where-is-it",
+     "text": "[relaxed] And to clear out the finished ones there's, where is it, Clear completed, over on the right.",
+     "model": "eleven_v3",
+     "stability": 0.7,
+     "speed": 1.0
+    },
+    {
+     "id": "b-wheres-the-um",
+     "text": "[relaxed] And to clear out the finished ones there's, where's the, um, Clear completed, over on the right.",
+     "model": "eleven_v3",
+     "stability": 0.7,
+     "speed": 1.0
+    },
+    {
+     "id": "c-hang-on",
+     "text": "[relaxed] And to clear out the finished ones there's, hang on, it's, yeah, Clear completed, over on the right.",
+     "model": "eleven_v3",
+     "stability": 0.7,
+     "speed": 1.0
+    },
+    {
+     "id": "d-actually",
+     "text": "[relaxed] And to clear out the finished ones there's actually a button for it, Clear completed, over on the right.",
+     "model": "eleven_v3",
+     "stability": 0.7,
+     "speed": 1.0
+    }
+   ]
+  },
+  "E6": {
+   "about": "Stability 0.7 vs 0.8 on the instruction lines Andy called AI (0.8 is outside the 0.6-0.75 window; test only)",
+   "variants": [
+    {
+     "id": "L1-0.7",
+     "text": "[relaxed] You type in the box up top, call the dentist, hit Enter and it's on the list.",
+     "model": "eleven_v3",
+     "stability": 0.7,
+     "speed": 1.0
+    },
+    {
+     "id": "L1-0.8",
+     "text": "[relaxed] You type in the box up top, call the dentist, hit Enter and it's on the list.",
+     "model": "eleven_v3",
+     "stability": 0.8,
+     "speed": 1.0
+    },
+    {
+     "id": "L2-0.7",
+     "text": "[relaxed] I'll add a couple more so there's something to work with.",
+     "model": "eleven_v3",
+     "stability": 0.7,
+     "speed": 1.0
+    },
+    {
+     "id": "L2-0.8",
+     "text": "[relaxed] I'll add a couple more so there's something to work with.",
+     "model": "eleven_v3",
+     "stability": 0.8,
+     "speed": 1.0
+    },
+    {
+     "id": "L3-0.7",
+     "text": "[relaxed] When you've done one you just click the little circle next to it and it gets crossed out.",
+     "model": "eleven_v3",
+     "stability": 0.7,
+     "speed": 1.0
+    },
+    {
+     "id": "L3-0.8",
+     "text": "[relaxed] When you've done one you just click the little circle next to it and it gets crossed out.",
+     "model": "eleven_v3",
+     "stability": 0.8,
+     "speed": 1.0
+    }
+   ]
+  }
+ }
+}
