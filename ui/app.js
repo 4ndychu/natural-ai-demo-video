@@ -78,7 +78,7 @@ class Component extends DCLogic {
       lib: false, libF: 'all', chat: [], chatDraft: '', chatAct: null,
       defCap: 'burn', defCorner: 'off', defCornerText: '',
       mode: 'one', bMore: false, bKind: 'course', recDoneOpen: false, markOther: false, bWhat: '', bSite: 'whop.com', bSiteNew: false, bNew: '', bWho: 0, bLen: 2, bHide: '', bVoice: 'alex', bCap: 'burn', bCorner: 'off', bCornerText: '', editing: false,
-      btSiteNew: false, btNew: '', btAll: false, fromBatch: null, batchItem: null, btText: '', btName: '', btFile: '', btSite: 'whop.com', btVoice: 'alex', btKind: 'course', btPreset: 'standard', btFolder: '', btOpen: null,
+      btSiteNew: false, btNew: '', btAll: false, fromBatch: null, batchItem: null, btText: '', btName: '', btFile: '', btSite: 'whop.com', btVoice: 'alex', btKind: 'course', btPreset: 'standard', btFolder: '', btOpen: null, bConfirm: false,
       toast: '', toastUndo: null, toastGo: null, toastGoLabel: ''
     };
     this.timers = {};
@@ -101,6 +101,7 @@ class Component extends DCLogic {
     if (st.markOpen) { this.setState({ markOpen: false, markOther: false, markDraft: '' }); back('#markbtn'); return true; }
     if (st.wipeConfirm) { this.setState({ wipeConfirm: false }); back('#wipebtn'); return true; }
     if (st.confirm) { this.setState({ confirm: null }); back('.stepfoot .pri'); return true; }
+    if (st.screen === 'batch' && st.bConfirm) { this.setState({ bConfirm: false }); back('.bprimary'); return true; }
     if (st.screen === 'new' && st.bSiteNew) { this.setState({ bSiteNew: false, bNew: '' }); back('#bnewchip'); return true; }
     if (st.screen === 'new' && st.btSiteNew) { this.setState({ btSiteNew: false, btNew: '' }); back('#btnewchip'); return true; }
     if (st.screen === 'settings' && st.keyEdit) { this.setState({ keyEdit: false, key: '', keyRes: null }); back('#keytoggle'); return true; }
@@ -151,7 +152,7 @@ class Component extends DCLogic {
   }
   // Each batch video gets its own demo record the first time it's watched (no marks, no blurs), so Review shows that video.
   batchDemos(b, i) { const id = b.id + '#' + i; if (this.state.demos.some((d) => d.id === id)) return { id: id, demos: this.state.demos }; const it = b.items[i]; const vo = this.VO[b.voice] || this.VO.alex; const d = { id: id, batchOf: b.id, title: it.t, site: b.site, len: 1, who: 0, voice: b.voice, model: vo.models.indexOf('v4') >= 0 ? 'v4' : vo.models[0], kind: b.kind, max: 4, cover: ['assets/cover-1.jpg', 'assets/cover-3.jpg', 'assets/cover-4.jpg'][i % 3], status: '', dot: '', recorded: true, written: true, notes: {}, blurs: [], lines: {}, capMode: 'burn', corner: 'off', cornerText: '' }; return { id: id, demos: this.state.demos.concat([d]) }; }
-  openBatch(id) { this.setState({ screen: 'batch', curBatch: id || this.state.curBatch, btOpen: null, help: false, confirm: null }); }
+  openBatch(id) { this.setState({ screen: 'batch', curBatch: id || this.state.curBatch, btOpen: null, help: false, confirm: null, bConfirm: false }); }
   renderVals() {
     const st = this.state; const D = this.demo(); this.useScript(D); const N = this.secs.length; const v = st.vals; const B = this.batch();
     const voice = D.voice; const VO = this.VO; const vInfo = VO[voice]; const model = D.model || 'v4';
@@ -310,7 +311,10 @@ class Component extends DCLogic {
     const bCreditNote = B && B.stage === 'recording' && !B.paused && bFits < bToRecord.length ? 'You have ' + this.num(st.credits) + ': enough for about ' + bFits + ' more. Recording pauses there until you top up.' : '';
     const watchItem = (i) => { const r = this.batchDemos(B, i); this.setState({ demos: r.demos, screen: 'demo', cur: r.id, step: 4, markOpen: false, confirm: null, fromBatch: B.id, batchItem: i, revT: 0, player: false, vals: this.recFor(B.voice, B.kind) }); };
     const approveItem = (i) => { const prev = B.items; const items = B.items.map((x, k) => k === i ? Object.assign({}, x, { st: 'approved' }) : x); this.patchBatch({ items: items }); this.say('Approved “' + B.items[i].t + '”', () => this.patchBatch({ items: prev })); };
-    let bPrimary = !B ? { label: '', act: () => {}, off: true } : B.stage === 'writing' ? { label: 'Approve all scripts', off: true, act: () => {} } : B.stage === 'approve' ? { label: 'Approve all and record', off: false, act: () => { if (this.needKey()) return; const items = B.items.map((x, k) => Object.assign({}, x, { st: k === 0 ? 'recording' : 'waiting' })); this.patchBatch({ items: items, stage: 'recording', paused: false }); this.runBatch(); this.focusLater('#batch-h'); this.say('Recording ' + this.plural(items.length, 'video') + ', one after another'); } } : { label: bApproved ? 'Export ' + this.plural(bApproved, 'approved video') : 'Export approved videos', off: !bApproved, act: () => { const n = bApproved; const items = B.items.map((x) => x.st === 'approved' ? Object.assign({}, x, { st: 'exported' }) : x); const done = items.every((x) => x.st === 'exported'); this.patchBatch({ items: items, stage: done ? 'done' : B.stage }); this.focusLater('.bprimary'); this.say('Exported ' + this.plural(n, 'video') + ' and the list file to ' + B.folder.replace(/^~\/Movies\//, 'Movies/')); } };
+    let bPrimary = !B ? { label: '', act: () => {}, off: true } : B.stage === 'writing' ? { label: 'Approve all scripts', off: true, act: () => {} } : B.stage === 'approve' ? { label: 'Approve all and record', off: false, act: () => { if (this.needKey()) return; this.setState({ bConfirm: true }); this.focusLater('#bcfyes'); }, start: () => { if (this.needKey()) return; const items = B.items.map((x, k) => Object.assign({}, x, { st: k === 0 ? 'recording' : 'waiting' })); this.setState({ bConfirm: false }); this.patchBatch({ items: items, stage: 'recording', paused: false }); this.runBatch(); this.focusLater('#batch-h'); this.say('Recording ' + this.plural(items.length, 'video') + ', one after another'); } } : { label: bApproved ? 'Export ' + this.plural(bApproved, 'approved video') : 'Export approved videos', off: !bApproved, act: () => { const n = bApproved; const items = B.items.map((x) => x.st === 'approved' ? Object.assign({}, x, { st: 'exported' }) : x); const done = items.every((x) => x.st === 'exported'); this.patchBatch({ items: items, stage: done ? 'done' : B.stage }); this.focusLater('.bprimary'); this.say('Exported ' + this.plural(n, 'video') + ' and the list file to ' + B.folder.replace(/^~\/Movies\//, 'Movies/')); } };
+    const bAllCost = bItems.reduce((s, x) => s + this.perVideo(x.min), 0); const bAllFits = (() => { let c = st.credits, n = 0; for (const x of bItems) { const k = this.perVideo(x.min); if (c < k) break; c -= k; n++; } return n; })();
+    const bConfirmText = 'Recording ' + this.plural(bItems.length, 'video') + ' uses about ' + this.num(bAllCost) + ' credits' + (bAllFits < bItems.length ? '. It pauses after ' + bAllFits + ' until you top up.' : '');
+    const bStartAll = bPrimary.start || (() => {});
     const exportAct = bPrimary.act; const exportLabel = bPrimary.label; const exportOff = bPrimary.off;
     const firstReady = bItems.findIndex((x) => x.st === 'recorded');
     let bSecondary = null;
@@ -396,6 +400,7 @@ class Component extends DCLogic {
       bReady: bReady, hasBReady: bReady > 0, bReadyText: this.plural(bReady, 'video') + ' ready to watch', bWatchFirst: () => { const k = bItems.findIndex((x) => x.st === 'recorded'); if (k >= 0) watchItem(k); },
       bFooter: B ? (B.stage === 'done' ? 'Everything is in ' + B.folder + ', with list.csv (title, file name, lesson). Nothing is published.' : B.stage === 'approve' || B.stage === 'writing' ? 'Nothing records until you approve the scripts.' : (firstReady >= 0 ? 'Next: ' + bItems[firstReady].t : 'Exports go to Movies/NAVI with a list file. Never published.')) : '',
       bPrimaryShort: /^Watch next/.test(bPrimary.label) ? 'Watch next' : (/^Export (\d+)/.test(bPrimary.label) ? 'Export ' + bPrimary.label.match(/\d+/)[0] : bPrimary.label), bSecondaryShort: bSecondary ? (/^Export (\d+)/.test(bSecondary.label) ? 'Export ' + bSecondary.label.match(/\d+/)[0] : 'Export') : '', bPrimaryLabel: bPrimary.label, bPrimaryOff: bPrimary.off, bPrimary: bPrimary.act, hasBSecondary: !!bSecondary, bSecondaryLabel: bSecondary ? bSecondary.label : '', bSecondary: bSecondary ? bSecondary.act : () => {}, bSecondaryOff: bSecondary ? !!bSecondary.off : false, hasBPause: !!bPauseObj, bPauseLabel: bPauseObj ? bPauseObj.label : '', bPause: bPauseObj ? bPauseObj.act : () => {}, bReviewing: !!(B && (B.stage === 'recording' || B.stage === 'review')),
+      bConfirm: !!(st.bConfirm && B && B.stage === 'approve'), bNotConfirm: !(st.bConfirm && B && B.stage === 'approve'), bConfirmText: bConfirmText, bConfirmYes: () => bStartAll(), bConfirmNo: () => { this.setState({ bConfirm: false }); this.focusLater('.bprimary'); },
       // ---- demo steps ----
       steps: steps, cur: cur, st0: st.step === 0, st1: st.step === 1, st2: st.step === 2, st3: st.step === 3, st4: st.step === 4, st5: st.step === 5,
       writing: !D.written, scriptReady: !!D.written, skelRows: this.secs.map((x, i) => ['62%', '80%', '70%', '86%', '58%', '74%', '66%'][i % 7]),

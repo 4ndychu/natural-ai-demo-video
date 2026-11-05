@@ -347,6 +347,8 @@ textarea{resize:none}
   .bsecond{min-width:0}
   .btable{max-height:none;overflow:visible}
   .bfoot .ftext > span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block!important}
+  .bfoot .ftext > span.bcf{white-space:normal;display:-webkit-box!important}
+  .bfoot .ftext > .dot{display:inline-block!important}
   .bacts .btn,.bnone{width:76px}
   .welcome-art{min-height:320px!important}
   .welcome-art img{object-position:50% 40%!important}
@@ -1041,7 +1043,7 @@ textarea{resize:none}
 </div>
 </div>
 </div>
-<div class="foot bfoot"><span class="ftext muted"><span>{{bFooter}}</span></span><span class="fbtns"><div v-if="hasBSecondary" style="display: contents"><button type="button" class="btn bsecond" @click="bSecondary($event)" :disabled="(bSecondaryOff)"><span class="lg-only">{{bSecondaryLabel}}</span><span class="sm-only">{{bSecondaryShort}}</span></button></div><button type="button" class="pri bprimary" @click="bPrimary($event)" :disabled="(bPrimaryOff)"><span class="lg-only">{{bPrimaryLabel}}</span><span class="sm-only">{{bPrimaryShort}}</span></button></span></div>
+<div class="foot bfoot"><span v-if="bConfirm" class="ftext" style="color: var(--ink)"><span class="dot k-ready"></span><span class="bcf">{{bConfirmText}}</span></span><span v-if="bNotConfirm" class="ftext muted"><span>{{bFooter}}</span></span><span class="fbtns"><div v-if="bConfirm" style="display: contents"><button type="button" class="btn" @click="bConfirmNo($event)">Cancel</button><button id="bcfyes" type="button" class="pri bprimary" @click="bConfirmYes($event)">Yes, record all</button></div><div v-if="bNotConfirm" style="display: contents"><div v-if="hasBSecondary" style="display: contents"><button type="button" class="btn bsecond" @click="bSecondary($event)" :disabled="(bSecondaryOff)"><span class="lg-only">{{bSecondaryLabel}}</span><span class="sm-only">{{bSecondaryShort}}</span></button></div><button type="button" class="pri bprimary" @click="bPrimary($event)" :disabled="(bPrimaryOff)"><span class="lg-only">{{bPrimaryLabel}}</span><span class="sm-only">{{bPrimaryShort}}</span></button></div></span></div>
 </section>
 </main>
 </div>
