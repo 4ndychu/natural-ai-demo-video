@@ -88,8 +88,32 @@ class Component extends DCLogic {
   later(name, ms, fn) { if (this.timers[name]) clearTimeout(this.timers[name]); this.timers[name] = setTimeout(fn, ms); }
   every(name, ms, fn) { if (this.timers[name]) clearInterval(this.timers[name]); this.timers[name] = setInterval(fn, ms); }
   stop(name) { if (this.timers[name]) { clearInterval(this.timers[name]); clearTimeout(this.timers[name]); delete this.timers[name]; } }
-  focusLater(sel) { requestAnimationFrame(() => { const el = typeof sel === 'string' ? document.querySelector(sel) : sel; if (el && el.focus) el.focus(); }); }
-  say(msg, undo, go, goLabel) { this.setState({ toast: msg, toastUndo: undo || null, toastGo: go || null, toastGoLabel: goLabel || '' }); this.later('toast', 4200, () => this.setState({ toast: '', toastUndo: null, toastGo: null })); }
+  focusLater(sel) { this.focusAt = Date.now(); requestAnimationFrame(() => { const el = typeof sel === 'string' ? document.querySelector(sel) : typeof sel === 'function' ? sel() : sel; if (el && el.focus) el.focus(); }); }
+  // Focus model helpers: describe a control so it can be found again after a re-render (Undo, swapped buttons).
+  describe(el) { if (!el || el === document.body || !el.getAttribute) return null; return { id: el.id || '', aria: el.getAttribute('aria-label') || '', text: (el.innerText || '').trim(), tag: el.tagName }; }
+  findDesc(d) { if (!d) return null; const ok = (e) => e && e.isConnected && !e.disabled && e.offsetParent !== null; if (d.id) { const e = document.getElementById(d.id); if (ok(e)) return e; } const all = [...document.querySelectorAll(d.tag || 'button')].filter(ok); return (d.aria && all.find((e) => e.getAttribute('aria-label') === d.aria)) || (d.text && all.find((e) => (e.innerText || '').trim() === d.text)) || null; }
+  heading() { return document.querySelector('#step-h, #batch-h, #demos-h, #set-h'); }
+  escape() {
+    const st = this.state; const back = (sel) => this.focusLater(sel);
+    if (st.lib) { this.setState({ lib: false }); back('#vmore'); return true; }
+    if (st.help) { this.setState({ help: false }); back('#helpbtn'); return true; }
+    if (st.chat.length) { this.setState({ chat: [], chatAct: null }); back('#chatin'); return true; }
+    if (st.markOpen) { this.setState({ markOpen: false, markOther: false, markDraft: '' }); back('#markbtn'); return true; }
+    if (st.wipeConfirm) { this.setState({ wipeConfirm: false }); back('#wipebtn'); return true; }
+    if (st.confirm) { this.setState({ confirm: null }); back('.stepfoot .pri'); return true; }
+    if (st.screen === 'new' && st.bSiteNew) { this.setState({ bSiteNew: false, bNew: '' }); back('#bnewchip'); return true; }
+    if (st.screen === 'new' && st.btSiteNew) { this.setState({ btSiteNew: false, btNew: '' }); back('#btnewchip'); return true; }
+    if (st.screen === 'settings' && st.keyEdit) { this.setState({ keyEdit: false, key: '', keyRes: null }); back('#keytoggle'); return true; }
+    return false;
+  }
+  outside(t) {
+    const st = this.state; const inside = (sel) => { const el = document.querySelector(sel); return el && el.contains(t); };
+    if (st.help && !inside('#helpdlg') && !inside('#helpbtn')) this.setState({ help: false });
+    if (st.markOpen && !inside('.markslot')) this.setState({ markOpen: false, markOther: false, markDraft: '' });
+    if (st.wipeConfirm && !inside('#wiperow')) this.setState({ wipeConfirm: false });
+    if (st.chat.length && !inside('.chatinner')) this.setState({ chat: [], chatAct: null });
+  }
+  say(msg, undo, go, goLabel) { if (undo) this.undoFrom = this.describe(document.activeElement); this.setState({ toast: msg, toastUndo: undo || null, toastGo: go || null, toastGoLabel: goLabel || '' }); this.later('toast', 4200, () => this.setState({ toast: '', toastUndo: null, toastGo: null })); }
   fmt(t) { const m = Math.floor(t / 60); const s = Math.floor(t % 60); return m + ':' + (s < 10 ? '0' : '') + s; }
   num(n) { return n.toLocaleString('en-US'); }
   plural(n, w) { return n + ' ' + w + (n === 1 ? '' : 's'); }
@@ -203,7 +227,7 @@ class Component extends DCLogic {
     const sw = (on) => ({ cls: on ? 'sw on' : 'sw', onStr: on ? 'true' : 'false' });
     const warns = { email: 'Real people’s emails would be visible to anyone watching.', money: 'Showing earnings in marketing can count as a claim you have to back up.', customers: 'This is other people’s data. Only show it if it’s fake.' };
     const row = (id, label) => { const on = st.shown[id]; const s = sw(on); const w = on && warns[id]; return { id: 'pv-' + id, label: label, warn: w || '', hasWarn: !!w, cls: s.cls, onStr: s.onStr, toggle: () => { const m = Object.assign({}, this.state.shown); m[id] = !on; this.setState({ shown: m }); } }; };
-    const addMark = (text) => { const t = st.revT; const i = secAt(t); const n = Object.assign({}, D.notes); n[i] = (n[i] || []).concat([{ t: t, text: text }]); this.patchDemo({ notes: n }); this.setState({ markOpen: false, markOther: false, markDraft: '' }); this.say('Marked ' + this.fmt(t) + ': ' + text); };
+    const addMark = (text) => { const t = st.revT; const i = secAt(t); const n = Object.assign({}, D.notes); n[i] = (n[i] || []).concat([{ t: t, text: text }]); this.patchDemo({ notes: n }); this.setState({ markOpen: false, markOther: false, markDraft: '' }); this.focusLater('#markbtn'); this.say('Marked ' + this.fmt(t) + ': ' + text); };
     const stopNow = () => { this.stop('rec'); this.setState({ recStopped: true, recPaused: false, recSlide: 0, recSliding: false }); this.patchDemo({ status: 'Stopped at ' + st.recPos + ' of ' + N, dot: '#E0A100' }); this.say('Stopped. ' + this.plural(st.recPos, 'finished section') + ' kept.'); this.focusLater('#reccarry'); };
     const goStep = (i) => { const p = { step: i, confirm: null, markOpen: false }; this.setState(p); if (D.max < i) this.patchDemo({ max: i }); };
     const doExport = () => { this.patchDemo({ exported: true, dirty: false, status: 'Exported Nov 5', dot: 'var(--okDot)', max: 5 }); this.setState({ confirm: null }); this.say('Exported to Movies/NAVI', null, () => this.say('Opening Movies/NAVI'), 'Open folder'); };
@@ -238,7 +262,7 @@ class Component extends DCLogic {
     const l = sw(st.lock), p = sw(st.p720), a = sw(st.caps);
     const dataDefs = [{ id: 'settings', n: 'Voice, privacy and learned preferences', w: 'Stored on this Mac. You can undo a reset.', l: 'Reset to defaults' }, { id: 'videos', n: 'Finished videos', w: 'Movies/NAVI. Never deleted from here.', l: 'Open folder' }];
     const dataAct = {
-      logins: () => { const prev = st.sites; this.setState({ sites: [] }); this.say('All saved logins forgotten', () => this.setState({ sites: prev })); },
+      logins: () => { const prev = st.sites; this.setState({ sites: [] }); this.focusLater('#ns'); this.say('All saved logins forgotten', () => this.setState({ sites: prev })); },
       videos: () => this.say('Opening Movies/NAVI'),
       settings: () => { const prev = { vals: st.vals, hide: st.hide, shown: st.shown, defVoice: st.defVoice, defCap: st.defCap, defCorner: st.defCorner, defCornerText: st.defCornerText }; this.setState({ vals: Object.assign({}, this.presetVals.course), hide: [], shown: Object.assign({}, PRESETS.standard), defVoice: 'alex', defCap: 'burn', defCorner: 'off', defCornerText: '' }); this.say('Settings reset', () => this.setState(prev)); }
     };
@@ -284,7 +308,7 @@ class Component extends DCLogic {
     const bCreditNote = B && B.stage === 'recording' && !B.paused && bFits < bToRecord.length ? 'Enough for about ' + bFits + ' more (about ' + this.num(Math.round(bLeftCost / Math.max(1, bToRecord.length) / 100) * 100) + ' credits each). The batch pauses there until you top up.' : '';
     const watchItem = (i) => { const r = this.batchDemos(B, i); this.setState({ demos: r.demos, screen: 'demo', cur: r.id, step: 4, markOpen: false, confirm: null, fromBatch: B.id, batchItem: i, revT: 0, player: false, vals: this.recFor(B.voice, B.kind) }); };
     const approveItem = (i) => { const prev = B.items; const items = B.items.map((x, k) => k === i ? Object.assign({}, x, { st: 'approved' }) : x); this.patchBatch({ items: items }); this.say('Approved “' + B.items[i].t + '”', () => this.patchBatch({ items: prev })); };
-    let bPrimary = !B ? { label: '', act: () => {}, off: true } : B.stage === 'writing' ? { label: 'Approve all scripts', off: true, act: () => {} } : B.stage === 'approve' ? { label: 'Approve all and record', off: false, act: () => { if (this.needKey()) return; const items = B.items.map((x, k) => Object.assign({}, x, { st: k === 0 ? 'recording' : 'waiting' })); this.patchBatch({ items: items, stage: 'recording', paused: false }); this.runBatch(); this.say('Recording ' + this.plural(items.length, 'video') + ', one after another'); } } : { label: bApproved ? 'Export ' + this.plural(bApproved, 'approved video') : 'Export approved videos', off: !bApproved, act: () => { const n = bApproved; const items = B.items.map((x) => x.st === 'approved' ? Object.assign({}, x, { st: 'exported' }) : x); const done = items.every((x) => x.st === 'exported'); this.patchBatch({ items: items, stage: done ? 'done' : B.stage }); this.say('Exported ' + this.plural(n, 'video') + ' and the list file to ' + B.folder.replace(/^~\/Movies\//, 'Movies/')); } };
+    let bPrimary = !B ? { label: '', act: () => {}, off: true } : B.stage === 'writing' ? { label: 'Approve all scripts', off: true, act: () => {} } : B.stage === 'approve' ? { label: 'Approve all and record', off: false, act: () => { if (this.needKey()) return; const items = B.items.map((x, k) => Object.assign({}, x, { st: k === 0 ? 'recording' : 'waiting' })); this.patchBatch({ items: items, stage: 'recording', paused: false }); this.runBatch(); this.focusLater('#batch-h'); this.say('Recording ' + this.plural(items.length, 'video') + ', one after another'); } } : { label: bApproved ? 'Export ' + this.plural(bApproved, 'approved video') : 'Export approved videos', off: !bApproved, act: () => { const n = bApproved; const items = B.items.map((x) => x.st === 'approved' ? Object.assign({}, x, { st: 'exported' }) : x); const done = items.every((x) => x.st === 'exported'); this.patchBatch({ items: items, stage: done ? 'done' : B.stage }); this.focusLater('.bprimary'); this.say('Exported ' + this.plural(n, 'video') + ' and the list file to ' + B.folder.replace(/^~\/Movies\//, 'Movies/')); } };
     const exportAct = bPrimary.act; const exportLabel = bPrimary.label; const exportOff = bPrimary.off;
     const firstReady = bItems.findIndex((x) => x.st === 'recorded');
     let bSecondary = null;
@@ -296,7 +320,7 @@ class Component extends DCLogic {
       crumb: st.screen !== 'home', crumbBatch: st.screen === 'demo' && !!st.fromBatch, crumbBatchName: st.fromBatch ? (st.batches.find((x) => x.id === st.fromBatch) || {}).name : '', goBatch: () => this.setState({ screen: 'batch', fromBatch: null, batchItem: null }), crumbText: st.screen === 'demo' ? (st.fromBatch && B ? (B.items[st.batchItem] || {}).t : D.title) : st.screen === 'batch' ? (B ? B.name : '') : st.screen === 'new' ? (st.editing ? 'Edit brief' : 'New demo') : 'Settings',
       showNewBtn: false, isPhone: isPhone,
       goHome: () => this.setState({ screen: 'home', help: false, confirm: null }), goSettings: () => this.setState({ screen: 'settings', help: false }),
-      helpOpen: st.help, toggleHelp: () => this.setState({ help: !st.help }),
+      helpOpen: st.help, toggleHelp: () => { const was = st.help; this.setState({ help: !was }); this.focusLater(was ? '#helpbtn' : '#helpok'); },
       keyOn: st.keyOn, keyOff: !st.keyOn, creditsText: this.num(st.credits),  creditPct: (st.credits / 30000 * 100) + '%',
       demos: st.demos.filter((d) => !d.batchOf).map((d) => ({ tint: d.tint || '', title: d.title, meta: d.site + ', ' + pretty(d.voice), status: d.status, dot: d.dot, cover: d.cover, open: () => { const s = d.exported ? 5 : Math.min(d.max, d.recorded ? 4 : d.max); this.setState({ screen: 'demo', cur: d.id, step: s, confirm: null, markOpen: false, scSel: 0, vals: this.recFor(d.voice, d.kind) }); } })),
       batchCards: st.batches.map((b) => { const r = b.items.filter((x) => ['recorded', 'approved', 'exported'].indexOf(x.st) >= 0).length; const rd = b.items.filter((x) => x.st === 'recorded').length; return { next: b.stage === 'approve' ? 'Approve the scripts →' : rd ? rd + ' ready to watch →' : 'See progress →', name: b.name, meta: 'Batch · ' + b.items.length + ' videos · ' + b.site, status: b.stage === 'writing' ? 'Writing scripts' : b.stage === 'approve' ? 'Scripts to approve' : b.paused ? 'Paused, ' + r + ' of ' + b.items.length : b.stage === 'done' ? 'All exported' : r + ' of ' + b.items.length + ' recorded', pct: (r / b.items.length * 100) + '%', open: () => this.openBatch(b.id) }; }),
@@ -365,7 +389,7 @@ class Component extends DCLogic {
       bStages: bStages, bRecLabel: B && B.stage === 'recording' ? 'Recording ' + bRecorded + ' of ' + bItems.length : '', bHead: bHead, bSub: bSub, bPct: (bItems.length ? (B.stage === 'approve' || B.stage === 'writing' ? 0 : bRecorded / bItems.length * 100) : 0) + '%', bCreditNote: bCreditNote, hasBCreditNote: !!bCreditNote, bPausedCredits: !!(B && B.paused === 'credits'),
       bItems: bItems.map((x, i) => ({ i: i, n: i + 1, t: x.t, min: x.min + ' min', st: x.st, status: stLabel[x.st], dot: stDot[x.st], ring: x.st === 'waiting', open: st.btOpen === i, openStr: st.btOpen === i ? 'true' : 'false', canOpen: x.st === 'script', canWatch: x.st === 'recorded' || x.st === 'approved', preview: 'Okay so… in this one we’re gonna ' + x.t.toLowerCase() + '. It’s, um, quicker than it looks.',
         toggle: () => this.setState({ btOpen: st.btOpen === i ? null : i }), watch: () => watchItem(i) })).filter((x) => st.btAll || x.st !== 'waiting' || x.i === bItems.findIndex((y) => y.st === 'waiting')),
-      bWaiting: cnt('waiting'), bAllOpenRaw: st.btAll, bWaitingCollapsed: !st.btAll && cnt('waiting') > 1, bShowAll: () => this.setState({ btAll: !st.btAll }), bShowAllLabel: st.btAll ? 'Show less' : 'Show all ' + cnt('waiting'), bAllOpen: st.btAll && cnt('waiting') > 1,
+      bWaiting: cnt('waiting'), bAllOpenRaw: st.btAll, bWaitingCollapsed: !st.btAll && cnt('waiting') > 1, bShowAll: () => this.setState({ btAll: !st.btAll }), bShowAllLabel: st.btAll ? 'Show less' : 'Show all ' + cnt('waiting') + ' waiting', bAllOpen: st.btAll && cnt('waiting') > 1, bShowToggle: cnt('waiting') > 1,
       bReady: bReady, hasBReady: bReady > 0, bReadyText: this.plural(bReady, 'video') + ' ready to watch', bWatchFirst: () => { const k = bItems.findIndex((x) => x.st === 'recorded'); if (k >= 0) watchItem(k); },
       bFooter: B ? (B.stage === 'done' ? 'Everything is in ' + B.folder + ', with list.csv (title, file name, lesson). Nothing is published.' : B.stage === 'approve' || B.stage === 'writing' ? 'Nothing records until you approve the scripts.' : 'Exports to Movies/NAVI with a list file. Never published.') : '',
       bPrimaryShort: /^Watch next/.test(bPrimary.label) ? 'Watch next video' : (/^Export (\d+)/.test(bPrimary.label) ? 'Export ' + bPrimary.label.match(/\d+/)[0] : bPrimary.label), bSecondaryShort: bSecondary ? (/^Export (\d+)/.test(bSecondary.label) ? 'Export ' + bSecondary.label.match(/\d+/)[0] + ' approved' : bSecondary.label) : '', bPrimaryLabel: bPrimary.label, bPrimaryOff: bPrimary.off, bPrimary: bPrimary.act, hasBSecondary: !!bSecondary, bSecondaryLabel: bSecondary ? bSecondary.label : '', bSecondary: bSecondary ? bSecondary.act : () => {}, bSecondaryOff: bSecondary ? !!bSecondary.off : false, hasBPause: !!bPauseObj, bPauseLabel: bPauseObj ? bPauseObj.label : '', bPause: bPauseObj ? bPauseObj.act : () => {}, bReviewing: !!(B && (B.stage === 'recording' || B.stage === 'review')),
@@ -385,9 +409,10 @@ class Component extends DCLogic {
       scChange: st.scChange, scDraft: st.scDraft, onScDraft: (e) => this.setState({ scDraft: e.target.value }), openScChange: () => { this.setState({ scChange: !st.scChange, scDraft: '' }); this.later('focusSc', 30, () => { const el = document.getElementById('scd'); if (el) el.focus(); }); },
       scPending: st.scPending === st.scSel, scPendingText: 'Rewriting this line…',
       sendScChange: () => { const d = st.scDraft.trim(); if (!d) return; const i = st.scSel; const prevLines = D.lines || {}; this.setState({ scChange: false, scDraft: '', scPending: i }); requestAnimationFrame(() => { const b = document.getElementById('scopen'); if (b) b.focus(); }); this.later('scw', 1600, () => { const nl = Object.assign({}, prevLines); nl[i] = this.secs[i].v.replace(/\b(um|uh|kind of|basically|to be fair|well|like),?\s*/gi, '').replace(/\s+/g, ' ').replace(/^(\w)/, (m) => m.toUpperCase()); this.setState({ scPending: null }); this.patchDemo({ lines: nl }); this.say('Line rewritten', () => this.patchDemo({ lines: prevLines })); }); },
-      scKey: (e) => { if (e.key === 'Enter') { e.preventDefault(); const b = document.getElementById('scsend'); if (b) b.click(); } else if (e.key === 'Escape') { this.setState({ scChange: false }); requestAnimationFrame(() => { const b = document.getElementById('scopen'); if (b) b.focus(); }); } },
+      scKey: (e) => { if (e.key === 'Enter') { e.preventDefault(); const b = document.getElementById('scsend'); if (b) b.click(); } else if (e.key === 'Escape') { e.stopPropagation(); this.setState({ scChange: false }); requestAnimationFrame(() => { const b = document.getElementById('scopen'); if (b) b.focus(); }); } },
       scPrevOff: st.scSel === 0, scNextOff: st.scSel === this.secs.length - 1,
-      scPrev: () => { if (st.scSel > 0) this.setState({ scSel: st.scSel - 1, scChange: false }); }, scNext: () => { if (st.scSel < this.secs.length - 1) this.setState({ scSel: st.scSel + 1, scChange: false }); },
+      scPrev: () => { if (st.scSel > 0) { this.setState({ scSel: st.scSel - 1, scChange: false }); if (st.scSel === 0) this.focusLater('[aria-label="Next section"]'); } }, scNext: () => { if (st.scSel < this.secs.length - 1) { this.setState({ scSel: st.scSel + 1, scChange: false }); if (st.scSel === this.secs.length - 1) this.focusLater('[aria-label="Previous section"]'); } },
+      scListKey: (e) => { const n = this.secs.length; const k = e.key; let i = st.scSel; if (k === 'ArrowDown' || k === 'ArrowRight') i = Math.min(n - 1, i + 1); else if (k === 'ArrowUp' || k === 'ArrowLeft') i = Math.max(0, i - 1); else if (k === 'Home') i = 0; else if (k === 'End') i = n - 1; else return; e.preventDefault(); this.setState({ scSel: i, scChange: false, scDraft: '' }); this.focusLater('.sclist button[aria-pressed=true]'); },
       scriptLenLine: this.secs.length + ' sections, about ' + lengthText + (model === 'v3' ? ' at ' + paceText + ' pace' : ''),
       // voice
       voiceName: voicePretty, voiceColor: vcol(voice), line: line, caption: caption,
@@ -396,7 +421,7 @@ class Component extends DCLogic {
         hear: () => { if (this.needKey()) return; const first = !st.heardVoices[k]; const h = Object.assign({}, st.heardVoices); h[k] = true; this.setState({ heardVoices: h }); if (first) this.spend(120); this.say('Playing ' + pretty(k) + (first ? ', 120 credits' : ', free replay')); } }; }),
       models: segOf([['v4', 'Eleven v4 (recommended)'], ['v3', 'Eleven v3']], model, (x) => this.patchDemo({ model: x })).map((o, i) => Object.assign(o, { short: ['v4 (recommended)', 'v3'][i] })),
       voiceWarn: !voiceOk,
-      openLib: () => this.setState({ lib: true }), closeLib: () => this.setState({ lib: false }), libOpen: st.lib,
+      openLib: () => { this.setState({ lib: true }); this.focusLater('#libclose'); }, closeLib: () => { this.setState({ lib: false }); this.focusLater('#vmore'); }, libOpen: st.lib,
       libFilters: [['all', 'All'], ['f', 'Female'], ['m', 'Male']].map((o) => ({ label: o[1], on: st.libF === o[0] ? 'true' : 'false', pick: () => this.setState({ libF: o[0] }) })),
       lib: Object.keys(VO).filter((k) => st.libF === 'all' || VO[k].g === st.libF).map((k) => ({ name: VO[k].name, desc: VO[k].desc + ', ' + (VO[k].models.length === 2 ? 'v3 and v4' : VO[k].models[0] + ' only'), img: VO[k].img, c: VO[k].c, canAdd: st.mine.indexOf(k) < 0, added: st.mine.indexOf(k) >= 0, hearAria: 'Hear ' + VO[k].name,
         hear: () => { if (this.needKey()) return; const first = !st.heardVoices[k]; const h = Object.assign({}, st.heardVoices); h[k] = true; this.setState({ heardVoices: h }); if (first) this.spend(120); this.say('Playing ' + pretty(k) + (first ? ', 120 credits' : ', free replay')); },
@@ -420,7 +445,7 @@ class Component extends DCLogic {
       pvBlurLine: (() => { const g = []; if (['email', 'phone', 'names', 'address'].every((k) => !st.shown[k])) g.push('personal info'); else ['email', 'phone', 'names', 'address'].filter((k) => !st.shown[k]).forEach((k) => g.push(ITEM_NAMES[k])); if (!st.shown.money) g.push('revenue'); if (!st.shown.customers) g.push('customers'); if (!st.shown.counts) g.push('counts'); ['usage', 'prices', 'dates'].filter((k) => !st.shown[k]).forEach((k) => g.push(ITEM_NAMES[k])); g.push('passwords and keys'); return g.join(', ') + '.'; })(),
       pvShowLine: shownItems.length ? shownItems.map((k) => ITEM_NAMES[k]).join(', ') + '.' : 'nothing that could be private.',
       pvMore: st.pvMore, togglePvMore: () => { this.setState({ pvMore: !st.pvMore }); if (!st.pvMore) requestAnimationFrame(() => { const el = document.getElementById('pvmore'); if (el && el.scrollIntoView) el.scrollIntoView({ block: 'start', behavior: 'smooth' }); }); }, pvMoreLabel: 'Customize each item',
-      hide: st.hide.map((w) => ({ w: w, aria: 'Remove ' + w, rm: () => { const prev = st.hide; this.setState({ hide: st.hide.filter((x) => x !== w) }); this.say('Removed “' + w + '”', () => this.setState({ hide: prev })); } })),
+      hide: st.hide.map((w, hi) => ({ w: w, aria: 'Remove ' + w, rm: () => { const prev = st.hide; this.setState({ hide: st.hide.filter((x) => x !== w) }); this.focusLater(() => { const xs = document.querySelectorAll('.chip button'); return xs[hi] || xs[hi - 1] || document.getElementById('hw'); }); this.say('Removed “' + w + '”', () => this.setState({ hide: prev })); } })),
       noHide: !st.hide.length, hideDup: !!st.hideDraft.trim() && st.hide.indexOf(st.hideDraft.trim()) >= 0, hideAddOff: !st.hideDraft.trim() || st.hide.indexOf(st.hideDraft.trim()) >= 0, alwaysText: 'API keys and tokens, passwords, 2FA and recovery codes, card and bank numbers, ID numbers, private keys and login links',
       hideDraft: st.hideDraft, onHideDraft: (e) => this.setState({ hideDraft: e.target.value }), addHide: () => { const w = st.hideDraft.trim(); if (w && st.hide.indexOf(w) < 0) { this.setState({ hide: st.hide.concat([w]), hideDraft: '' }); this.say('Will always blur “' + w + '”'); } },
       hideKey: (e) => { if (e.key === 'Enter') { e.preventDefault(); const w = st.hideDraft.trim(); if (w && st.hide.indexOf(w) < 0) { this.setState({ hide: st.hide.concat([w]), hideDraft: '' }); this.say('Will always blur “' + w + '”'); } } },
@@ -453,10 +478,10 @@ class Component extends DCLogic {
       scrubKey: (e) => { const d = e.key === 'ArrowRight' ? 5 : e.key === 'ArrowLeft' ? -5 : 0; if (d) { e.preventDefault(); this.setState({ revT: Math.max(0, Math.min(this.total, st.revT + d)) }); } },
       playerOn: st.player, playerOff: !st.player, playerAria: st.player ? 'Pause' : 'Play',
       togglePlayer: () => { if (st.player) { this.stop('player'); this.setState({ player: false }); return; } this.setState({ player: true, markOpen: false }); this.every('player', 250, () => { const t = this.state.revT + 1; if (t >= this.total) { this.stop('player'); this.setState({ player: false, revT: this.total }); return; } this.setState({ revT: t }); }); },
-      markOpen: st.markOpen, markClosed: !st.markOpen, markOther: st.markOther, openOther: () => { this.setState({ markOther: true }); requestAnimationFrame(() => { const el = document.getElementById('mown'); if (el) el.focus(); }); }, openMark: () => { this.stop('player'); this.setState({ player: false, markOpen: true, markOther: false, markDraft: '' }); }, closeMark: () => this.setState({ markOpen: false, markOther: false, markDraft: '' }),
+      markOpen: st.markOpen, markClosed: !st.markOpen, markOther: st.markOther, openOther: () => { this.setState({ markOther: true }); requestAnimationFrame(() => { const el = document.getElementById('mown'); if (el) el.focus(); }); }, openMark: () => { this.stop('player'); this.setState({ player: false, markOpen: true, markOther: false, markDraft: '' }); this.focusLater('#markfirst'); }, closeMark: () => { this.setState({ markOpen: false, markOther: false, markDraft: '' }); this.focusLater('#markbtn'); },
       markAi: () => addMark('Sounds like AI'), markBlur: () => addMark('Needs a blur'), markFast: () => addMark('Too fast'),
       markDraft: st.markDraft, onMarkDraft: (e) => this.setState({ markDraft: e.target.value }), markOwn: () => { const d = st.markDraft.trim(); if (d) addMark(d); },
-      markKey: (e) => { if (e.key === 'Enter') { e.preventDefault(); const d = (e.target.value || '').trim(); if (d) addMark(d); } else if (e.key === 'Escape') this.setState({ markOpen: false }); },
+      markKey: (e) => { if (e.key === 'Enter') { e.preventDefault(); const d = (e.target.value || '').trim(); if (d) addMark(d); } },
       marks: allMarks.map((m) => ({ t: this.fmt(m.t), text: m.text, sec: this.secs[Number(m.k)].n, jumpAria: 'Jump to ' + this.fmt(m.t), jump: () => this.setState({ revT: m.t, player: false }), rmAria: 'Remove mark at ' + this.fmt(m.t),
         rm: () => { const prev = D.notes; const n = Object.assign({}, prev); n[m.k] = prev[m.k].filter((x, k) => k !== m.j); this.patchDemo({ notes: n }); this.say('Mark removed', () => this.patchDemo({ notes: prev })); } })),
       hasMarks: marks > 0, noMarks: marks === 0, marksCount: marks ? '(' + marks + ')' : '', revCover: D.cover,
@@ -475,13 +500,16 @@ class Component extends DCLogic {
       defCaps: segOf(capOpts, st.defCap, (x) => { this.setState({ defCap: x }); this.say('Saved'); }),
       defCorner: cornerCtl(st.defCorner, (x) => this.setState({ defCorner: x }), 'dct'),
       defCornerText: st.defCornerText, onDefCornerText: (e) => this.setState({ defCornerText: e.target.value }), defCornerOff: st.defCorner === 'off',
-      key: st.key, onKey: (e) => this.setState({ key: e.target.value, keyRes: null }), keyType: st.keyType, keyTypeLabel: st.keyType === 'password' ? 'Show key' : 'Hide key', toggleKeyType: () => this.setState({ keyType: st.keyType === 'password' ? 'text' : 'password' }),
-      testKey: () => { if (!st.key.trim()) { this.setState({ keyRes: 'empty' }); return; } const ok = st.key.trim().length > 8; this.setState({ keyRes: ok ? 'ok' : 'bad', keyOn: ok ? true : st.keyOn }); if (ok && st.screen === 'settings') this.later('keyclose', 1400, () => this.setState({ keyEdit: false, key: '', keyRes: null })); },
+      key: st.key, onKey: (e) => { if (e.target.value !== this.state.key) this.setState({ key: e.target.value, keyRes: null }); }, keyType: st.keyType, keyTypeLabel: st.keyType === 'password' ? 'Show key' : 'Hide key', toggleKeyType: () => this.setState({ keyType: st.keyType === 'password' ? 'text' : 'password' }),
+      testKey: () => { if (!st.key.trim()) { this.setState({ keyRes: 'empty' }); return; } const ok = st.key.trim().length > 8; this.setState({ keyRes: ok ? 'ok' : 'bad', keyOn: ok ? true : st.keyOn }); if (ok && st.screen === 'settings') this.later('keyclose', 1400, () => { const inEdit = document.activeElement && document.activeElement.closest && document.activeElement.closest('.fade'); this.setState({ keyEdit: false, key: '', keyRes: null }); if (inEdit) this.focusLater('#keytoggle'); }); },
+      keyEnter: (e) => { if (e.key === 'Enter') { e.preventDefault(); this.state.key = e.target.value; this.renderVals().testKey(); } },
+      wSiteKey: (e) => { if (e.key === 'Enter') { e.preventDefault(); this.state.wSite = e.target.value; this.renderVals().loginSite(); } },
+      siteKey: (e) => { if (e.key === 'Enter') { e.preventDefault(); this.state.siteDraft = e.target.value; this.renderVals().addSite(); } },
       keyMsg: keyMsg, keyMsgColor: st.keyRes === 'bad' || st.keyRes === 'empty' ? 'var(--danger)' : 'var(--ok)',
       w1Cls: wsw(st.keyRes === 'ok'), w1Mark: st.keyRes === 'ok' ? '✓' : '1', w2Cls: wsw(st.tools === 'done'), w2Mark: st.tools === 'done' ? '✓' : '2', w3Cls: wsw(st.logged), w3Mark: st.logged ? '✓' : '3',
       toolsIdle: st.tools === 'idle', toolsAsking: st.tools === 'ask',
       toolsText: st.tools === 'done' ? 'Installed. NAVI can drive a browser and save video.' : st.tools === 'ask' ? 'Install now? About 300 MB, takes about 2 minutes, one time.' : st.tools === 'busy' ? 'Installing… about 2 minutes.' : 'Lets NAVI drive a browser and save video. About 300 MB, one time.',
-      askTools: () => this.setState({ tools: 'ask' }), cancelTools: () => this.setState({ tools: 'idle' }), installTools: () => { this.setState({ tools: 'busy' }); this.later('tools', 1600, () => this.setState({ tools: 'done' })); },
+      askTools: () => { this.setState({ tools: 'ask' }); this.focusLater('#toolsyes'); }, cancelTools: () => { this.setState({ tools: 'idle' }); this.focusLater('#toolsinstall'); }, installTools: () => { this.setState({ tools: 'busy' }); this.focusLater('#toolstext'); this.later('tools', 1600, () => this.setState({ tools: 'done' })); },
       wSite: st.wSite, onWSite: (e) => this.setState({ wSite: e.target.value }),
       loginLabel: st.logged ? 'Logged in' : 'Open browser', loginSite: () => { const u = st.wSite.trim(); if (!u) { this.say('Type the site first, e.g. whop.com'); return; } this.setState({ logged: true, sites: st.sites.some((s) => s.u === u) ? st.sites : [{ u: u, note: 'Saved Nov 5' }].concat(st.sites) }); },
       welcomeBlocked: !(st.keyRes === 'ok' && st.tools === 'done'), welcomeStatus: st.keyRes === 'ok' && st.tools === 'done' ? 'All set.' : (st.keyRes !== 'ok' && st.tools !== 'done' ? 'Connect ElevenLabs and install the tools to continue.' : st.keyRes !== 'ok' ? 'Connect ElevenLabs to continue.' : 'Install the tools to continue.') ||  ((st.keyRes === 'ok' ? 0 : 1) + (st.tools === 'done' ? 0 : 1)) + (((st.keyRes === 'ok' ? 0 : 1) + (st.tools === 'done' ? 0 : 1)) === 1 ? ' step left' : ' steps left'),
@@ -490,13 +518,13 @@ class Component extends DCLogic {
       defVoices: st.mine.map((k) => ({ label: pretty(k), on: st.defVoice === k ? 'true' : 'false', pick: () => { this.setState({ defVoice: k }); this.say(pretty(k) + ' is now the default for new demos'); } })),
       keyRow: st.keyOn ? 'Ending 4f2a · ' + this.num(st.credits) + ' credits left' : 'Not connected. Demos can’t be voiced until you add one.', keyRowColor: st.keyOn ? 'var(--ink2)' : 'var(--danger)',
       keyEdit: st.keyEdit, keyEditLabel: st.keyEdit ? 'Cancel' : (st.keyOn ? 'Change' : 'Add key'), toggleKeyEdit: () => this.setState({ keyEdit: !st.keyEdit, key: '', keyRes: null }),
-      canRemoveKey: st.keyOn && !st.keyEdit, removeKey: () => { this.setState({ keyOn: false }); this.say('Key removed here. It still works at ElevenLabs.', () => this.setState({ keyOn: true })); },
+      canRemoveKey: st.keyOn && !st.keyEdit, removeKey: () => { this.setState({ keyOn: false }); this.focusLater('#keytoggle'); this.say('Key removed here. It still works at ElevenLabs.', () => this.setState({ keyOn: true })); },
       sites: st.sites.map((s) => ({ u: s.u, note: s.note, relog: () => this.say('A browser opens so you can log in to ' + s.u + ' again'), forget: () => { const prev = st.sites; this.setState({ sites: st.sites.filter((x) => x.u !== s.u) }); this.say('Forgot ' + s.u, () => this.setState({ sites: prev })); } })),
       noSites: !st.sites.length,
       siteDraft: st.siteDraft, onSiteDraft: (e) => this.setState({ siteDraft: e.target.value }), addSite: () => { const u = st.siteDraft.trim(); if (!u) return; if (!siteOk(u)) { this.say('That doesn’t look like a web address.'); return; } this.setState({ sites: st.sites.concat([{ u: u, note: 'Saved Nov 5' }]), siteDraft: '' }); this.say('A browser opens so you can log in to ' + u); },
       data: dataDefs.map((d) => ({ n: d.n, w: d.w, l: d.l, can: !!d.l, act: dataAct[d.id] || (() => {}) })), forgetAll: dataAct.logins,
-      wipeConfirm: st.wipeConfirm, notWipeConfirm: !st.wipeConfirm, askWipe: () => this.setState({ wipeConfirm: true }), cancelWipe: () => this.setState({ wipeConfirm: false }),
-      doWipe: () => { this.setState({ wipeConfirm: false, keyOn: false, sites: [], hide: [], vals: Object.assign({}, this.presetVals.course), defVoice: 'alex', mine: ['alex', 'jessica', 'george'], heardVoices: {}, tools: 'idle' }); this.say('Everything this skill saved is gone. Your videos are untouched.', null, () => this.setState({ screen: 'welcome', keyRes: null, logged: false, wSite: '' }), 'Set up again'); },
+      wipeConfirm: st.wipeConfirm, notWipeConfirm: !st.wipeConfirm, askWipe: () => { this.setState({ wipeConfirm: true }); this.focusLater('#wipecancel'); }, cancelWipe: () => { this.setState({ wipeConfirm: false }); this.focusLater('#wipebtn'); },
+      doWipe: () => { this.focusLater('#wipebtn'); this.setState({ wipeConfirm: false, keyOn: false, sites: [], hide: [], vals: Object.assign({}, this.presetVals.course), defVoice: 'alex', mine: ['alex', 'jessica', 'george'], heardVoices: {}, tools: 'idle' }); this.say('Everything this skill saved is gone. Your videos are untouched.', null, () => this.setState({ screen: 'welcome', keyRes: null, logged: false, wSite: '' }), 'Set up again'); },
       showWelcome: () => this.setState({ screen: 'welcome', keyRes: null, key: '', tools: st.tools === 'done' ? 'done' : 'idle', logged: false, wSite: '' }),
       // chat + toast
       chatOpen: st.chat.length > 0, chatDraft: st.chatDraft, onChat: (e) => this.setState({ chatDraft: e.target.value }),
@@ -506,7 +534,7 @@ class Component extends DCLogic {
       sendChat: () => this.sendChatNow(),
       chatAction: !!st.chatAct, doChatAction: () => this.setState({ screen: 'new', mode: 'one', editing: false, bWhat: chatClean(st.chatAct), bNew: '', bSiteNew: false, bVoice: st.defVoice, bSite: st.sites[0] ? st.sites[0].u : '', chatAct: null, chat: [] }),
       closeChat: () => this.setState({ chat: [], chatAct: null }),
-      hasToast: !!st.toast, toast: st.toast, toastUndo: !!st.toastUndo, undoToast: () => { if (st.toastUndo) st.toastUndo(); this.setState({ toast: '', toastUndo: null, toastGo: null }); },
+      hasToast: !!st.toast, toast: st.toast, toastUndo: !!st.toastUndo, undoToast: () => { const d = this.undoFrom; if (st.toastUndo) st.toastUndo(); this.setState({ toast: '', toastUndo: null, toastGo: null }); this.focusLater(() => this.findDesc(d) || this.heading()); },
       toastGo: !!st.toastGo, toastGoLabel: st.toastGoLabel, goToast: () => { if (st.toastGo) st.toastGo(); this.setState({ toast: '', toastUndo: null, toastGo: null }); }
     };
   }
@@ -523,7 +551,22 @@ class Component extends DCLogic {
   const comp = new Component({ startOn: q.get('start') || 'welcome', theme: q.get('theme') || 'system' });
   const scope = PetiteVue.reactive(comp.renderVals());
   const keepStepVisible = () => requestAnimationFrame(() => { const box = document.querySelector('.steplist'); const el = box && box.querySelector('.stepbtn.now'); if (!box) return; if (el && box.scrollWidth > box.clientWidth) { const prev = el.previousElementSibling && el.previousElementSibling.classList.contains('stepbtn') ? el.previousElementSibling : (el.parentElement.previousElementSibling && el.parentElement.previousElementSibling.querySelector ? el.parentElement.previousElementSibling.querySelector('.stepbtn') : null); const target = prev || el; box.scrollLeft = Math.max(0, box.scrollLeft + target.getBoundingClientRect().left - box.getBoundingClientRect().left - 6); } const upd = () => box.classList.toggle('at-start', box.scrollLeft < 4); upd(); if (!box._navi) { box._navi = 1; box.addEventListener('scroll', upd, { passive: true }); } });
-  comp.setState = function (s) { Object.assign(comp.state, s); Object.assign(scope, comp.renderVals()); keepStepVisible(); };
+  let lastDesc = null, lastEl = null, where = comp.state.screen + '/' + comp.state.step;
+  document.addEventListener('focusin', (e) => { lastEl = e.target; lastDesc = comp.describe(e.target); });
+  // After every render: a new step or screen focuses its heading; if the focused control vanished, find its stand-in.
+  const afterRender = () => requestAnimationFrame(() => requestAnimationFrame(() => {
+    const now = comp.state.screen + '/' + comp.state.step; const moved = now !== where; where = now;
+    const recent = comp.focusAt && Date.now() - comp.focusAt < 120;
+    const ae = document.activeElement; const lost = !ae || ae === document.body;
+    if (moved && !recent && comp.state.screen !== 'welcome') { if (comp.state.screen === 'new') { if (lost || !document.querySelector('main').contains(ae)) { const f = document.getElementById(comp.state.mode === 'batch' ? 'btt' : 'bw'); if (f) f.focus(); } } else { const hd = comp.heading(); if (hd) hd.focus(); } return; }
+    if (lost && !recent && lastEl && (!lastEl.isConnected || lastEl.disabled || lastEl.offsetParent === null)) { const el = comp.findDesc(lastDesc) || comp.heading(); if (el) el.focus(); }
+  }));
+  comp.setState = function (s) { Object.assign(comp.state, s); Object.assign(scope, comp.renderVals()); keepStepVisible(); afterRender(); };
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && !e.defaultPrevented) { if (comp.escape()) e.preventDefault(); return; }
+    if (e.key === 'Tab' && comp.state.lib) { const d = document.getElementById('libdlg'); if (!d) return; const f = [...d.querySelectorAll('button, input, [tabindex="0"]')].filter((x) => !x.disabled && x.offsetParent !== null); if (!f.length) return; const i = f.indexOf(document.activeElement); if (e.shiftKey && (i <= 0)) { e.preventDefault(); f[f.length - 1].focus(); } else if (!e.shiftKey && (i === f.length - 1 || i < 0)) { e.preventDefault(); f[0].focus(); } }
+  });
+  document.addEventListener('pointerdown', (e) => comp.outside(e.target), true);
   try { window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => comp.setState({})); } catch (e) {}
   PetiteVue.createApp(scope).mount('#app');
   keepStepVisible(); window.addEventListener('resize', () => comp.setState({}));
