@@ -1,7 +1,32 @@
 {
   "_about": "NAVI defaults. Slider ranges are deliberately narrow so no setting can tip into AI slop. Values come from the W01 listening rounds; see reference/voice-rules.md. Every new review complaint should end up as a change here or a rule there.",
   "voice": {
-    "model": "eleven_v3",
+    "model": "eleven_v4",
+    "models": {
+      "eleven_v4": {
+        "label": "Eleven v4",
+        "recommended": true,
+        "speed": false,
+        "settings": [
+          "stability",
+          "similarity_boost"
+        ],
+        "note": "Sounds more natural. No speed setting, so pace comes from the script wording. Preferred over v3 overall in a blind comparison on 2026-11-05 (equal or better in every section); Alex is fully trained for it."
+      },
+      "eleven_v3": {
+        "label": "Eleven v3",
+        "recommended": false,
+        "speed": true,
+        "settings": [
+          "stability",
+          "similarity_boost",
+          "style",
+          "use_speaker_boost",
+          "speed"
+        ],
+        "note": "For anyone who needs speed control: the Pace slider only applies to v3. Alex is not fully trained for it."
+      }
+    },
     "reads": "one continuous read per section",
     "takes_per_section": 2,
     "opening_tag": "[relaxed]",
@@ -22,14 +47,26 @@
       0.75
     ],
     "speed_default": 1.0,
+    "speed_applies_to": [
+      "eleven_v3"
+    ],
     "never_speed_up_after": true,
     "never_pass_next_text": true,
-    "rank_takes_by": "pace closest to reference_pace_wps when set, else finality of the last sentence (scripts/audio/finality.py); the user can overrule by ear",
+    "rank_takes_by": "finality of the last sentence (scripts/audio/finality.py), or pace closest to reference_pace_wps when set; then the ear. measure_speech.py flags problems but must not pick takes: it disagreed with Andy on 4 of 7 experiments (2026-11-05)",
     "reference_pace_wps": null
   },
   "audio_edit": {
     "trim_after_sentence": false,
     "shorten_silences_longer_than_s": 0.8,
+    "keep_hunt_pauses": true,
+    "hunt_words": [
+      "where is it",
+      "where's the",
+      "where's it",
+      "hang on",
+      "let's see",
+      "um"
+    ],
     "min_tail_after_last_word_ms": 250,
     "end_fade_ms_if_clipped": 150,
     "section_gap_s": [
@@ -88,9 +125,12 @@
       "label": "Pace",
       "min": 94,
       "max": 108,
-      "unit": "ElevenLabs speed x 100",
+      "unit": "ElevenLabs speed x 100 (eleven_v3 only; eleven_v4 has no speed setting)",
       "low": "Easy to follow, can drag",
-      "high": "Snappy, can rush the clicks"
+      "high": "Snappy, can rush the clicks",
+      "models": [
+        "eleven_v3"
+      ]
     },
     "hes": {
       "label": "Hesitations",

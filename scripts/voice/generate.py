@@ -38,7 +38,10 @@ import dsp  # noqa: E402
 from finality import finality, words_from  # noqa: E402
 from treat import add_room_tone, synth_room_tone, treat  # noqa: E402
 
-MODEL, SR = 'eleven_v3', 44100
+SR = 44100
+CONFIG = json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'config', 'defaults.json')))
+MODEL = CONFIG['voice']['model']  # eleven_v4 by default; --model eleven_v3 for speed control
+HUNT_WORDS = CONFIG['audio_edit'].get('hunt_words', []) if CONFIG['audio_edit'].get('keep_hunt_pauses') else []
 MAX_PAUSE = 0.8          # walkthroughs: only silences over 0.8 s are shortened (voice-rules.md, section 4)
 FINAL_MAX, SECTION_MAX = 0.45, 0.25
 FADE_END, FADE_CUT, XF = 0.08, 0.15, 0.03
@@ -87,7 +90,11 @@ def check_tags(text):
 
 
 def fetch(path_base, voice_id, text, settings, key):
-    if not os.path.exists(path_base + '.json'):
+    """One take. Reuses an existing take: <base>.json (ElevenLabs alignment) or, for a take made elsewhere,
+    <base>.words.json (local word timings, e.g. from scripts/research/transcribe_verbatim.py) next to <base>.mp3."""
+    local = os.path.exists(path_base + '.mp3') and os.path.exists(path_base + '.words.json')
+    if not local and not os.path.exists(path_base + '.json'):
+        key = key or get_key()
         req = urllib.request.Request(
             f'https://api.elevenlabs.io/v1/text-to-speech/{voice_id}/with-timestamps?output_format=mp3_44100_128',
             data=json.dumps({'text': text, 'model_id': MODEL, 'voice_settings': settings}).encode(),
@@ -98,6 +105,14 @@ def fetch(path_base, voice_id, text, settings, key):
     subprocess.run(['ffmpeg', '-y', '-loglevel', 'error', '-i', path_base + '.mp3', '-ac', '1', '-ar', str(SR),
                     path_base + '.wav'], check=True)
     x, _ = dsp.read_wav(path_base + '.wav')
+    if local:
+        words = []
+        for w in json.load(open(path_base + '.words.json')):
+            m = re.fullmatch(r'\[(UH|UM)\]', w['w'].strip())
+            word = m.group(1).lower() + ',' if m else w['w']
+            if not TAG_RE.fullmatch(word):
+                words.append({'w': word, 'start': w['s'], 'end': w['e']})
+        return x, words
     words = [w for w in words_from(json.load(open(path_base + '.json'))) if not TAG_RE.fullmatch(w['w'])]
     return x, words
 
@@ -137,6 +152,9 @@ def shape(x, words, final):
     keep, cuts, pos = [], [], s0
     for k in range(len(words) - 1):
         gap = words[k + 1]['start'] - words[k]['end']
+        near = ' '.join(w['w'] for w in words[max(0, k - 2):k + 3]).lower()
+        if any(h in near for h in HUNT_WORDS):
+            continue  # never shorten a pause at a hunt moment (voice-rules.md, section 4)
         if re.search(r'[.?!,]$', words[k]['w']) and gap > MAX_PAUSE:
             a = words[k]['end'] + MAX_PAUSE / 2
             b = words[k + 1]['start'] - MAX_PAUSE / 2
@@ -172,12 +190,14 @@ def shape(x, words, final):
 
 
 def main():
+    global MODEL
     ap = argparse.ArgumentParser()
     ap.add_argument('script')
     ap.add_argument('--out', required=True)
     ap.add_argument('--takes', type=int, default=2)
     ap.add_argument('--stability', type=float, default=0.7)
-    ap.add_argument('--speed', type=float, default=1.0)
+    ap.add_argument('--model', default=MODEL, choices=list(CONFIG['voice']['models']))
+    ap.add_argument('--speed', type=float, default=None, help='eleven_v3 only (eleven_v4 has no speed setting)')
     ap.add_argument('--yes', action='store_true', help='actually spend credits')
     ap.add_argument('--pick', default='', help='overrule the ranking by ear, e.g. "open=2,filter-and-clear=1"')
     ap.add_argument('--reference-pace', type=float, default=None,
@@ -185,6 +205,11 @@ def main():
     a = ap.parse_args()
     if not 0.6 <= a.stability <= 0.75:
         sys.exit('Stability must stay within 0.6 to 0.75 (config/defaults.json).')
+    MODEL = a.model
+    if not CONFIG['voice']['models'][MODEL]['speed'] and a.speed is not None:
+        sys.exit(f'{MODEL} has no speed setting. Leave --speed out, or use --model eleven_v3.')
+    if a.speed is None:
+        a.speed = 1.0
     if not 0.94 <= a.speed <= 1.08:
         sys.exit('Speed must stay within 0.94 to 1.08 (config/defaults.json).')
     picks = dict((n, int(k)) for n, k in (p.split('=') for p in a.pick.split(',') if p))
@@ -192,15 +217,19 @@ def main():
     sc = json.load(open(a.script))
     for s in sc['sections']:
         check_tags(s['talk'])
-    chars = sum(len(s['talk']) for s in sc['sections']) * a.takes
+    def have(n, k):
+        b = os.path.join(a.out, f'{n}_take{k}')
+        return os.path.exists(b + '.json') or (os.path.exists(b + '.mp3') and os.path.exists(b + '.words.json'))
+    chars = sum(len(s['talk']) for s in sc['sections'] for k in range(1, a.takes + 1) if not have(s['name'], k))
     print(f'{len(sc["sections"])} sections x {a.takes} takes = about {chars:,} characters (about {chars:,} credits).')
     if not a.yes:
         print('Nothing generated. Re-run with --yes once the user has agreed to the cost.')
         return
     os.makedirs(a.out, exist_ok=True)
-    key = get_key()
-    settings = {'stability': a.stability, 'similarity_boost': 0.75, 'style': 0.0, 'use_speaker_boost': True,
-                'speed': a.speed}
+    key = None
+    settings = {'stability': a.stability, 'similarity_boost': 0.75}
+    if CONFIG['voice']['models'][MODEL]['speed']:
+        settings.update({'style': 0.0, 'use_speaker_boost': True, 'speed': a.speed})
     out, words_all, windows, report, prev_tail = [], [], [], [], 0.0
     for si, s in enumerate(sc['sections']):
         final = si == len(sc['sections']) - 1

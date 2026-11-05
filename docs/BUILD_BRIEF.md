@@ -30,7 +30,7 @@ Build in this order. Stop at the end of each phase, report in plain words, and w
 - **Check:** the readiness command passes on Andy's Mac.
 
 ### Phase 1: voice
-- Generate one continuous take per section from a talking script, with the settings in `config/defaults.json` (`[relaxed]` only, stability 0.7, speed from the pace slider, no other tags).
+- Generate one continuous take per section from a talking script, with the settings in `config/defaults.json` (eleven_v4 by default, `[relaxed]` only, stability 0.7, no other tags; speed from the pace slider only when the user picks eleven_v3).
 - 2 takes per section; save both; let Andy pick or auto-pick the one closest to a reference take in pace.
 - Audio edit exactly as `voice-rules.md` section 4: no trimming after sentences, shorten silences over 0.8 s from the middle, short fade only if clipped, light treatment, room tone, no music.
 - **Check:** a test script with generic content, 3 short sections. **Andy listens and approves** before Phase 2.

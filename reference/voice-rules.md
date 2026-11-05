@@ -18,7 +18,11 @@ Each section has two versions: the **talking version** the voice reads, and a **
 ### What worked best (keep doing these)
 - **Name a common mistake, then correct it from what you checked.** "You'd think the app lives in the app store, right? It, well, it didn't when we checked." *(Loved in the v2 video review.)*
 - **Short live reactions to what appears on screen.** Two or three words, said as the thing appears: "Okay, chapters." Flat, not excited. *(Loved in v1 and v2.)*
-- **One small restart or repeated word per section, not more.** "You- you just drag the handle." "Each, uh, each module is basically a course card." These read as a real person thinking. *(Script v2, kept through every round.)*
+- **One small restart or repeated word per section, not more.** Repeat a small word with the stall between the two copies: "book the, uh, book the train tickets", "I'm, uh, I'm gonna", "the, the menu", "it's, it's in the left column". Never cut a word off ("You- you just drag"): it sounded fake. Two slips in a 40-second stretch already sounds nervous. *(Script v2; experiments E4 and A/B, 2026-11-05.)*
+- **A filler just before the name of the thing on screen.** "you just click the, uh, little circle next to it" beat every other wording of that line. About a third of real casual narrators' fillers sit there, between "the", "to" or "about" and the noun. *(Experiment E1; reference/research/casual-vs-scripted.md.)*
+- **Start a new step with "Okay. So now," or "Right, so,".** Both beat a bare "So now,". *(Experiment E3.)*
+- **Write a hunt as self-talk, then land the target cleanly:** "there's, where is it, Clear completed" and "there's, where's the, um, Clear completed" were both rated amazing. Real narrators do this rarely (about once every 20 to 30 minutes), so use it at real hunting moments only. *(Experiment E5; reference/research/unsureness.md.)*
+- **Let a sentence run on.** A long sentence that carries into something spoken, like a web address, made the breaths sound "like a byproduct of talking". Clipped short sentences were the weakest. *(Experiment E2.)*
 
 ### Fillers
 - **Very few, and only where the screen earns them.** Realism comes from pace, reactions, restarts and opinions, not from an "um" in every sentence. *(Rounds 2 to 4.)*
@@ -29,6 +33,9 @@ Each section has two versions: the **talking version** the voice reads, and a **
 ### Lines to avoid
 - **Cheerful one-word lines.** "Easy." "There we go." "There it is!" read as fake joy. Use flatter phrasing: "yeah, that's it", "and it's in the left column", "and it's saved". *(Rounds 3 to 5.)*
 - **Polished, upbeat summary lines.** "and you'll have opened it the way a buyer would" was the most hated line of the project. Plain beats clever: "and you've clicked through it on your laptop and your phone". *(Round 4.)*
+- **"and yeah, it's X" as the last words of a line.** "and yeah" is good mid-line, but "it's crossed out" after it went high and enthusiastic. *(Experiment E1.)*
+- **"If I click…" framing** sounded unnatural, even though real narrators use it. *(Experiment E1.)*
+- **Bright wrap-up lines that end on a rise,** like "hit Enter and it's on the list": still human, but too enthusiastic. *(A/B, 2026-11-05.)*
 - **Tacked-on clauses.** A fragment added after a list ("Modules, chapters, lessons, every file's got its home") gets read as a new sentence and sounds bolted on. When a sentence carries on, write it so it leans on the one before. Avoid long runs of added-on clauses. *(v2 review.)*
 
 ### The opening
@@ -39,6 +46,7 @@ Each section has two versions: the **talking version** the voice reads, and a **
 - Full stops fall. Commas lift slightly. Every comma tends to become a pause, so use fewer commas in lists and let casual lines run on. *(Stage 1 audit.)*
 - Don't use "…" for a hesitation. It stretches the word before it instead of adding a pause. *(Round 2 measurements.)*
 - Casual lines and "right?" can lift or trail. Only the last line of a section lands down. *(Round 3.)*
+- **The last line of a section is a plain statement that ends low.** Not a cheerful result ("and it's on the list"), but something that trails off with a place or a reason: "over on the right", "you don't really need to see what's done". The two lines Andy liked most for delivery both end this way, low and flat. *(A/B and research, 2026-11-05.)*
 
 ### Names the voice gets wrong
 - Respell brand or product names **in the talking version only** when the model mispronounces them, and keep the real spelling in captions. The model guesses pronunciation fresh each time, so the same take can say a name two ways. Test spellings by ear. *(Round 4 and 5: one brand name was said two different ways in one take until respelled.)*
@@ -50,16 +58,17 @@ Each section has two versions: the **talking version** the voice reads, and a **
 
 | Setting | Rule | Why |
 |---|---|---|
-| Model | ElevenLabs eleven_v3 | Best natural delivery in testing |
+| Model | **ElevenLabs eleven_v4** by default. eleven_v3 stays as an option for anyone who needs speed control. | 2026-11-05: v4 was preferred over v3 overall in a blind comparison (equal or better in every section). The same text that was "okay, not exceptional" on v3 scored 7 to 9 out of 10 on v4. Alex is fully trained for v4 and not for v3. |
 | Reads | **One continuous read per section.** Never split a section into sentence or beat-sized clips. | Round 3: the split "beats" version was rejected outright ("so AI"). Splitting also trims away the breaths and mouth sounds that make it human. |
-| Stability | Start at **0.7** for the recommended voice | Round 4: 0.7 beat 0.6. Lower stability added drastic tone swings and fake cheer. |
+| Stability | Start at **0.7** for the recommended voice | Round 4: 0.7 beat 0.6. Lower stability added drastic tone swings and fake cheer. 2026-11-05: 0.8 didn't calm the pitch swing (better on one line, worse on one, equal on one). |
 | Opening tag | **`[relaxed]`** at the start of each section, nothing else | `[casually]` came out too happy; `[matter-of-fact]` was mixed. |
 | Other tags | **None.** No `[inhales]`, `[exhales]`, `[clears throat]`, `[coughs]`, `[sighs]`. Don't rely on `[short pause]`. | Round 5: `[inhales]` was ignored, `[exhales]` came out as a dramatic sigh or the word "Phew", and the forced sounds were judged staged. `[short pause]` worked in only half the takes. |
-| Speed | 1.0 (the pace slider moves it within 0.94 to 1.08) | Walkthroughs are never sped up afterwards. |
+| Speed | eleven_v4 has no speed setting: pace comes from the script wording. On eleven_v3, 1.0, and the pace slider moves it within 0.94 to 1.08. | Walkthroughs are never sped up afterwards. |
 | Takes | 2 per section; keep the one closest to the approved reference in pace and tone | The model varies a lot between takes. |
 | Word timings | Get them locally from the finished take (Whisper family), not from a second API call | Needed to time the clicks; avoids extra credits. |
 | Context | Never pass `next_text` or neighbouring text, and never generate sentences separately and stitch them | Both make every sentence sound like it's about to carry on, then stops. |
 | Picking takes | Rank by how finished the section's last sentence sounds (`scripts/audio/finality.py`), then confirm by ear | Pitch checks alone passed takes a listener heard as unfinished. |
+| Measuring takes | `scripts/research/measure_speech.py` flags problems (a clean line that's fast with a wide pitch swing, no pauses, no breaths). It doesn't pick the best take. | 2026-11-05: it agreed with Andy's top pick in only 3 of 7 experiments. On short lines it rewards flat and slow, which isn't the same as natural. |
 
 ---
 
@@ -77,6 +86,7 @@ Each section has two versions: the **talking version** the voice reads, and a **
 
 - **Never trim right after a sentence.** The tongue clicks and breaths live there. *(Round 3: the split version lost almost all of them to edge trimming.)*
 - Only shorten silences longer than 0.8 s, cutting from the middle and leaving at least 250 ms after the last word.
+- **Never shorten a pause at a hunt moment** ("where is it", "where's the, um", "hang on"). Real casual narrators have about 1.4 pauses over 1 s per minute, mostly when searching, and the long pause is what makes the search sound real. *(reference/research/casual-vs-scripted.md; agreed 2026-11-05.)*
 - If a take ends while the last word is still sounding, add a short fade (about 150 ms) into room tone. Skip the fade if the take ends cleanly.
 - Find the real end of speech from the audio, not the timing data: eleven_v3's timings run the last word to the end of the file. Never add reverb to fake a decay.
 - Gentle treatment only (`scripts/audio/treat.py`): de-ess 5 to 8 kHz, high shelf −2.5 dB above 8 kHz, light 2:1 compression, voice at −16.4 LUFS, limiter at −2.5 dBFS.
@@ -113,7 +123,7 @@ Splitting reads into separately generated beats with a library of filler clips w
 
 ## 7. Voices
 
-- **Recommended now: Alex** (a professional voice clone in the ElevenLabs library), stability 0.7, `[relaxed]`. Best of every voice tested.
+- **Recommended now: Alex** (a professional voice clone in the ElevenLabs library), eleven_v4, stability 0.7, `[relaxed]`. Best of every voice tested. Check which models a voice clone is trained for before using it (`/v1/voices/<id>`, `fine_tuning`): Alex is trained for v4 and not for v3.
 - Tested and rejected for sounding read, hyped or announcer-like: Will, Chris, Liam, and four shared-library conversational voices.
 - Open issue: Alex can sound "too perfect", like a polished YouTube voice most people don't have. A rougher voice or lighter processing may fix it. Untested.
 - Female voices haven't been tested yet. Any new voice starts at Alex's settings and is judged by ear before it's offered as recommended.
