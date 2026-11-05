@@ -9,6 +9,8 @@
 | `audio/finality.py` | Working (from the pilot) | Scores how "finished" a take's last sentence sounds (pitch near the floor, energy draining). Used to rank takes. |
 | `audio/treat.py` | Working (from the pilot) | The gentle voice treatment chain and room tone. |
 | `voice/generate.py` | Adapted, not yet run against the API | One continuous read per section on eleven_v3, 2 takes, finality ranking, edge shaping, treatment. Prints the credit estimate and stops unless run with `--yes`. |
+| `research/measure_speech.py` | Working | Measures a voice track like a real narrator: pace and pitch variation per phrase, pauses, fillers, repeats, breaths, clicks. Used for the research in `reference/research/` and for scoring new takes. |
+| `research/transcribe_verbatim.py` | Working | Verbatim transcript (CrisperWhisper 2.0, keeps uh/um/repeats) with word timings. Model is non-commercial-research only. |
 | recording, timing, blur, render, app server | To build | See `docs/BUILD_BRIEF.md`. |
 
 The recorder (agent-screenplay plus NAVI's patch) is in `../recorder/`.
