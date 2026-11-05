@@ -255,9 +255,14 @@ textarea{resize:none}
 .sumrow{display:flex;align-items:center;gap:12px;height:56px;box-sizing:border-box;padding:0 10px 0 16px;border-radius:12px;background:var(--tray)}
 .sumrow > span:first-child{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .chips button[aria-pressed=true]::before{content:'✓ '}
-.sumrow .btn{margin-left:auto;min-width:132px}
+.sumrow .btn{margin-left:auto;width:120px;flex:none}
 .scslot{display:flex;flex-direction:column;gap:12px;padding-top:20px}
 .markslot{margin-top:12px;min-height:46px}
+.mrow{display:flex;align-items:center;gap:12px;height:46px;min-width:0}
+.mtime{margin-top:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sklist{display:flex;flex-direction:column;gap:2px}
+.skrow{display:flex;align-items:center;height:44px;padding:0 10px}
+.skpanel{gap:12px}
 .markslot .reasons{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;min-height:46px}
 .markslot .reasons > *{flex:none}
 .phone-setup{display:none}
@@ -283,7 +288,7 @@ textarea{resize:none}
   #scsel{appearance:none;-webkit-appearance:none;background:var(--wash) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2.4' stroke-linecap='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") no-repeat right 14px center;border:0;border-radius:999px;padding-right:36px}
   .sumrow{height:88px;padding:8px 8px 8px 14px}
   .sumrow > span:first-child{white-space:normal;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical}
-  .sumrow .btn{min-width:0!important;background:var(--sheet)!important;text-decoration:none!important;padding:0 12px!important}
+  .sumrow .btn{background:var(--sheet)!important;text-decoration:none!important;padding:0 12px!important}
   .vmore{min-height:56px!important;grid-column:1 / -1;flex-direction:row!important}
   .phone-setup{background:transparent!important;padding:4px 2px!important;color:var(--ink2)!important}
   .dcard .meta{margin-top:0!important;margin-left:6px}
@@ -332,7 +337,9 @@ textarea{resize:none}
   .vgrid{grid-template-columns:repeat(2,minmax(0,1fr))}
   .presets{grid-template-columns:minmax(0,1fr)}
   .preset{padding:12px 14px}
-  .scline{font-size:21px}
+  .scline{font-size:21px;min-height:calc(5 * 1.4em)}
+  .scpanel{min-height:434px;box-sizing:border-box}
+  .wkmsg{min-height:4.35em!important}
   .sclist{display:none}
   .scpick{display:block}
   .scpanel{padding:16px}
@@ -373,7 +380,7 @@ textarea{resize:none}
 <div :class="(themeClass)" style="min-height: 100vh; background: var(--ground); color: var(--ink); font-family: 'Mona Sans', -apple-system, sans-serif; font-size: 15px; line-height: 1.45; position: relative">
 
 <div v-if="isWelcome" style="display: contents">
-<div class="fade" style="min-height: 100vh; box-sizing: border-box; padding: 24px 16px; display: flex; align-items: center; justify-content: center">
+<div class="fade wwrap" style="min-height: 100vh; box-sizing: border-box; padding: max(24px, calc((100vh - 780px) / 2)) 16px 24px; display: flex; align-items: flex-start; justify-content: center">
 <div class="tray welcome-grid" style="width: 100%; max-width: 1180px; display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); gap: 6px">
 <div class="welcome-art" style="position: relative; border-radius: 20px; overflow: hidden; background: #0000F2; min-height: 700px">
 <img src="assets/voice-alex.png" alt="Halftone marble head, the portrait for the voice Alex" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 30%">
@@ -393,7 +400,7 @@ textarea{resize:none}
 <button type="button" class="btn" @click="testKey($event)">Test key</button>
 <button type="button" class="btn" @click="toggleKeyType($event)">{{keyTypeLabel}}</button>
 </div>
-<p v-if="keyMsg" role="status" class="wpad" :style="'margin: 8px 0 0 40px; color: ' + (keyMsgColor)">{{keyMsg}}</p>
+<p role="status" class="wpad wkmsg" :style="'margin: 8px 0 0 40px; min-height: 2.9em; color: ' + (keyMsgColor)">{{keyMsg}}</p>
 </div>
 
 <div style="border-top: 1px solid var(--line); padding: 16px 0">
@@ -526,8 +533,8 @@ textarea{resize:none}
 <div v-if="st0" style="display: contents">
 <div v-if="writing" style="display: contents">
 <div aria-label="Writing the script" class="sc">
-<div style="display: flex; flex-direction: column; gap: 12px"><div v-for="r in skelRows" style="display: contents"><span class="skel" :style="'height: 18px; width: ' + (r)"></span></div></div>
-<div style="display: flex; flex-direction: column; gap: 12px"><span class="skel" style="height: 26px; width: 90%"></span><span class="skel" style="height: 26px; width: 70%"></span></div>
+<div><div class="sklist"><div v-for="r in skelRows" style="display: contents"><span class="skrow"><span class="skel" :style="'height: 16px; width: ' + (r)"></span></span></div></div><p class="muted small sclen" style="margin: 12px 10px 0">&nbsp;</p></div>
+<div class="scpanel skpanel"><span class="skel" style="height: 26px; width: 55%"></span><span class="skel" style="height: 26px; width: 92%; margin-top: 18px"></span><span class="skel" style="height: 26px; width: 84%"></span><span class="skel" style="height: 26px; width: 60%"></span></div>
 </div>
 </div>
 <div v-if="scriptReady" style="display: contents">
@@ -677,7 +684,7 @@ textarea{resize:none}
 <span v-if="noHide" class="muted small">No words yet.</span>
 </div>
 <div style="display: flex; gap: 8px"><input id="hw" class="inp" type="text" :value="(hideDraft)" @input="onHideDraft($event)" @change="onHideDraft($event)" @keydown="hideKey($event)" placeholder="Type a word, press Enter" :aria-describedby="hideDup ? 'hwdup' : null" :aria-invalid="hideDup ? 'true' : 'false'" :style="hideDup ? 'border-color: var(--danger)' : ''"><button type="button" class="btn" @click="addHide($event)">Add</button></div>
-<p v-if="hideDup" id="hwdup" class="small" style="margin: 6px 0 0; color: var(--danger)">Already in the list.</p>
+<p id="hwdup" class="small" style="margin: 6px 0 0; min-height: 20px; color: var(--danger)">{{hideDup ? 'Already in the list.' : ''}}</p>
 </div>
 
 <div style="margin-top: 14px">
@@ -766,20 +773,21 @@ textarea{resize:none}
 </div>
 <div class="markslot">
 <div v-if="markClosed" style="display: contents">
-<div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap">
+<div class="mrow">
 <button id="markbtn" type="button" class="btn" @click="openMark($event)"><span style="display: block; width: 10px; height: 10px; border-radius: 5px; background: var(--pin)"></span>Mark this moment</button>
-<span><span class="mono">{{revTime}}</span> <span class="muted">· {{revSecName}}</span></span>
+<span class="lg-only" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis"><span class="mono">{{revTime}}</span> <span class="muted">· {{revSecName}}</span></span>
 </div>
 </div>
 <div v-if="markOpen" style="display: contents">
 <div id="reasons" class="fade reasons" role="group" aria-label="Why mark this moment">
-<span style="font-weight: 500; white-space: nowrap">At <span class="mono">{{revTime}}</span>:</span>
+<span class="lg-only" style="font-weight: 500; white-space: nowrap">At <span class="mono">{{revTime}}</span>:</span>
 <button id="markfirst" type="button" class="btn sm" @click="markAi($event)">Sounds like AI</button><button type="button" class="btn sm" @click="markBlur($event)">Needs a blur</button><button type="button" class="btn sm" @click="markFast($event)">Too fast</button>
 <div v-if="!markOther" style="display: contents"><button type="button" class="btn sm" @click="openOther($event)">Other…</button></div>
 <div v-if="markOther" style="display: contents"><span style="display: flex; gap: 6px; flex: 1 1 200px"><label for="mown" class="sr">What’s off?</label><input id="mown" class="inp" type="text" :value="(markDraft)" @input="onMarkDraft($event)" @change="onMarkDraft($event)" @keydown="markKey($event)" placeholder="What’s off? Press Enter" style="height: 36px; font-size: 14px"></span></div>
 <button type="button" class="icon" @click="closeMark($event)" aria-label="Cancel" title="Cancel" style="width: 36px; height: 36px"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
 </div>
 </div>
+<div class="sm-only mtime"><span class="mono">{{revTime}}</span> <span class="muted">· {{revSecName}}</span></div>
 </div>
 </div>
 <aside aria-label="Your marks" style="min-width: 0; display: flex; flex-direction: column; gap: 10px">
