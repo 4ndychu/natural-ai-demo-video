@@ -43,7 +43,7 @@ CONFIG = json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)),
 MODEL = CONFIG['voice']['model']  # eleven_v4 by default; --model eleven_v3 for speed control
 HUNT_WORDS = CONFIG['audio_edit'].get('hunt_words', []) if CONFIG['audio_edit'].get('keep_hunt_pauses') else []
 MAX_PAUSE = 0.8          # walkthroughs: only silences over 0.8 s are shortened (voice-rules.md, section 4)
-FINAL_MAX, SECTION_MAX = 0.45, 0.25
+FINAL_MAX, SECTION_MAX = 0.45, 0.45  # every section keeps its last word's natural decay
 FADE_END, FADE_CUT, XF = 0.08, 0.15, 0.03
 SECTION_GAP = 0.40       # last word to next section's first word (0.35 to 0.45 s)
 TAG_RE = re.compile(r'\[[^\]]+\]')
@@ -127,12 +127,16 @@ def peak_level(x):
     return max(level(x, k * 0.01) for k in range(int(len(x) / SR / 0.01) - 1))
 
 
+RELEASE_GRACE = 0.25  # final consonants ("left", "list") release a burst after the vowel: not a breath
+
+
 def decay_stop(x, end, limit, top):
-    """Where the last word's decay stops falling (a breath would rise 3 dB) or reaches silence."""
+    """Where the last word's decay reaches silence (-60 dB of the take's peak), or stops falling because a breath
+    starts (a 3 dB rise). Rises in the first RELEASE_GRACE seconds are the word's own consonant release, kept."""
     t, low = end, level(x, end)
     while t < end + limit:
         nl = level(x, t + 0.01)
-        if nl < top * 10 ** (-60 / 20) or nl > low * 10 ** (3 / 20):
+        if nl < top * 10 ** (-60 / 20) or (t > end + RELEASE_GRACE and nl > low * 10 ** (3 / 20)):
             break
         low = min(low, nl)
         t += 0.01
@@ -144,7 +148,7 @@ def shape(x, words, final):
     top = peak_level(x)
     s0 = max(0.0, words[0]['start'] - 0.04)
     t = min(len(x) / SR, words[-1]['end'] + 0.5) - 0.01
-    while t > words[-1]['start'] and level(x, t) < top * 10 ** (-30 / 20):
+    while t > words[-1]['start'] and level(x, t) < top * 10 ** (-45 / 20):  # -45 dB keeps quiet final f, s, t
         t -= 0.01
     words[-1] = {**words[-1], 'end': round(min(words[-1]['end'], t + 0.01), 3)}
     stop = min(decay_stop(x, words[-1]['end'], FINAL_MAX if final else SECTION_MAX, top), len(x) / SR)
