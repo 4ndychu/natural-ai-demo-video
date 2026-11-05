@@ -187,8 +187,7 @@ textarea{resize:none}
 .chatwrap{position:fixed;left:0;right:0;bottom:0;z-index:6;pointer-events:none}
 .chatband{height:84px;background:var(--ground);pointer-events:auto;position:absolute;left:0;right:0;bottom:0}
 .chatinner{position:relative;margin:0 auto 18px;width:min(720px,calc(100% - 32px));pointer-events:auto}
-.chatwrap.indemo .chatinner{transform:translateX(133px);width:min(720px,calc(100% - 330px))}
-@media (min-width: 861px){.toastdemo{margin-left:133px}}
+
 .newtile{}
 @media (max-width: 860px){.newtile{min-height:64px!important;flex-direction:row!important;justify-content:flex-start!important;padding:10px 16px!important}.newtile > span:first-child{width:40px!important;height:40px!important}.newtile .wide{font-size:16px!important}}
 .recscreen{aspect-ratio:16/10}
@@ -316,7 +315,6 @@ textarea{resize:none}
   .stepfoot .backbtn{display:none}
   .scpanel .sclen{display:block!important}  .brow .bacts{grid-column:3;grid-row:1 / 3}
   .chatband{height:76px}
-  .chatwrap.indemo .chatinner{transform:none;width:calc(100% - 24px)}
   .welcome-grid{grid-template-columns:minmax(0,1fr)!important}
   .modeseg{width:100%!important}
   .capov{font-size:11px!important;bottom:18px!important}
@@ -995,7 +993,7 @@ textarea{resize:none}
 </main>
 </div>
 
-<div :class="isDemo ? 'chatwrap indemo' : 'chatwrap'">
+<div class="chatwrap">
 <div class="chatband"></div>
 <div class="chatinner">
 <div v-if="chatOpen" style="display: contents">
@@ -1042,7 +1040,7 @@ textarea{resize:none}
 </div>
 
 <div v-if="hasToast" style="display: contents">
-<div role="status" :class="isDemo ? 'toast toastdemo' : 'toast'" style="position: fixed; left: 50%; bottom: 96px; transform: translateX(-50%); background: var(--ink); color: var(--sheet); padding: 10px 10px 10px 18px; border-radius: 16px; display: flex; align-items: center; gap: 14px; box-shadow: 0 16px 36px -16px rgba(0,0,0,0.45); z-index: 9; max-width: calc(100% - 32px); box-sizing: border-box">
+<div role="status" class="toast" style="position: fixed; left: 50%; bottom: 96px; transform: translateX(-50%); background: var(--ink); color: var(--sheet); padding: 10px 10px 10px 18px; border-radius: 16px; display: flex; align-items: center; gap: 14px; box-shadow: 0 16px 36px -16px rgba(0,0,0,0.45); z-index: 9; max-width: calc(100% - 32px); box-sizing: border-box">
 <span>{{toast}}</span>
 <div v-if="toastUndo" style="display: contents"><button type="button" @click="undoToast($event)" style="border: 0; background: rgba(128,128,128,0.28); color: inherit; height: 32px; padding: 0 12px; border-radius: 999px; flex: none">Undo</button></div>
 <div v-if="toastGo" style="display: contents"><button type="button" @click="goToast($event)" style="border: 0; background: rgba(128,128,128,0.28); color: inherit; height: 32px; padding: 0 12px; border-radius: 999px; flex: none">{{toastGoLabel}}</button></div>
