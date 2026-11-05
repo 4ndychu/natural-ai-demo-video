@@ -249,7 +249,7 @@ class Component extends DCLogic {
     const cf = st.confirm ? confirms[st.confirm] : null;
     const pvFoot = { strict: 'Strict', standard: 'Standard', test: 'Test account', custom: 'Custom' }[preset];
     const footTexts = [
-      D.written ? (D.max > 0 ? 'Approved. Changing a line asks you to approve again.' : 'Not approved yet. ' + this.secs.length + ' sections, about ' + lengthText) : 'Claude is writing the script',
+      D.written ? (D.max > 0 ? 'Approved. You can still change any line.' : 'Not approved yet. ' + this.secs.length + ' sections, about ' + lengthText) : 'Claude is writing the script',
       voiceOk ? voicePretty + (changed ? ', ' + changed + ' setting' + (changed === 1 ? '' : 's') + ' changed' : ', recommended for a ' + kindName) : voicePretty + ' needs Eleven ' + vInfo.models[0] + '. Pick another voice, or',
       pvFoot + (D.recorded ? '' : ' · recording uses about ' + this.num(videoCost) + ' credits'),
       D.recorded ? 'Recorded, ' + lengthText : (st.recStopped ? 'Stopped. Finished sections are kept.' : (st.recPaused ? (isPhone ? 'Paused.' : 'Paused. The draft is ready when recording finishes.') : (isPhone ? 'The draft comes when it’s done.' : 'The draft is ready when recording finishes.'))),
