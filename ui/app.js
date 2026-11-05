@@ -551,6 +551,9 @@ class Component extends DCLogic {
   const comp = new Component({ startOn: q.get('start') || 'welcome', theme: q.get('theme') || 'system' });
   const scope = PetiteVue.reactive(comp.renderVals());
   const keepStepVisible = () => requestAnimationFrame(() => { const box = document.querySelector('.steplist'); const el = box && box.querySelector('.stepbtn.now'); if (!box) return; if (el && box.scrollWidth > box.clientWidth) { const prev = el.previousElementSibling && el.previousElementSibling.classList.contains('stepbtn') ? el.previousElementSibling : (el.parentElement.previousElementSibling && el.parentElement.previousElementSibling.querySelector ? el.parentElement.previousElementSibling.querySelector('.stepbtn') : null); const target = prev || el; box.scrollLeft = Math.max(0, box.scrollLeft + target.getBoundingClientRect().left - box.getBoundingClientRect().left - 6); } const upd = () => box.classList.toggle('at-start', box.scrollLeft < 4); upd(); if (!box._navi) { box._navi = 1; box.addEventListener('scroll', upd, { passive: true }); } });
+  // Toasts sit above the chat bar, and lift above any footer buttons they would cover.
+  const placeToast = () => { const el = document.getElementById('toast'); if (!el) return; el.style.bottom = ''; el.style.top = ''; const tr = el.getBoundingClientRect(); const hit = [...document.querySelectorAll('main .foot .fbtns')].map((f) => f.getBoundingClientRect()).find((f) => f.height && f.bottom > 0 && f.top < innerHeight && f.top < tr.bottom && f.bottom > tr.top); if (!hit) return; const room = hit.top - 8; if (room - tr.height > 72) el.style.bottom = (innerHeight - room) + 'px'; else { el.style.bottom = 'auto'; el.style.top = Math.min(innerHeight - tr.height - 96, hit.bottom + 8) + 'px'; } };
+  window.addEventListener('scroll', () => placeToast(), { passive: true });
   let lastDesc = null, lastEl = null, where = comp.state.screen + '/' + comp.state.step;
   document.addEventListener('focusin', (e) => { lastEl = e.target; lastDesc = comp.describe(e.target); });
   // After every render: a new step or screen focuses its heading; if the focused control vanished, find its stand-in.
@@ -558,10 +561,12 @@ class Component extends DCLogic {
     const now = comp.state.screen + '/' + comp.state.step; const moved = now !== where; where = now;
     const recent = comp.focusAt && Date.now() - comp.focusAt < 120;
     const ae = document.activeElement; const lost = !ae || ae === document.body;
-    if (moved && !recent && comp.state.screen !== 'welcome') { if (comp.state.screen === 'new') { if (lost || !document.querySelector('main').contains(ae)) { const f = document.getElementById(comp.state.mode === 'batch' ? 'btt' : 'bw'); if (f) f.focus(); } } else { const hd = comp.heading(); if (hd) hd.focus(); } return; }
+    placeToast();
+    if (moved) { const hd = comp.heading(); if (hd && comp.state.screen !== 'new') { const r = hd.getBoundingClientRect(); if (r.top < 0 || r.bottom > innerHeight * 0.6) window.scrollTo(0, Math.max(0, scrollY + r.top - 16)); } }
+    if (moved && !recent && comp.state.screen !== 'welcome') { if (comp.state.screen === 'new') { if (lost || !document.querySelector('main').contains(ae)) { const f = document.getElementById(comp.state.mode === 'batch' ? 'btt' : 'bw'); if (f) f.focus({ preventScroll: true }); } } else { const hd = comp.heading(); if (hd) hd.focus({ preventScroll: true }); } return; }
     if (lost && !recent && lastEl && (!lastEl.isConnected || lastEl.disabled || lastEl.offsetParent === null)) { const el = comp.findDesc(lastDesc) || comp.heading(); if (el) el.focus(); }
   }));
-  comp.setState = function (s) { Object.assign(comp.state, s); Object.assign(scope, comp.renderVals()); keepStepVisible(); afterRender(); };
+  comp.setState = function (s) { Object.assign(comp.state, s); Object.assign(scope, comp.renderVals()); keepStepVisible(); if (s && 'toast' in s) requestAnimationFrame(placeToast); afterRender(); };
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && !e.defaultPrevented) { if (comp.escape()) e.preventDefault(); return; }
     if (e.key === 'Tab' && comp.state.lib) { const d = document.getElementById('libdlg'); if (!d) return; const f = [...d.querySelectorAll('button, input, [tabindex="0"]')].filter((x) => !x.disabled && x.offsetParent !== null); if (!f.length) return; const i = f.indexOf(document.activeElement); if (e.shiftKey && (i <= 0)) { e.preventDefault(); f[f.length - 1].focus(); } else if (!e.shiftKey && (i === f.length - 1 || i < 0)) { e.preventDefault(); f[0].focus(); } }

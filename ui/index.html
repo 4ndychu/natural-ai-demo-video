@@ -11,6 +11,7 @@
 @font-face{font-family:'Geist Mono';src:url(fonts/geist-mono-latin-500-normal.woff2) format('woff2');font-weight:500;font-display:block}
 [v-cloak]{display:none}
 body{margin:0}
+html{scroll-padding-bottom:104px;scroll-padding-top:12px}
 .t-light{--ground:#E4E4E1;--tray:#EDEDEB;--sheet:#FFFFFF;--ink:#111111;--ink2:#55554F;--line:#DEDEDA;--wash:rgba(17,17,17,0.06);--fill:rgba(17,17,17,0.13);--segOn:#FFFFFF;--ok:#1D7A4A;--okDot:#1D9E5A;--blueDot:#2F5BEA;--amber:#D99A00;--warnBg:#FFF1D9;--warnInk:#6B4300;--danger:#B3261E;--pin:#E5484D;--screen:#0E0E10;--focus:rgba(17,17,17,0.6);--knobOff:#FFFFFF;color-scheme:light}
 .t-dark{--ground:#0C0C0E;--tray:#17171A;--sheet:#212125;--ink:#F2F2F0;--ink2:#B4B4AD;--line:#303035;--wash:rgba(242,242,240,0.07);--fill:rgba(242,242,240,0.15);--segOn:#3E3E45;--ok:#7FD9A2;--okDot:#3CCB7F;--blueDot:#7C9CFF;--amber:#F0B429;--warnBg:#3A2C10;--warnInk:#FFD892;--danger:#FF8A80;--pin:#FF6B6B;--screen:#000000;--focus:rgba(242,242,240,0.6);--knobOff:#76767E;color-scheme:dark}
 .wide{font-family:'Mona Sans',sans-serif;font-stretch:125%;font-weight:560;letter-spacing:-0.01em}
@@ -88,7 +89,7 @@ textarea{resize:none}
 @keyframes wv{from{transform:scaleY(0.35)}to{transform:scaleY(1)}}
 .fade{animation:fade 200ms ease-out}
 @keyframes fade{from{opacity:0}to{opacity:1}}
-.toast{animation:fade 200ms ease-out}
+.toast{animation:fade 200ms ease-out;bottom:96px}
 .skel{background:var(--wash);border-radius:6px;animation:sk 1.2s ease-in-out infinite alternate}
 @keyframes sk{from{opacity:0.5}to{opacity:1}}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
@@ -353,6 +354,7 @@ textarea{resize:none}
   .stepfoot .backbtn{display:none}
   .scpanel .sclen{display:block!important}  .brow .bacts{grid-column:3;grid-row:1 / 3}
   .chatband{height:76px}
+  .toast{bottom:88px}
   .welcome-grid{grid-template-columns:minmax(0,1fr)!important}
   .modeseg{width:100%!important}
   .capov{font-size:11px!important;bottom:18px!important}
@@ -445,7 +447,7 @@ textarea{resize:none}
 <div v-if="showNewBtn" style="display: contents"><button type="button" class="btn line" @click="newDemo($event)" style="height: 40px" aria-label="New demo"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg><span class="newlabel">New demo</span></button></div>
 <button type="button" class="credits" @click="goSettings($event)" title="ElevenLabs credits left this month">
 <div v-if="keyOn" style="display: contents"><span class="small"><span style="font-size: 15px">{{creditsText}}</span> credits</span></div>
-<div v-if="keyOff" style="display: contents"><span class="dot" style="background: var(--danger)"></span><span class="small">Connect ElevenLabs</span></div>
+<div v-if="keyOff" style="display: contents"><span class="dot" style="background: var(--danger)"></span><span class="small"><span class="lg-only">Connect ElevenLabs</span><span class="sm-only">Connect</span></span></div>
 </button>
 <button type="button" class="icon" @click="toggleTheme($event)" :aria-label="(themeAria)" :title="(themeAria)">
 <div v-if="isDark" style="display: contents"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg></div>
@@ -1081,7 +1083,7 @@ textarea{resize:none}
 </div>
 
 <div v-if="hasToast" style="display: contents">
-<div role="status" class="toast" style="position: fixed; left: 50%; bottom: 96px; transform: translateX(-50%); background: var(--ink); color: var(--sheet); padding: 10px 10px 10px 18px; border-radius: 16px; display: flex; align-items: center; gap: 14px; box-shadow: 0 16px 36px -16px rgba(0,0,0,0.45); z-index: 9; max-width: calc(100% - 32px); box-sizing: border-box">
+<div id="toast" role="status" class="toast" style="position: fixed; left: 50%; transform: translateX(-50%); background: var(--ink); color: var(--sheet); padding: 10px 10px 10px 18px; border-radius: 16px; display: flex; align-items: center; gap: 14px; box-shadow: 0 16px 36px -16px rgba(0,0,0,0.45); z-index: 9; max-width: calc(100% - 32px); box-sizing: border-box">
 <span>{{toast}}</span>
 <div v-if="toastUndo" style="display: contents"><button type="button" @click="undoToast($event)" style="border: 0; background: rgba(128,128,128,0.28); color: inherit; height: 32px; padding: 0 12px; border-radius: 999px; flex: none">Undo</button></div>
 <div v-if="toastGo" style="display: contents"><button type="button" @click="goToast($event)" style="border: 0; background: rgba(128,128,128,0.28); color: inherit; height: 32px; padding: 0 12px; border-radius: 999px; flex: none">{{toastGoLabel}}</button></div>
