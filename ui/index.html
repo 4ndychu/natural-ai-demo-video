@@ -176,10 +176,15 @@ textarea{resize:none}
 .timeline .tick{position:absolute;top:26px;width:2px;height:14px;margin-left:-1px;background:var(--ink2);opacity:0.6;pointer-events:none}
 .timeline .head{z-index:2;position:absolute;top:26px;width:2px;height:14px;margin-left:-1px;background:var(--ink);pointer-events:none}
 .timeline .head::after{content:'';position:absolute;left:-5px;top:1px;width:12px;height:12px;border-radius:6px;background:var(--ink);box-shadow:0 0 0 2px var(--sheet)}
-.pins{position:absolute;left:0;right:0;top:0;height:22px}
-.pins .pin{position:absolute;top:0;width:24px;height:24px;margin-left:-12px;border:0;padding:0;background:transparent;z-index:2}
+.pins{position:absolute;left:0;right:0;top:0;height:22px;pointer-events:none}
+.pins .pin{pointer-events:auto}
+.pins .pin{position:absolute;top:0;width:24px;height:17px;margin-left:-12px;border:0;padding:0;background:transparent;z-index:2}
+.pins .pin i{pointer-events:none}
 .pins .pin span{position:absolute;left:6px;top:2px;width:12px;height:12px;border-radius:6px;background:var(--pin);box-shadow:0 0 0 2px var(--sheet)}
 .pins .pin i{position:absolute;left:11px;top:14px;width:2px;height:8px;background:var(--pin)}
+.pins .pin span{display:flex;align-items:center;justify-content:center;color:#fff;font-size:10px;font-weight:500;line-height:1}
+.pins .pin.many span{left:3px;top:-2px;width:18px;height:18px;border-radius:9px}
+.pins .pin.many i{top:16px;height:6px}
 .markrow .icon:hover,.markrow .mono:hover{background:var(--fill)!important}
 .markrow{display:grid;grid-template-columns:auto minmax(0,1fr) 36px;gap:10px;align-items:center;min-height:58px;border-top:1px solid var(--line)}
 .reasons{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
@@ -763,13 +768,13 @@ textarea{resize:none}
 </button>
 <span class="mono" style="width: 40px">{{revTime}}</span>
 <div style="position: relative; flex: 1; height: 48px">
-<div class="timeline" style="position: absolute; inset: 0" role="slider" tabindex="0" aria-label="Timeline" aria-valuemin="0" :aria-valuemax="(totalSec)" :aria-valuenow="(revSec)" :aria-valuetext="(revTime)" @pointerdown="scrub($event)" @keydown="scrubKey($event)" title="Click to jump">
+<div class="timeline" style="position: absolute; inset: 0" role="slider" tabindex="0" aria-label="Timeline" aria-valuemin="0" :aria-valuemax="(totalSec)" :aria-valuenow="(revSec)" :aria-valuetext="(revTime)" @pointerdown="scrub($event)" @pointermove="scrubMove($event)" @pointerup="scrubUp($event)" @pointercancel="scrubUp($event)" @keydown="scrubKey($event)" title="Click or drag to move">
 <div class="track"></div>
 <div class="played" :style="'width: ' + (revLeft)"></div>
 <div v-for="t in ticks" style="display: contents"><span class="tick" aria-hidden="true" :style="'left: ' + (t)"></span></div>
 <div class="head" :style="'left: ' + (revLeft)"></div>
 </div>
-<div class="pins"><div v-for="m in markPins" style="display: contents"><button type="button" class="pin" :style="'left: ' + (m.left)" :title="(m.label)" :aria-label="'Jump to mark ' + m.label" @click="m.jump($event)"><span></span><i></i></button></div></div>
+<div class="pins"><div v-for="m in markPins" style="display: contents"><button type="button" :class="m.count > 1 ? 'pin many' : 'pin'" :style="'left: ' + (m.left)" :title="(m.label)" :aria-label="(m.aria)" @click="m.jump($event)"><span>{{m.count > 1 ? m.count : ''}}</span><i></i></button></div></div>
 </div>
 <span class="mono">{{lengthText}}</span>
 </div>
