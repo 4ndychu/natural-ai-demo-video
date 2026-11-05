@@ -75,5 +75,5 @@ The stop rule was "every screen 8.5 from all three reviewers, or two rounds in a
 ### Open points the reviewers keep raising
 
 - **Phone widths:** the remaining nitpicks are wrapping, empty space on a few screens, and the footer buttons on New batch, Batch, Record and Review.
-- **The "nothing moves when you click" rule:** buttons still shrink slightly (0.97×) when pressed, and the chat bar sits centered on the content column on step screens, so it shifts between Home and a demo. Both are taste calls for Andy.
+- **The "nothing moves when you click" rule:** the chat bar sits centered on the content column on step screens, so it shifts sideways between Home and a demo. The judge kept it (it's a page change, not a click on the same page), but it's a taste call for Andy. The button press shrink and the card hover lift were removed.
 - **"Some":** the middle "Who's watching" option was shortened from "Some experience" to "Some". One reviewer finds it vague.
