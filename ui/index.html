@@ -158,7 +158,7 @@ textarea{resize:none}
 .swl{font-weight:450;white-space:nowrap}
 .mpills{display:flex;gap:2px}
 .mpills button{height:34px;padding:0 12px;border:0;border-radius:999px;background:transparent;color:var(--ink2);font-size:14px;white-space:nowrap}
-.mpills button[aria-pressed=true]{background:var(--segOn);color:var(--ink);font-weight:500;box-shadow:0 1px 2px rgba(0,0,0,0.14),inset 0 0 0 1px var(--fill)}
+.mpills button[aria-pressed=true]{background:var(--segOn);color:var(--ink);font-weight:400;box-shadow:0 1px 2px rgba(0,0,0,0.14),inset 0 0 0 1px var(--fill)}
 @media (hover:hover){.mpills button[aria-pressed=false]:hover{color:var(--ink);background:var(--wash)}}
 .swcap{display:flex;align-items:center;justify-content:space-between;gap:10px;height:46px;margin-top:14px;padding:0 8px 0 14px;border-radius:12px;background:var(--wash);box-sizing:border-box}
 /* privacy */
@@ -278,7 +278,7 @@ textarea{resize:none}
 .slab{color:var(--ink)}
 .pills{display:inline-flex;flex-wrap:wrap;justify-content:flex-end;gap:2px;padding:2px;border-radius:20px;background:var(--wash);flex:none;max-width:100%;box-sizing:border-box}
 .pills button{height:36px;padding:0 14px;border:0;border-radius:18px;background:transparent;color:var(--ink2);font-size:14px;white-space:nowrap}
-.pills button[aria-pressed=true]{background:var(--segOn);color:var(--ink);font-weight:500;box-shadow:0 1px 2px rgba(0,0,0,0.14),inset 0 0 0 1px var(--fill)}
+.pills button[aria-pressed=true]{background:var(--segOn);color:var(--ink);font-weight:400;box-shadow:0 1px 2px rgba(0,0,0,0.14),inset 0 0 0 1px var(--fill)}
 @media (hover:hover){.pills button[aria-pressed=false]:hover{color:var(--ink);background:var(--wash)}}
 .pills .star{margin-left:4px}
 .srow .sctl{flex:0 1 360px;min-width:0}
@@ -293,13 +293,15 @@ textarea{resize:none}
 .btn.line,.btn.strong{background:var(--wash);box-shadow:none}
 .tagq.solid{box-shadow:none;background:var(--wash);color:var(--ink)}
 .chips{display:flex;flex-wrap:wrap;gap:8px}
-.chips button{flex:0 0 auto;height:40px;padding:0 16px;border-radius:999px;border:0;background:var(--wash);color:var(--ink2);font-size:15px;white-space:nowrap}
-.chips button[aria-pressed=true]{background:var(--segOn);color:var(--ink);font-weight:500;box-shadow:inset 0 0 0 1.5px var(--ink)}
+.chips button{flex:0 0 auto;height:40px;padding:0 23px;border-radius:999px;border:0;background:var(--wash);color:var(--ink2);font-size:15px;white-space:nowrap}
+.chips button[aria-pressed=true]{padding:0 16px;background:var(--segOn);color:var(--ink);font-weight:400;box-shadow:inset 0 0 0 1.5px var(--ink)}
 .chips .newchip{color:var(--ink);background:transparent;box-shadow:inset 0 0 0 1.5px var(--fill);border:1.5px dashed var(--fill);box-shadow:none}
 @media (hover:hover){.chips button[aria-pressed=false]:hover{background:var(--fill);color:var(--ink)}}
 .sumrow{display:flex;align-items:center;gap:12px;height:56px;box-sizing:border-box;padding:0 10px 0 16px;border-radius:12px;background:var(--tray)}
 .sumrow > span:first-child{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.chips button[aria-pressed=true]::before{content:'✓ '}
+/* The tick sits in the padding unselected chips keep, so picking a site moves no chip. */
+.chips button[aria-pressed=true]::before{content:'✓';display:inline-block;width:14px;text-align:left}
+.chips .newchip{padding:0 16px}
 .sumrow .btn{margin-left:auto;width:120px;flex:none}
 .scslot{display:flex;flex-direction:column;gap:12px;padding-top:20px;margin-top:auto}
 @media (min-width: 861px){.scslot > .scbtns{order:2}}
@@ -428,6 +430,8 @@ textarea{resize:none}
   .wpad{margin-left:0!important}
   .wfoot .pri{flex:1 1 100%}
   .wwrap{padding-top:16px!important}
+  .shelp2{min-height:calc(2 * 1.45em)}
+  .stepfoot .ftext{min-height:calc(2 * 1.45em)}
   .wthead{min-height:50px!important}
   .wfoot > .muted{text-align:left!important}
   #toolstext,.wfoot > .muted{min-height:calc(2 * 1.45em)!important}
@@ -957,7 +961,7 @@ textarea{resize:none}
 <div v-if="bMore" style="display: contents">
 <div class="fade srows" style="margin-top: 6px">
 <div class="srow"><span class="sl"><span class="slab">Who’s watching</span></span><div class="pills" role="group" aria-label="Who's watching"><div v-for="o in bWho" style="display: contents"><button type="button" :aria-pressed="(o.on)" @click="o.pick($event)">{{o.label}}</button></div></div></div>
-<div class="srow"><span class="sl"><span class="slab">Kind of demo</span><span class="muted small shelp">{{bKindHint}}</span></span><div class="pills" role="group" aria-label="Kind of demo"><div v-for="o in bKinds" style="display: contents"><button type="button" :aria-pressed="(o.on)" @click="o.pick($event)">{{o.label}}</button></div></div></div>
+<div class="srow"><span class="sl"><span class="slab">Kind of demo</span><span class="muted small shelp shelp2">{{bKindHint}}</span></span><div class="pills" role="group" aria-label="Kind of demo"><div v-for="o in bKinds" style="display: contents"><button type="button" :aria-pressed="(o.on)" @click="o.pick($event)">{{o.label}}</button></div></div></div>
 <div class="srow"><span class="sl"><span class="slab">Length</span><span class="muted small shelp">{{lenHint}}</span></span><div class="pills" role="group" aria-label="How long"><div v-for="o in bLen" style="display: contents"><button type="button" :aria-pressed="(o.on)" @click="o.pick($event)">{{o.label}}<span v-if="o.star" class="star" aria-label="suggested">★</span></button></div></div></div>
 <div class="srow"><span class="sl"><span class="slab">Voice</span></span><div class="pills" role="group" aria-label="Voice"><div v-for="o in bVoices" style="display: contents"><button type="button" :aria-pressed="(o.on)" @click="o.pick($event)">{{o.label}}</button></div></div></div>
 <div class="srow"><span class="sl"><label for="bh" class="slab">Pages to avoid</label><span class="muted small shelp">Pages the browser should never open.</span></span><input id="bh" class="inp sctl" type="text" :value="(bHide)" @input="onBHide($event)" @change="onBHide($event)" placeholder="e.g. the billing page"></div>
@@ -986,9 +990,9 @@ textarea{resize:none}
 <div class="srow"><span class="sl"><label for="btn" class="slab">Batch name</label></span><input id="btn" class="inp sctl" type="text" :value="(btName)" @input="onBtName($event)" @change="onBtName($event)" :placeholder="(btNamePh)"></div>
 <div class="srow swrap"><span class="sl"><span class="slab">Site</span></span><div class="sctl2"><div class="chips" role="group" aria-label="Site"><div v-for="o in btSites" style="display: contents"><button type="button" :aria-pressed="(o.on)" @click="o.pick($event)">{{o.label}}</button></div><button type="button" id="btnewchip" class="newchip" :aria-expanded="btSiteNew ? 'true' : 'false'" @click="openBtNew($event)">+ New site</button></div><div v-if="btSiteNew" style="display: contents"><div class="fade" style="margin-top: 8px"><label for="btns" class="sr">New site address</label><input id="btns" class="inp" type="text" :value="(btNew)" @input="onBtNew($event)" @change="onBtNew($event)" placeholder="e.g. app.yourproduct.com" :aria-invalid="btNewBad ? 'true' : 'false'"><div class="small" :style="'margin-top: 6px; min-height: 20px; color: ' + (btNewBad ? 'var(--danger)' : 'var(--ink2)')">{{btNewBad ? 'That doesn’t look like a web address.' : 'You log in once before the batch starts.'}}</div></div></div></div></div>
 <div class="srow"><span class="sl"><span class="slab">Voice</span></span><div class="pills" role="group" aria-label="Voice"><div v-for="o in btVoices" style="display: contents"><button type="button" :aria-pressed="(o.on)" @click="o.pick($event)">{{o.label}}</button></div></div></div>
-<div class="srow"><span class="sl"><span class="slab">Kind of demo</span><span class="muted small shelp">{{btKindHint}}</span></span><div class="pills" role="group" aria-label="Kind of demo"><div v-for="o in btKinds" style="display: contents"><button type="button" :aria-pressed="(o.on)" @click="o.pick($event)">{{o.label}}</button></div></div></div>
-<div class="srow"><span class="sl"><span class="slab">Privacy</span><span class="muted small shelp">{{btPresetHint}}</span></span><div class="pills" role="group" aria-label="Privacy"><div v-for="o in btPresets" style="display: contents"><button type="button" :aria-pressed="(o.on)" @click="o.pick($event)">{{o.label}}</button></div></div></div>
-<div class="srow"><span class="sl"><label for="btf" class="slab">Export folder</label></span><div class="folderrow sctl" style="display: flex; gap: 8px"><input id="btf" class="inp lg-only" type="text" :value="(btFolderVal)" @input="onBtFolder($event)" @change="onBtFolder($event)"><span class="sm-only" style="flex: 1 1 100%; overflow-wrap: anywhere">{{btFolderVal}}</span><button type="button" class="btn" @click="chooseFolder($event)">Change folder</button></div></div>
+<div class="srow"><span class="sl"><span class="slab">Kind of demo</span><span class="muted small shelp shelp2">{{btKindHint}}</span></span><div class="pills" role="group" aria-label="Kind of demo"><div v-for="o in btKinds" style="display: contents"><button type="button" :aria-pressed="(o.on)" @click="o.pick($event)">{{o.label}}</button></div></div></div>
+<div class="srow"><span class="sl"><span class="slab">Privacy</span><span class="muted small shelp shelp2">{{btPresetHint}}</span></span><div class="pills" role="group" aria-label="Privacy"><div v-for="o in btPresets" style="display: contents"><button type="button" :aria-pressed="(o.on)" @click="o.pick($event)">{{o.label}}</button></div></div></div>
+<div class="srow"><span class="sl"><span class="slab">Export folder</span></span><div class="folderrow sctl" style="display: flex; align-items: center; gap: 12px; flex-basis: 440px"><span id="btf" :title="(btFolderVal)" style="flex: 1 1 auto; min-width: 0; text-align: right; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{btFolderShort}}</span><button type="button" class="btn" @click="chooseFolder($event)" aria-describedby="btf">Change folder</button></div></div>
 </div>
 </div>
 <div class="est" aria-live="polite">
