@@ -529,7 +529,9 @@ textarea{resize:none}
   .brow.babove{grid-template-rows:auto;min-height:0;padding:10px 0}
   .brow .bst{grid-column:2!important;grid-row:2}
   .brow .bacts{grid-column:3!important;grid-row:1 / 3!important}
-  .bpause{flex-basis:100%;display:flex;justify-content:flex-end}
+  /* With Pause showing, row 1 is the count and Pause, and row 2 is the bar at full width. */
+  .bpause{display:flex;margin-left:auto}
+  .bprogp .bbar{order:1;flex-basis:100%!important}
   .stepfoot .backbtn{display:none}
   /* Review's two footer buttons share the row inside the tray's padding, so neither touches the edge. */
   .revfoot{padding-right:16px}
@@ -1152,9 +1154,9 @@ textarea{resize:none}
 <div class="sheet stepsheet" style="min-height: 0">
 <h1 id="batch-h" tabindex="-1" class="h-step">Your batch</h1>
 <p :class="bCreditSlot ? 'muted bsub brec' : 'muted bsub'" style="margin: 8px 0 0; max-width: 70ch">{{bHead}} {{bSub}}</p>
-<div style="display: flex; align-items: center; gap: 10px 16px; margin-top: 16px; flex-wrap: wrap">
+<div :class="hasBPause ? 'bprog bprogp' : 'bprog'" style="display: flex; align-items: center; gap: 10px 16px; margin-top: 16px; flex-wrap: wrap">
 <span v-if="bRecLabel" class="muted small" style="white-space: nowrap">{{bRecLabel}}</span>
-<div style="flex: 1 1 100px; min-width: 80px; height: 6px; border-radius: 999px; background: var(--fill); overflow: hidden"><span :style="'display: block; height: 6px; background: var(--ink); width: ' + (bPct)"></span></div>
+<div class="bbar" style="flex: 1 1 100px; min-width: 80px; height: 6px; border-radius: 999px; background: var(--fill); overflow: hidden"><span :style="'display: block; height: 6px; background: var(--ink); width: ' + (bPct)"></span></div>
 <div v-if="hasBPause" class="bpause"><button type="button" class="btn sm" @click="bPause($event)" style="width: 168px">{{bPauseLabel}}</button></div>
 </div>
 <div v-if="bCreditSlot" style="display: contents"><p class="note small bnote" :style="bCreditHidden ? 'visibility: hidden' : ''"><svg class="warnic" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" :style="hasBCreditNote ? '' : 'visibility: hidden'"><path d="M12 3l9.5 17h-19z"></path><path d="M12 10v4M12 17.5v.01"></path></svg><span>{{bCreditNote}}</span></p></div>
