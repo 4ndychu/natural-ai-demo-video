@@ -267,7 +267,7 @@ class Component extends DCLogic {
     const foot = cf ? { text: cf.text, dot: 'ready', color: 'var(--ink)' } : { text: footTexts[st.step], dot: footBad ? 'bad' : footKinds[st.step], color: footBad ? 'var(--ink)' : 'var(--ink2)' };
     const wsw = (done) => done ? 'wnum done' : 'wnum';
     const l = sw(st.lock), p = sw(st.p720), a = sw(st.caps);
-    const dataDefs = [{ id: 'settings', n: 'Voice, privacy and learned preferences', w: 'Stored on this Mac. You can undo a reset.', l: 'Reset to defaults' }, { id: 'videos', n: 'Finished videos', w: 'Movies/NAVI. Never deleted from here.', l: 'Open folder' }];
+    const dataDefs = [{ id: 'settings', n: 'Voice, privacy and the choices NAVI remembers, like your usual length', w: 'Stored on this Mac. You can undo a reset.', l: 'Reset to defaults' }, { id: 'videos', n: 'Finished videos', w: 'Movies/NAVI. Never deleted from here.', l: 'Open folder' }];
     const dataAct = {
       logins: () => { const prev = st.sites; this.setState({ sites: [] }); this.focusAt = Date.now(); requestAnimationFrame(() => { const el = document.getElementById('addsite'); if (!el) return; el.focus({ preventScroll: true }); const band = document.querySelector('.chatband'); if (band && el.getBoundingClientRect().bottom > band.getBoundingClientRect().top - 8) el.scrollIntoView({ block: 'center', behavior: 'instant' }); }); this.say('All saved logins forgotten', () => this.setState({ sites: prev })); },
       videos: () => this.say('Opening Movies/NAVI'),
@@ -542,7 +542,7 @@ class Component extends DCLogic {
       appear: [['system', 'Follow Mac'], ['light', 'Light'], ['dark', 'Dark']].map((o) => ({ label: o[1], on: (st.theme || 'system') === o[0] ? 'true' : 'false', pick: () => { this.setState({ theme: o[0] === 'system' ? null : o[0] }); this.say('Saved'); } })),
       defVoices: st.mine.map((k) => ({ label: pretty(k), on: st.defVoice === k ? 'true' : 'false', pick: () => { this.setState({ defVoice: k }); this.say(pretty(k) + ' is now the default for new demos'); } })),
       keyRow: st.keyOn ? 'Ending 4f2a · ' + this.num(st.credits) + ' credits left' : 'Not connected. Demos can’t be voiced until you add one.', keyRowColor: st.keyOn ? 'var(--ink2)' : 'var(--danger)',
-      keyEdit: st.keyEdit, keyEditLabel: st.keyEdit ? 'Cancel' : (st.keyOn ? 'Change' : 'Add key'), toggleKeyEdit: () => this.setState({ keyEdit: !st.keyEdit, key: '', keyRes: null }),
+      keyEdit: st.keyEdit, keyEditLabel: st.keyEdit ? 'Cancel' : (st.keyOn ? 'Change' : 'Add key'), toggleKeyEdit: () => { const open = !this.state.keyEdit; this.setState({ keyEdit: open, key: '', keyRes: null }); if (open) this.focusLater('#key2'); },
       canRemoveKey: st.keyOn && !st.keyEdit, removeKey: () => { this.setState({ keyOn: false }); this.focusLater('#keytoggle'); this.say('Key removed here. It still works at ElevenLabs.', () => this.setState({ keyOn: true })); },
       sites: st.sites.map((s) => ({ u: s.u, note: s.note, relog: () => this.say('A browser opens so you can log in to ' + s.u + ' again'), forget: () => { const prev = st.sites; this.setState({ sites: st.sites.filter((x) => x.u !== s.u) }); this.say('Forgot ' + s.u, () => this.setState({ sites: prev })); } })),
       noSites: !st.sites.length,

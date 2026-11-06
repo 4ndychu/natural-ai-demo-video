@@ -1203,7 +1203,7 @@ textarea{resize:none}
 <div class="tray"><div class="sheet" style="padding: 18px 18px 8px">
 <h2 class="h-big" style="margin-bottom: 10px">Your data</h2>
 <div class="list">
-<div v-for="d in data" style="display: contents"><div class="row" style="padding: 8px 0"><span style="flex: 1"><span style="display: block">{{d.n}}</span><span class="muted small">{{d.w}}</span></span><div v-if="d.can" style="display: contents"><button type="button" class="btn sm" @click="d.act($event)">{{d.l}}</button></div></div></div>
+<div v-for="d in data" style="display: contents"><div class="row" style="padding: 8px 0; row-gap: 8px"><span style="flex: 1 1 220px"><span style="display: block">{{d.n}}</span><span class="muted small">{{d.w}}</span></span><div v-if="d.can" style="display: contents"><button type="button" class="btn sm" @click="d.act($event)" style="margin-left: auto">{{d.l}}</button></div></div></div>
 <div class="row" style="padding: 8px 0"><span style="flex: 1"><span style="display: block">First-time setup</span><span class="muted small">Walk through the key, tools and login again</span></span><button type="button" class="btn sm" @click="showWelcome($event)">Run again</button></div>
 <div id="wiperow" class="row" style="padding: 8px 0; flex-wrap: wrap"><span style="flex: 1 1 260px"><span style="display: block">Erase NAVI data</span><span class="muted small">Your key, logins and preferences. Your videos are kept.</span></span>
 <span style="display: flex; gap: 6px; margin-left: auto">
