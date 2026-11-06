@@ -380,6 +380,16 @@ textarea{resize:none}
 @media (prefers-reduced-motion: reduce){.wv.on span,.fade,.toast,.skel,.pmark.spin,.dot.k-busy{animation:none}.bar .fill,button,.sw span,.disclose svg{transition:none}}
 /* phone width */
 .wfoot > .muted{flex:1 1 100%;text-align:right}
+/* Review: the marks column never grows past the player block, so marks never move the footer. It hugs its rows until then; past that the list scrolls inside and the heading stays. */
+.revaside{min-width:0}
+.revcap{display:flex;flex-direction:column;gap:10px}
+@media (min-width: 861px){
+  .revaside{align-self:stretch;position:relative}
+  .revcap{position:absolute;top:0;left:0;right:0;max-height:100%}
+  .revcap > *{flex:none}
+  .revcap .markspanel{flex:0 1 auto;min-height:150px;display:flex;flex-direction:column}
+  .revcap .markslist{flex:0 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;margin:4px -4px -4px;padding:0 4px 4px}
+}
 /* Script: "Rewriting this line…" sits in the Show captions button's box while busy, so nothing wraps or moves. */
 .scbusy{position:relative;display:inline-flex;max-width:100%}
 .scbusytext{position:absolute;inset:0;display:flex;align-items:center;min-width:0;overflow:hidden;white-space:nowrap}
@@ -487,7 +497,7 @@ textarea{resize:none}
   .stepfoot .backbtn{display:none}
   /* Review's two footer buttons share the row inside the tray's padding, so neither touches the edge. */
   .revfoot{padding-right:16px}
-  .revfoot .fbtns button{flex:1 1 0;min-width:0;padding:0 12px}
+  .revfoot .fbtns button{flex:1 1 auto;min-width:0;padding:0 12px}
   .scpanel .sclen{display:block!important}  .brow .bacts{grid-column:3;grid-row:1 / 3}
   .chatband{height:76px}
   .toast{bottom:88px}
@@ -947,7 +957,7 @@ textarea{resize:none}
 <div class="sm-only mtime"><span class="mono">{{revTime}}</span> <span class="muted">· {{revSecName}}</span></div>
 </div>
 </div>
-<aside aria-label="Your marks" style="min-width: 0; display: flex; flex-direction: column; gap: 10px">
+<aside aria-label="Your marks" class="revaside"><div class="revcap">
 <div v-if="hasUnsure" style="display: contents">
 <button type="button" class="warnbtn" @click="toggleBlurs($event)" :aria-expanded="(blurOpen)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l9.5 17h-19z"></path><path d="M12 10v4M12 17.5v.01"></path></svg><span style="flex: 1">{{unsureText}}<span class="lg-only"> before export</span></span><span class="wpill">{{blurOpen ? 'Hide' : 'Show'}}</span></button>
 <div v-if="blurOpen" style="display: contents">
@@ -956,18 +966,18 @@ textarea{resize:none}
 </div>
 </div>
 </div>
-<div class="panel" style="padding: 16px">
+<div class="panel markspanel" style="padding: 16px">
 <h2 class="h-sec" style="min-height: 30px; display: flex; align-items: center">Your marks {{marksCount}}</h2>
 <div v-if="noMarks" style="display: contents"><p class="muted" style="margin: 8px 0 4px">No marks yet. Play the draft and press Mark this moment when something’s off.</p></div>
 <div v-if="hasMarks" style="display: contents">
-<div class="list" style="margin-top: 4px">
+<div class="list markslist" style="margin-top: 4px">
 <div v-for="m in marks" style="display: contents">
 <div class="markrow"><button type="button" class="mono" @click="m.jump($event)" :aria-label="(m.jumpAria)" :title="(m.jumpAria)" style="border: 0; background: var(--sheet); border-radius: 999px; height: 32px; padding: 0 12px; white-space: nowrap; display: inline-flex; align-items: center; gap: 6px"><svg width="9" height="9" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 4.5v15l12-7.5z"></path></svg>{{m.t}}</button><span style="min-width: 0"><span style="display: block" :title="m.text !== m.full ? m.full : null">{{m.text}}</span><span class="muted small" style="display: block">{{m.sec}}</span></span><button type="button" class="icon" @click="m.rm($event)" :aria-label="(m.rmAria)" title="Remove" style="width: 36px; height: 36px"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button></div>
 </div>
 </div>
 </div>
 </div>
-</aside>
+</div></aside>
 </div>
 </div>
 
@@ -1010,7 +1020,7 @@ textarea{resize:none}
 <div v-if="notConfirming" style="display: contents">
 <div v-if="recHold" style="display: contents"><span class="fhold" aria-hidden="true"><span class="btn ghost backbtn">Back</span><span class="btn">Record again</span></span></div>
 <div v-if="canBack" style="display: contents"><button type="button" class="btn ghost backbtn" @click="back($event)">Back</button></div>
-<div v-if="hasSkip" style="display: contents"><button type="button" class="btn" @click="doSkip($event)"><span class="lg-only">Export without redos</span><span class="sm-only">Export as is</span></button></div>
+<div v-if="hasSkip" style="display: contents"><button type="button" class="btn" @click="doSkip($event)">Export without redos</button></div>
 <div v-if="hasSecondary" style="display: contents"><button type="button" class="btn" @click="secondary($event)">{{cur.second}}</button></div>
 <button type="button" :class="st1 ? 'pri privoice' : 'pri'" @click="primary($event)" :disabled="(primaryBlocked)"><span class="lg-only">{{cur.cta}}</span><span class="sm-only">{{cur.ctaShort || cur.cta}}</span></button>
 </div>
