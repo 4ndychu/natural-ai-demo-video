@@ -384,3 +384,68 @@ The average minimum is 8.68, flat for three rounds. The lens averages are User 8
 6. One Corner label hint everywhere: "Your name or brand in a corner".
 7. New options at 390: Who's watching gets label-sized columns with no gap; "Walkthrough" becomes the name at every width.
 8. Voice at 390: More voices fills the empty cell beside George.
+
+## Round 8: 3 reverts plus 8 fixes, first round under the two-step blind protocol
+
+The previous accepted version is commit 918baca (round 7 with Export, Export (before export) and New options reverted). The candidate is R8 fixes 1–8 (up to 559d253). Each reviewer saved its A/B table before it saw the scoring folder.
+
+| Screen | User | Visual | QA | Verdict |
+|---|---|---|---|---|
+| new, new-options, new-batch, voice, export (before export), export | new | new | new | New stays (unanimous) |
+| review, settings, welcome | same | same | new | Fixes stay: verified focus fixes that only show when you click (Redo confirm, removing the last mark, Run again, bad key) |
+| batch | old | new | same | **Reverted** (no majority). The 21.8 px Pause shift at 390 comes back for one round; round 9 re-lands the fix with the user reviewer's wording |
+| home, privacy, script, record | same | same | same | Tie |
+
+No reviewer found a guard hit on the candidate.
+
+**Scores (candidate)**
+
+| Screen | User | Visual | QA | Min | vs round 7 |
+|---|---|---|---|---|---|
+| welcome | 9.0 | 9.0 | 9.5 | 9.0 | 0 |
+| home | 9.0 | 9.0 | 9.5 | 9.0 | 0 |
+| new | 9.0 | 9.0 | 9.0 | 9.0 | 0 |
+| new-options | 9.0 | 9.0 | 9.5 | 9.0 | +0.5 |
+| new-batch | 9.0 | 8.5 | 9.0 | 8.5 | −0.5 |
+| batch (reverted) | 8.5 | 9.0 | 8.5 | 8.5 | 0 |
+| script | 9.0 | 8.5 | 9.5 | 8.5 | 0 |
+| voice | 8.5 | 8.5 | 9.0 | 8.5 | +0.5 |
+| privacy | 9.0 | 9.0 | 9.0 | 9.0 | 0 |
+| record | 9.0 | 9.0 | 8.5 | 8.5 | −0.5 |
+| review | 9.0 | 9.0 | 9.0 | 9.0 | +0.5 |
+| export (before export) | 9.0 | 8.5 | 9.5 | 8.5 | 0 |
+| export | 9.0 | 8.5 | 9.5 | 8.5 | 0 |
+| settings | 9.0 | 9.0 | 9.5 | 9.0 | +0.5 |
+
+**What moved:**
+- The average minimum is **8.75**, up from 8.68 after three flat rounds.
+- Lens averages: User 8.93, Visual 8.82, QA 9.18.
+- The first 9.5s of the second climb came this round, all from QA (7 screens).
+- Every screen is now 8.5 or higher on every lens.
+- The two −0.5 rows aren't regressions: the screens are unchanged, and the reviewers newly noticed crowded pills on New batch at 390 and an unconfirmed Record again.
+
+**Convergence (rounds 4–8):**
+
+| | R4 | R5 | R6 | R7 | R8 |
+|---|---|---|---|---|---|
+| Screens won | 13 | 12 | 8 | 6 | 6 |
+| Lost or reverted | 0 | 2 | 4 | 3 | 1 |
+| Tied | 1 | 0 | 2 | 5 | 7 |
+| Mean minimum | 8.61 | 8.68 | 8.68 | 8.68 | 8.75 |
+
+**What's left to reach 9.5.** The User and Visual reviewers sit at about 9.0. Their remaining asks are mostly structural calls for Andy:
+- the chat bar on New and Record;
+- whether space is reserved or grows (the 130 px gap on Export at 390);
+- the half-empty columns on Voice, Home and Script.
+
+**Round 9 plan (judge, ranked):**
+1. Batch recording line in the user's voice, on 2 lines at 390 (re-lands the Pause fix).
+2. Batch watch: Back holds still when the button label changes.
+3. Batch at 390: Pause sits beside the count.
+4. Record again asks first (it costs credits).
+5. Three-option pills at 390 sized to their labels everywhere.
+6. New and New batch: no "5 / min" splits, the count line doesn't jump while pasting, and a disabled Write focuses its field.
+7. Export: the Corner label hint sits under its title, with a hairline above the file list.
+8. Voice: More voices tile at 390, v4 note spacing, reset badge clear of the focus ring.
+9. Script, dark: the selected section turns lighter than the sheet.
+10. Toasts: Undo holds still, and one Undo restores several removed marks.
