@@ -268,7 +268,7 @@ class Component extends DCLogic {
     const foot = cf ? { text: cf.text, dot: 'ready', color: 'var(--ink)' } : { text: footTexts[st.step], dot: footBad ? 'bad' : footKinds[st.step], color: footBad ? 'var(--ink)' : 'var(--ink2)' };
     const wsw = (done) => done ? 'wnum done' : 'wnum';
     const l = sw(st.lock), p = sw(st.p720), a = sw(st.caps);
-    const dataDefs = [{ id: 'settings', n: 'Voice, privacy and the choices NAVI remembers, like your usual length', w: 'Stored on this Mac. You can undo a reset.', l: 'Reset to defaults' }, { id: 'videos', n: 'Finished videos', w: 'Movies/NAVI. Never deleted from here.', l: 'Open folder' }];
+    const dataDefs = [{ id: 'settings', n: 'Your saved choices', w: 'Voice, privacy and your usual length. Stored on this Mac. You can undo a reset.', l: 'Reset to defaults' }, { id: 'videos', n: 'Finished videos', w: 'Movies/NAVI. Never deleted from here.', l: 'Open folder' }];
     const dataAct = {
       logins: () => { const prev = st.sites; this.setState({ sites: [] }); this.focusAt = Date.now(); requestAnimationFrame(() => { const el = document.getElementById('addsite'); if (!el) return; el.focus({ preventScroll: true }); const band = document.querySelector('.chatband'); if (band && el.getBoundingClientRect().bottom > band.getBoundingClientRect().top - 8) el.scrollIntoView({ block: 'center', behavior: 'instant' }); }); this.say('All saved logins forgotten', () => this.setState({ sites: prev })); },
       videos: () => this.say('Opening Movies/NAVI'),

@@ -52,6 +52,8 @@ textarea{resize:none}
 /* Review: the primary keeps the width of its longest label ('Looks good, go to Export'), so adding marks never moves Back or Export without redos. */
 @media (min-width: 861px){.prirev{min-width:218px}.prirev.prib{min-width:232px}}
 @media (max-width: 860px){.prirev{min-width:160px}}
+/* Settings: the key status keeps a slot, two lines at 390, so a bad key moves nothing below it. */
+.keystat{min-height:22px}
 .pri[disabled],.pri[aria-disabled=true]{opacity:1;background:var(--wash);color:var(--ink2);box-shadow:inset 0 0 0 1px var(--line)}
 .btn.ghost{background:transparent;color:var(--ink2)}
 @media (hover:hover){.btn.ghost:hover{background:var(--wash);color:var(--ink)}}
@@ -586,6 +588,7 @@ textarea{resize:none}
   .wpad{margin-left:0!important}
   .wwrap{padding-top:16px!important}
   .stepfoot .ftext{min-height:calc(2 * 1.45em)}
+  .keystat{min-height:calc(2 * 1.45em)!important}
   .stepfoot .ftext .link{padding-top:0;padding-bottom:0}
   .wtools{flex-wrap:wrap;gap:8px}
   .wtslot{flex-basis:100%;width:auto}
@@ -1236,7 +1239,7 @@ textarea{resize:none}
 <div class="fade" style="padding: 4px 0 14px">
 <p class="muted small" style="margin: 0 0 8px">At elevenlabs.io: Developers, then API keys, then create a key with text to speech access.</p>
 <div class="wfield" style="display: flex; gap: 8px"><label for="key2" class="sr">ElevenLabs API key</label><input id="key2" class="inp" :type="(keyType)" :value="(key)" @input="onKey($event)" @change="onKey($event)" @keydown="keyEnter($event)" placeholder="Paste your API key" autocomplete="off" spellcheck="false" style="flex: 1"><button type="button" class="btn" @click="toggleKeyType($event)" style="width: 76px">{{keyTypeLabel}}</button><button type="button" class="btn" @click="testKey($event)">Test and save</button></div>
-<p role="status" :style="'margin: 8px 0 0; min-height: 22px; color: ' + (keyMsgColor)">{{keyMsg}}</p>
+<p role="status" class="keystat" :style="'margin: 8px 0 0; color: ' + (keyMsgColor)">{{keyMsg}}</p>
 </div>
 </div>
 <div style="height: 4px"></div>
