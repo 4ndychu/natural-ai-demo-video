@@ -231,7 +231,7 @@ class Component extends DCLogic {
     const addMark = (text) => { const t = st.revT; const i = secAt(t); const n = Object.assign({}, D.notes); n[i] = (n[i] || []).concat([{ t: t, text: text }]); this.patchDemo({ notes: n }); this.setState({ markOpen: false, markOther: false, markDraft: '' }); this.focusLater('#markbtn'); this.say('Marked ' + this.fmt(t) + ': ' + text); };
     const stopNow = () => { this.stop('rec'); this.setState({ recStopped: true, recPaused: false, recSlide: 0, recSliding: false }); this.patchDemo({ status: 'Stopped at ' + st.recPos + ' of ' + N, dot: 'wait' }); this.say('Stopped. ' + this.plural(st.recPos, 'finished section') + ' kept.'); this.focusLater('#reccarry'); };
     const goStep = (i) => { const p = { step: i, confirm: null, markOpen: false }; this.setState(p); if (D.max < i) this.patchDemo({ max: i }); };
-    const doExport = () => { this.patchDemo({ exported: true, dirty: false, exportedOn: 'Nov 5', status: 'Exported Nov 5 · Open →', dot: 'done', max: 5 }); this.setState({ confirm: null }); this.say('Exported to Movies/NAVI', null, () => this.say('Opening Movies/NAVI'), 'Open folder'); };
+    const doExport = () => { this.patchDemo({ exported: true, dirty: false, exportedOn: 'Nov 5', status: 'Exported Nov 5 · Open →', dot: 'done', max: 5 }); this.setState({ confirm: null }); this.focusAt = Date.now(); requestAnimationFrame(() => { const el = document.querySelector('.stepfoot .pri'); if (el) el.focus({ preventScroll: true }); }); this.say('Exported to Movies/NAVI', null, () => this.say('Opening Movies/NAVI'), 'Open folder'); };
     const primaryFor = [
       () => goStep(1),
       () => { if (!voiceOk) return; goStep(2); this.say(st.lock ? voicePretty + ' is set for every demo in this project' : 'Using ' + voicePretty + ' for this demo'); },
@@ -572,7 +572,8 @@ class Component extends DCLogic {
     const recent = comp.focusAt && Date.now() - comp.focusAt < 120;
     const ae = document.activeElement; const lost = !ae || ae === document.body;
     placeToast();
-    if (moved) { const hd = comp.heading(); if (hd && comp.state.screen !== 'new') { const r = hd.getBoundingClientRect(); if (r.top < 0 || r.bottom > innerHeight * 0.6) window.scrollTo(0, Math.max(0, scrollY + r.top - 16)); } }
+    // A new step or screen opens at the top of the page, so the header and its title are in view.
+    if (moved) window.scrollTo(0, 0);
     if (moved && !recent && comp.state.screen !== 'welcome') { if (comp.state.screen === 'new') { if (lost || !document.querySelector('main').contains(ae)) { const f = document.getElementById(comp.state.mode === 'batch' ? 'btt' : 'bw'); if (f) f.focus({ preventScroll: true }); } } else { const hd = comp.heading(); if (hd) hd.focus({ preventScroll: true }); } return; }
     if (lost && !recent && lastEl && (!lastEl.isConnected || lastEl.disabled || lastEl.offsetParent === null)) { const el = comp.findDesc(lastDesc) || comp.heading(); if (el) el.focus(); }
   }));
