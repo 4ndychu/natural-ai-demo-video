@@ -123,7 +123,8 @@ textarea{resize:none}
 @media (hover:hover){button.stepbtn:not(.now):not([disabled]):hover{background:var(--wash)}}
 .dcard{border:0;text-align:left;display:flex;flex-direction:column;padding:6px;width:100%}
 .dcard{transition:background-color 160ms ease}
-.dcard .meta{padding:12px 12px 12px 14px;margin-top:6px;display:flex;flex-direction:column;gap:2px;background:var(--sheet);border-radius:16px;flex:1}
+.dcard .meta{padding:12px 12px 12px 14px;margin-top:6px;display:flex;flex-direction:column;gap:2px;background:var(--sheet);border-radius:20px;flex:1}
+.cards .name{text-wrap:balance}
 @media (hover:hover){.dcard:hover{background:var(--fill)}}
 /* script */
 .sc{display:grid;grid-template-columns:260px minmax(0,1fr);grid-template-rows:auto auto;gap:0 22px;align-items:stretch}
@@ -281,7 +282,7 @@ textarea{resize:none}
 .stephelp .hold{visibility:hidden}
 /* While recording, the footer keeps the room its finished buttons need, so nothing moves when the draft is ready. */
 .fhold{display:inline-flex;gap:8px;visibility:hidden}
-.credits{font-variant-numeric:tabular-nums}
+.credits{font-variant-numeric:proportional-nums}
 .prog li{display:flex;align-items:center;gap:10px;height:32px;padding:0 4px}
 .prog .pn{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .prog .pdone{color:var(--ink2)}
@@ -483,7 +484,7 @@ textarea{resize:none}
   .phone-setup{display:flex;align-items:center;gap:8px;border:0;background:var(--tray);border-radius:14px;padding:10px 14px;text-align:left;font-size:14px;color:var(--ink)}
   .home-aside{display:none!important}
   .dcard{flex-direction:row;align-items:stretch}
-  .dcard .cover{width:96px!important;height:96px!important;flex:none;border-radius:16px}
+  .dcard .cover{width:96px!important;height:96px!important;flex:none;border-radius:20px}
   .dcard .cover img{border-radius:0!important}
   .dcard .meta{flex:1;min-width:0;padding:8px 10px}
   .sclen{margin:8px 0 0!important}
@@ -622,9 +623,9 @@ textarea{resize:none}
 <button type="button" class="newtile" @click="newDemo($event)" style="min-height: 262px; border: 0; border-radius: 26px; background: var(--sheet); box-shadow: 0 0 0 6px var(--tray); margin: 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 16px"><span style="width: 56px; height: 56px; border-radius: 28px; background: var(--ink); color: var(--sheet); display: inline-flex; align-items: center; justify-content: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg></span><span class="wide caps" style="font-size: 20px">New demo</span><span class="muted">One video, or a whole batch</span></button>
 <div v-for="b in batchCards" style="display: contents">
 <button type="button" class="tray dcard" @click="b.open($event)">
-<span class="cover" style="height: 176px; display: grid; grid-template-columns: 1fr 1fr; gap: 4px; background: var(--tray)"><img src="assets/cover-3.jpg" alt="" style="border-radius: 14px 4px 4px 14px"><span style="display: grid; grid-template-rows: 1fr 1fr; gap: 4px; min-height: 0"><img src="assets/cover-1.jpg" alt="" style="border-radius: 4px 14px 4px 4px; min-height: 0"><img src="assets/cover-4.jpg" alt="" style="border-radius: 4px 4px 14px 4px; min-height: 0"></span></span>
+<span class="cover" style="height: 176px; display: grid; grid-template-columns: 1fr 1fr; gap: 4px; background: var(--tray)"><img src="assets/cover-3.jpg" alt="" style="border-radius: 12px"><span style="display: grid; grid-template-rows: 1fr 1fr; gap: 4px; min-height: 0"><img src="assets/cover-1.jpg" alt="" style="border-radius: 12px; min-height: 0"><img src="assets/cover-4.jpg" alt="" style="border-radius: 12px; min-height: 0"></span></span>
 <span class="meta"><span class="name" style="font-size: 16px">{{b.name}}</span><span class="muted">{{b.meta}}</span><span style="display: inline-flex; align-items: center; gap: 8px; margin-top: 4px"><span class="dot k-ready"></span>{{b.next}}</span>
-<span style="display: flex; align-items: center; gap: 10px; margin-top: 6px"><span style="flex: 1; height: 6px; border-radius: 3px; background: var(--fill); overflow: hidden"><span :style="'display: block; height: 6px; background: var(--ink); width: ' + (b.pct)"></span></span><span class="small" style="white-space: nowrap">{{b.status}}</span></span></span>
+<span style="display: flex; align-items: center; gap: 10px; margin-top: 6px"><span style="flex: 1; height: 6px; border-radius: 999px; background: var(--fill); overflow: hidden"><span :style="'display: block; height: 6px; background: var(--ink); width: ' + (b.pct)"></span></span><span class="small" style="white-space: nowrap">{{b.status}}</span></span></span>
 </button>
 </div>
 <div v-for="d in demos" style="display: contents">
@@ -635,13 +636,13 @@ textarea{resize:none}
 </div>
 </div>
 </section>
-<button type="button" class="phone-setup" @click="goSettings($event)"><span :class="'dot k-' + keyDot"></span>{{keyStatus}} · {{toolsStatus}} ›</button>
-<aside aria-label="Your setup" class="home-aside" style="display: flex; flex-direction: column; gap: 14px; margin-top: 98px">
+<button type="button" class="phone-setup" @click="goSettings($event)"><span :class="'dot k-' + setupDot"></span>{{setupShort}} · <span class="link" style="padding: 0; font-size: inherit">Check setup</span></button>
+<aside aria-label="Your setup" class="home-aside" style="display: flex; flex-direction: column; gap: 14px; margin-top: 98px; align-self: stretch">
 <div class="tray">
 <div :style="'position: relative; height: 260px; border-radius: 20px; overflow: hidden; background: ' + (defC)"><img :src="(defImg)" alt="" style="width: 100%; height: 100%; object-fit: cover; object-position: 50% 30%"></div>
 <div class="foot"><span><span class="wide" style="display: block; font-size: 24px; line-height: 1">{{defName}}</span><span class="muted">New demos use {{defNamePretty}}</span></span><button type="button" class="btn sm" @click="goSettings($event)">Change voice</button></div>
 </div>
-<div class="tray"><div class="sheet list" style="padding: 4px 16px">
+<div class="tray" style="flex: 1; display: flex; flex-direction: column"><div class="sheet list" style="padding: 4px 16px; flex: 1; display: flex; flex-direction: column; justify-content: space-evenly">
 <div class="row"><span :class="'dot k-' + keyDot"></span><span style="flex: 1">{{keyStatus}}</span><button type="button" class="btn sm" @click="goSettings($event)">{{keyAction}}</button></div>
 <div class="row"><span :class="'dot k-' + toolsDot"></span><span style="flex: 1">Recording tools</span><span class="muted small" style="padding-right: 14px; text-align: right">{{toolsReady}}</span></div>
 <div class="row"><span class="dot k-done"></span><span style="flex: 1">{{sitesStatus}}</span><button type="button" class="btn sm" @click="goSettings($event)">Manage</button></div>
