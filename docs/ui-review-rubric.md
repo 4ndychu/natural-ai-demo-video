@@ -64,6 +64,12 @@ For each screen, the reviewer gets two images, **X** and **Y**: the previous acc
 - **Why:** one or two concrete reasons, citing the rubric lens.
 - **Guard:** does either one hit the overdesign guard? Which?
 
+**Blindness, added after round 7.** In round 7 a reviewer could see the scoring folder and hashed the images, so it could tell which side of each pair was new. From round 8 on, each reviewer works in two steps:
+1. **A/B first,** with access only to the A/B folder and the docs. No scoring folder, no keys, no source.
+2. **Scoring and fixes after,** once its A/B table is saved.
+
+The interaction reviewer's app copies are labelled X/Y at random as before.
+
 A candidate change stays only if it wins the majority of reviewers' comparisons for that screen (2 of 3, or 2 of 2 with one "same"). A guard hit by the candidate counts as a loss for that reviewer. Changes that lose are reverted before the next round. Scores are recorded too, but the comparisons decide.
 
 ## Fixed prompts
