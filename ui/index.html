@@ -1087,6 +1087,7 @@ textarea{resize:none}
 <div v-if="notConfirming" style="display: contents">
 <div v-if="recHold" style="display: contents"><span class="fhold" aria-hidden="true"><span class="btn ghost backbtn">Back</span><span class="btn secrec">Record again</span></span></div>
 <div v-if="canBack" style="display: contents"><button type="button" class="btn ghost backbtn" @click="back($event)">Back</button></div>
+<div v-if="recStopHold" style="display: contents"><span class="fhold" aria-hidden="true"><span class="btn secrec">Record again</span></span></div>
 <div v-if="hasSkip" style="display: contents"><button type="button" class="btn" @click="doSkip($event)">Export without redos</button></div>
 <div v-if="hasSecondary" style="display: contents"><button id="secbtn" type="button" :class="st3 ? 'btn secrec' : 'btn'" @click="secondary($event)">{{cur.second}}</button></div>
 <button type="button" :class="st1 ? 'pri privoice' : (st4b ? 'pri prirev prib' : (st4 ? 'pri prirev' : (st5 ? 'pri priex' : (st3 ? 'pri prirec' : 'pri'))))" @click="primary($event)" :disabled="(primaryBlocked)"><span class="lg-only">{{cur.cta}}</span><span class="sm-only">{{cur.ctaShort || cur.cta}}</span></button>
