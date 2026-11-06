@@ -330,3 +330,57 @@ The average minimum is 8.68 (flat on round 5).
 - Reaching 9.5 would likely need app-wide rules decided once (what may grow when clicked vs what reserves space, a fixed primary-button slot, one 390 row pattern, one focus ring) plus a structural pass on Voice and Batch.
 
 **Checkpoint after 6 rounds:** shown to Andy (`docs/screens/climb2/r6-*`).
+
+## Round 7: 8 fixes, decided by blind A/B
+
+The previous accepted version is commit 6303112 (round 6 with its four losing screens reverted). The candidate is R7 fixes 1–8 (up to 09d37ab).
+
+**A blindness leak, and the fix.** The user reviewer could see the scoring folder. It hashed the images, so it knew which side of each pair was new. Its A/B was thrown out and re-run blind in a separate pass. That re-run changed two verdicts, Export and Export (before export): the non-blind pass called them "same". The rubric now requires two steps: blind A/B first, with no access to the scoring folder, and scoring after.
+
+| Screen | User (blind) | Visual | QA | Verdict |
+|---|---|---|---|---|
+| new-batch | new | new | new | New stays |
+| new | same | new | new | New stays |
+| review | new | same | new | New stays |
+| settings, welcome | old | new | new | New stays (2 of 3) |
+| voice | new | new | old | New stays (2 of 3). QA's reason: switching to Eleven v3 moves Back and Use Alex down 60 px. That gets fixed in round 8 |
+| export, export (before export) | old | new | old | **Reverted.** User preferred the old hint "in a corner of the video"; QA flagged a 55 px shift at 390 with 720p plus a separate captions file |
+| new-options | old | old | new | **Reverted.** The "Who's watching" track at 390 left a blank third; "Hide" read worse than "Hide options" |
+| batch, home, privacy, record, script | same | same | same | Tie. The Batch fix stays: Pause, Back and the toast fix three verified bugs |
+
+**Scores (candidate; rows for reverted screens score the losing candidate)**
+
+| Screen | User | Visual | QA | Min | vs round 6 |
+|---|---|---|---|---|---|
+| welcome | 9.0 | 9.0 | 9.0 | 9.0 | 0 |
+| home | 9.0 | 9.0 | 9.0 | 9.0 | 0 |
+| new | 9.0 | 9.0 | 9.0 | 9.0 | 0 |
+| new-options (reverted) | 8.5 | 8.5 | 9.0 | 8.5 | 0 |
+| new-batch | 9.0 | 9.0 | 9.0 | 9.0 | +1.0 |
+| batch | 8.5 | 9.0 | 8.5 | 8.5 | 0 |
+| script | 9.0 | 8.5 | 9.0 | 8.5 | 0 |
+| voice | 8.5 | 8.5 | 8.0 | 8.0 | −0.5 |
+| privacy | 9.0 | 9.0 | 9.0 | 9.0 | 0 |
+| record | 9.0 | 9.0 | 9.0 | 9.0 | 0 |
+| review | 9.0 | 9.0 | 8.5 | 8.5 | 0 |
+| export (before export, reverted) | 9.0 | 9.0 | 8.5 | 8.5 | −0.5 |
+| export (reverted) | 9.0 | 9.0 | 8.5 | 8.5 | −0.5 |
+| settings | 9.0 | 9.0 | 8.5 | 8.5 | +0.5 |
+
+The average minimum is 8.68, flat for three rounds. The lens averages are User 8.89, Visual 8.89 and QA 8.75. No screen got 9.5.
+
+**Convergence (the judge's reading, rounds 4–7):**
+- Screen comparisons won: 13, 12, 8, 6. Lost: 0, 2, 4, 3. Tied: 1, 0, 2, 5.
+- This round's wins are mostly behaviour fixes: controls that hold still, focus after an empty click, a working folder field, and Back returning to the batch.
+- All three reverts were visual trade-offs at 390.
+- The judge recommends making round 8 the last polish round. If Voice reaches QA 8.5, every screen meets the brief's 8.5 floor on all three lenses.
+
+**Round 8 plan (judge, ranked):**
+1. Voice: switching model moves nothing (Pace gets a fixed slot).
+2. Voice at 390: the first Play sample doesn't shift.
+3. Batch at 390: Pause doesn't move the list.
+4. Review: focus after the Redo confirm and after removing the last mark.
+5. Settings and Welcome: focus after Run again and after a bad key.
+6. One Corner label hint everywhere: "Your name or brand in a corner".
+7. New options at 390: Who's watching gets label-sized columns with no gap; "Walkthrough" becomes the name at every width.
+8. Voice at 390: More voices fills the empty cell beside George.
