@@ -234,7 +234,7 @@ textarea{resize:none}
 .bacts{display:flex;gap:6px;justify-content:flex-end}
 .form{display:grid;grid-template-columns:150px minmax(0,1fr);gap:16px 18px;align-items:start}
 .form > .lbl{min-height:44px;display:flex;align-items:center}
-.est{padding:14px 16px;border-radius:20px;background:var(--wash);line-height:1.55}
+.est{padding:16px;border-radius:20px;background:var(--wash);line-height:1.55;text-wrap:pretty}
 .note{display:flex;gap:8px;align-items:baseline;margin:8px 0 0}
 .note .dot{background:var(--ink);transform:translateY(-1px)}
 .nw{white-space:nowrap}
@@ -1068,7 +1068,7 @@ textarea{resize:none}
 <p class="note small" style="margin-top: 4px"><span class="dot" :style="btShort ? '' : 'visibility: hidden'"></span><span>{{btLine2}}</span></p>
 </div>
 </div>
-<div class="foot"><span class="ftext muted">{{btFootText}}</span><span class="fbtns"><button type="button" class="btn ghost" @click="cancelBrief($event)">Cancel</button><button type="button" class="pri" @click="submitBatch($event)" :disabled="(btEmpty)">{{btCta}}</button></span></div>
+<div class="foot"><span class="ftext muted">{{btFootText}}</span><span class="fbtns"><button type="button" class="btn ghost" @click="cancelBrief($event)">Cancel</button><button type="button" class="pri" @click="submitBatch($event)" :disabled="(btEmpty)" style="min-width: 160px">{{btCta}}</button></span></div>
 </div>
 </div>
 </main>
