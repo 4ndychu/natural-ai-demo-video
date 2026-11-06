@@ -429,7 +429,8 @@ textarea{resize:none}
   /* Phone: each file's detail sits left-aligned under its name; the list keeps the height of its largest state (4 files), so no setting moves Export video. */
   .filerow{flex-direction:column;align-items:flex-start;gap:0}
   .filerow .fdet{margin-left:0;text-align:left}
-  .fileslist{min-height:219px}
+  /* Reserves the default files plus one: every single toggle (captions file or 720p) stays inside it; only both together add a row, below the switch you clicked. */
+  .fileslist{min-height:164.2px}
   .cslot{min-height:42px}
   .cfields .csel{flex-basis:118px}
   .addrow{flex-wrap:wrap;row-gap:8px}
