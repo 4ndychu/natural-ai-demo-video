@@ -218,7 +218,7 @@ class Component extends DCLogic {
     const sliders = defs.map((d) => ({ k: d.k, label: d.label, min: d.min, max: d.max, value: v[d.k], display: d.f(v[d.k]), pct: ((v[d.k] - d.min) / (d.max - d.min) * 100) + '%', rec: ((rec[d.k] - d.min) / (d.max - d.min) * 100) + '%', off: v[d.k] !== rec[d.k], low: d.low, high: d.high, isSwear: d.k === 'swear',
       reset: () => { const prev = this.state.vals; const n = Object.assign({}, prev); n[d.k] = rec[d.k]; setVals(n, d.label + ' back to recommended', prev); this.focusLater('#rng-' + d.k); },
       onChange: (e) => setV(d.k, Number(e.target.value)),
-      down: (e) => { this.dragKey = d.k; try { e.currentTarget.setPointerCapture(e.pointerId); } catch (x) {} drag(e, d); },
+      down: (e) => { this.dragKey = d.k; const inp = e.currentTarget.querySelector('input'); if (inp) { e.preventDefault(); inp.focus({ preventScroll: true }); } try { e.currentTarget.setPointerCapture(e.pointerId); } catch (x) {} drag(e, d); },
       move: (e) => { if (this.dragKey === d.k) drag(e, d); },
       up: () => { this.dragKey = null; } }));
     const changed = defs.filter((d) => v[d.k] !== rec[d.k]).length;
@@ -441,7 +441,7 @@ class Component extends DCLogic {
       fineNote: changed ? changed + ' changed' : 'All recommended', sliders: sliders.filter((x) => x.k !== 'pace' && x.k !== 'swear'), paceSliders: sliders.filter((x) => x.k === 'pace'),
       swearPills: ['Off', 'One', 'A few'].map((l, i) => ({ label: l, on: v.swear === i ? 'true' : 'false', pick: () => setV('swear', i) })), swearHelp: 'Off: fine for any audience. On: at natural reactions, never in instructions.', sliderHelp: st.sliderHelp, toggleSliderHelp: () => this.setState({ sliderHelp: !st.sliderHelp }), sliderHelpLabel: st.sliderHelp ? 'Hide what these do' : 'What do these do?',
       resetAll: () => { const prev = st.vals; setVals(Object.assign({}, rec), 'Back to the recommended settings', prev); this.focusLater('#slhelp'); }, anyChanged: changed > 0,
-      capsOn: a.onStr, capsCls: a.cls, toggleCaps: () => this.setState({ caps: !st.caps }),
+      capsOn: a.onStr, capsCls: a.cls, toggleCaps: () => { if (v.swear > 0) this.setState({ caps: !st.caps }); },
       playSample: () => { if (st.sampling) { this.stop('sample'); this.setState({ sampling: false }); return; } if (this.needKey()) return; const free = st.lastSample === sampleKey; if (!free) this.spend(SAMPLE_COST); this.setState({ sampling: true, lastSample: sampleKey }); this.later('sample', 6000, () => this.setState({ sampling: false })); },
       samplePlaying: st.sampling, sampleStopped: !st.sampling, playAria: st.sampling ? 'Stop sample' : 'Play sample', wvClass: st.sampling ? 'wv on' : 'wv',
       wbars: [30, 55, 40, 75, 50, 90, 62, 100, 48, 70, 36, 64, 88, 52, 96, 58, 44, 80, 50, 72, 34, 60, 92, 46, 70, 40, 66, 30].map((h, i) => ({ h: h + '%', d: (i % 7) * 70 + 'ms' })),

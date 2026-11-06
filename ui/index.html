@@ -75,7 +75,7 @@ textarea{resize:none}
 .bar .rec::before{display:none}.bar .rec::after{bottom:0;height:5px;opacity:0.55}
 .bar .bl,.bar .bv{z-index:1}
 .bar input{position:absolute;inset:0;width:100%;height:100%;margin:0;opacity:0;pointer-events:none}
-.bar:focus-within{outline:2px solid var(--focus);outline-offset:2px}
+.bar:has(input:focus-visible){outline:2px solid var(--focus);outline-offset:2px}
 .slwrap{position:relative}
 .slwrap .reset{position:absolute;right:-6px;top:-8px;width:24px;height:24px;border-radius:12px;border:0;background:var(--ink);color:var(--sheet);display:inline-flex;align-items:center;justify-content:center;padding:0}
 .sw{width:46px;height:28px;border-radius:14px;border:0;padding:3px;display:inline-flex;flex:none;background:var(--fill)}
@@ -162,6 +162,10 @@ textarea{resize:none}
 .mpills button[aria-pressed=true]{background:var(--segOn);color:var(--ink);font-weight:400;box-shadow:0 1px 2px rgba(0,0,0,0.14),inset 0 0 0 1px var(--fill)}
 @media (hover:hover){.mpills button[aria-pressed=false]:hover{color:var(--ink);background:var(--wash)}}
 .swcap{display:flex;align-items:center;justify-content:space-between;gap:10px;height:46px;margin-top:14px;padding:0 8px 0 14px;border-radius:12px;background:var(--wash);box-sizing:border-box}
+/* While Swearing is Off the captions switch stays in place, shown disabled, so picking a level moves nothing. */
+.swcap.swoff{color:var(--ink2)}
+.swcap.swoff .sw{opacity:0.4;cursor:not-allowed}
+.finenote{display:inline-block;min-width:8.5em;font-variant-numeric:tabular-nums}
 /* privacy */
 .presets{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
 .preset{border:0;text-align:left;background:var(--tray);border-radius:20px;padding:16px 16px 18px;display:flex;flex-direction:column;gap:6px;color:var(--ink)}
@@ -367,7 +371,6 @@ textarea{resize:none}
   .slide .slabel{left:50px;right:6px}
   .sliders{grid-template-columns:minmax(0,1fr)}
   .paceslot:empty{display:none}
-  .swcap.swoff{display:none}
   .setrow,.list > div > .row,.list > .row{flex-wrap:wrap}
   .page{padding:4px 12px 120px}
   .hdr{padding:0 8px 0 14px;gap:4px}
@@ -691,7 +694,7 @@ textarea{resize:none}
 
 
 <div style="margin-top: 22px">
-<div class="ftrow" style="display: flex; align-items: center; gap: 12px; min-height: 40px; flex-wrap: wrap"><h2 class="h-sec" style="flex: none; white-space: nowrap">Fine-tune</h2><span class="muted small lg-only" style="white-space: nowrap">{{fineNote}}</span><div v-if="anyChanged" style="display: contents"><button id="resetall" type="button" class="btn sm" @click="resetAll($event)">Reset all</button></div><span style="flex: 1"></span><button id="slhelp" type="button" class="link small" @click="toggleSliderHelp($event)" :aria-expanded="(sliderHelp)">{{sliderHelpLabel}}</button></div>
+<div class="ftrow" style="display: flex; align-items: center; gap: 12px; min-height: 40px; flex-wrap: wrap"><h2 class="h-sec" style="flex: none; white-space: nowrap">Fine-tune</h2><span class="muted small lg-only finenote" style="white-space: nowrap">{{fineNote}}</span><div v-if="anyChanged" style="display: contents"><button id="resetall" type="button" class="btn sm" @click="resetAll($event)">Reset all</button></div><span style="flex: 1"></span><button id="slhelp" type="button" class="link small" @click="toggleSliderHelp($event)" :aria-expanded="(sliderHelp)">{{sliderHelpLabel}}</button></div>
 <p class="muted small" style="margin: 2px 0 0">Drag a bar or click anywhere on it. The small notch marks the recommended spot for {{voiceName}}.</p>
 <div class="sliders" style="margin-top: 12px">
 <div v-for="s in sliders" style="display: contents">
@@ -717,7 +720,7 @@ textarea{resize:none}
 </div>
 </div></div></div>
 </div>
-<div :class="swearOn ? 'swcap' : 'swcap swoff'" :style="'visibility: ' + (swearOn ? 'visible' : 'hidden')"><span id="capsLbl">Swears in captions too</span><button type="button" :class="(capsCls)" role="switch" :aria-checked="(capsOn)" aria-labelledby="capsLbl" @click="toggleCaps($event)" :tabindex="swearOn ? null : '-1'"><span></span></button></div>
+<div :class="swearOn ? 'swcap' : 'swcap swoff'"><span id="capsLbl">Swears in captions too</span><button type="button" :class="(capsCls)" role="switch" :aria-checked="(capsOn)" :aria-disabled="swearOn ? null : 'true'" aria-labelledby="capsLbl" @click="toggleCaps($event)" :tabindex="swearOn ? null : '-1'"><span></span></button></div>
 </div>
 </div>
 
