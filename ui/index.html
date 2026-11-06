@@ -26,7 +26,7 @@ html{scroll-padding-bottom:104px;scroll-padding-top:12px}
 .small{font-size:14px}
 button,input,textarea,select{font:inherit;color:inherit}
 button{cursor:pointer;transition:background-color 160ms ease,box-shadow 160ms ease,opacity 160ms ease,color 160ms ease}
-button[disabled]{cursor:not-allowed}
+button[disabled],.pri[aria-disabled=true]{cursor:not-allowed}
 :focus{outline:none}
 :focus-visible{outline:2px solid var(--focus);outline-offset:2px}
 h1[tabindex="-1"]:focus,p[tabindex="-1"]:focus,div[tabindex="-1"]:focus{outline:none}
@@ -51,7 +51,7 @@ textarea{resize:none}
 .pri{height:44px;padding:0 22px;border-radius:999px;border:0;background:var(--ink);color:var(--sheet);font-size:15px;font-weight:500;white-space:nowrap}
 /* Review: the primary keeps the width of its longest label ('Looks good, go to Export'), so adding marks never moves Back or Export without redos. */
 @media (min-width: 861px){.prirev{min-width:218px}.prirev.prib{min-width:232px}}
-.pri[disabled]{opacity:1;background:var(--wash);color:var(--ink2);box-shadow:inset 0 0 0 1px var(--line)}
+.pri[disabled],.pri[aria-disabled=true]{opacity:1;background:var(--wash);color:var(--ink2);box-shadow:inset 0 0 0 1px var(--line)}
 .btn.ghost{background:transparent;color:var(--ink2)}
 @media (hover:hover){.btn.ghost:hover{background:var(--wash);color:var(--ink)}}
 .link{border:0;background:none;padding:4px 0;color:var(--ink);text-decoration:underline;text-decoration-color:var(--fill);text-underline-offset:3px;font-size:inherit;white-space:nowrap}
@@ -531,6 +531,8 @@ textarea{resize:none}
   .brow .bacts{grid-column:3!important;grid-row:1 / 3!important}
   /* With Pause showing, row 1 is the count and Pause, and row 2 is the bar at full width. */
   .bpause{display:flex;margin-left:auto}
+  /* The count line after Choose a file always has its own line, so pasting never moves Shared settings. */
+  .btcount{flex-basis:100%}
   .bprogp .bbar{order:1;flex-basis:100%!important}
   .stepfoot .backbtn{display:none}
   /* Review's two footer buttons share the row inside the tray's padding, so neither touches the edge. */
@@ -1100,7 +1102,7 @@ textarea{resize:none}
 </div>
 </div>
 </div>
-<div class="foot"><span class="ftext muted">{{briefWhy || briefHint}}</span><span class="fbtns"><button type="button" class="btn ghost" @click="cancelBrief($event)">Cancel</button><button type="button" class="pri" @click="submitBrief($event)" :disabled="(briefEmpty)">{{briefCta}}</button></span></div>
+<div class="foot"><span class="ftext muted">{{briefWhy || briefHint}}</span><span class="fbtns"><button type="button" class="btn ghost" @click="cancelBrief($event)">Cancel</button><button type="button" class="pri" @click="submitBrief($event)" :aria-disabled="briefEmpty ? 'true' : 'false'">{{briefCta}}</button></span></div>
 </div>
 </div>
 
@@ -1111,7 +1113,7 @@ textarea{resize:none}
 <label for="btt" class="wide" style="display: block; font-size: 24px; line-height: 1.2; font-weight: 500">Which videos?</label>
 <p class="muted" style="margin: 6px 0 12px">One video per line, for example every lesson in a course. Or choose a course outline (.txt, .md or .csv).</p>
 <div class="btbox"><textarea id="btt" :rows="(btRows)" :value="(btText)" @input="onBtText($event)" @change="onBtText($event)" placeholder="Create your whop&#10;Add the Courses app&#10;Plan your modules" class="inp"></textarea></div>
-<div style="display: flex; align-items: center; gap: 12px; margin-top: 10px; flex-wrap: wrap"><button type="button" class="btn sm" @click="pickFile($event)">Choose a file</button><input id="btfile" type="file" accept=".txt,.md,.csv,text/plain,text/markdown,text/csv" @change="onFile($event)" class="sr" tabindex="-1" aria-hidden="true"><span class="muted small">{{btHasFile ? 'From ' + btFileName + '. ' : ''}}{{btLinesText}}</span></div>
+<div style="display: flex; align-items: center; gap: 12px; margin-top: 10px; flex-wrap: wrap"><button type="button" class="btn sm" @click="pickFile($event)">Choose a file</button><input id="btfile" type="file" accept=".txt,.md,.csv,text/plain,text/markdown,text/csv" @change="onFile($event)" class="sr" tabindex="-1" aria-hidden="true"><span class="muted small btcount">{{btHasFile ? 'From ' + btFileName + '. ' : ''}}{{btLinesText}}</span></div>
 </div>
 <div>
 <h2 class="h-sec" style="margin-bottom: 4px">Shared settings</h2>
@@ -1129,7 +1131,7 @@ textarea{resize:none}
 <p class="note small" style="margin-top: 4px"><svg class="warnic" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" :style="btShort ? '' : 'visibility: hidden'"><path d="M12 3l9.5 17h-19z"></path><path d="M12 10v4M12 17.5v.01"></path></svg><span>{{btLine2}}</span></p>
 </div>
 </div>
-<div class="foot"><span class="ftext muted">{{btFootText}}</span><span class="fbtns"><button type="button" class="btn ghost" @click="cancelBrief($event)">Cancel</button><button type="button" class="pri" @click="submitBatch($event)" :disabled="(btEmpty)" style="min-width: 160px">{{btCta}}</button></span></div>
+<div class="foot"><span class="ftext muted">{{btFootText}}</span><span class="fbtns"><button type="button" class="btn ghost" @click="cancelBrief($event)">Cancel</button><button type="button" class="pri" @click="submitBatch($event)" :aria-disabled="btEmpty ? 'true' : 'false'" style="min-width: 160px">{{btCta}}</button></span></div>
 </div>
 </div>
 </main>

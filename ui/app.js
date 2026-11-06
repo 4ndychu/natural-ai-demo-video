@@ -291,7 +291,8 @@ class Component extends DCLogic {
     const bSiteVal = st.bSiteNew ? st.bNew.trim() : st.bSite;
     const posName = { tl: 'top left', tr: 'top right', bl: 'bottom left', br: 'bottom right' };
     const kindLabel = { course: 'walkthrough', saas: 'quick demo', tour: 'product tour' };
-    const summaryParts = [['Beginners', 'Some experience', 'Pros'][st.bWho], kindLabel[st.bKind].charAt(0).toUpperCase() + kindLabel[st.bKind].slice(1), lenOpts[st.bLen] + ' min' + (st.bLen === suggestLen ? ' (suggested)' : ''), pretty(st.bVoice), { burn: 'Captions on', file: 'Captions as a file', off: 'No captions' }[st.bCap]].concat(st.bCorner === 'off' ? [] : ['label' + (st.bCornerText.trim() ? ': ' + st.bCornerText.trim() + ',' : '') + ' ' + posName[st.bCorner]]);
+    const nb = (x) => x.replace(/ /g, '\u00a0');
+    const summaryParts = [['Beginners', 'Some experience', 'Pros'][st.bWho], kindLabel[st.bKind].charAt(0).toUpperCase() + kindLabel[st.bKind].slice(1), lenOpts[st.bLen] + ' min' + (st.bLen === suggestLen ? ' (suggested)' : ''), pretty(st.bVoice), { burn: 'Captions on', file: 'Captions as a file', off: 'No captions' }[st.bCap]].map(nb).concat(st.bCorner === 'off' ? [] : ['label' + (st.bCornerText.trim() ? ': ' + st.bCornerText.trim() + ',' : '') + ' ' + posName[st.bCorner]]);
     if (st.bHide.trim()) summaryParts.push('keep “' + st.bHide.trim() + '” off screen');
     // ---- batch (new) ----
     const btLines = st.btText.split(/\r?\n/).map((s) => s.replace(/^\s*(?:[-*•]|\d+[.)]|#+)\s*/, '').split(/\t|,(?=(?:[^"]*"[^"]*")*[^"]*$)/)[0].replace(/^"|"$/g, '').trim()).filter((s) => s && !/^(title|lesson|name)$/i.test(s));
@@ -372,7 +373,7 @@ class Component extends DCLogic {
       lenHint: suggestLen < 0 ? lenOpts[st.bLen] + ' min for now. Claude suggests a length once you say what to show.' : '★ Suggested for what you typed. Your pick wins.',
       cancelBrief: () => this.setState({ screen: st.editing ? 'demo' : 'home' }),
       submitBrief: () => {
-        const w = st.bWhat.trim(); if (!w) return; const site = bSiteVal || 'whop.com'; if (!site) return; const t = w.length > 34 ? w.slice(0, 32).replace(/\s+\S*$/, '') + '…' : w;
+        const w = st.bWhat.trim(); if (!w) { this.focusLater('#bw'); return; } if (st.bSiteNew && !siteOk(st.bNew)) { this.focusLater('#bns'); return; } const site = bSiteVal || 'whop.com'; if (!site) return; const t = w.length > 34 ? w.slice(0, 32).replace(/\s+\S*$/, '') + '…' : w;
         const newSite = !st.sites.some((s) => s.u === site);
         if (st.editing) { this.patchDemo({ title: t, what: w, site: site, who: st.bWho, len: st.bLen, voice: st.bVoice, capMode: st.bCap, corner: st.bCorner, cornerText: st.bCornerText, written: false }); this.setState({ screen: 'demo', step: 0, sites: newSite ? st.sites.concat([{ u: site, note: 'Saved Nov 5' }]) : st.sites }); this.later('write', 2200, () => { this.patchDemo({ written: true }); this.say('Script updated'); }); this.say('Updating the script'); return; }
         const id = 'd' + Date.now();
@@ -393,11 +394,11 @@ class Component extends DCLogic {
       btVoices: st.mine.map((k) => ({ label: pretty(k), on: st.btVoice === k ? 'true' : 'false', pick: () => this.setState({ btVoice: k }) })),
       btKinds: segOf([['course', 'Walkthrough'], ['saas', 'Quick demo'], ['tour', 'Product tour']], st.btKind, (x) => this.setState({ btKind: x })).map((o, i) => Object.assign(o, { short: ['Course', 'SaaS', 'Tour'][i], ph: ['Walkthrough', 'Quick demo', 'Product tour'][i] })),
       btPresets: segOf([['strict', 'Strict'], ['standard', 'Standard'], ['test', 'Test account']], st.btPreset, (x) => this.setState({ btPreset: x })).map((o, i) => Object.assign(o, { short: ['Strict', 'Standard', 'Test'][i] })),
-      btCount: btCount, btEmpty: !btCount || (st.btSiteNew && !siteOk(st.btNew)), btCountText: btCount ? this.plural(btCount, 'video') : 'No videos yet', btMinText: 'about ' + btMin + ' min', btCostText: 'about ' + this.num(btCost) + ' credits', btLine2: btShort && btCount > 0 ? 'You have ' + this.num(st.credits) + ' credits, enough for about ' + this.plural(btFits, 'video') + '. Recording pauses there until you top up.' : 'You have ' + this.num(st.credits) + ' credits. Claude picks a length for each video.', btLeftText: 'you have ' + this.num(st.credits) + '.', btLinesText: btCount ? this.plural(btCount, 'line') + ' → ' + this.plural(btCount, 'video') + (btCount > 7 ? ' · scroll for ' + (btCount - 7) + ' more' : '') : 'Nothing yet',
+      btCount: btCount, btEmpty: !btCount || (st.btSiteNew && !siteOk(st.btNew)), btCountText: btCount ? this.plural(btCount, 'video') : 'No videos yet', btMinText: 'about\u00a0' + btMin + '\u00a0min', btCostText: 'about\u00a0' + this.num(btCost) + '\u00a0credits', btLine2: btShort && btCount > 0 ? 'You have ' + this.num(st.credits) + ' credits, enough for about ' + this.plural(btFits, 'video') + '. Recording pauses there until you top up.' : 'You have ' + this.num(st.credits) + ' credits. Claude picks a length for each video.', btLeftText: 'you have ' + this.num(st.credits) + '.', btLinesText: btCount ? this.plural(btCount, 'line') + ' → ' + this.plural(btCount, 'video') + (btCount > 7 ? ' · scroll for ' + (btCount - 7) + ' more' : '') : 'Nothing yet',
       btShort: btShort && btCount > 0, btShortText: 'Enough for about ' + btFits + '. Recording pauses there until you top up. Nothing fails.',
       btCta: btCount ? 'Write ' + this.plural(btCount, 'script') : 'Write the scripts',
       submitBatch: () => {
-        if (!btCount || (st.btSiteNew && !siteOk(st.btNew))) return; const id = 'b' + Date.now();
+        if (!btCount) { this.focusLater('#btt'); return; } if (st.btSiteNew && !siteOk(st.btNew)) { this.focusLater('#btns'); return; } const id = 'b' + Date.now();
         const b = { id: id, name: btName, site: st.btSiteNew ? st.btNew.trim() : st.btSite, voice: st.btVoice, kind: st.btKind, preset: st.btPreset, folder: btFolder, stage: 'writing', paused: false, items: btLines.map((t, i) => ({ t: t, lesson: 'Lesson ' + (i + 1), min: 3, st: 'writing' })) };
         this.setState({ batches: [b].concat(st.batches), curBatch: id, screen: 'batch', btText: '', btName: '', btFile: '', btFolder: '' });
         this.later('bwrite', 2600, () => { this.patchBatch((x) => ({ stage: 'approve', items: x.items.map((it) => Object.assign({}, it, { st: 'script' })) }), id); this.say('All scripts are ready to approve'); });
