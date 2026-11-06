@@ -492,6 +492,8 @@ textarea{resize:none}
   .phone-setup{background:transparent!important;padding:4px 2px!important;color:var(--ink2)!important}
   .dcard .meta{margin-top:0!important;margin-left:6px}
   .bprimary{min-width:0}
+  /* Watch #5 keeps the box of Watch next, so the number never resizes it. */
+  .bprimary.bwatch{min-width:124.2px}
   .bsecond{min-width:0}
   .bmore{padding-left:36px}
   /* The batch footer line wraps to two lines on phones instead of ending in an ellipsis. */
@@ -1219,7 +1221,7 @@ textarea{resize:none}
 <div v-if="bShowToggle" class="bmore"><button type="button" class="link" @click="bShowAll($event)" :aria-expanded="bAllOpenRaw ? 'true' : 'false'">{{bShowAllLabel}}</button></div>
 </div>
 </div>
-<div :class="bCfSlot ? 'foot bfoot bfcf' : 'foot bfoot'"><span v-if="bConfirm" class="ftext" style="color: var(--ink)"><span class="dot k-ready"></span><span class="bcf">{{bConfirmText}}</span></span><span v-if="bNotConfirm" class="ftext muted"><span id="bwhy"><span class="lg-only">{{bFooter}}</span><span class="sm-only">{{bFooterShort}}</span></span></span><span class="fbtns"><div v-if="bConfirm" style="display: contents"><button type="button" class="btn" @click="bConfirmNo($event)">Cancel</button><button id="bcfyes" type="button" class="pri bprimary bapprove" @click="bConfirmYes($event)">Yes, record all</button></div><div v-if="bNotConfirm" style="display: contents"><div v-if="hasBSecondary" style="display: contents"><button type="button" class="btn bsecond" @click="bSecondary($event)" :aria-disabled="bSecondaryOff ? 'true' : 'false'"><span class="lg-only">{{bSecondaryLabel}}</span><span class="sm-only">{{bSecondaryShort}}</span></button></div><button type="button" :class="bCfSlot ? 'pri bprimary bapprove' : 'pri bprimary'" @click="bPrimary($event)" :aria-disabled="bPrimaryOff ? 'true' : 'false'" :aria-describedby="bPrimaryOff ? 'bwhy' : null"><span class="lg-only">{{bPrimaryLabel}}</span><span class="sm-only">{{bPrimaryShort}}</span></button></div></span></div>
+<div :class="bCfSlot ? 'foot bfoot bfcf' : 'foot bfoot'"><span v-if="bConfirm" class="ftext" style="color: var(--ink)"><span class="dot k-ready"></span><span class="bcf">{{bConfirmText}}</span></span><span v-if="bNotConfirm" class="ftext muted"><span id="bwhy"><span class="lg-only">{{bFooter}}</span><span class="sm-only">{{bFooterShort}}</span></span></span><span class="fbtns"><div v-if="bConfirm" style="display: contents"><button type="button" class="btn" @click="bConfirmNo($event)">Cancel</button><button id="bcfyes" type="button" class="pri bprimary bapprove" @click="bConfirmYes($event)">Yes, record all</button></div><div v-if="bNotConfirm" style="display: contents"><div v-if="hasBSecondary" style="display: contents"><button type="button" class="btn bsecond" @click="bSecondary($event)" :aria-disabled="bSecondaryOff ? 'true' : 'false'"><span class="lg-only">{{bSecondaryLabel}}</span><span class="sm-only">{{bSecondaryShort}}</span></button></div><button type="button" :class="bCfSlot ? 'pri bprimary bapprove' : (bWatchBtn ? 'pri bprimary bwatch' : 'pri bprimary')" @click="bPrimary($event)" :aria-disabled="bPrimaryOff ? 'true' : 'false'" :aria-describedby="bPrimaryOff ? 'bwhy' : null"><span class="lg-only">{{bPrimaryLabel}}</span><span class="sm-only">{{bPrimaryShort}}</span></button></div></span></div>
 </section>
 </main>
 </div>
