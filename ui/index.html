@@ -427,6 +427,10 @@ textarea{resize:none}
 .scbusy{position:relative;display:inline-flex;max-width:100%}
 .scbusytext{position:absolute;inset:0;display:flex;align-items:center;min-width:0;overflow:hidden;white-space:nowrap}
 .scbusytext:empty{display:none}
+/* Welcome step 2: like steps 1 and 3, the title row holds no button. The text and a fixed action slot share the row under it (the slot takes its own line on phones), so Install, Not now / Yes, install and the empty busy/done states all keep one shape. */
+.wtools{display:flex;align-items:center;gap:12px;margin:8px 0 0 40px}
+.wtools #toolstext{flex:1 1 0;min-width:0;margin:0;min-height:calc(2 * 1.45em)}
+.wtslot{flex:none;width:209px;min-height:44px;display:flex;justify-content:flex-end;gap:6px}
 @media (min-width: 861px){.sm-only{display:none!important}}
 @media (max-width: 860px){
   .lg-only{display:none!important}
@@ -567,7 +571,8 @@ textarea{resize:none}
   .wwrap{padding-top:16px!important}
   .stepfoot .ftext{min-height:calc(2 * 1.45em)}
   .stepfoot .ftext .link{padding-top:0;padding-bottom:0}
-  .wthead{min-height:50px!important}
+  .wtools{flex-wrap:wrap;gap:8px}
+  .wtslot{flex-basis:100%;width:auto}
   .wfoot > .muted{text-align:left!important}
   #toolstext,.wfoot > .muted{min-height:calc(2 * 1.45em)!important}
   .setrow{flex-wrap:wrap;padding:12px 0}
@@ -622,11 +627,14 @@ textarea{resize:none}
 </div>
 
 <div style="border-top: 1px solid var(--line); padding: 16px 0">
-<div class="wthead" style="display: flex; align-items: center; gap: 12px; font-weight: 500; font-size: 17px; min-height: 44px"><span :class="(w2Cls)" class="disc">{{w2Mark}}</span>Recording tools<span style="flex: 1"></span>
-<div v-if="toolsIdle" style="display: contents"><button id="toolsinstall" type="button" class="btn" @click="askTools($event)">Install</button></div>
-<div v-if="toolsAsking" style="display: contents"><span style="display: inline-flex; gap: 6px"><button type="button" class="btn" @click="cancelTools($event)">Not now</button><button id="toolsyes" type="button" class="btn strong" @click="installTools($event)">Yes, install</button></span></div>
+<div style="display: flex; align-items: center; gap: 12px; font-weight: 500; font-size: 17px"><span :class="(w2Cls)" class="disc">{{w2Mark}}</span>Recording tools</div>
+<div class="wtools wpad">
+<p id="toolstext" tabindex="-1" class="muted">{{toolsText}}</p>
+<div class="wtslot">
+<div v-if="toolsIdle" style="display: contents"><button id="toolsinstall" type="button" class="btn wtest" @click="askTools($event)" style="width: 150px">Install</button></div>
+<div v-if="toolsAsking" style="display: contents"><button type="button" class="btn" @click="cancelTools($event)">Not now</button><button id="toolsyes" type="button" class="btn strong" @click="installTools($event)">Yes, install</button></div>
 </div>
-<p id="toolstext" tabindex="-1" class="muted wpad" style="margin: 6px 0 0 40px; min-height: 22px">{{toolsText}}</p>
+</div>
 </div>
 
 <div style="border-top: 1px solid var(--line); padding: 16px 0">
