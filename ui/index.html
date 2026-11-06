@@ -368,7 +368,7 @@ textarea{resize:none}
 .srow .sctl{flex:0 1 360px;min-width:0}
 .srow .sctl2{flex:0 1 auto;display:flex;flex-direction:column;align-items:flex-end;min-width:0;max-width:100%}
 .srow .sctl2 .chips{justify-content:flex-end}
-.srow > .folderrow{flex:0 1 360px}
+.srow > .folderrow{flex:0 1 440px}
 /* The paste box shows whole lines only: the padding sits on the frame, so the textarea clips on a line edge. */
 .btbox{border:1px solid var(--line);border-radius:12px;background:var(--sheet);padding:14px 0}
 .btbox:focus-within{border-color:var(--ink2)}
@@ -611,6 +611,8 @@ textarea{resize:none}
   .chips .newchip{padding:0 14px}
   .srow > .folderrow{flex:1 1 auto;flex-wrap:nowrap;justify-content:space-between}
   .srow > .folderrow .btn{padding:0 14px}
+  /* The credits line keeps the height of its longest version (three lines), so pasting a list doesn't move Write N scripts. */
+  .btcred{min-height:calc(3 * 1.55em)}
 }
 </style>
 </head>
@@ -1149,12 +1151,12 @@ textarea{resize:none}
 <div class="srow"><span class="sl"><span class="slab">Voice</span></span><div class="pills pillsfit" role="group" aria-label="Voice"><div v-for="o in btVoices" style="display: contents"><button type="button" :aria-pressed="(o.on)" @click="o.pick($event)">{{o.label}}</button></div></div></div>
 <div class="srow"><span class="sl"><span class="slab">Kind of demo</span><span class="muted small shelp shelp2">{{btKindHint}}</span></span><div class="pills pillsfit" role="group" aria-label="Kind of demo"><div v-for="o in btKinds" style="display: contents"><button type="button" :aria-pressed="(o.on)" @click="o.pick($event)"><span class="lg-only">{{o.label}}</span><span class="sm-only">{{o.ph}}</span></button></div></div></div>
 <div class="srow"><span class="sl"><span class="slab">Privacy</span><span class="muted small shelp shelp2">{{btPresetHint}}</span></span><div class="pills pillsfit" role="group" aria-label="Privacy"><div v-for="o in btPresets" style="display: contents"><button type="button" :aria-pressed="(o.on)" @click="o.pick($event)">{{o.label}}</button></div></div></div>
-<div class="srow"><span class="sl"><span class="slab">Export folder</span></span><div class="folderrow sctl" style="display: flex; align-items: center; gap: 8px"><button type="button" id="btf" class="inp" tabindex="-1" :title="(btFolderVal)" :aria-label="'Export folder: ' + btFolderVal + '. Change folder'" @click="chooseFolder($event)" style="flex: 1 1 auto; min-width: 0; display: block; line-height: 42px; padding: 0 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: left; cursor: pointer">{{btFolderShort}}</button><button type="button" class="btn" @click="chooseFolder($event)" aria-describedby="btf"><span class="lg-only">Change folder</span><span class="sm-only">Change</span></button></div></div>
+<div class="srow"><span class="sl"><span class="slab">Export folder</span></span><div class="folderrow sctl" style="display: flex; align-items: center; gap: 8px"><button type="button" id="btf" class="inp" tabindex="-1" :title="(btFolderVal)" :aria-label="'Export folder: ' + btFolderVal + '. Change folder'" @click="chooseFolder($event)" style="flex: 1 1 auto; min-width: 0; display: block; line-height: 42px; padding: 0 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: left; cursor: pointer; direction: rtl"><bdi dir="ltr">{{btFolderShort}}</bdi></button><button type="button" class="btn" @click="chooseFolder($event)" aria-describedby="btf"><span class="lg-only">Change folder</span><span class="sm-only">Change</span></button></div></div>
 </div>
 </div>
 <div class="est" aria-live="polite">
 <div><span class="nw">{{btCountText}}</span> · <span class="nw">{{btMinText}}</span> · <span class="nw">{{btCostText}}</span></div>
-<p class="note small" style="margin-top: 4px"><svg class="warnic" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" :style="btShort ? '' : 'visibility: hidden'"><path d="M12 3l9.5 17h-19z"></path><path d="M12 10v4M12 17.5v.01"></path></svg><span>{{btLine2}}</span></p>
+<p class="note small btcred" style="margin-top: 4px"><svg class="warnic" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" :style="btShort ? '' : 'visibility: hidden'"><path d="M12 3l9.5 17h-19z"></path><path d="M12 10v4M12 17.5v.01"></path></svg><span>{{btLine2}}</span></p>
 </div>
 </div>
 <div class="foot"><span class="ftext muted">{{btFootText}}</span><span class="fbtns"><button type="button" class="btn ghost" @click="cancelBrief($event)">Cancel</button><button type="button" class="pri" @click="submitBatch($event)" :aria-disabled="btEmpty ? 'true' : 'false'" style="min-width: 160px">{{btCta}}</button></span></div>
