@@ -209,11 +209,11 @@ textarea{resize:none}
 .dot.k-rec{background:#FF5A4E}
 .pill{--dc:#FFFFFF}
 /* batch */
-.brow{display:grid;grid-template-columns:32px minmax(0,320px) 72px 160px minmax(0,1fr) 88px;gap:0 12px;align-items:center;min-height:54px;border-top:1px solid var(--line)}
-.brow > .bacts{grid-column:6}
+.brow{display:grid;grid-template-columns:32px minmax(0,1fr) 72px 160px 88px;gap:0 12px;align-items:center;min-height:54px;border-top:1px solid var(--line)}
+.brow > .bacts{grid-column:5}
+.bmore{display:flex;align-items:center;height:54px;border-top:1px solid var(--line);padding-left:44px}
 .bacts .btn{width:88px;padding:0}
 .bnone{display:inline-block;width:88px;text-align:center}
-.btable{max-height:calc(7.5 * 55px);overflow-y:auto;overscroll-behavior:contain}
 .bnote{min-height:22px}
 .bsecond{min-width:232px}
 .brow .mono{font-size:14px}
@@ -349,7 +349,7 @@ textarea{resize:none}
   .dcard .meta{margin-top:0!important;margin-left:6px}
   .bprimary{min-width:0}
   .bsecond{min-width:0}
-  .btable{max-height:none;overflow:visible}
+  .bmore{padding-left:36px}
   .bfoot .ftext > span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block!important}
   .bfoot .ftext > span.bcf{white-space:normal;display:-webkit-box!important}
   .bfoot .ftext > .dot{display:inline-block!important}
@@ -1042,11 +1042,12 @@ textarea{resize:none}
 <span class="bacts">
 <div v-if="it.canOpen" style="display: contents"><button type="button" class="btn sm" @click="it.toggle($event)" :aria-expanded="(it.openStr)">{{it.open ? 'Close' : 'Read'}}</button></div>
 <div v-if="it.canWatch" style="display: contents"><button type="button" class="btn sm" @click="it.watch($event)" :aria-label="'Watch ' + it.t">Watch</button></div>
-<div v-if="it.noAct" style="display: contents"><span class="muted bnone" aria-hidden="true">–</span></div>
+<div v-if="it.noAct" style="display: contents"><span class="bnone" aria-hidden="true"></span></div>
 </span>
 </div>
 <div v-if="it.open" style="display: contents"><div class="fade" style="padding: 4px 0 14px 42px"><p style="margin: 0; font-size: 17px">“{{it.preview}}”</p><p class="muted small" style="margin: 6px 0 0">Want changes? Tell Claude in the bar below, e.g. “make lesson {{it.n}} shorter”.</p></div></div>
 </div>
+<div v-if="bShowToggle" class="bmore"><button type="button" class="link" @click="bShowAll($event)" :aria-expanded="bAllOpenRaw ? 'true' : 'false'">{{bShowAllLabel}}</button></div>
 </div>
 </div>
 <div class="foot bfoot"><span v-if="bConfirm" class="ftext" style="color: var(--ink)"><span class="dot k-ready"></span><span class="bcf">{{bConfirmText}}</span></span><span v-if="bNotConfirm" class="ftext muted"><span>{{bFooter}}</span></span><span class="fbtns"><div v-if="bConfirm" style="display: contents"><button type="button" class="btn" @click="bConfirmNo($event)">Cancel</button><button id="bcfyes" type="button" class="pri bprimary" @click="bConfirmYes($event)">Yes, record all</button></div><div v-if="bNotConfirm" style="display: contents"><div v-if="hasBSecondary" style="display: contents"><button type="button" class="btn bsecond" @click="bSecondary($event)" :disabled="(bSecondaryOff)"><span class="lg-only">{{bSecondaryLabel}}</span><span class="sm-only">{{bSecondaryShort}}</span></button></div><button type="button" class="pri bprimary" @click="bPrimary($event)" :disabled="(bPrimaryOff)"><span class="lg-only">{{bPrimaryLabel}}</span><span class="sm-only">{{bPrimaryShort}}</span></button></div></span></div>
