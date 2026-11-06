@@ -370,7 +370,7 @@ class Component extends DCLogic {
       bCorner: cornerCtl(st.bCorner, (x) => this.setState({ bCorner: x }), 'bct'),
       bCornerText: st.bCornerText, onBCornerText: (e) => this.setState({ bCornerText: e.target.value }), bCornerOff: st.bCorner === 'off',
       bCornerPh: 'Text for the corner, e.g. your brand name',
-      lenHint: suggestLen < 0 ? lenOpts[st.bLen] + ' min for now. Claude suggests a length once you say what to show.' : '★ Suggested for what you typed. Your pick wins.',
+      lenHint: suggestLen < 0 ? 'Claude suggests a length once you say what to show.' : '★ Suggested for what you typed. Your pick wins.',
       cancelBrief: () => this.setState({ screen: st.editing ? 'demo' : 'home' }),
       submitBrief: () => {
         const w = st.bWhat.trim(); if (!w) { this.focusLater('#bw'); return; } if (st.bSiteNew && !siteOk(st.bNew)) { this.focusLater('#bns'); return; } const site = bSiteVal || 'whop.com'; if (!site) return; const t = w.length > 34 ? w.slice(0, 32).replace(/\s+\S*$/, '') + '…' : w;
