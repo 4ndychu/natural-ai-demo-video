@@ -373,6 +373,9 @@ textarea{resize:none}
 @media (prefers-reduced-motion: reduce){.wv.on span,.fade,.toast,.skel,.pmark.spin,.dot.k-busy{animation:none}.bar .fill,button,.sw span,.disclose svg{transition:none}}
 /* phone width */
 .wfoot > .muted{flex:1 1 100%;text-align:right}
+/* Welcome hairlines start at the steps' text column, not the sheet edge. */
+.wstep{position:relative}
+.wstep::before{content:'';position:absolute;top:0;left:40px;right:0;height:1px;background:var(--line)}
 @media (min-width: 861px){.sm-only{display:none!important}}
 @media (max-width: 860px){
   .lg-only{display:none!important}
@@ -496,6 +499,7 @@ textarea{resize:none}
   .wfield{flex-wrap:wrap;margin-left:0!important}
   .wfield .inp{flex:1 1 100%!important}
   .wpad{margin-left:0!important}
+  .wstep::before{left:0}
   .wwrap{padding-top:16px!important}
   .stepfoot .ftext{min-height:calc(2 * 1.45em)}
   .wthead{min-height:50px!important}
@@ -551,7 +555,7 @@ textarea{resize:none}
 </div>
 </div>
 
-<div style="border-top: 1px solid var(--line); padding: 16px 0">
+<div class="wstep" style="padding: 16px 0">
 <div class="wthead" style="display: flex; align-items: center; gap: 12px; font-weight: 500; font-size: 17px; min-height: 44px"><span :class="(w2Cls)" class="disc">{{w2Mark}}</span>Recording tools<span style="flex: 1"></span>
 <div v-if="toolsIdle" style="display: contents"><button id="toolsinstall" type="button" class="btn" @click="askTools($event)">Install</button></div>
 <div v-if="toolsAsking" style="display: contents"><span style="display: inline-flex; gap: 6px"><button type="button" class="btn" @click="cancelTools($event)">Not now</button><button id="toolsyes" type="button" class="btn strong" @click="installTools($event)">Yes, install</button></span></div>
@@ -559,14 +563,14 @@ textarea{resize:none}
 <p id="toolstext" tabindex="-1" class="muted wpad" style="margin: 6px 0 0 40px; min-height: 22px">{{toolsText}}</p>
 </div>
 
-<div style="border-top: 1px solid var(--line); padding: 16px 0">
-<div style="display: flex; align-items: center; gap: 12px; font-weight: 500; font-size: 17px"><span :class="(w3Cls)" class="disc">{{w3Mark}}</span><span>Log in to your test account <span class="muted small lg-only" style="font-weight: 400">optional</span></span></div>
+<div class="wstep" style="padding: 16px 0">
+<div style="display: flex; align-items: center; gap: 12px; font-weight: 500; font-size: 17px"><span :class="(w3Cls)" class="disc">{{w3Mark}}</span><span>Log in to your test account</span></div>
 <div class="wfield" style="display: flex; gap: 8px; margin: 12px 0 0 40px">
 <label for="wsite" class="sr">Site you'll demo</label>
 <input id="wsite" class="inp" type="text" :value="(wSite)" @input="onWSite($event)" @change="onWSite($event)" @keydown="wSiteKey($event)" placeholder="Site you'll demo, e.g. whop.com" style="flex: 1">
 <button type="button" class="btn" @click="loginSite($event)" style="width: 150px">{{loginLabel}}</button>
 </div>
-<p class="muted wpad" style="margin: 8px 0 0 40px"><span class="sm-only">Optional. </span>A browser opens and you log in yourself. Use a test account with fake data. NAVI never types your passwords.</p>
+<p class="muted wpad" style="margin: 8px 0 0 40px">Optional. A browser opens and you log in yourself. Use a test account with fake data. NAVI never types your passwords.</p>
 </div>
 </div>
 
@@ -697,7 +701,7 @@ textarea{resize:none}
 <div class="sctop">
 <div id="scname" class="wide caps scname">{{scName}}</div>
 <p class="muted small sclen sm-only" style="margin: 0; flex: 1">{{scriptLenLine}}</p>
-<span class="muted hide-sm sctime"><span class="mono">{{scTime}}</span> · {{scNum}}</span>
+<span class="muted hide-sm sctime" style="font-size: 13px"><span class="mono">{{scTime}}</span> · {{scNum}}</span>
 <span class="scarrows"><button type="button" class="icon fill" @click="scPrev($event)" :disabled="(scPrevOff)" aria-label="Previous section" title="Previous section"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"></path></svg></button><button type="button" class="icon fill" @click="scNext($event)" :disabled="(scNextOff)" aria-label="Next section" title="Next section"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg></button></span>
 </div>
 <div class="scpick" style="margin-top: 10px"><label for="scsel" class="sr">Section</label><select id="scsel" class="inp" @change="scPickSel($event)"><option v-for="r in scList" :value="r.i" :selected="r.on === 'true'">{{r.i + 1}} · {{r.n}}</option></select></div>

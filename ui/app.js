@@ -251,7 +251,7 @@ class Component extends DCLogic {
     const cf = st.confirm ? confirms[st.confirm] : null;
     const pvFoot = { strict: 'Strict', standard: 'Standard', test: 'Test account', custom: 'Custom' }[preset];
     const footTexts = [
-      D.written ? (D.max > 0 ? 'Approved. You can still change any line.' : 'Not approved yet. ' + this.secs.length + ' sections, about ' + lengthText) : 'Claude is writing the script',
+      D.written ? (D.max > 0 ? 'Looks right? Next: Voice. You can still change any line.' : 'Not approved yet. ' + this.secs.length + ' sections, about ' + lengthText) : 'Claude is writing the script',
       voiceOk ? voicePretty + (changed ? ', ' + changed + ' setting' + (changed === 1 ? '' : 's') + ' changed' : ', recommended for a ' + kindName) : voicePretty + ' needs Eleven ' + vInfo.models[0] + '. Pick another voice, or',
       pvFoot + (D.recorded ? '' : ' · recording uses about ' + this.num(videoCost) + ' credits'),
       D.recorded ? 'Recorded, ' + lengthText : (st.recStopped ? 'Stopped. Finished sections are kept.' : (st.recPaused ? 'Paused. The draft is ready when recording finishes.' : 'The draft is ready when recording finishes.')),
@@ -259,7 +259,7 @@ class Component extends DCLogic {
       D.exported ? (D.dirty ? 'Changed. Export again to update the files.' : 'Exported ' + (D.exportedOn || 'Nov 5') + ' · ' + this.plural(1 + ((D.capMode || 'burn') === 'file' ? 1 : 0) + 1 + (st.p720 ? 1 : 0), 'file')) : 'Saves to Movies/NAVI'
     ];
     const footBad = (st.step === 1 && !voiceOk);
-    const footKinds = [D.written ? (D.max > 0 ? 'done' : 'ready') : 'busy', 'ready', 'ready', D.recorded ? 'done' : (st.recPaused || st.recStopped ? 'wait' : 'busy'), 'ready', D.exported && !D.dirty ? 'done' : 'ready'];
+    const footKinds = [D.written ? 'ready' : 'busy', 'ready', 'ready', D.recorded ? 'done' : (st.recPaused || st.recStopped ? 'wait' : 'busy'), 'ready', D.exported && !D.dirty ? 'done' : 'ready'];
     const foot = cf ? { text: cf.text, dot: 'ready', color: 'var(--ink)' } : { text: footTexts[st.step], dot: footBad ? 'bad' : footKinds[st.step], color: footBad ? 'var(--ink)' : 'var(--ink2)' };
     const wsw = (done) => done ? 'wnum done' : 'wnum';
     const l = sw(st.lock), p = sw(st.p720), a = sw(st.caps);
