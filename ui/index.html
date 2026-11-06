@@ -380,6 +380,10 @@ textarea{resize:none}
 @media (prefers-reduced-motion: reduce){.wv.on span,.fade,.toast,.skel,.pmark.spin,.dot.k-busy{animation:none}.bar .fill,button,.sw span,.disclose svg{transition:none}}
 /* phone width */
 .wfoot > .muted{flex:1 1 100%;text-align:right}
+/* Script: "Rewriting this line…" sits in the Show captions button's box while busy, so nothing wraps or moves. */
+.scbusy{position:relative;display:inline-flex;max-width:100%}
+.scbusytext{position:absolute;inset:0;display:flex;align-items:center;min-width:0;overflow:hidden;white-space:nowrap}
+.scbusytext:empty{display:none}
 @media (min-width: 861px){.sm-only{display:none!important}}
 @media (max-width: 860px){
   .lg-only{display:none!important}
@@ -712,8 +716,7 @@ textarea{resize:none}
 <div class="scslot">
 <div class="scbtns" style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center">
 <button id="scopen" type="button" class="btn sm" @click="openScChange($event)" :aria-expanded="(scChange)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z"></path></svg>Change this line</button>
-<button type="button" class="btn sm" @click="toggleScCaps($event)" :aria-expanded="(scCaps)">{{scCapsLabel}}</button>
-<div v-if="scPending" style="display: contents"><span class="muted small" role="status">{{scPendingText}}</span></div>
+<span class="scbusy"><button type="button" class="btn sm" @click="toggleScCaps($event)" :aria-expanded="(scCaps)" :style="scPending ? 'visibility: hidden' : ''">{{scCapsLabel}}</button><span class="muted small scbusytext" role="status">{{scPending ? scPendingText : ''}}</span></span>
 </div>
 <div v-if="scChange" style="display: contents">
 <div class="fade" style="display: flex; gap: 8px">
