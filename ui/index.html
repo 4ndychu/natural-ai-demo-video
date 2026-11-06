@@ -228,6 +228,11 @@ textarea{resize:none}
 .note{display:flex;gap:8px;align-items:baseline;margin:8px 0 0}
 .note .dot{background:var(--amber);transform:translateY(-1px)}
 .nw{white-space:nowrap}
+.fline{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.fname,.fname0{min-width:0;overflow-wrap:anywhere;text-align:left}
+.fname{border:0;background:none;padding:0;color:var(--ink);font:inherit;text-decoration:underline;text-decoration-color:transparent;text-underline-offset:3px}
+@media (hover:hover){.fname:hover{text-decoration-color:var(--fill)}}
+.fline .dot.k-done{margin-right:4px}
 /* chat */
 .chatwrap{position:fixed;left:0;right:0;bottom:0;z-index:6;pointer-events:none}
 .chatband{height:84px;background:var(--ground);pointer-events:auto;position:absolute;left:0;right:0;bottom:0}
@@ -344,9 +349,8 @@ textarea{resize:none}
   .sclenrow{display:none}
   .sc{gap:0}
   .newtile .muted{display:none}
-  .filerow{flex-wrap:wrap}
-  .filerow > span:nth-child(2){flex:1 1 calc(100% - 40px)!important}
-  .filerow .btn{margin-left:auto}
+  /* The list keeps room for the captions file, so picking Separate file moves nothing below it. */
+  .fileslist{min-height:calc(3 * 68px + 2px)}
   .folderrow{flex-wrap:wrap;justify-content:flex-end}
   .ftrow{flex-wrap:nowrap!important;height:40px}
   .sc .scleft{display:none}
@@ -933,8 +937,8 @@ textarea{resize:none}
 <div class="row" style="border-top: 1px solid var(--line); padding: 10px 0"><span style="flex: 1"><span id="p720" style="display: block; font-weight: 500">Also make a small 720p copy</span><span class="muted small">For email and chat</span></span><button type="button" :class="(p720Cls)" role="switch" :aria-checked="(p720On)" aria-labelledby="p720" @click="toggle720($event)"><span></span></button></div>
 <div style="margin-top: 18px">
 <h2 class="h-sec">{{filesHead}}</h2>
-<div class="list" style="margin-top: 4px">
-<div v-for="f in files" style="display: contents"><div class="row filerow" style="min-height: 56px; padding: 6px 0"><span style="width: 20px; flex: none; display: inline-flex; justify-content: center"><span v-if="fileMark" class="dot k-done" role="img" aria-label="Saved"></span></span><span style="flex: 1; min-width: 0"><span style="display: block; overflow-wrap: anywhere">{{f.n}}</span><span class="muted small">{{fileWill ? 'Will be saved' : f.s}}</span></span><div v-if="fileMark" style="display: contents"><button type="button" class="btn sm" @click="showInFinder($event)">Show in Finder</button></div></div></div>
+<div class="list fileslist" style="margin-top: 4px">
+<div v-for="f in files" style="display: contents"><div class="row filerow" style="min-height: 56px; padding: 6px 0"><span style="flex: 1; min-width: 0"><span class="fline"><span v-if="fileMark" style="display: contents"><button type="button" class="fname" @click="showInFinder($event)" :aria-label="'Show ' + f.n + ' in Finder'" title="Show in Finder">{{f.n}}</button><span class="dot k-done" role="img" aria-label="Saved"></span></span><span v-if="!fileMark" class="fname0">{{f.n}}</span></span><span class="muted small" style="display: block">{{fileWill ? 'Will be saved' : f.s}}</span></span></div></div>
 </div>
 </div>
 </div>
