@@ -1124,7 +1124,7 @@ textarea{resize:none}
 <div class="sheet stepsheet" style="min-height: 0">
 <h1 id="batch-h" tabindex="-1" class="h-step">Your batch</h1>
 <p class="muted bsub" style="margin: 8px 0 0; max-width: 70ch">{{bHead}} {{bSub}}</p>
-<div style="display: flex; align-items: center; gap: 10px 14px; margin-top: 16px; flex-wrap: wrap">
+<div style="display: flex; align-items: center; gap: 10px 16px; margin-top: 16px; flex-wrap: wrap">
 <span v-if="bRecLabel" class="muted small" style="white-space: nowrap">{{bRecLabel}}</span>
 <div style="flex: 1 1 100px; min-width: 80px; height: 6px; border-radius: 999px; background: var(--fill); overflow: hidden"><span :style="'display: block; height: 6px; background: var(--ink); width: ' + (bPct)"></span></div>
 <div v-if="hasBPause" class="bpause"><button type="button" class="btn sm" @click="bPause($event)" style="width: 168px">{{bPauseLabel}}</button></div>
@@ -1139,7 +1139,7 @@ textarea{resize:none}
 <span class="muted bmin" style="text-align: right">{{it.min}}</span>
 <span class="bst small" style="display: inline-flex; align-items: center; gap: 6px; white-space: nowrap"><span :class="'dot lg-only k-' + it.dot"></span><span class="sm-only">{{it.min}} ·</span><span :class="'dot sm-only k-' + it.dot"></span>{{it.status}}</span>
 <span class="bacts">
-<div v-if="it.canOpen" style="display: contents"><button type="button" class="btn sm" @click="it.toggle($event)" :aria-expanded="(it.openStr)">{{it.open ? 'Close' : 'Read'}}</button></div>
+<div v-if="it.canOpen" style="display: contents"><button type="button" class="btn sm" :id="'bread-' + it.i" @click="it.toggle($event)" :aria-expanded="(it.openStr)">{{it.open ? 'Close' : 'Read'}}</button></div>
 <div v-if="it.canWatch" style="display: contents"><button type="button" class="btn sm" @click="it.watch($event)" :aria-label="'Watch ' + it.t">Watch</button></div>
 <div v-if="it.noAct" style="display: contents"><span class="bnone" aria-hidden="true"></span></div>
 </span>
