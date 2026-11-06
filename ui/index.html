@@ -153,11 +153,12 @@ textarea{resize:none}
 .vimg{position:relative;display:block;height:200px;border-radius:20px;overflow:hidden}
 .vimg img{width:100%;height:100%;object-fit:cover;object-position:50% 30%;display:block}
 .hear{position:absolute;right:15px;top:163px;height:32px;padding:0 12px;border-radius:16px;border:0;background:rgba(255,255,255,0.94);color:#111;display:inline-flex;align-items:center;gap:6px;font-size:13px}
-.vtag{display:block;width:max-content;margin-top:4px;font-size:12px;padding:2px 8px;border-radius:999px;background:var(--wash);color:var(--ink2)}
+.vtag{display:block;width:max-content;margin-top:4px;font-size:13px;padding:2px 8px;border-radius:999px;background:var(--wash);color:var(--ink2)}
 .sliders{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;align-items:start}
-.paceslot:empty{display:none}
-/* At desktop width the fine-tune grid keeps room for v3's Pace row, so switching models moves nothing below it. */
-@media (min-width: 861px){.sliders{min-height:calc(4 * 46px + 3 * 14px);align-content:start}}
+/* The Pace slot is always there: v3 shows the Pace bar, v4 a muted line at the same 46 px, so switching models moves nothing. */
+.swrow.paceoff{color:var(--ink2);padding-right:20px}
+.paceoff .swl{color:var(--ink2)}
+.ftrow .link{text-decoration-color:var(--ink2)}
 .swrow{display:flex;align-items:center;justify-content:space-between;gap:8px;height:46px;padding:0 6px 0 14px;border-radius:12px;background:var(--wash);box-sizing:border-box}
 .swl{font-weight:400;white-space:nowrap}
 .mpills{display:flex;gap:2px}
@@ -443,7 +444,6 @@ textarea{resize:none}
   .slide .slabel{left:50px;right:6px}
   .slide .sls{font-size:12px}
   .sliders{grid-template-columns:minmax(0,1fr)}
-  .paceslot:empty{display:none}
   .setrow,.list > div > .row,.list > .row{flex-wrap:wrap}
   .page{padding:4px 12px 120px}
   .hdr{padding:0 8px 0 14px;gap:4px}
@@ -519,6 +519,7 @@ textarea{resize:none}
   .wpad{margin-left:0!important}
   .wwrap{padding-top:16px!important}
   .stepfoot .ftext{min-height:calc(2 * 1.45em)}
+  .stepfoot .ftext .link{padding-top:0;padding-bottom:0}
   .wthead{min-height:50px!important}
   .wfoot > .muted{text-align:left!important}
   #toolstext,.wfoot > .muted{min-height:calc(2 * 1.45em)!important}
@@ -786,8 +787,8 @@ textarea{resize:none}
 <div class="swrow"><span class="swl" id="swlbl">Swearing</span><span class="mpills" role="group" aria-labelledby="swlbl"><div v-for="o in swearPills" style="display: contents"><button type="button" :aria-pressed="(o.on)" @click="o.pick($event)">{{o.label}}</button></div></span></div>
 <div v-if="sliderHelp" style="display: contents"><p class="muted small" style="margin: 6px 0 0">{{swearHelp}}</p></div>
 </div>
-<div :class="swearOn ? 'swcap' : 'swcap swoff'"><span class="capl"><span id="capsLbl">Swears in captions too</span><span id="capsHint" class="caphint">Turn on Swearing first</span></span><button type="button" :class="(capsCls)" role="switch" :aria-checked="(capsOn)" :aria-disabled="swearOn ? null : 'true'" aria-labelledby="capsLbl" aria-describedby="capsHint" @click="toggleCaps($event)" :tabindex="swearOn ? null : '-1'"><span></span></button></div>
-<div class="paceslot"><div v-if="isV3" style="display: contents"><div v-for="s in paceSliders" style="display: contents">
+<div :class="swearOn ? 'swcap' : 'swcap swoff'"><span class="capl"><span id="capsLbl">Swears in captions too</span><span id="capsHint" class="caphint">Turn on Swearing first</span></span><button type="button" :class="(capsCls)" role="switch" :aria-checked="(capsOn)" :aria-disabled="swearOn ? null : 'true'" aria-labelledby="capsLbl" aria-describedby="capsHint" @click="toggleCaps($event)" @mousedown="capsDown($event)" :tabindex="swearOn ? null : '-1'"><span></span></button></div>
+<div class="paceslot"><div v-if="!isV3" style="display: contents"><div class="swrow paceoff"><span class="swl">Pace</span><span class="small">Only with Eleven v3</span></div><div v-if="sliderHelp" style="display: contents"><p class="muted small" style="margin: 6px 0 0">Slower: easy to follow, can drag.<br>Faster: snappy, can rush the clicks.</p></div></div><div v-if="isV3" style="display: contents"><div v-for="s in paceSliders" style="display: contents">
 <div>
 <div class="slwrap">
 <div class="bar" @pointerdown="s.down($event)" @pointermove="s.move($event)" @pointerup="s.up($event)" @pointercancel="s.up($event)"><span class="fill" :style="'width: ' + (s.pct)"></span><span class="rec" :style="'left: ' + (s.rec)"></span><span class="bl">{{s.label}}</span><span class="bv">{{s.display}}</span><input type="range" :id="'rng-' + s.k" :aria-label="(s.label)" :min="(s.min)" :max="(s.max)" step="1" :value="(s.value)" @input="s.onChange($event)" @change="s.onChange($event)"></div>
