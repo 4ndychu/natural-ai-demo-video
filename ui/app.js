@@ -384,7 +384,7 @@ class Component extends DCLogic {
       },
       // ---- new batch ----
       btText: st.btText, onBtText: (e) => this.setState({ btText: e.target.value }), btName: st.btName, onBtName: (e) => this.setState({ btName: e.target.value }), btNamePh: st.btFile ? btName : 'e.g. Whop course, module 3',
-      btFolder: st.btFolder, onBtFolder: (e) => this.setState({ btFolder: e.target.value }), btFolderPh: btFolder, btFolderVal: st.btFolder || btFolder, btFolderShort: (st.btFolder || btFolder).replace(/^~\//, ''), chooseFolder: () => this.say('A folder picker opens on your Mac'),
+      btFolder: st.btFolder, onBtFolder: (e) => this.setState({ btFolder: e.target.value }), btFolderPh: btFolder, btFolderVal: st.btFolder || btFolder, btFolderShort: (st.btFolder || btFolder).replace(/^~\//, ''), btFolderTail: (() => { const parts = (st.btFolder || btFolder).replace(/^~\//, '').split('/'); return parts.length > 1 ? '…/' + parts[parts.length - 1] : parts[0]; })(), chooseFolder: () => this.say('A folder picker opens on your Mac'),
       btRows: 7, btPresetHint: { strict: 'Standard, plus usage, prices, dates.', standard: 'Blurs personal info, money and counts.', test: 'Fake data: names show, money blurred.' }[st.btPreset], btFootText: 'Scripts are free. You approve every script before anything records.', btMore: btCount > 7, btKindHint: { course: 'Step by step, at a teaching pace.', saas: 'Short and lively, for a product page.', tour: 'A calm look around the main screens.' }[st.btKind],
       btFileName: st.btFile, btHasFile: !!st.btFile,
       pickFile: () => { const el = document.getElementById('btfile'); if (el) el.click(); },
