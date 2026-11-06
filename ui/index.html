@@ -388,6 +388,9 @@ textarea{resize:none}
 @media (prefers-reduced-motion: reduce){.wv.on span,.fade,.toast,.skel,.pmark.spin,.dot.k-busy{animation:none}.bar .fill,button,.sw span,.disclose svg{transition:none}}
 /* phone width */
 .wfoot > .muted{flex:1 1 100%;text-align:right}
+/* New options: label + hint pairs fit the 64 px row, so every option row has the same pitch. */
+.srows .shelp{line-height:1.35}
+@media (min-width: 861px){.srows .srow{min-height:65px}}
 /* Welcome: Show key is an eye button inside the key field's right end, so the row holds the field and Test key only. */
 .keybox{position:relative;display:flex;flex:1 1 auto;min-width:0}
 .keybox .inp{flex:1 1 auto;padding-right:48px}
@@ -436,7 +439,9 @@ textarea{resize:none}
   .sumrow{height:auto;min-height:calc(2 * 1.45em + 16px);padding:8px 8px 8px 14px}
   .nsheet{gap:20px!important}
   .sumrow > span:first-child{white-space:normal;overflow:visible}
-  .sumrow .btn{width:auto;background:var(--sheet)!important;text-decoration:none!important;padding:0 12px!important}
+  .sumrow{align-items:flex-start}
+  .sumrow > span:first-child{padding-top:7px}
+  .sumrow .btn{width:112px;background:var(--sheet)!important;text-decoration:none!important;padding:0 12px!important}
   .vmore{min-height:56px!important;grid-column:1 / -1;flex-direction:row!important}
   .phone-setup{background:transparent!important;padding:4px 2px!important;color:var(--ink2)!important}
   .dcard .meta{margin-top:0!important;margin-left:6px}
@@ -1064,7 +1069,7 @@ textarea{resize:none}
 <div v-if="bSiteNew" style="display: contents"><div class="fade" style="margin-top: 10px"><label for="bns" class="sr">New site address</label><input id="bns" class="inp" type="text" :value="(bNew)" @input="onBNew($event)" @change="onBNew($event)" placeholder="The site’s address, e.g. app.yourproduct.com" :aria-invalid="bNewBad ? 'true' : 'false'"><div class="small" :style="'margin-top: 6px; min-height: 20px; color: ' + (bNewBad ? 'var(--danger)' : 'var(--ink2)')">{{bNewBad ? 'That doesn’t look like a web address.' : 'A browser opens so you can log in once. Then it’s saved.'}}</div></div></div>
 </div>
 <div>
-<div :class="bMore ? 'sumrow open' : 'sumrow'"><span style="flex: 1 1 260px; min-width: 0"><span v-if="bLess"><span class="lg-only">{{bSummary}}</span><span class="sm-only">{{bSummaryShort}}</span></span><span v-if="bMore" class="muted">For this demo only. Voice and captions can change later.</span></span><button type="button" class="btn sm" @click="toggleMore($event)" :aria-expanded="bMore ? 'true' : 'false'" style="background: var(--sheet)">{{bMore ? 'Hide options' : 'Change'}}</button></div>
+<div :class="bMore ? 'sumrow open' : 'sumrow'"><span style="flex: 1 1 260px; min-width: 0"><span v-if="bLess"><span class="lg-only">{{bSummary}}</span><span class="sm-only">{{bSummaryShort}}</span></span><span v-if="bMore" class="muted">For this demo only.<span class="lg-only"> Voice and captions can change later.</span></span></span><button type="button" class="btn sm" @click="toggleMore($event)" :aria-expanded="bMore ? 'true' : 'false'" style="background: var(--sheet)">{{bMore ? 'Hide options' : 'Change'}}</button></div>
 <div v-if="bMore" style="display: contents">
 <div class="fade srows" style="margin-top: 6px">
 <div class="srow"><span class="sl"><span class="slab">Who’s watching</span></span><div class="pills" role="group" aria-label="Who's watching"><div v-for="o in bWho" style="display: contents"><button type="button" :aria-pressed="(o.on)" @click="o.pick($event)">{{o.label}}</button></div></div></div>
