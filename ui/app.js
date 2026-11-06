@@ -107,6 +107,7 @@ class Component extends DCLogic {
     if (st.screen === 'batch' && st.bConfirm) { this.setState({ bConfirm: false }); back('.bprimary'); return true; }
     if (st.screen === 'new' && st.bSiteNew) { this.setState({ bSiteNew: false, bNew: '' }); back('#bnewchip'); return true; }
     if (st.screen === 'new' && st.btSiteNew) { this.setState({ btSiteNew: false, btNew: '' }); back('#btnewchip'); return true; }
+    if (st.screen === 'welcome' && st.tools === 'ask') { this.setState({ tools: 'idle' }); back('#toolsinstall'); return true; }
     if (st.screen === 'settings' && st.keyEdit) { this.setState({ keyEdit: false, key: '', keyRes: null }); back('#keytoggle'); return true; }
     return false;
   }
@@ -523,8 +524,8 @@ class Component extends DCLogic {
       defCaps: segOf(capOpts, st.defCap, (x) => { this.setState({ defCap: x }); this.say('Saved'); }),
       defCorner: cornerCtl(st.defCorner, (x) => this.setState({ defCorner: x }), 'dct'),
       defCornerText: st.defCornerText, onDefCornerText: (e) => this.setState({ defCornerText: e.target.value }), defCornerOff: st.defCorner === 'off',
-      key: st.key, onKey: (e) => { if (e.target.value !== this.state.key) this.setState({ key: e.target.value, keyRes: null }); }, keyType: st.keyType, keyTypeLabel: st.keyType === 'password' ? 'Show key' : 'Hide key', toggleKeyType: () => this.setState({ keyType: st.keyType === 'password' ? 'text' : 'password' }),
-      testKey: () => { if (!st.key.trim()) { this.setState({ keyRes: 'empty' }); return; } const ok = st.key.trim().length > 8; this.setState({ keyRes: ok ? 'ok' : 'bad', keyOn: ok ? true : st.keyOn }); if (ok && st.screen === 'settings') this.later('keyclose', 1400, () => { const inEdit = document.activeElement && document.activeElement.closest && document.activeElement.closest('.fade'); this.setState({ keyEdit: false, key: '', keyRes: null }); if (inEdit) this.focusLater('#keytoggle'); }); },
+      key: st.key, onKey: (e) => { if (e.target.value !== this.state.key) this.setState({ key: e.target.value, keyRes: null }); }, keyType: st.keyType, keyTypeLabel: st.keyType === 'password' ? 'Show key' : 'Hide key', keyShown: st.keyType !== 'password', toggleKeyType: () => this.setState({ keyType: st.keyType === 'password' ? 'text' : 'password' }),
+      testKey: () => { if (!st.key.trim()) { this.setState({ keyRes: 'empty' }); this.focusLater(st.screen === 'settings' ? '#key2' : '#key'); return; } const ok = st.key.trim().length > 8; this.setState({ keyRes: ok ? 'ok' : 'bad', keyOn: ok ? true : st.keyOn }); if (ok && st.screen === 'settings') this.later('keyclose', 1400, () => { const inEdit = document.activeElement && document.activeElement.closest && document.activeElement.closest('.fade'); this.setState({ keyEdit: false, key: '', keyRes: null }); if (inEdit) this.focusLater('#keytoggle'); }); },
       keyEnter: (e) => { if (e.key === 'Enter') { e.preventDefault(); this.state.key = e.target.value; this.renderVals().testKey(); } },
       wSiteKey: (e) => { if (e.key === 'Enter') { e.preventDefault(); this.state.wSite = e.target.value; this.renderVals().loginSite(); } },
       siteKey: (e) => { if (e.key === 'Enter') { e.preventDefault(); this.state.siteDraft = e.target.value; this.renderVals().addSite(); } },

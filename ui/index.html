@@ -381,6 +381,11 @@ textarea{resize:none}
 @media (prefers-reduced-motion: reduce){.wv.on span,.fade,.toast,.skel,.pmark.spin,.dot.k-busy{animation:none}.bar .fill,button,.sw span,.disclose svg{transition:none}}
 /* phone width */
 .wfoot > .muted{flex:1 1 100%;text-align:right}
+/* Welcome: Show key is an eye button inside the key field's right end, so the row holds the field and Test key only. */
+.keybox{position:relative;display:flex;flex:1 1 auto;min-width:0}
+.keybox .inp{flex:1 1 auto;padding-right:48px}
+.keyeye{position:absolute;right:4px;top:4px;width:36px;height:36px;color:var(--ink2)}
+@media (hover:hover){.keyeye:hover{color:var(--ink);background:var(--wash)}}
 /* Review: the marks column never grows past the player block, so marks never move the footer. It hugs its rows until then; past that the list scrolls inside and the heading stays. */
 .revaside{min-width:0}
 .revcap{display:flex;flex-direction:column;gap:10px}
@@ -516,6 +521,11 @@ textarea{resize:none}
   .welcome-art > div:last-child{padding:12px 18px 14px!important}
   .wfield{flex-wrap:wrap;margin-left:0!important}
   .wfield .inp{flex:1 1 100%!important}
+  .wfield.wrow1{flex-wrap:nowrap}
+  .wfield.wrow1 .inp{flex:1 1 auto!important}
+  .wfield.wrow1 > .btn{flex:none}
+  .wtest{width:auto!important;padding:0 16px}
+  .wlogin{width:128px!important;padding:0 12px}
   .wpad{margin-left:0!important}
   .wwrap{padding-top:16px!important}
   .stepfoot .ftext{min-height:calc(2 * 1.45em)}
@@ -565,11 +575,10 @@ textarea{resize:none}
 <p class="muted" :style="'grid-area: 1/1; margin: 0' + (keyMsg ? '; visibility: hidden' : '')" :aria-hidden="keyMsg ? 'true' : 'false'">At <a href="https://elevenlabs.io/app/settings/api-keys" target="_blank" rel="noopener" style="color: var(--ink)" :tabindex="keyMsg ? '-1' : null">elevenlabs.io</a> go to Developers, then API keys, and create a key with text to speech access. Paste it here.</p>
 <p role="status" :style="'grid-area: 1/1; margin: 0; color: ' + (keyMsgColor)">{{keyMsg}}</p>
 </div>
-<div class="wfield" style="display: flex; gap: 8px; margin: 12px 0 0 40px">
+<div class="wfield wrow1" style="display: flex; gap: 8px; margin: 12px 0 0 40px">
 <label for="key" class="sr">ElevenLabs API key</label>
-<input id="key" class="inp" :type="(keyType)" :value="(key)" @input="onKey($event)" @change="onKey($event)" @keydown="keyEnter($event)" placeholder="Paste your API key" autocomplete="off" spellcheck="false" style="flex: 1">
-<button type="button" class="btn" @click="testKey($event)">Test key</button>
-<button type="button" class="btn" @click="toggleKeyType($event)" style="width: 104px; padding: 0">{{keyTypeLabel}}</button>
+<span class="keybox"><input id="key" class="inp" :type="(keyType)" :value="(key)" @input="onKey($event)" @change="onKey($event)" @keydown="keyEnter($event)" :placeholder="isPhone ? 'Paste your key' : 'Paste your API key'" autocomplete="off" spellcheck="false"><button type="button" class="icon keyeye" @click="toggleKeyType($event)" :aria-label="(keyTypeLabel)" :title="(keyTypeLabel)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"></path><circle cx="12" cy="12" r="3"></circle><path :style="keyShown ? 'visibility: hidden' : ''" d="M4 4l16 16"></path></svg></button></span>
+<button type="button" class="btn wtest" @click="testKey($event)" style="width: 150px">Test key</button>
 </div>
 </div>
 
@@ -583,10 +592,10 @@ textarea{resize:none}
 
 <div style="border-top: 1px solid var(--line); padding: 16px 0">
 <div style="display: flex; align-items: center; gap: 12px; font-weight: 500; font-size: 17px"><span :class="(w3Cls)" class="disc">{{w3Mark}}</span><span>Log in to your test account <span class="muted small lg-only" style="font-weight: 400">optional</span></span></div>
-<div class="wfield" style="display: flex; gap: 8px; margin: 12px 0 0 40px">
+<div class="wfield wrow1" style="display: flex; gap: 8px; margin: 12px 0 0 40px">
 <label for="wsite" class="sr">Site you'll demo</label>
-<input id="wsite" class="inp" type="text" :value="(wSite)" @input="onWSite($event)" @change="onWSite($event)" @keydown="wSiteKey($event)" placeholder="Site you'll demo, e.g. whop.com" style="flex: 1">
-<button type="button" class="btn" @click="loginSite($event)" style="width: 150px">{{loginLabel}}</button>
+<input id="wsite" class="inp" type="text" :value="(wSite)" @input="onWSite($event)" @change="onWSite($event)" @keydown="wSiteKey($event)" :placeholder="isPhone ? 'e.g. whop.com' : 'Site you\'ll demo, e.g. whop.com'" style="flex: 1">
+<button type="button" class="btn wlogin" @click="loginSite($event)" style="width: 150px">{{loginLabel}}</button>
 </div>
 <p class="muted wpad" style="margin: 8px 0 0 40px"><span class="sm-only">Optional. </span>A browser opens and you log in yourself. Use a test account with fake data. NAVI never types your passwords.</p>
 </div>
