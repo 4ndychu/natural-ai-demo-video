@@ -266,7 +266,7 @@ textarea{resize:none}
 /* Corner label: when on, the text field and the corner picker replace the sub-line inside the row, so the row keeps its height. */
 .crow{display:flex;align-items:center;gap:12px;border-top:1px solid var(--line);padding:6px 0}
 .crowl{flex:1;min-width:0}
-.cslot{display:flex;align-items:center;min-height:36px}
+.cslot{display:flex;align-items:flex-start;min-height:36px}
 .cfields{display:flex;gap:8px;flex:1;min-width:0}
 .cfields .inp{height:34px;font-size:14px;padding:0 12px}
 .cfields .csel{flex:0 0 128px;appearance:none;-webkit-appearance:none;background:var(--wash) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2.4' stroke-linecap='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") no-repeat right 12px center;border:0;border-radius:999px;padding-right:30px}
@@ -1043,8 +1043,8 @@ textarea{resize:none}
 <span class="cslot"><span v-if="revCornerOff" class="muted small">Your name or brand in a corner</span><span v-if="revCorner.on" class="fade cfields"><label for="rct" class="sr">Label text</label><input id="rct" class="inp" type="text" :value="(revCornerText)" @input="onRevCornerText($event)" @change="onRevCornerText($event)" :placeholder="isPhone ? 'Label text' : 'Label text, e.g. your logo'"><label for="rcpos" class="sr">Corner</label><select id="rcpos" class="inp csel" @change="revCorner.pickVal($event)"><option v-for="o in revCorner.seg" :value="(o.k)" :selected="o.on === 'true'">{{o.label}}</option></select></span></span></span>
 <button type="button" :class="(revCorner.cls)" role="switch" :aria-checked="(revCorner.onStr)" aria-labelledby="rclbl" @click="revCorner.toggle($event)"><span></span></button>
 </div>
-<div class="row" style="border-top: 1px solid var(--line); padding: 10px 0; min-height: 64px; box-sizing: border-box"><span style="flex: 1"><span id="p720" style="display: block; font-weight: 500">Also make a small 720p copy</span><span class="muted small">For email and chat</span></span><button type="button" :class="(p720Cls)" role="switch" :aria-checked="(p720On)" aria-labelledby="p720" @click="toggle720($event)"><span></span></button></div>
-<div style="margin-top: 9px">
+<div class="row" style="border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); padding: 10px 0; min-height: 64px; box-sizing: border-box"><span style="flex: 1"><span id="p720" style="display: block; font-weight: 500">Also make a small 720p copy</span><span class="muted small">For email and chat</span></span><button type="button" :class="(p720Cls)" role="switch" :aria-checked="(p720On)" aria-labelledby="p720" @click="toggle720($event)"><span></span></button></div>
+<div style="margin-top: 8px">
 <h2 class="h-sec">{{filesHead}}</h2>
 <div class="list fileslist" style="margin-top: 2px">
 <div v-for="f in files" style="display: contents"><div class="row filerow"><span class="fline"><span v-if="fileMark" style="display: contents"><button type="button" class="fname" @click="showInFinder($event)" :aria-label="'Show ' + f.n + ' in Finder'" title="Show in Finder">{{f.n}}</button><span class="dot k-done" role="img" aria-label="Saved"></span></span><span v-if="!fileMark" class="fname0">{{f.n}}</span></span><span class="fdet muted small">{{fileWill ? 'Will be saved' : f.s}}</span></div></div>
