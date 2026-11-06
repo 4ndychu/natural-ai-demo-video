@@ -196,6 +196,7 @@ textarea{resize:none}
 .timeline .head::after{content:'';position:absolute;left:-5px;top:1px;width:12px;height:12px;border-radius:6px;background:var(--ink);box-shadow:0 0 0 2px var(--sheet)}
 .pins{position:absolute;left:0;right:0;top:0;height:22px;pointer-events:none}
 .pins .pin{pointer-events:auto}
+.tiplbl{position:absolute;bottom:calc(100% + 2px);transform:translateX(-50%);z-index:3;pointer-events:none;white-space:nowrap;padding:5px 10px;border-radius:999px;background:var(--ink);color:var(--sheet);font-size:13px;line-height:1.2}
 .pins .pin{position:absolute;top:0;width:24px;height:17px;margin-left:-12px;border:0;padding:0;background:transparent;z-index:2}
 .pins .pin i{pointer-events:none}
 .pins .pin span{position:absolute;left:6px;top:2px;width:12px;height:12px;border-radius:6px;background:var(--pin);box-shadow:0 0 0 2px var(--sheet)}
@@ -468,6 +469,9 @@ textarea{resize:none}
   .brow .bacts{grid-column:3!important;grid-row:1 / 3!important}
   .bpause{flex-basis:100%;display:flex;justify-content:flex-end}
   .stepfoot .backbtn{display:none}
+  /* Review's two footer buttons share the row inside the tray's padding, so neither touches the edge. */
+  .revfoot{padding-right:16px}
+  .revfoot .fbtns button{flex:1 1 0;min-width:0;padding:0 12px}
   .scpanel .sclen{display:block!important}  .brow .bacts{grid-column:3;grid-row:1 / 3}
   .chatband{height:76px}
   .toast{bottom:88px}
@@ -899,12 +903,13 @@ textarea{resize:none}
 </button>
 <span class="mono" style="width: 40px">{{revTime}}</span>
 <div style="position: relative; flex: 1; height: 48px">
-<div class="timeline" style="position: absolute; inset: 0" role="slider" tabindex="0" aria-label="Timeline" aria-valuemin="0" :aria-valuemax="(totalSec)" :aria-valuenow="(revSec)" :aria-valuetext="(revTime)" @pointerdown="scrub($event)" @pointermove="scrubMove($event)" @pointerup="scrubUp($event)" @pointercancel="scrubUp($event)" @keydown="scrubKey($event)" title="Click or drag to move">
+<div class="timeline" style="position: absolute; inset: 0" role="slider" tabindex="0" aria-label="Timeline" aria-valuemin="0" :aria-valuemax="(totalSec)" :aria-valuenow="(revSec)" :aria-valuetext="(revTime)" @pointerdown="scrub($event)" @pointermove="scrubMove($event)" @pointerup="scrubUp($event)" @pointercancel="scrubUp($event)" @pointerleave="tipLeave($event)" @keydown="scrubKey($event)" title="Click or drag to move">
 <div class="track"></div>
 <div class="played" :style="'width: ' + (revLeft)"></div>
 <div v-for="t in ticks" style="display: contents"><span class="tick" aria-hidden="true" :style="'left: ' + (t)"></span></div>
 <div class="head" :style="'left: ' + (revLeft)"></div>
 </div>
+<div v-if="tipOn" class="tiplbl" aria-hidden="true" :style="'left: ' + (tipLeft)">{{tipName}}</div>
 <div class="pins"><div v-for="m in markPins" style="display: contents"><button type="button" :class="m.count > 1 ? 'pin many' : 'pin'" :style="'left: ' + (m.left)" :title="(m.label)" :aria-label="(m.aria)" @click="m.jump($event)"><span>{{m.count > 1 ? m.count : ''}}</span><i></i></button></div></div>
 </div>
 <span class="mono">{{lengthText}}</span>
@@ -942,7 +947,7 @@ textarea{resize:none}
 <div v-if="hasMarks" style="display: contents">
 <div class="list" style="margin-top: 4px">
 <div v-for="m in marks" style="display: contents">
-<div class="markrow"><button type="button" class="mono" @click="m.jump($event)" :aria-label="(m.jumpAria)" :title="(m.jumpAria)" style="border: 0; background: var(--sheet); border-radius: 999px; height: 32px; padding: 0 12px; white-space: nowrap; display: inline-flex; align-items: center; gap: 6px"><svg width="9" height="9" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 4.5v15l12-7.5z"></path></svg>{{m.t}}</button><span style="min-width: 0"><span style="display: block">{{m.text}}</span><span class="muted small" style="display: block">{{m.sec}}</span></span><button type="button" class="icon" @click="m.rm($event)" :aria-label="(m.rmAria)" title="Remove" style="width: 36px; height: 36px"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button></div>
+<div class="markrow"><button type="button" class="mono" @click="m.jump($event)" :aria-label="(m.jumpAria)" :title="(m.jumpAria)" style="border: 0; background: var(--sheet); border-radius: 999px; height: 32px; padding: 0 12px; white-space: nowrap; display: inline-flex; align-items: center; gap: 6px"><svg width="9" height="9" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 4.5v15l12-7.5z"></path></svg>{{m.t}}</button><span style="min-width: 0"><span style="display: block" :title="m.text !== m.full ? m.full : null">{{m.text}}</span><span class="muted small" style="display: block">{{m.sec}}</span></span><button type="button" class="icon" @click="m.rm($event)" :aria-label="(m.rmAria)" title="Remove" style="width: 36px; height: 36px"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button></div>
 </div>
 </div>
 </div>
@@ -983,14 +988,14 @@ textarea{resize:none}
 </div>
 </div>
 </div>
-<div class="foot stepfoot">
+<div :class="st4 && hasSkip ? 'foot stepfoot revfoot' : 'foot stepfoot'">
 <span class="ftext" :style="'color: ' + (footColor)"><span :class="'dot k-' + footDot"></span><span>{{footText}}<span v-if="footLinkOn"> <button type="button" class="link" @click="footLinkAct($event)">{{footLinkLabel}}</button></span></span></span>
 <span class="fbtns">
 <div v-if="confirming" style="display: contents"><button id="cfno" type="button" class="btn" @click="cancelConfirm($event)">{{confirmNo}}</button><button id="cfyes" type="button" class="pri" @click="doConfirm($event)">{{confirmYes}}</button></div>
 <div v-if="notConfirming" style="display: contents">
 <div v-if="recHold" style="display: contents"><span class="fhold" aria-hidden="true"><span class="btn ghost backbtn">Back</span><span class="btn">Record again</span></span></div>
 <div v-if="canBack" style="display: contents"><button type="button" class="btn ghost backbtn" @click="back($event)">Back</button></div>
-<div v-if="hasSkip" style="display: contents"><button type="button" class="btn" @click="doSkip($event)">Export without redos</button></div>
+<div v-if="hasSkip" style="display: contents"><button type="button" class="btn" @click="doSkip($event)"><span class="lg-only">Export without redos</span><span class="sm-only">Export as is</span></button></div>
 <div v-if="hasSecondary" style="display: contents"><button type="button" class="btn" @click="secondary($event)">{{cur.second}}</button></div>
 <button type="button" :class="st1 ? 'pri privoice' : 'pri'" @click="primary($event)" :disabled="(primaryBlocked)"><span class="lg-only">{{cur.cta}}</span><span class="sm-only">{{cur.ctaShort || cur.cta}}</span></button>
 </div>
