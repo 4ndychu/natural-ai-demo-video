@@ -103,7 +103,7 @@ class Component extends DCLogic {
     if (st.chat.length) { this.setState({ chat: [], chatAct: null }); back('#chatin'); return true; }
     if (st.markOpen) { this.setState({ markOpen: false, markOther: false, markDraft: '' }); back('#markbtn'); return true; }
     if (st.wipeConfirm) { this.setState({ wipeConfirm: false }); back('#wipebtn'); return true; }
-    if (st.confirm) { this.setState({ confirm: null }); back('.stepfoot .pri'); return true; }
+    if (st.confirm) { const sel = st.confirm === 'rerecord' ? '#secbtn' : '.stepfoot .pri'; this.setState({ confirm: null }); back(sel); return true; }
     if (st.screen === 'batch' && st.btOpen != null) { const i = st.btOpen; this.setState({ btOpen: null }); back('#bread-' + i); return true; }
     if (st.screen === 'batch' && st.bConfirm) { this.setState({ bConfirm: false }); back('.bprimary'); return true; }
     if (st.screen === 'new' && st.bSiteNew) { this.setState({ bSiteNew: false, bNew: '' }); back('#bnewchip'); return true; }
@@ -245,10 +245,11 @@ class Component extends DCLogic {
       () => { if (marks) { this.setState({ confirm: 'redo' }); this.focusLater('#cfyes'); return; } if (unsure) { this.setState({ confirm: 'approve' }); this.focusLater('#cfno'); return; } if (st.fromBatch) { batchApproveNext(); return; } goStep(5); },
       () => { if (!D.exported || D.dirty) doExport(); else this.say('Opening Movies/NAVI'); }
     ];
-    const secondaryFor = [null, null, null, () => { if (this.needKey()) return; this.patchDemo({ recorded: false }); this.startRecording(); }, () => this.setState({ confirm: 'approve' }), () => this.say('Opening Movies/NAVI')];
+    const secondaryFor = [null, null, null, () => { if (this.needKey()) return; this.setState({ confirm: 'rerecord' }); this.focusLater('#cfyes'); }, () => this.setState({ confirm: 'approve' }), () => this.say('Opening Movies/NAVI')];
     const confirms = {
       approve: { text: [marks ? this.plural(marks, 'mark') + ' kept, not redone' : '', unsure ? this.plural(unsure, 'blur') + ' not checked' : ''].filter(Boolean).join(', '), no: 'Go back', yes: 'Approve anyway', act: () => { if (st.fromBatch) { this.setState({ confirm: null }); batchApproveNext(); } else goStep(5); } },
       record: { text: 'Recording uses about ' + this.num(videoCost) + ' credits', no: 'Cancel', yes: 'Yes, record', act: () => { if (this.needKey()) return; this.setState({ confirm: null }); goStep(3); this.startRecording(0); } },
+      rerecord: { text: 'Record again uses about ' + this.num(videoCost) + ' credits', no: 'Cancel', yes: 'Yes, record again', act: () => { if (this.needKey()) return; this.setState({ confirm: null }); this.patchDemo({ recorded: false }); this.startRecording(); } },
       redo: { text: 'Redo ' + this.plural(markedSecs.length, 'section') + ' for about ' + this.num(markedSecs.length * 420) + ' credits?', no: 'Cancel', yes: 'Redo them', act: () => { if (this.needKey()) return; this.spend(markedSecs.length * 420); const prev = D.notes; this.patchDemo({ notes: {} }); this.setState({ confirm: null }); this.say('Redoing ' + this.plural(markedSecs.length, 'section') + '. Draft 2 will be here in a few minutes.'); } }
     };
     const batchApproveNext = () => { const bid = st.fromBatch; const bb = st.batches.find((x) => x.id === bid); if (!bb) return; const items = bb.items.map((x, k) => k === st.batchItem ? Object.assign({}, x, { st: 'approved' }) : x); this.patchBatch({ items: items }, bid); const next = items.findIndex((x) => x.st === 'recorded'); this.say('Approved “' + bb.items[st.batchItem].t + '”'); if (next >= 0) { const r = this.batchDemos(Object.assign({}, bb, { items: items }), next); this.setState({ demos: r.demos, cur: r.id, batchItem: next, revT: 0, markOpen: false, confirm: null }); this.focusLater('#playbtn'); } else this.setState({ screen: 'batch', fromBatch: null, batchItem: null, confirm: null }); };
@@ -417,7 +418,7 @@ class Component extends DCLogic {
       writing: !D.written, scriptReady: !!D.written, skelRows: this.secs.map((x, i) => ['62%', '80%', '70%', '86%', '58%', '74%', '66%'][i % 7]),
       canBack: st.step > 0 && st.step < 5 && !(st.step === 3 && !D.recorded && !st.recStopped), recHold: st.step === 3 && !D.recorded && !st.recStopped, back: () => { const bid = st.step === 4 ? (st.fromBatch || D.batchOf) : null; if (bid) { const i = st.batchItem; this.setState({ fromBatch: null, batchItem: null, markOpen: false }); this.openBatch(bid); this.focusLater('#bwatch-' + i); return; } this.setState({ step: st.step - 1, confirm: null, markOpen: false }); }, hasSecondary: !!cur.second, secondary: secondaryFor[st.step] || (() => {}), primary: primaryFor[st.step],
       primaryBlocked: (st.step === 0 && !D.written) || (st.step === 3 && !D.recorded) || (st.step === 1 && !voiceOk),
-      confirming: !!cf, notConfirming: !cf, confirmNo: cf ? cf.no : '', confirmYes: cf ? cf.yes : '', cancelConfirm: () => { this.setState({ confirm: null }); this.focusLater('.stepfoot .pri'); }, doConfirm: () => { if (cf) cf.act(); },
+      confirming: !!cf, notConfirming: !cf, confirmNo: cf ? cf.no : '', confirmYes: cf ? cf.yes : '', cancelConfirm: () => { const sel = st.confirm === 'rerecord' ? '#secbtn' : '.stepfoot .pri'; this.setState({ confirm: null }); this.focusLater(sel); }, doConfirm: () => { if (cf) cf.act(); },
       footText: foot.text, footDot: foot.dot, footColor: foot.color,
       footLinkOn: !cf && footBad, footLinkLabel: 'switch back to ' + vInfo.models[0], footLinkAct: () => { this.patchDemo({ model: vInfo.models[0] }); this.say('Switched to Eleven ' + vInfo.models[0] + ' for ' + voicePretty); this.focusLater('.stepfoot .pri'); },
       // script
