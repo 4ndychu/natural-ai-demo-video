@@ -370,6 +370,13 @@ textarea{resize:none}
 .t-dark .capchip{background:#000;box-shadow:inset 0 0 0 1px var(--line)}
 .bar .bl{font-weight:400}
 .mono{font-weight:400}
+/* ===== R5 fix 11: two weights, 400 and 560 =====
+   Every text weight is 400 except the wide names and titles (560): hierarchy comes from size, case and grey.
+   The app root carries .w2 on every screen except those listed in W2_OFF in app.js. To switch this off for one screen,
+   add its key there (e.g. const W2_OFF = ['voice']), or append :not([data-scr="voice"]) to .w2 in the selector below.
+   Keys: welcome home new new-batch batch script voice privacy record review export settings. */
+.w2 *:not(.h-page):not(.h-step):not(.name):not(.h-big):not(.preset .pn):not(.wide:not([style*="font-weight"])){font-weight:400!important}
+/* ===== end R5 fix 11 ===== */
 @media (prefers-reduced-motion: reduce){.wv.on span,.fade,.toast,.skel,.pmark.spin,.dot.k-busy{animation:none}.bar .fill,button,.sw span,.disclose svg{transition:none}}
 /* phone width */
 .wfoot > .muted{flex:1 1 100%;text-align:right}
@@ -527,7 +534,7 @@ textarea{resize:none}
 </head>
 <body>
 <div id="app" v-cloak>
-<div :class="(themeClass)" style="min-height: 100vh; background: var(--ground); color: var(--ink); font-family: 'Mona Sans', -apple-system, sans-serif; font-size: 15px; line-height: 1.45; position: relative">
+<div :class="(themeClass)" :data-scr="(scrKey)" style="min-height: 100vh; background: var(--ground); color: var(--ink); font-family: 'Mona Sans', -apple-system, sans-serif; font-size: 15px; line-height: 1.45; position: relative">
 
 <div v-if="isWelcome" style="display: contents">
 <div class="fade wwrap" style="min-height: 100vh; box-sizing: border-box; padding: max(24px, calc((100vh - 734px) / 2)) 16px 24px; display: flex; align-items: flex-start; justify-content: center">

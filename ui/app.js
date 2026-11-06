@@ -7,6 +7,8 @@ const PRESETS = {
   standard: { email: false, phone: false, names: false, address: false, money: false, customers: false, counts: false, usage: true, prices: true, dates: true },
   test: { email: true, phone: true, names: true, address: true, money: false, customers: false, counts: false, usage: true, prices: true, dates: true }
 };
+// R5 fix 11 (two weights): screens listed here keep the old third weight (500). Keys: welcome home new new-batch batch script voice privacy record review export settings.
+const W2_OFF = [];
 const SAMPLE_COST = 120; // credits to hear a voice the first time (preview card, Hear badge, library)
 const ITEM_NAMES = { email: 'emails', phone: 'phone numbers', names: 'names and photos', address: 'addresses', money: 'revenue and balances', customers: 'customer details', counts: 'follower and member counts', usage: 'usage stats', prices: 'public prices', dates: 'dates' };
 const COURSE = ['Welcome to the course', 'Create your whop', 'Add the Courses app', 'Plan your modules', 'Chapters and lessons', 'Pick a lesson type', 'Upload videos and files', 'Write lesson text', 'Add a quiz', 'Drip or open access', 'Brand your course', 'Set a cover image', 'Preview as a buyer', 'Check it on a phone', 'Write the product page', 'Set a price', 'Add a free trial', 'Connect payouts', 'Invite your first members', 'Post an announcement', 'Answer comments', 'Read your stats', 'What to do next'];
@@ -325,9 +327,10 @@ class Component extends DCLogic {
     let bSecondary = null;
     if (B && (B.stage === 'recording' || B.stage === 'review')) { bSecondary = { label: exportLabel, act: exportAct, off: exportOff }; bPrimary = { label: 'Watch next', off: firstReady < 0, act: () => { if (firstReady >= 0) watchItem(firstReady); } }; }
     const bPauseObj = B && B.stage === 'recording' ? (B.paused ? { label: 'Resume recording', act: () => { this.patchBatch({ paused: false }); this.runBatch(); } } : { label: 'Pause recording', act: () => { this.patchBatch({ paused: true }); this.say('Paused. The video being recorded finishes first.'); } }) : null;
+    const scrKey = st.screen === 'demo' ? ['script', 'voice', 'privacy', 'record', 'review', 'export'][st.step] : st.screen === 'new' ? (st.mode === 'batch' && !st.editing ? 'new-batch' : 'new') : st.screen;
     const tipHover = (e) => { if (this.scrubbing || e.pointerType === 'touch') return; const r = e.currentTarget.getBoundingClientRect(); let best = null; this.starts.forEach((s, i) => { if (!i) return; const x = r.left + s / this.total * r.width; if (Math.abs(e.clientX - x) <= 8 && (best == null || Math.abs(e.clientX - x) < Math.abs(e.clientX - (r.left + this.starts[best] / this.total * r.width)))) best = i; }); if (best !== this.state.tipSec) this.setState({ tipSec: best }); };
     return {
-      themeClass: theme === 'dark' ? 't-dark' : 't-light', isDark: theme === 'dark', isLight: theme !== 'dark', themeAria: theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode', toggleTheme: () => this.setState({ theme: theme === 'dark' ? 'light' : 'dark' }),
+      themeClass: (theme === 'dark' ? 't-dark' : 't-light') + (W2_OFF.indexOf(scrKey) < 0 ? ' w2' : ''), scrKey: scrKey, isDark: theme === 'dark', isLight: theme !== 'dark', themeAria: theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode', toggleTheme: () => this.setState({ theme: theme === 'dark' ? 'light' : 'dark' }),
       isWelcome: st.screen === 'welcome', inApp: st.screen !== 'welcome', isHome: st.screen === 'home', isDemo: st.screen === 'demo', isSettings: st.screen === 'settings', isNew: st.screen === 'new', isBatch: st.screen === 'batch',
       crumb: st.screen !== 'home', crumbBatch: st.screen === 'demo' && !!st.fromBatch, crumbBatchName: st.fromBatch ? (st.batches.find((x) => x.id === st.fromBatch) || {}).name : '', goBatch: () => this.setState({ screen: 'batch', fromBatch: null, batchItem: null }), crumbText: st.screen === 'demo' ? (st.fromBatch && B ? (B.items[st.batchItem] || {}).t : D.title) : st.screen === 'batch' ? (B ? B.name : '') : st.screen === 'new' ? (st.editing ? 'Edit brief' : 'New demo') : 'Settings',
       showNewBtn: false, isPhone: isPhone,
