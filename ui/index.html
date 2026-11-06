@@ -178,11 +178,11 @@ textarea{resize:none}
 .disclose svg{transition:transform 160ms ease}
 .disclose[aria-expanded=true] svg{transform:rotate(90deg)}
 /* record + review */
-.screen{position:relative;aspect-ratio:16/9;border-radius:16px;overflow:hidden;background:var(--screen)}
-.screen .art{position:absolute;inset:8px;border-radius:8px;overflow:hidden;background:#2A2A2E}
+.screen{position:relative;aspect-ratio:16/9;border-radius:20px;overflow:hidden;background:var(--screen)}
+.screen .art{position:absolute;inset:8px;border-radius:12px;overflow:hidden;background:#2A2A2E}
 .screen .art img{width:100%;height:100%;object-fit:cover;display:block}
 .pill{position:absolute;display:inline-flex;align-items:center;gap:8px;background:rgba(17,17,17,0.85);color:#FFF;padding:6px 12px;border-radius:999px;font-size:13px}
-.panel{background:var(--tray);border-radius:18px;padding:16px}
+.panel{background:var(--tray);border-radius:20px;padding:16px}
 .timeline{position:relative;flex:1;height:40px;cursor:pointer;touch-action:none}
 .timeline .track{position:absolute;left:0;right:0;top:30px;height:6px;border-radius:3px;background:var(--fill);pointer-events:none}
 .timeline .played{position:absolute;left:0;top:30px;height:6px;border-radius:3px;background:var(--ink);pointer-events:none}
@@ -201,7 +201,7 @@ textarea{resize:none}
 .markrow .icon:hover,.markrow .mono:hover{background:var(--fill)!important}
 .markrow{display:grid;grid-template-columns:auto minmax(0,1fr) 36px;gap:10px;align-items:center;min-height:58px;border-top:1px solid var(--line)}
 .reasons{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
-.warnbtn{display:flex;align-items:center;gap:10px;width:100%;min-height:50px;padding:0 8px 0 14px;border:0;border-radius:14px;background:var(--tray);color:var(--ink);text-align:left}
+.warnbtn{display:flex;align-items:center;gap:10px;width:100%;min-height:50px;padding:0 8px 0 14px;border:0;border-radius:20px;background:var(--tray);color:var(--ink);text-align:left}
 .warnbtn .wpill{display:inline-flex;align-items:center;height:32px;padding:0 14px;border-radius:999px;background:var(--sheet);font-size:14px}
 @media (hover:hover){.warnbtn:hover .wpill{background:var(--wash)}}
 .dot.k-ready{background:var(--dc,var(--ink))}
@@ -324,6 +324,10 @@ textarea{resize:none}
 .skpanel{gap:12px;min-height:265.6px;box-sizing:border-box}
 .markslot .reasons{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;min-height:46px}
 .markslot .reasons > *{flex:none}
+/* Cancel keeps one slot at the end of the reasons row, whether the chips or the typed reason fill it. */
+.markslot .reasons .markx{margin-left:auto;position:sticky;right:0;background:var(--sheet)}
+@media (hover:hover){.markslot .reasons .markx:hover{background:var(--fill)}}
+.list > :last-child > .markrow{padding-bottom:0;min-height:0}
 .phone-setup{display:none}
 .capov{font-size:15px}
 .t-dark .capchip{background:#000;box-shadow:inset 0 0 0 1px var(--line)}
@@ -873,10 +877,9 @@ textarea{resize:none}
 <div v-if="markOpen" style="display: contents">
 <div id="reasons" class="fade reasons" role="group" aria-label="Why mark this moment">
 <span class="lg-only" style="font-weight: 500; white-space: nowrap">At <span class="mono">{{revTime}}</span>:</span>
-<button id="markfirst" type="button" class="btn sm" @click="markAi($event)">Sounds like AI</button><button type="button" class="btn sm" @click="markBlur($event)">Needs a blur</button><button type="button" class="btn sm" @click="markFast($event)">Too fast</button>
-<div v-if="!markOther" style="display: contents"><button type="button" class="btn sm" @click="openOther($event)">Other…</button></div>
-<div v-if="markOther" style="display: contents"><span style="display: flex; gap: 6px; flex: 1 1 200px"><label for="mown" class="sr">What’s off?</label><input id="mown" class="inp" type="text" :value="(markDraft)" @input="onMarkDraft($event)" @change="onMarkDraft($event)" @keydown="markKey($event)" placeholder="What’s off? Press Enter" style="height: 36px; font-size: 14px"></span></div>
-<button type="button" class="icon" @click="closeMark($event)" aria-label="Cancel" title="Cancel" style="width: 36px; height: 36px"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+<div v-if="!markOther" style="display: contents"><button id="markfirst" type="button" class="btn sm" @click="markAi($event)">Sounds like AI</button><button type="button" class="btn sm" @click="markBlur($event)">Needs a blur</button><button type="button" class="btn sm" @click="markFast($event)">Too fast</button><button type="button" class="btn sm" @click="openOther($event)">Other…</button></div>
+<div v-if="markOther" style="display: contents"><span style="display: flex; gap: 6px; flex: 1 1 200px; min-width: 0"><label for="mown" class="sr">What’s off?</label><input id="mown" class="inp" type="text" :value="(markDraft)" @input="onMarkDraft($event)" @change="onMarkDraft($event)" @keydown="markKey($event)" placeholder="What’s off? Press Enter" style="height: 36px; font-size: 14px"></span></div>
+<button type="button" class="icon markx" @click="closeMark($event)" aria-label="Cancel" title="Cancel" style="width: 36px; height: 36px"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
 </div>
 </div>
 <div class="sm-only mtime"><span class="mono">{{revTime}}</span> <span class="muted">· {{revSecName}}</span></div>
@@ -886,18 +889,18 @@ textarea{resize:none}
 <div v-if="hasUnsure" style="display: contents">
 <button type="button" class="warnbtn" @click="toggleBlurs($event)" :aria-expanded="(blurOpen)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l9.5 17h-19z"></path><path d="M12 10v4M12 17.5v.01"></path></svg><span style="flex: 1">{{unsureText}}<span class="lg-only"> before export</span></span><span class="wpill">{{blurOpen ? 'Hide' : 'Show'}}</span></button>
 <div v-if="blurOpen" style="display: contents">
-<div class="fade panel list" style="padding: 6px 14px">
+<div class="fade panel list" style="padding: 8px 16px">
 <div v-for="b in blurs" style="display: contents"><div class="row" style="flex-wrap: wrap; padding: 8px 0"><span class="mono muted">{{b.t}}</span><span style="flex: 1 1 160px">{{b.what}}</span><span style="display: inline-flex; gap: 6px"><button type="button" class="btn sm" @click="b.keep($event)" style="background: var(--sheet)">Keep blurred</button><button type="button" class="btn sm" @click="b.show($event)" style="background: var(--sheet)">Show it</button></span></div></div>
 </div>
 </div>
 </div>
-<div class="panel" style="padding: 14px 16px">
+<div class="panel" style="padding: 16px">
 <h2 class="h-sec" style="min-height: 30px; display: flex; align-items: center">Your marks {{marksCount}}</h2>
 <div v-if="noMarks" style="display: contents"><p class="muted" style="margin: 8px 0 4px">No marks yet. Play the draft and press Mark this moment when something’s off.</p></div>
 <div v-if="hasMarks" style="display: contents">
 <div class="list" style="margin-top: 4px">
 <div v-for="m in marks" style="display: contents">
-<div class="markrow"><button type="button" class="mono" @click="m.jump($event)" :aria-label="(m.jumpAria)" :title="(m.jumpAria)" style="border: 0; background: var(--sheet); border-radius: 8px; height: 32px; padding: 0 10px; white-space: nowrap; display: inline-flex; align-items: center; gap: 6px"><svg width="9" height="9" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 4.5v15l12-7.5z"></path></svg>{{m.t}}</button><span style="min-width: 0"><span style="display: block">{{m.text}}</span><span class="muted small" style="display: block">{{m.sec}}</span></span><button type="button" class="icon" @click="m.rm($event)" :aria-label="(m.rmAria)" title="Remove" style="width: 36px; height: 36px"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button></div>
+<div class="markrow"><button type="button" class="mono" @click="m.jump($event)" :aria-label="(m.jumpAria)" :title="(m.jumpAria)" style="border: 0; background: var(--sheet); border-radius: 999px; height: 32px; padding: 0 12px; white-space: nowrap; display: inline-flex; align-items: center; gap: 6px"><svg width="9" height="9" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 4.5v15l12-7.5z"></path></svg>{{m.t}}</button><span style="min-width: 0"><span style="display: block">{{m.text}}</span><span class="muted small" style="display: block">{{m.sec}}</span></span><button type="button" class="icon" @click="m.rm($event)" :aria-label="(m.rmAria)" title="Remove" style="width: 36px; height: 36px"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button></div>
 </div>
 </div>
 </div>
@@ -944,7 +947,7 @@ textarea{resize:none}
 <div v-if="confirming" style="display: contents"><button id="cfno" type="button" class="btn" @click="cancelConfirm($event)">{{confirmNo}}</button><button id="cfyes" type="button" class="pri" @click="doConfirm($event)">{{confirmYes}}</button></div>
 <div v-if="notConfirming" style="display: contents">
 <div v-if="canBack" style="display: contents"><button type="button" class="btn ghost backbtn" @click="back($event)">Back</button></div>
-<div v-if="hasSkip" style="display: contents"><button type="button" class="btn" @click="doSkip($event)">Skip redos</button></div>
+<div v-if="hasSkip" style="display: contents"><button type="button" class="btn" @click="doSkip($event)">Export without redos</button></div>
 <div v-if="hasSecondary" style="display: contents"><button type="button" class="btn" @click="secondary($event)">{{cur.second}}</button></div>
 <button type="button" :class="st1 ? 'pri privoice' : 'pri'" @click="primary($event)" :disabled="(primaryBlocked)"><span class="lg-only">{{cur.cta}}</span><span class="sm-only">{{cur.ctaShort || cur.cta}}</span></button>
 </div>
