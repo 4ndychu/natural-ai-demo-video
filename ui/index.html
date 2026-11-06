@@ -79,7 +79,9 @@ textarea{resize:none}
 .bar input{position:absolute;inset:0;width:100%;height:100%;margin:0;opacity:0;pointer-events:none}
 .bar:has(input:focus-visible){outline:2px solid var(--focus);outline-offset:2px}
 .slwrap{position:relative}
-.slwrap .reset{position:absolute;right:-6px;top:-8px;width:24px;height:24px;border-radius:12px;border:0;background:var(--ink);color:var(--sheet);display:inline-flex;align-items:center;justify-content:center;padding:0}
+/* The reset badge sits inside the bar, 8 px after its label, while the bar is off its recommended spot. The label is left-anchored and the value right-anchored, so nothing moves when it appears, and it stays clear of the focus ring. */
+.bar .bl{display:inline-flex;align-items:center;gap:8px}
+.bar .reset{flex:none;width:22px;height:22px;border-radius:11px;border:0;background:var(--ink);color:var(--sheet);display:inline-flex;align-items:center;justify-content:center;padding:0;pointer-events:auto;cursor:pointer}
 .sw{width:46px;height:28px;border-radius:14px;border:0;padding:3px;display:inline-flex;flex:none;background:var(--fill)}
 .sw span{width:22px;height:22px;border-radius:11px;background:var(--knobOff);box-shadow:0 1px 2px rgba(0,0,0,0.2);transition:transform 200ms cubic-bezier(.22,1,.36,1)}
 .sw.on{background:var(--ink)}
@@ -167,7 +169,7 @@ textarea{resize:none}
 .vpick{display:block;width:100%;border:0;background:transparent;padding:0;text-align:left;border-radius:20px}
 .vimg{position:relative;display:block;height:200px;border-radius:20px;overflow:hidden}
 .vimg img{width:100%;height:100%;object-fit:cover;object-position:50% 30%;display:block}
-.hear{position:absolute;right:15px;top:163px;height:32px;padding:0 12px;border-radius:16px;border:0;background:rgba(255,255,255,0.94);color:#111;display:inline-flex;align-items:center;gap:6px;font-size:13px}
+.hear{position:absolute;right:15px;top:163px;height:32px;padding:0 12px;border-radius:16px;border:0;background:rgba(255,255,255,0.94);color:#111;display:inline-flex;align-items:center;gap:6px;font-size:13px;min-width:82px;justify-content:center}
 .vtag{display:block;width:max-content;margin-top:4px;font-size:13px;padding:2px 8px;border-radius:999px;background:var(--wash);color:var(--ink2)}
 .sliders{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;align-items:start}
 /* Under Voice model: the v4 line or, in v3, the Pace bar, in one slot the height of the bar, so switching model moves nothing. */
@@ -834,8 +836,7 @@ textarea{resize:none}
 <div class="mslot"><div v-if="!isV3" style="display: contents"><p class="muted small" style="margin: 0">v4 sounds more natural but has no speed control. Pick v3 if you need to set the pace.</p></div><div v-if="isV3" style="display: contents"><div v-for="s in paceSliders" style="display: contents">
 <div>
 <div class="slwrap">
-<div class="bar" @pointerdown="s.down($event)" @pointermove="s.move($event)" @pointerup="s.up($event)" @pointercancel="s.up($event)"><span class="fill" :style="'width: ' + (s.pct)"></span><span class="rec" :style="'left: ' + (s.rec)"></span><span class="bl">{{s.label}}</span><span class="bv">{{s.display}}</span><input type="range" :id="'rng-' + s.k" :aria-label="(s.label)" :min="(s.min)" :max="(s.max)" step="1" :value="(s.value)" @input="s.onChange($event)" @change="s.onChange($event)"></div>
-<div v-if="s.off" style="display: contents"><button type="button" class="reset" @click="s.reset($event)" :aria-label="s.label + ' back to recommended'" title="Back to recommended"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.4-5.7L4 8.5"></path><path d="M4 3.5v5h5"></path></svg></button></div>
+<div class="bar" @pointerdown="s.down($event)" @pointermove="s.move($event)" @pointerup="s.up($event)" @pointercancel="s.up($event)"><span class="fill" :style="'width: ' + (s.pct)"></span><span class="rec" :style="'left: ' + (s.rec)"></span><span class="bl">{{s.label}}<span v-if="s.off" style="display: contents"><button type="button" class="reset" @pointerdown.stop @click="s.reset($event)" :aria-label="s.label + ' back to recommended'" title="Back to recommended"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.4-5.7L4 8.5"></path><path d="M4 3.5v5h5"></path></svg></button></span></span><span class="bv">{{s.display}}</span><input type="range" :id="'rng-' + s.k" :aria-label="(s.label)" :min="(s.min)" :max="(s.max)" step="1" :value="(s.value)" @input="s.onChange($event)" @change="s.onChange($event)"></div>
 </div>
 <div v-if="sliderHelp" style="display: contents"><p class="muted small" style="margin: 6px 0 0">{{s.low}}<br>{{s.high}}</p></div>
 </div>
@@ -850,8 +851,7 @@ textarea{resize:none}
 <div v-for="s in sliders" style="display: contents">
 <div>
 <div class="slwrap">
-<div class="bar" @pointerdown="s.down($event)" @pointermove="s.move($event)" @pointerup="s.up($event)" @pointercancel="s.up($event)"><span class="fill" :style="'width: ' + (s.pct)"></span><span class="rec" :style="'left: ' + (s.rec)"></span><span class="bl">{{s.label}}</span><span class="bv">{{s.display}}</span><input type="range" :id="'rng-' + s.k" :aria-label="(s.label)" :min="(s.min)" :max="(s.max)" step="1" :value="(s.value)" @input="s.onChange($event)" @change="s.onChange($event)"></div>
-<div v-if="s.off" style="display: contents"><button type="button" class="reset" @click="s.reset($event)" :aria-label="s.label + ' back to recommended'" title="Back to recommended"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.4-5.7L4 8.5"></path><path d="M4 3.5v5h5"></path></svg></button></div>
+<div class="bar" @pointerdown="s.down($event)" @pointermove="s.move($event)" @pointerup="s.up($event)" @pointercancel="s.up($event)"><span class="fill" :style="'width: ' + (s.pct)"></span><span class="rec" :style="'left: ' + (s.rec)"></span><span class="bl">{{s.label}}<span v-if="s.off" style="display: contents"><button type="button" class="reset" @pointerdown.stop @click="s.reset($event)" :aria-label="s.label + ' back to recommended'" title="Back to recommended"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.4-5.7L4 8.5"></path><path d="M4 3.5v5h5"></path></svg></button></span></span><span class="bv">{{s.display}}</span><input type="range" :id="'rng-' + s.k" :aria-label="(s.label)" :min="(s.min)" :max="(s.max)" step="1" :value="(s.value)" @input="s.onChange($event)" @change="s.onChange($event)"></div>
 </div>
 <div v-if="sliderHelp" style="display: contents"><p class="muted small" style="margin: 6px 0 0">{{s.low}}<br>{{s.high}}</p></div>
 </div>
