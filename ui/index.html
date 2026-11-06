@@ -370,6 +370,7 @@ textarea{resize:none}
 .chips button[aria-pressed=true]::before{content:'✓';display:inline-block;width:14px;text-align:left}
 .chips .newchip{padding:0 16px}
 .sumrow .btn{margin-left:auto;width:120px;flex:none}
+.tgstack{display:none}
 .scslot{display:flex;flex-direction:column;gap:12px;padding-top:18px}
 .markslot{margin-top:12px;min-height:46px}
 .mrow{display:flex;align-items:center;gap:12px;height:46px;min-width:0}
@@ -450,7 +451,15 @@ textarea{resize:none}
   .sumrow{height:auto;min-height:calc(2 * 1.45em + 16px);padding:8px 8px 8px 14px}
   .nsheet{gap:20px!important}
   .sumrow > span:first-child{white-space:normal;overflow:visible}
-  .sumrow.open{align-items:flex-start}
+  /* The options toggle is one box the width of 'Change' at the row's top right, closed and open ('Change' / 'Hide'), so toggling moves nothing. */
+  .sumrow{align-items:flex-start}
+  .sumrow .tglbl{display:none}
+  .tgstack{display:grid}
+  .tgstack::before{content:'Change'}
+  .tgstack::after{content:'Hide';visibility:hidden}
+  .tgstack::before,.tgstack::after{grid-area:1 / 1}
+  .sumrow.open .tgstack::before{visibility:hidden}
+  .sumrow.open .tgstack::after{visibility:visible}
   .sumrow.open > span:first-child{padding-top:7px}
   .sumrow .btn{width:auto;background:var(--sheet)!important;text-decoration:none!important;padding:0 12px!important}
   .vmore{min-height:56px!important;grid-column:1 / -1;flex-direction:row!important}
@@ -571,6 +580,8 @@ textarea{resize:none}
   .srow.swrap > .sl{flex:1 1 0}
   .srow > .pills{align-self:stretch;display:grid;grid-auto-flow:column;grid-auto-columns:1fr}
   .pills button{white-space:normal;height:auto;min-height:36px;padding:4px 6px;line-height:1.15}
+  /* Who's watching: columns sized to their labels, so 'Some experience' stays on one line. */
+  .srow > .pills.pillsfit{grid-auto-columns:auto}
   .srow.swrap > .sctl2{flex:1 1 100%;align-items:flex-start}
   .srow.swrap > .sctl2 .chips{justify-content:flex-start}
   .chips button{padding:0 14px}
@@ -1033,7 +1044,7 @@ textarea{resize:none}
 <div class="srow caprow"><span class="sl"><h2 class="h-sec" id="caplbl" style="font-size: 16px">Captions</h2></span><div class="pills" role="group" aria-labelledby="caplbl"><div v-for="o in revCaps" style="display: contents"><button type="button" :aria-pressed="(o.on)" @click="o.pick($event)">{{o.label}}</button></div></div></div>
 <div class="crow">
 <span class="crowl"><h2 class="h-sec" id="rclbl" style="font-size: 16px">Corner label</h2>
-<span class="cslot"><span v-if="revCornerOff" class="muted small">Your name or brand in a corner of the video</span><span v-if="revCorner.on" class="fade cfields"><label for="rct" class="sr">Label text</label><input id="rct" class="inp" type="text" :value="(revCornerText)" @input="onRevCornerText($event)" @change="onRevCornerText($event)" :placeholder="isPhone ? 'Label text' : 'Label text, e.g. your logo'"><label for="rcpos" class="sr">Corner</label><select id="rcpos" class="inp csel" @change="revCorner.pickVal($event)"><option v-for="o in revCorner.seg" :value="(o.k)" :selected="o.on === 'true'">{{o.label}}</option></select></span></span></span>
+<span class="cslot"><span v-if="revCornerOff" class="muted small">Your name or brand on the video</span><span v-if="revCorner.on" class="fade cfields"><label for="rct" class="sr">Label text</label><input id="rct" class="inp" type="text" :value="(revCornerText)" @input="onRevCornerText($event)" @change="onRevCornerText($event)" :placeholder="isPhone ? 'Label text' : 'Label text, e.g. your logo'"><label for="rcpos" class="sr">Corner</label><select id="rcpos" class="inp csel" @change="revCorner.pickVal($event)"><option v-for="o in revCorner.seg" :value="(o.k)" :selected="o.on === 'true'">{{o.label}}</option></select></span></span></span>
 <button type="button" :class="(revCorner.cls)" role="switch" :aria-checked="(revCorner.onStr)" aria-labelledby="rclbl" @click="revCorner.toggle($event)"><span></span></button>
 </div>
 <div class="row" style="border-top: 1px solid var(--line); padding: 10px 0; min-height: 64px; box-sizing: border-box"><span style="flex: 1"><span id="p720" style="display: block; font-weight: 500">Also make a small 720p copy</span><span class="muted small">For email and chat</span></span><button type="button" :class="(p720Cls)" role="switch" :aria-checked="(p720On)" aria-labelledby="p720" @click="toggle720($event)"><span></span></button></div>
@@ -1081,16 +1092,16 @@ textarea{resize:none}
 <div v-if="bSiteNew" style="display: contents"><div class="fade" style="margin-top: 10px"><label for="bns" class="sr">New site address</label><input id="bns" class="inp" type="text" :value="(bNew)" @input="onBNew($event)" @change="onBNew($event)" placeholder="The site’s address, e.g. app.yourproduct.com" :aria-invalid="bNewBad ? 'true' : 'false'"><div class="small" :style="'margin-top: 6px; min-height: 20px; color: ' + (bNewBad ? 'var(--danger)' : 'var(--ink2)')">{{bNewBad ? 'That doesn’t look like a web address.' : 'A browser opens so you can log in once. Then it’s saved.'}}</div></div></div>
 </div>
 <div>
-<div :class="bMore ? 'sumrow open' : 'sumrow'"><span style="flex: 1 1 260px; min-width: 0"><span v-if="bLess"><span class="lg-only">{{bSummary}}</span><span class="sm-only">{{bSummaryShort}}</span></span><span v-if="bMore" class="muted">For this demo only.<span class="lg-only"> Voice and captions can change later.</span></span></span><button type="button" class="btn sm" @click="toggleMore($event)" :aria-expanded="bMore ? 'true' : 'false'" style="background: var(--sheet)">{{bMore ? 'Hide options' : 'Change'}}</button></div>
+<div :class="bMore ? 'sumrow open' : 'sumrow'"><span style="flex: 1 1 260px; min-width: 0"><span v-if="bLess"><span class="lg-only">{{bSummary}}</span><span class="sm-only">{{bSummaryShort}}</span></span><span v-if="bMore" class="muted">For this demo only.<span class="lg-only"> Voice and captions can change later.</span></span></span><button type="button" class="btn sm" @click="toggleMore($event)" :aria-expanded="bMore ? 'true' : 'false'" style="background: var(--sheet)" :aria-label="bMore ? 'Hide options' : 'Change'"><span class="tglbl">{{bMore ? 'Hide options' : 'Change'}}</span><span class="tgstack" aria-hidden="true"></span></button></div>
 <div v-if="bMore" style="display: contents">
 <div class="fade srows" style="margin-top: 6px">
-<div class="srow"><span class="sl"><span class="slab">Who’s watching</span></span><div class="pills" role="group" aria-label="Who's watching"><div v-for="o in bWho" style="display: contents"><button type="button" :aria-pressed="(o.on)" @click="o.pick($event)">{{o.label}}</button></div></div></div>
+<div class="srow"><span class="sl"><span class="slab">Who’s watching</span></span><div class="pills pillsfit" role="group" aria-label="Who's watching"><div v-for="o in bWho" style="display: contents"><button type="button" :aria-pressed="(o.on)" @click="o.pick($event)">{{o.label}}</button></div></div></div>
 <div class="srow"><span class="sl"><span class="slab">Kind of demo</span><span class="muted small shelp shelp2">{{bKindHint}}</span></span><div class="pills" role="group" aria-label="Kind of demo"><div v-for="o in bKinds" style="display: contents"><button type="button" :aria-pressed="(o.on)" @click="o.pick($event)"><span class="lg-only">{{o.label}}</span><span class="sm-only">{{o.ph}}</span></button></div></div></div>
 <div class="srow"><span class="sl"><span class="slab">Length</span><span class="muted small shelp">{{lenHint}}</span></span><div class="pills" role="group" aria-label="How long"><div v-for="o in bLen" style="display: contents"><button type="button" :aria-pressed="(o.on)" @click="o.pick($event)">{{o.label}}<span v-if="o.star" class="star" aria-label="suggested">★</span></button></div></div></div>
 <div class="srow"><span class="sl"><span class="slab">Voice</span></span><div class="pills" role="group" aria-label="Voice"><div v-for="o in bVoices" style="display: contents"><button type="button" :aria-pressed="(o.on)" @click="o.pick($event)">{{o.label}}</button></div></div></div>
 <div class="srow"><span class="sl"><label for="bh" class="slab">Pages to avoid</label><span class="muted small shelp">Pages the browser should never open.</span></span><input id="bh" class="inp sctl" type="text" :value="(bHide)" @input="onBHide($event)" @change="onBHide($event)" placeholder="e.g. the billing page, settings"></div>
 <div class="srow"><span class="sl"><span class="slab">Captions</span></span><div class="pills" role="group" aria-label="Captions"><div v-for="o in bCaps" style="display: contents"><button type="button" :aria-pressed="(o.on)" @click="o.pick($event)">{{o.label}}</button></div></div></div>
-<div class="srow swrap"><span class="sl"><span class="slab" id="bclbl">Corner label</span><span class="muted small shelp">Your name or brand in a corner of the video</span></span><button type="button" :class="(bCorner.cls)" role="switch" :aria-checked="(bCorner.onStr)" aria-labelledby="bclbl" @click="bCorner.toggle($event)"><span></span></button><div v-if="bCorner.on" style="display: contents"><div class="fade sexpand"><label for="bct" class="sr">Label text</label><input id="bct" class="inp" type="text" :value="(bCornerText)" @input="onBCornerText($event)" @change="onBCornerText($event)" placeholder="Label text, e.g. your logo name"><div class="seg seg4" role="group" aria-label="Corner"><div v-for="o in bCorner.seg" style="display: contents"><button type="button" :aria-pressed="(o.on)" @click="o.pick($event)">{{o.label}}</button></div></div></div></div></div>
+<div class="srow swrap"><span class="sl"><span class="slab" id="bclbl">Corner label</span><span class="muted small shelp">Your name or brand on the video</span></span><button type="button" :class="(bCorner.cls)" role="switch" :aria-checked="(bCorner.onStr)" aria-labelledby="bclbl" @click="bCorner.toggle($event)"><span></span></button><div v-if="bCorner.on" style="display: contents"><div class="fade sexpand"><label for="bct" class="sr">Label text</label><input id="bct" class="inp" type="text" :value="(bCornerText)" @input="onBCornerText($event)" @change="onBCornerText($event)" placeholder="Label text, e.g. your logo name"><div class="seg seg4" role="group" aria-label="Corner"><div v-for="o in bCorner.seg" style="display: contents"><button type="button" :aria-pressed="(o.on)" @click="o.pick($event)">{{o.label}}</button></div></div></div></div></div>
 </div>
 </div>
 </div>
@@ -1189,7 +1200,7 @@ textarea{resize:none}
 <div class="row setrow" style="padding: 10px 0"><span style="flex: 1"><span style="display: block">Appearance</span><span class="muted small">Follows your Mac unless you pick one</span></span><div class="seg ctl" role="group" aria-label="Appearance" style="width: 360px"><div v-for="a in appear" style="display: contents"><button type="button" :aria-pressed="(a.on)" @click="a.pick($event)">{{a.label}}</button></div></div></div>
 <div class="row setrow" style="padding: 10px 0"><span style="flex: 1"><span style="display: block">Voice for new demos</span><span class="muted small">Add more in any demo’s Voice step</span></span><div class="seg ctl" role="group" aria-label="Default voice" style="width: 360px"><div v-for="a in defVoices" style="display: contents"><button type="button" :aria-pressed="(a.on)" @click="a.pick($event)">{{a.label}}</button></div></div></div>
 <div class="row setrow" style="padding: 10px 0"><span style="flex: 1"><span style="display: block">Captions</span><span class="muted small">You can change it per demo</span></span><div class="seg ctl" role="group" aria-label="Default captions" style="width: 360px"><div v-for="a in defCaps" style="display: contents"><button type="button" :aria-pressed="(a.on)" @click="a.pick($event)">{{a.label}}</button></div></div></div>
-<div class="row crow2" style="padding: 12px 0; flex-wrap: wrap"><span class="crow2l"><span><span id="dclbl" style="display: block">Corner label</span><span class="muted small">Your name or brand in a corner of the video</span></span></span><button type="button" :class="(defCorner.cls)" role="switch" :aria-checked="(defCorner.onStr)" aria-labelledby="dclbl" @click="defCorner.toggle($event)"><span></span></button>
+<div class="row crow2" style="padding: 12px 0; flex-wrap: wrap"><span class="crow2l"><span><span id="dclbl" style="display: block">Corner label</span><span class="muted small">Your name or brand on the video</span></span></span><button type="button" :class="(defCorner.cls)" role="switch" :aria-checked="(defCorner.onStr)" aria-labelledby="dclbl" @click="defCorner.toggle($event)"><span></span></button>
 <div v-if="defCorner.on" style="display: contents"><div class="fade" style="flex: 1 1 100%; display: grid; gap: 8px; padding-bottom: 4px"><label for="dct" class="sr">Label text</label><input id="dct" class="inp" type="text" :value="(defCornerText)" @input="onDefCornerText($event)" @change="onDefCornerText($event)" placeholder="Label text, e.g. your logo name"><div class="seg seg4" role="group" aria-label="Corner"><div v-for="o in defCorner.seg" style="display: contents"><button type="button" :aria-pressed="(o.on)" @click="o.pick($event)">{{o.label}}</button></div></div></div></div></div>
 </div>
 </div></div>
