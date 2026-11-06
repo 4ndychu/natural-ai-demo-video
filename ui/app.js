@@ -242,7 +242,7 @@ class Component extends DCLogic {
       () => { if (!voiceOk) return; goStep(2); this.say(st.lock ? voicePretty + ' is set for every demo in this project' : 'Using ' + voicePretty + ' for this demo'); },
       () => { const fresh = !D.recorded && st.recPos === 0 && !this.timers.rec; if (fresh) { if (this.needKey()) return; this.setState({ confirm: 'record' }); this.focusLater('#cfyes'); return; } goStep(3); if (!D.recorded && !this.timers.rec && !st.recPaused && !st.recStopped) { if (this.needKey()) return; this.startRecording(st.recPos); } },
       () => goStep(4),
-      () => { if (marks) { this.setState({ confirm: 'redo' }); return; } if (unsure) { this.setState({ confirm: 'approve' }); this.focusLater('#cfno'); return; } if (st.fromBatch) { batchApproveNext(); return; } goStep(5); },
+      () => { if (marks) { this.setState({ confirm: 'redo' }); this.focusLater('#cfyes'); return; } if (unsure) { this.setState({ confirm: 'approve' }); this.focusLater('#cfno'); return; } if (st.fromBatch) { batchApproveNext(); return; } goStep(5); },
       () => { if (!D.exported || D.dirty) doExport(); else this.say('Opening Movies/NAVI'); }
     ];
     const secondaryFor = [null, null, null, () => { if (this.needKey()) return; this.patchDemo({ recorded: false }); this.startRecording(); }, () => this.setState({ confirm: 'approve' }), () => this.say('Opening Movies/NAVI')];
@@ -508,7 +508,7 @@ class Component extends DCLogic {
       markDraft: st.markDraft, onMarkDraft: (e) => this.setState({ markDraft: e.target.value }), markOwn: () => { const d = st.markDraft.trim(); if (d) addMark(d); },
       markKey: (e) => { if (e.key === 'Enter') { e.preventDefault(); const d = (e.target.value || '').trim(); if (d) addMark(d); } },
       marks: allMarks.map((m) => ({ t: this.fmt(m.t), text: m.text.length > 40 ? m.text.slice(0, 39).replace(/\s+$/, '') + '…' : m.text, full: m.text, sec: this.secs[Number(m.k)].n, jumpAria: 'Jump to ' + this.fmt(m.t), jump: () => this.setState({ revT: m.t, player: false }), rmAria: 'Remove mark at ' + this.fmt(m.t),
-        rm: () => { const prev = D.notes; const n = Object.assign({}, prev); n[m.k] = prev[m.k].filter((x, k) => k !== m.j); this.patchDemo({ notes: n }); this.say('Mark removed', () => this.patchDemo({ notes: prev })); } })),
+        rm: () => { const prev = D.notes; const n = Object.assign({}, prev); n[m.k] = prev[m.k].filter((x, k) => k !== m.j); this.patchDemo({ notes: n }); if (allMarks.length === 1) this.focusLater('#markbtn'); this.say('Mark removed', () => this.patchDemo({ notes: prev })); } })),
       hasMarks: marks > 0, noMarks: marks === 0, marksCount: marks ? '(' + marks + ')' : '', revCover: D.cover,
       hasUnsure: unsure > 0, unsureText: this.plural(unsure, 'blur') + ' to check', hasSkip: !!cur.skip && !st.confirm, skipLabel: cur.skip || '', doSkip: () => { this.setState({ confirm: 'approve' }); this.focusLater('#cfno'); }, blurOpen: st.blurOpen, toggleBlurs: () => this.setState({ blurOpen: !st.blurOpen }),
       blurs: unsureBlurs.map((b) => ({ t: b.t, what: b.what, keep: () => { const prev = D.blurs; this.patchDemo({ blurs: D.blurs.map((x) => x.id === b.id ? Object.assign({}, x, { s: 'keep' }) : x) }); this.say('Kept blurred', () => this.patchDemo({ blurs: prev })); }, show: () => { const prev = D.blurs; this.patchDemo({ blurs: D.blurs.map((x) => x.id === b.id ? Object.assign({}, x, { s: 'show' }) : x) }); this.say('Will be shown', () => this.patchDemo({ blurs: prev })); } })),
