@@ -249,8 +249,15 @@ textarea{resize:none}
 .filerow{flex-wrap:wrap;gap:0 16px;min-height:34px;padding:6px 0;box-sizing:border-box;align-items:baseline}
 .filerow .fline{flex:0 1 auto;min-width:0;justify-content:flex-start;gap:8px}
 .filerow .fdet{margin-left:auto;text-align:right}
-/* The settings column keeps the height of its largest state (label open, 720p copy, captions file), so no setting moves Export video. */
-@media (min-width: 861px){.excol{min-height:467px}.excol .caprow{min-height:60px}}
+/* Corner label: when on, the text field and the corner picker replace the sub-line inside the row, so the row keeps its height. */
+.crow{display:flex;align-items:center;gap:12px;border-top:1px solid var(--line);padding:6px 0}
+.crowl{flex:1;min-width:0}
+.cslot{display:flex;align-items:center;min-height:36px}
+.cfields{display:flex;gap:8px;flex:1;min-width:0}
+.cfields .inp{height:34px;font-size:14px;padding:0 12px}
+.cfields .csel{flex:0 0 128px;appearance:none;-webkit-appearance:none;background:var(--wash) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2.4' stroke-linecap='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") no-repeat right 12px center;border:0;border-radius:999px;padding-right:30px}
+/* The settings column keeps the height of its largest state (720p copy and captions file on), so no setting moves Export video. */
+@media (min-width: 861px){.excol{min-height:366px}.excol .caprow{min-height:60px}.exsheet{min-height:0}}
 .fline .dot.k-done{margin-right:4px}
 /* chat */
 .chatwrap{position:fixed;left:0;right:0;bottom:0;z-index:6;pointer-events:none}
@@ -406,8 +413,12 @@ textarea{resize:none}
   .sclenrow{display:none}
   .sc{gap:0}
   .newtile .muted{display:none}
-  /* The list keeps room for the captions file, so picking Separate file moves nothing below it. */
-  .fileslist{min-height:124px}
+  /* Phone: each file's detail sits left-aligned under its name; the list keeps the height of its largest state (4 files), so no setting moves Export video. */
+  .filerow{flex-direction:column;align-items:flex-start;gap:0}
+  .filerow .fdet{margin-left:0;text-align:left}
+  .fileslist{min-height:219px}
+  .cslot{min-height:42px}
+  .cfields .csel{flex-basis:118px}
   .addrow{flex-wrap:wrap;row-gap:8px}
   .addrow .inp{flex:1 1 100%!important}
   .addrow .btn{margin-left:auto}
@@ -704,7 +715,7 @@ textarea{resize:none}
 </nav>
 
 <section class="tray" aria-labelledby="step-h">
-<div class="sheet stepsheet" :class="st3 ? 'recsheet' : ''">
+<div class="sheet stepsheet" :class="st3 ? 'recsheet' : st5 ? 'exsheet' : ''">
 <h1 id="step-h" tabindex="-1" class="h-step">{{cur.title}}</h1>
 <p class="muted stephelp" style="margin: 8px 0 22px; max-width: 70ch"><span>{{cur.help}}</span><span v-if="cur.helpHold" class="hold" aria-hidden="true">{{cur.helpHold}}</span></p>
 
@@ -1003,14 +1014,10 @@ textarea{resize:none}
 </div>
 <div class="list excol" style="min-width: 0; display: flex; flex-direction: column">
 <div class="srow caprow"><span class="sl"><h2 class="h-sec" id="caplbl" style="font-size: 16px">Captions</h2></span><div class="pills" role="group" aria-labelledby="caplbl"><div v-for="o in revCaps" style="display: contents"><button type="button" :aria-pressed="(o.on)" @click="o.pick($event)">{{o.label}}</button></div></div></div>
-<div style="border-top: 1px solid var(--line); padding: 12px 0">
-<div style="display: flex; align-items: center; gap: 12px"><span style="flex: 1"><h2 class="h-sec" id="rclbl" style="font-size: 16px">Corner label</h2><span class="muted small">Your name or brand in a corner of the video</span></span><button type="button" :class="(revCorner.cls)" role="switch" :aria-checked="(revCorner.onStr)" aria-labelledby="rclbl" @click="revCorner.toggle($event)"><span></span></button></div>
-<div v-if="revCorner.on" style="display: contents">
-<div class="fade" style="margin-top: 8px; display: grid; gap: 8px">
-<label for="rct" class="sr">Label text</label><input id="rct" class="inp" type="text" :value="(revCornerText)" @input="onRevCornerText($event)" @change="onRevCornerText($event)" placeholder="Label text, e.g. your logo name">
-<div class="seg seg4" role="group" aria-label="Corner"><div v-for="o in revCorner.seg" style="display: contents"><button type="button" :aria-pressed="(o.on)" @click="o.pick($event)">{{o.label}}</button></div></div>
-</div>
-</div>
+<div class="crow">
+<span class="crowl"><h2 class="h-sec" id="rclbl" style="font-size: 16px">Corner label</h2>
+<span class="cslot"><span v-if="revCornerOff" class="muted small">Your name or brand in a corner of the video</span><span v-if="revCorner.on" class="fade cfields"><label for="rct" class="sr">Label text</label><input id="rct" class="inp" type="text" :value="(revCornerText)" @input="onRevCornerText($event)" @change="onRevCornerText($event)" :placeholder="isPhone ? 'Label text' : 'Label text, e.g. your logo'"><label for="rcpos" class="sr">Corner</label><select id="rcpos" class="inp csel" @change="revCorner.pickVal($event)"><option v-for="o in revCorner.seg" :value="(o.k)" :selected="o.on === 'true'">{{o.label}}</option></select></span></span></span>
+<button type="button" :class="(revCorner.cls)" role="switch" :aria-checked="(revCorner.onStr)" aria-labelledby="rclbl" @click="revCorner.toggle($event)"><span></span></button>
 </div>
 <div class="row" style="border-top: 1px solid var(--line); padding: 10px 0; min-height: 64px; box-sizing: border-box"><span style="flex: 1"><span id="p720" style="display: block; font-weight: 500">Also make a small 720p copy</span><span class="muted small">For email and chat</span></span><button type="button" :class="(p720Cls)" role="switch" :aria-checked="(p720On)" aria-labelledby="p720" @click="toggle720($event)"><span></span></button></div>
 <div style="margin-top: 9px">
