@@ -356,6 +356,8 @@ textarea{resize:none}
 .secrec{min-width:130px;box-sizing:border-box}
 .prirec{min-width:163px}
 .bprimary{min-width:160px;overflow:hidden;text-overflow:ellipsis}
+/* Batch: "Yes, record all" keeps the box of "Approve all and record", so the confirm moves nothing. */
+.bprimary.bapprove{min-width:202px}
 @media (min-width: 861px){.caprow{border-top:0!important;padding-top:0!important}}
 .srows{display:flex;flex-direction:column}
 .srow{display:flex;align-items:center;justify-content:space-between;gap:10px 20px;min-height:64px;padding:10px 0;border-top:1px solid var(--line);box-sizing:border-box}
@@ -1212,7 +1214,7 @@ textarea{resize:none}
 <div v-if="bShowToggle" class="bmore"><button type="button" class="link" @click="bShowAll($event)" :aria-expanded="bAllOpenRaw ? 'true' : 'false'">{{bShowAllLabel}}</button></div>
 </div>
 </div>
-<div :class="bCfSlot ? 'foot bfoot bfcf' : 'foot bfoot'"><span v-if="bConfirm" class="ftext" style="color: var(--ink)"><span class="dot k-ready"></span><span class="bcf">{{bConfirmText}}</span></span><span v-if="bNotConfirm" class="ftext muted"><span id="bwhy"><span class="lg-only">{{bFooter}}</span><span class="sm-only">{{bFooterShort}}</span></span></span><span class="fbtns"><div v-if="bConfirm" style="display: contents"><button type="button" class="btn" @click="bConfirmNo($event)">Cancel</button><button id="bcfyes" type="button" class="pri bprimary" @click="bConfirmYes($event)">Yes, record all</button></div><div v-if="bNotConfirm" style="display: contents"><div v-if="hasBSecondary" style="display: contents"><button type="button" class="btn bsecond" @click="bSecondary($event)" :aria-disabled="bSecondaryOff ? 'true' : 'false'"><span class="lg-only">{{bSecondaryLabel}}</span><span class="sm-only">{{bSecondaryShort}}</span></button></div><button type="button" class="pri bprimary" @click="bPrimary($event)" :aria-disabled="bPrimaryOff ? 'true' : 'false'" :aria-describedby="bPrimaryOff ? 'bwhy' : null"><span class="lg-only">{{bPrimaryLabel}}</span><span class="sm-only">{{bPrimaryShort}}</span></button></div></span></div>
+<div :class="bCfSlot ? 'foot bfoot bfcf' : 'foot bfoot'"><span v-if="bConfirm" class="ftext" style="color: var(--ink)"><span class="dot k-ready"></span><span class="bcf">{{bConfirmText}}</span></span><span v-if="bNotConfirm" class="ftext muted"><span id="bwhy"><span class="lg-only">{{bFooter}}</span><span class="sm-only">{{bFooterShort}}</span></span></span><span class="fbtns"><div v-if="bConfirm" style="display: contents"><button type="button" class="btn" @click="bConfirmNo($event)">Cancel</button><button id="bcfyes" type="button" class="pri bprimary bapprove" @click="bConfirmYes($event)">Yes, record all</button></div><div v-if="bNotConfirm" style="display: contents"><div v-if="hasBSecondary" style="display: contents"><button type="button" class="btn bsecond" @click="bSecondary($event)" :aria-disabled="bSecondaryOff ? 'true' : 'false'"><span class="lg-only">{{bSecondaryLabel}}</span><span class="sm-only">{{bSecondaryShort}}</span></button></div><button type="button" :class="bCfSlot ? 'pri bprimary bapprove' : 'pri bprimary'" @click="bPrimary($event)" :aria-disabled="bPrimaryOff ? 'true' : 'false'" :aria-describedby="bPrimaryOff ? 'bwhy' : null"><span class="lg-only">{{bPrimaryLabel}}</span><span class="sm-only">{{bPrimaryShort}}</span></button></div></span></div>
 </section>
 </main>
 </div>
