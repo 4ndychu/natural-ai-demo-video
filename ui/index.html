@@ -165,7 +165,7 @@ textarea{resize:none}
 .vtag{display:block;width:max-content;margin-top:4px;font-size:13px;padding:2px 8px;border-radius:999px;background:var(--wash);color:var(--ink2)}
 .sliders{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;align-items:start}
 /* Under Voice model: the v4 line or, in v3, the Pace bar, in one slot the height of the bar, so switching model moves nothing. */
-.mslot{min-height:46px;display:flex;flex-direction:column;justify-content:center}
+.mslot{min-height:46px;display:flex;flex-direction:column;justify-content:flex-start}
 /* The sample's cost line keeps the height of its longer text after the first play, so nothing below it moves. */
 .cstack{display:grid}
 .cstack > span{grid-area:1 / 1}
@@ -457,7 +457,6 @@ textarea{resize:none}
   .sumrow{align-items:flex-start}
   .sumrow.open > span:first-child{padding-top:7px}
   .sumrow .btn{width:auto;background:var(--sheet)!important;text-decoration:none!important;padding:0 12px!important}
-  .vmore{min-height:56px!important;flex-direction:row!important}
   .phone-setup{background:transparent!important;padding:4px 2px!important;color:var(--ink2)!important}
   .dcard .meta{margin-top:0!important;margin-left:6px}
   .bprimary{min-width:0}
