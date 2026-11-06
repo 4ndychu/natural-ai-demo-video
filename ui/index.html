@@ -1097,7 +1097,7 @@ textarea{resize:none}
 <h1 id="set-h" tabindex="-1" class="h-page" style="margin: 10px 4px 18px">Settings</h1>
 <div style="display: flex; flex-direction: column; gap: 14px">
 <div class="tray"><div class="sheet" style="padding: 18px 18px 8px">
-<h2 class="h-big">Defaults</h2>
+<h2 class="h-big" style="margin-bottom: 10px">Defaults</h2>
 <div class="list">
 <div class="row setrow" style="padding: 10px 0"><span style="flex: 1"><span style="display: block">Appearance</span><span class="muted small">Follows your Mac unless you pick one</span></span><div class="seg ctl" role="group" aria-label="Appearance" style="width: 360px"><div v-for="a in appear" style="display: contents"><button type="button" :aria-pressed="(a.on)" @click="a.pick($event)">{{a.label}}</button></div></div></div>
 <div class="row setrow" style="padding: 10px 0"><span style="flex: 1"><span style="display: block">Voice for new demos</span><span class="muted small">Add more in any demo’s Voice step</span></span><div class="seg ctl" role="group" aria-label="Default voice" style="width: 360px"><div v-for="a in defVoices" style="display: contents"><button type="button" :aria-pressed="(a.on)" @click="a.pick($event)">{{a.label}}</button></div></div></div>
@@ -1108,7 +1108,7 @@ textarea{resize:none}
 </div></div>
 
 <div class="tray"><div class="sheet" style="padding: 18px 18px 8px">
-<h2 class="h-big">ElevenLabs</h2>
+<h2 class="h-big" style="margin-bottom: 10px">ElevenLabs</h2>
 <div class="list"><div class="row setrow" style="padding: 10px 0"><span style="flex: 1 1 220px"><span style="display: block">API key</span><span :style="'font-size: 14px; color: ' + (keyRowColor)">{{keyRow}}</span></span><span style="display: flex; gap: 6px; margin-left: auto"><div v-if="keyOn" style="display: contents"><button id="keyremove" type="button" class="btn sm" @click="removeKey($event)" :disabled="(keyEdit)">Remove</button></div><button id="keytoggle" type="button" class="btn sm" @click="toggleKeyEdit($event)" :aria-expanded="(keyEdit)" style="width: 92px; padding: 0">{{keyEditLabel}}</button></span></div></div>
 <div v-if="keyEdit" style="display: contents">
 <div class="fade" style="padding: 4px 0 14px">
@@ -1121,7 +1121,7 @@ textarea{resize:none}
 </div></div>
 
 <div class="tray"><div class="sheet" style="padding: 18px 18px 8px">
-<div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px"><h2 class="h-big" style="flex: 1; margin: 0">Saved logins</h2><div v-if="!noSites" style="display: contents"><button type="button" class="btn sm" @click="forgetAll($event)">Forget all logins</button></div></div>
+<div style="display: flex; align-items: center; gap: 10px; min-height: 36px; margin-bottom: 10px"><h2 class="h-big" style="flex: 1; margin: 0">Saved logins</h2><div v-if="!noSites" style="display: contents"><button type="button" class="btn sm" @click="forgetAll($event)">Forget all logins</button></div></div>
 <div class="list">
 <div v-for="s in sites" style="display: contents"><div class="row" style="flex-wrap: wrap; padding: 8px 0"><span style="flex: 1 1 200px; min-width: 0"><span style="display: block">{{s.u}}</span><span class="muted small">{{s.note}}</span></span><span style="display: flex; gap: 6px; margin-left: auto"><button type="button" class="btn sm" @click="s.forget($event)">Forget</button><button type="button" class="btn sm" @click="s.relog($event)">Log in again</button></span></div></div>
 <div v-if="noSites" style="display: contents"><div id="nosites" tabindex="-1" class="row muted">No saved logins. Add a site below, or Claude asks when a demo needs one.</div></div>
@@ -1131,11 +1131,11 @@ textarea{resize:none}
 </div></div>
 
 <div class="tray"><div class="sheet" style="padding: 18px 18px 8px">
-<h2 class="h-big">Your data</h2>
+<h2 class="h-big" style="margin-bottom: 10px">Your data</h2>
 <div class="list">
 <div v-for="d in data" style="display: contents"><div class="row" style="padding: 8px 0"><span style="flex: 1"><span style="display: block">{{d.n}}</span><span class="muted small">{{d.w}}</span></span><div v-if="d.can" style="display: contents"><button type="button" class="btn sm" @click="d.act($event)">{{d.l}}</button></div></div></div>
 <div class="row" style="padding: 8px 0"><span style="flex: 1"><span style="display: block">First-time setup</span><span class="muted small">Walk through the key, tools and login again</span></span><button type="button" class="btn sm" @click="showWelcome($event)">Run again</button></div>
-<div id="wiperow" class="row" style="padding: 8px 0; flex-wrap: wrap"><span style="flex: 1 1 260px"><span style="display: block">Delete everything</span><span class="muted small">Your key, logins and preferences. Your videos are kept.</span></span>
+<div id="wiperow" class="row" style="padding: 8px 0; flex-wrap: wrap"><span style="flex: 1 1 260px"><span style="display: block">Erase NAVI data</span><span class="muted small">Your key, logins and preferences. Your videos are kept.</span></span>
 <span style="display: flex; gap: 6px; margin-left: auto">
 <div v-if="notWipeConfirm" style="display: contents"><button id="wipebtn" type="button" class="btn sm danger" @click="askWipe($event)">Delete everything</button></div>
 </span>
