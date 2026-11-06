@@ -247,18 +247,28 @@ textarea{resize:none}
 .slide .sfill{position:absolute;left:1px;top:1px;bottom:1px;border-radius:23px;background:var(--wash);transition:width 220ms cubic-bezier(.22,1,.36,1)}
 .slide .slabel{position:absolute;left:52px;right:12px;top:0;bottom:0;display:flex;flex-direction:column;justify-content:center;line-height:1.2;pointer-events:none;white-space:nowrap;overflow:hidden}
 .slide .slt{font-size:14px;font-weight:500}
-.slide .sls{font-size:12px;color:var(--ink2);overflow:hidden;text-overflow:ellipsis}
+.slide .sls{font-size:13px;color:var(--ink2);overflow:hidden;text-overflow:ellipsis}
 .shandle{position:absolute;top:4px;width:40px;height:40px;border-radius:20px;background:var(--danger);color:var(--sheet);display:inline-flex;align-items:center;justify-content:center;cursor:grab;touch-action:none;transition:left 220ms cubic-bezier(.22,1,.36,1)}
 .slide.dragging .shandle,.slide.dragging .sfill{transition:none}
 .slide.dragging .shandle{cursor:grabbing}
 .rphead{font-size:17px}
-.prog{list-style:none;margin:14px 0 0;padding:0;display:flex;flex-direction:column;gap:2px}
+/* The now card hugs its quote; the list keeps the height of the longest quote, so the panel never changes height between sections. */
+.recpanel{--ql:3;--qf:16px;--progmin:calc(4 * 36px + 4 * 2px + 8px + 26px + 21.75px + 8px + var(--ql) * 1.45 * var(--qf));min-height:calc(var(--progmin) + 150.65px);box-sizing:border-box}
+.prog{list-style:none;margin:14px 0 0;padding:0;display:flex;flex-direction:column;gap:2px;min-height:var(--progmin)}
+/* Record ends where its columns end, and keeps one height from recording to recorded. */
+.recsheet{min-height:0}
+.stephelp{display:grid}
+.stephelp > *{grid-area:1/1}
+.stephelp .hold{visibility:hidden}
+/* While recording, the footer keeps the room its finished buttons need, so nothing moves when the draft is ready. */
+.fhold{display:inline-flex;gap:8px;visibility:hidden}
+.credits{font-variant-numeric:tabular-nums}
 .prog li{display:flex;align-items:center;gap:10px;min-height:36px;padding:0 4px}
 .prog .pn{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .prog .pdone{color:var(--ink2)}
 .prog .pnow{display:block;margin:4px 0;padding:12px 14px 14px;border-radius:14px;background:var(--sheet);box-shadow:inset 0 0 0 1px var(--line)}
 .pnowtop{display:flex;align-items:center;gap:10px;font-weight:500}
-.pquote{--ql:3;margin:8px 0 0;font-size:16px;line-height:1.45;height:calc(var(--ql) * 1.45em);overflow:hidden;display:-webkit-box;-webkit-line-clamp:var(--ql);-webkit-box-orient:vertical}
+.pquote{margin:8px 0 0;font-size:var(--qf);line-height:1.45;max-height:calc(var(--ql) * 1.45em);overflow:hidden;display:-webkit-box;-webkit-line-clamp:var(--ql);-webkit-box-orient:vertical}
 .pmark{flex:none;width:16px;height:16px;border-radius:8px;box-sizing:border-box;position:relative}
 .pmark.tick{background:var(--ink2)}
 .pmark.tick::after{content:'';position:absolute;left:5.5px;top:3px;width:3px;height:7px;border:solid var(--sheet);border-width:0 1.6px 1.6px 0;transform:rotate(45deg)}
@@ -380,9 +390,10 @@ textarea{resize:none}
   .welcome-art{min-height:320px!important}
   .welcome-art img{object-position:50% 40%!important}
   .wfield{justify-content:flex-end}
-  .pquote{--ql:4;font-size:15px}
+  .recpanel{--ql:4;--qf:15px}
   .pausebtn{width:80px;padding:0 10px}
   .slide .slabel{left:50px;right:6px}
+  .slide .sls{font-size:12px}
   .sliders{grid-template-columns:minmax(0,1fr)}
   .paceslot:empty{display:none}
   .setrow,.list > div > .row,.list > .row{flex-wrap:wrap}
@@ -631,9 +642,9 @@ textarea{resize:none}
 </nav>
 
 <section class="tray" aria-labelledby="step-h">
-<div class="sheet stepsheet">
+<div class="sheet stepsheet" :class="st3 ? 'recsheet' : ''">
 <h1 id="step-h" tabindex="-1" class="h-step">{{cur.title}}</h1>
-<p class="muted" style="margin: 8px 0 22px; max-width: 70ch">{{cur.help}}</p>
+<p class="muted stephelp" style="margin: 8px 0 22px; max-width: 70ch"><span>{{cur.help}}</span><span v-if="cur.helpHold" class="hold" aria-hidden="true">{{cur.helpHold}}</span></p>
 
 <!-- SCRIPT -->
 <div v-if="st0" style="display: contents">
@@ -829,7 +840,6 @@ textarea{resize:none}
 <div class="art" aria-hidden="true"><img :src="(recCover)" alt="" style="filter: blur(6px) saturate(0.8); transform: scale(1.06)"></div>
 <span class="pill" style="left: 22px; top: 22px"><span :class="'dot k-' + recBadgeDot"></span>{{recBadge}}</span>
 </div>
-<div v-if="recDone" style="display: contents"><p class="muted" style="margin: 14px 0 0">{{recNote}}</p></div>
 </div>
 <div class="panel recpanel" aria-live="polite" style="display: flex; flex-direction: column; align-self: start">
 <div class="rphead">{{recHeadLine}}</div>
@@ -839,6 +849,7 @@ textarea{resize:none}
 <li class="pdone" :style="hasLastDone ? '' : 'visibility: hidden'"><span :class="'pmark ' + (recDoneMark)" aria-hidden="true"></span><span class="pn">{{recLastDone}}</span></li>
 <li class="pnow"><div class="pnowtop"><span :class="'pmark ' + (recNowMark)" aria-hidden="true"></span><span class="pn">{{recNowName}}</span></div><p class="pquote"><span class="muted">{{voiceName}}: </span>“{{recNowLine}}”</p></li>
 <div v-for="n in recNext" style="display: contents"><li class="pnext" :style="n.n ? '' : 'visibility: hidden'"><span class="pmark dash" aria-hidden="true"></span><span class="pn">{{n.n}}</span></li></div>
+<li class="pdone" :style="recMoreN > 0 ? '' : 'visibility: hidden'"><span class="pmark" aria-hidden="true"></span><span class="pn">+{{recMoreN}} more</span></li>
 </ol>
 <div class="recctl">
 <div v-if="recControls" style="display: contents"><button id="recpause" type="button" class="btn pausebtn" @click="pauseRec($event)">{{pauseLabel}}</button>
@@ -846,7 +857,7 @@ textarea{resize:none}
 <div v-if="recStopped" style="display: contents"><button id="reccarry" type="button" class="btn" @click="resumeStopped($event)">Carry on recording</button></div>
 </div>
 </div>
-<div v-if="recDone" style="display: contents"><p class="muted" style="margin: 14px 0 0">All sections are in. Watch the draft to check it.</p></div>
+<div v-if="recDone" style="display: contents"><p class="muted" style="margin: 14px 0 0">All sections are in. Watch the draft to check it.</p><p class="muted" style="margin: 8px 0 0">{{recNote}}</p></div>
 </div>
 </div>
 </div>
@@ -955,6 +966,7 @@ textarea{resize:none}
 <span class="fbtns">
 <div v-if="confirming" style="display: contents"><button id="cfno" type="button" class="btn" @click="cancelConfirm($event)">{{confirmNo}}</button><button id="cfyes" type="button" class="pri" @click="doConfirm($event)">{{confirmYes}}</button></div>
 <div v-if="notConfirming" style="display: contents">
+<div v-if="recHold" style="display: contents"><span class="fhold" aria-hidden="true"><span class="btn ghost backbtn">Back</span><span class="btn">Record again</span></span></div>
 <div v-if="canBack" style="display: contents"><button type="button" class="btn ghost backbtn" @click="back($event)">Back</button></div>
 <div v-if="hasSkip" style="display: contents"><button type="button" class="btn" @click="doSkip($event)">Export without redos</button></div>
 <div v-if="hasSecondary" style="display: contents"><button type="button" class="btn" @click="secondary($event)">{{cur.second}}</button></div>
