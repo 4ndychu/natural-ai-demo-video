@@ -61,9 +61,9 @@ textarea{resize:none}
 .inp::placeholder,textarea::placeholder{color:var(--ink2);opacity:0.85}
 #chatin::placeholder{color:var(--ink2);opacity:1}
 .inp[disabled]{opacity:0.5}
-.seg{display:flex;gap:2px;padding:3px;border-radius:13px;background:var(--wash)}
-.seg button{position:relative;flex:1 1 0;min-width:0;min-height:38px;border:0;border-radius:10px;background:transparent;font-size:14px;padding:4px 10px;line-height:1.2;white-space:nowrap;color:var(--ink2)}
-.seg button[aria-pressed=true]{background:var(--segOn);color:var(--ink);font-weight:500;box-shadow:0 1px 2px rgba(0,0,0,0.14),inset 0 0 0 1px var(--fill)}
+.seg{display:flex;gap:2px;padding:3px;border-radius:999px;background:var(--wash)}
+.seg button{position:relative;flex:1 1 0;min-width:0;min-height:38px;border:0;background:transparent;font-size:14px;padding:4px 10px;line-height:1.2;white-space:nowrap;color:var(--ink2);border-radius:999px}
+.seg button[aria-pressed=true]{background:var(--segOn);color:var(--ink);font-weight:400;box-shadow:0 1px 2px rgba(0,0,0,0.14),inset 0 0 0 1px var(--fill)}
 .seg .star{margin-left:4px}
 @media (hover:hover){.seg button[aria-pressed=false]:hover{color:var(--ink);background:var(--wash)}}
 .bar{position:relative;height:46px;border-radius:12px;background:var(--wash);overflow:hidden;cursor:ew-resize;touch-action:none;user-select:none}
@@ -114,7 +114,7 @@ textarea{resize:none}
 .two{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:22px;align-items:start}
 .two-v{grid-template-columns:minmax(0,1.6fr) minmax(0,1fr)}.two-e{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.two-x{grid-template-columns:minmax(0,1.2fr) minmax(0,1fr)}
 .stepsheet{padding:26px 28px;min-height:600px;box-sizing:border-box}
-.stepbtn{box-sizing:border-box;display:flex;align-items:center;gap:12px;width:100%;min-height:58px;padding:8px 10px;border:0;border-radius:14px;background:transparent;text-align:left;color:var(--ink)}
+.stepbtn{box-sizing:border-box;display:flex;align-items:center;gap:12px;width:100%;min-height:58px;padding:8px 10px;border:0;border-radius:12px;background:transparent;text-align:left;color:var(--ink)}
 .stepbtn.now{background:var(--tray)}
 .stepbtn.locked{color:var(--ink2)}
 .stepbtn.locked .stepdot{box-shadow:inset 0 0 0 1.5px var(--ink2);color:var(--ink2)}
@@ -136,7 +136,7 @@ textarea{resize:none}
 .sclist{display:flex;flex-direction:column;gap:2px}
 .edot{display:inline-block;width:6px;height:6px;border-radius:3px;background:var(--ink);margin-left:5px;vertical-align:2px}
 .sclist button{display:grid;grid-template-columns:48px 1fr;gap:8px;align-items:center;min-height:44px;padding:6px 10px;border:0;border-radius:12px;background:transparent;text-align:left;color:var(--ink2)}
-.sclist button[aria-pressed=true]{background:var(--tray);color:var(--ink);font-weight:500}
+.sclist button[aria-pressed=true]{background:var(--tray);color:var(--ink);font-weight:400}
 @media (hover:hover){.sclist button[aria-pressed=false]:hover{background:var(--wash);color:var(--ink)}}
 .scpick{display:none}
 .scpanel{display:flex;flex-direction:column;background:var(--tray);border-radius:18px;padding:20px 24px;align-self:start}
@@ -145,11 +145,11 @@ textarea{resize:none}
 .capchip{margin:0;padding:10px 14px;border-radius:10px;background:#1B1B1E;color:#F2F2F0;font-size:15px;line-height:1.4}
 /* voice */
 .vgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
-.vcard{position:relative;background:var(--tray);border-radius:22px;padding:5px}
+.vcard{position:relative;background:var(--tray);border-radius:26px;padding:6px}
 .vcard.on{box-shadow:inset 0 0 0 2.5px var(--ink)}
 .vcard.dim .vpick > span:last-child{opacity:0.5}
-.vpick{display:block;width:100%;border:0;background:transparent;padding:0;text-align:left;border-radius:18px}
-.vimg{position:relative;display:block;height:200px;border-radius:18px;overflow:hidden}
+.vpick{display:block;width:100%;border:0;background:transparent;padding:0;text-align:left;border-radius:20px}
+.vimg{position:relative;display:block;height:200px;border-radius:20px;overflow:hidden}
 .vimg img{width:100%;height:100%;object-fit:cover;object-position:50% 30%;display:block}
 .hear{position:absolute;right:15px;top:163px;height:32px;padding:0 12px;border-radius:16px;border:0;background:rgba(255,255,255,0.94);color:#111;display:inline-flex;align-items:center;gap:6px;font-size:13px}
 .vtag{display:inline-block;margin-top:4px;font-size:12px;padding:2px 8px;border-radius:999px;background:var(--wash);color:var(--ink2)}
@@ -264,6 +264,7 @@ textarea{resize:none}
 .t-dark{--segOn:#4A4A52;--knobOff:#A2A2A8}
 .t-dark .seg button[aria-pressed=true]{box-shadow:inset 0 0 0 1px rgba(242,242,240,0.28)}
 .t-dark .stepbtn.now{background:var(--segOn)}
+.t-dark .stepbtn.now .sub{color:#C8C8C2}
 .sw{box-shadow:inset 0 0 0 1px var(--line)}
 .sw.on{box-shadow:none}
 .bv.chip{background:var(--track);padding:2px 8px;border-radius:8px;z-index:2;box-shadow:none}
@@ -404,7 +405,7 @@ textarea{resize:none}
   .foot .fbtns{flex:1 1 100%;justify-content:flex-end}
   .seg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr}
   .seg button{white-space:normal;padding:4px 6px}
-  .seg.seg4{grid-auto-flow:row;grid-template-columns:1fr 1fr}
+  .seg.seg4{grid-auto-flow:row;grid-template-columns:1fr 1fr;border-radius:20px}
   .vgrid{grid-template-columns:repeat(2,minmax(0,1fr))}
   .presets{grid-template-columns:minmax(0,1fr)}
   .preset{padding:12px 14px}
@@ -683,7 +684,7 @@ textarea{resize:none}
 <button type="button" class="hear" style="top: auto; bottom: 88px" @click="v.hear($event)" :aria-label="(v.hearAria)" :title="(v.hearAria)"><svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 4.5v15l12-7.5z"></path></svg>{{v.badge}}</button>
 </div>
 </div>
-<button id="vmore" type="button" class="vmore" @click="openLib($event)" style="border: 1.5px dashed var(--fill); border-radius: 22px; background: transparent; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; min-height: 200px"><span style="width: 40px; height: 40px; border-radius: 20px; background: var(--wash); display: inline-flex; align-items: center; justify-content: center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg></span><span style="font-weight: 500">More voices</span></button>
+<button id="vmore" type="button" class="vmore" @click="openLib($event)" style="border: 1.5px dashed var(--fill); border-radius: 26px; background: transparent; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; min-height: 200px"><span style="width: 40px; height: 40px; border-radius: 20px; background: var(--wash); display: inline-flex; align-items: center; justify-content: center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg></span><span style="font-weight: 500">More voices</span></button>
 </div>
 
 <div style="margin-top: 22px; display: grid; gap: 8px">
