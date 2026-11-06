@@ -351,6 +351,8 @@ textarea{resize:none}
   .newtile .muted{display:none}
   /* The list keeps room for the captions file, so picking Separate file moves nothing below it. */
   .fileslist{min-height:calc(3 * 68px + 2px)}
+  /* The blur summary keeps the height of its longest preset (Test account), so presets move nothing below it. */
+  .pvsum{min-height:calc(5 * 1.45em + 32px)!important;box-sizing:border-box}
   .folderrow{flex-wrap:wrap;justify-content:flex-end}
   .ftrow{flex-wrap:nowrap!important;height:40px}
   .sc .scleft{display:none}
@@ -771,7 +773,7 @@ textarea{resize:none}
 </button>
 </div>
 </div>
-<div style="margin-top: 14px; padding: 14px 16px; border-radius: 14px; background: var(--tray); min-height: 52px">
+<div class="pvsum" style="margin-top: 14px; padding: 14px 16px; border-radius: 14px; background: var(--tray); min-height: 52px">
 <p style="margin: 0">Blurred: <span class="muted">{{pvBlurLine}}</span></p>
 <p style="margin: 4px 0 0">Shown: <span class="muted">{{pvShowLine}}</span></p>
 </div>
