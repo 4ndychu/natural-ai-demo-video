@@ -283,3 +283,50 @@ The Visual reviewer's main block to 9.5 is type weights: it wants two weights on
 | settings | 9.0 | 9.0 | 9.0 | 9.0 | +1.0 |
 
 The average minimum rose from 8.61 to 8.68, and the average across all lenses is 8.85. The two drops are QA finding defects that also exist in the old app, not regressions: Escape doesn't cancel the Install confirm on Welcome, and the page scrolls sideways at 390 during a line rewrite on Script.
+
+## Round 6: Home/Welcome revert, "Some experience" restored, then 10 fixes, decided by blind A/B
+
+The previous accepted version is commit 4b91518 (round 5 + the two reverts + "Some experience").
+
+| Screen | User | Visual | QA | Verdict |
+|---|---|---|---|---|
+| welcome, batch, export (before export), export | new | new | new | New stays |
+| new-batch | new | new | old | New stays (2 of 3); QA's reason, an inert folder field, is fixed in round 7 |
+| new-options | old | new | new | New stays (2 of 3) |
+| settings, review | new | old | new | New stays (2 of 3) |
+| voice | old | old | new | **Reverted** (the greyed "Pace · Only with Eleven v3" row read as a dead control) |
+| new | same | old | new | **Reverted** (closed state at 390) |
+| record | same | old | same | **Reverted** |
+| home | same | new | same | **Reverted** |
+| privacy, script | same | same | same | Tie; Script's sideways-scroll fix stays |
+
+**Scores (candidate; rows for reverted screens score the losing candidate)**
+
+| Screen | User | Visual | QA | Min | vs round 5 |
+|---|---|---|---|---|---|
+| welcome | 9.0 | 9.0 | 9.0 | 9.0 | +0.5 |
+| home (reverted) | 9.0 | 9.0 | 9.0 | 9.0 | 0 |
+| new (reverted) | 9.0 | 9.0 | 9.0 | 9.0 | 0 |
+| new-options | 9.0 | 8.5 | 9.0 | 8.5 | 0 |
+| new-batch | 9.0 | 8.5 | 8.0 | 8.0 | −0.5 |
+| batch | 8.5 | 8.5 | 8.5 | 8.5 | 0 |
+| script | 9.0 | 8.5 | 9.0 | 8.5 | 0 |
+| voice (reverted) | 8.5 | 8.5 | 8.5 | 8.5 | 0 |
+| privacy | 9.0 | 9.0 | 9.0 | 9.0 | 0 |
+| record (reverted) | 9.0 | 9.0 | 9.0 | 9.0 | 0 |
+| review | 9.0 | 9.0 | 8.5 | 8.5 | 0 |
+| export (before export) | 9.0 | 9.0 | 9.0 | 9.0 | +0.5 |
+| export | 9.0 | 9.0 | 9.0 | 9.0 | +0.5 |
+| settings | 9.0 | 8.5 | 8.0 | 8.0 | −1.0 |
+
+The average minimum is 8.68 (flat on round 5).
+- **Settings −1.0:** QA newly found two defects that are in both versions, so this isn't a regression.
+- **New batch −0.5:** a real regression, the inert folder field.
+
+**Convergence (the judge's reading, rounds 4–6):**
+- Screen comparisons won fell 13 → 12 → 8; reverts rose 0 → 2 → 4.
+- The average minimum went 8.61 → 8.68 → 8.68, and no reviewer has given any screen 9.5.
+- It's levelling off around 8.7–9.0. The fixes are now small tweaks, and each lens's taste trades off against another's.
+- Reaching 9.5 would likely need app-wide rules decided once (what may grow when clicked vs what reserves space, a fixed primary-button slot, one 390 row pattern, one focus ring) plus a structural pass on Voice and Batch.
+
+**Checkpoint after 6 rounds:** shown to Andy (`docs/screens/climb2/r6-*`).
