@@ -574,9 +574,8 @@ textarea{resize:none}
   .srow .sctl{flex:none;width:100%}
   .srow.swrap{flex-direction:row;align-items:center}
   .srow.swrap > .sl{flex:1 1 0}
-  .srow > .pills{align-self:stretch;display:grid;grid-auto-flow:column;grid-auto-columns:1fr}
-  /* Who's watching: columns sized to their labels and stretched to fill the track, so 'Some experience' stays on one line. */
-  .srow > .pills.pillsfit{grid-auto-columns:auto;justify-content:stretch}
+  /* Every segmented track: columns sized to their labels and stretched to fill the track, so each label keeps one line and the same room either side. */
+  .srow > .pills{align-self:stretch;display:grid;grid-auto-flow:column;grid-auto-columns:auto;justify-content:stretch}
   .pills button{white-space:normal;height:auto;min-height:36px;padding:4px 6px;line-height:1.15}
   .srow.swrap > .sctl2{flex:1 1 100%;align-items:flex-start}
   .srow.swrap > .sctl2 .chips{justify-content:flex-start}
@@ -1090,7 +1089,7 @@ textarea{resize:none}
 <div :class="bMore ? 'sumrow open' : 'sumrow'"><span style="flex: 1 1 260px; min-width: 0"><span v-if="bLess"><span class="lg-only">{{bSummary}}</span><span class="sm-only">{{bSummaryShort}}</span></span><span v-if="bMore" class="muted">For this demo only.<span class="lg-only"> Voice and captions can change later.</span></span></span><button type="button" class="btn sm" @click="toggleMore($event)" :aria-expanded="bMore ? 'true' : 'false'" style="background: var(--sheet)">{{bMore ? 'Hide options' : 'Change'}}</button></div>
 <div v-if="bMore" style="display: contents">
 <div class="fade srows" style="margin-top: 6px">
-<div class="srow"><span class="sl"><span class="slab">Who’s watching</span></span><div class="pills pillsfit" role="group" aria-label="Who's watching"><div v-for="o in bWho" style="display: contents"><button type="button" :aria-pressed="(o.on)" @click="o.pick($event)">{{o.label}}</button></div></div></div>
+<div class="srow"><span class="sl"><span class="slab">Who’s watching</span></span><div class="pills" role="group" aria-label="Who's watching"><div v-for="o in bWho" style="display: contents"><button type="button" :aria-pressed="(o.on)" @click="o.pick($event)">{{o.label}}</button></div></div></div>
 <div class="srow"><span class="sl"><span class="slab">Kind of demo</span><span class="muted small shelp shelp2">{{bKindHint}}</span></span><div class="pills" role="group" aria-label="Kind of demo"><div v-for="o in bKinds" style="display: contents"><button type="button" :aria-pressed="(o.on)" @click="o.pick($event)"><span class="lg-only">{{o.label}}</span><span class="sm-only">{{o.ph}}</span></button></div></div></div>
 <div class="srow"><span class="sl"><span class="slab">Length</span><span class="muted small shelp">{{lenHint}}</span></span><div class="pills" role="group" aria-label="How long"><div v-for="o in bLen" style="display: contents"><button type="button" :aria-pressed="(o.on)" @click="o.pick($event)">{{o.label}}<span v-if="o.star" class="star" aria-label="suggested">★</span></button></div></div></div>
 <div class="srow"><span class="sl"><span class="slab">Voice</span></span><div class="pills" role="group" aria-label="Voice"><div v-for="o in bVoices" style="display: contents"><button type="button" :aria-pressed="(o.on)" @click="o.pick($event)">{{o.label}}</button></div></div></div>
