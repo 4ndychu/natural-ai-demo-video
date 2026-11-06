@@ -14,7 +14,7 @@ const WHOP = [
       { n: 'Create the whop', d: 24, v: 'Okay, cool. So first, whop dot com slash start. It kind of asks what you’re here for.', c: 'First, go to whop.com/start. It asks what you’re here for.' },
       { n: 'Add the Courses app', d: 28, v: 'Now this is the part where people get stuck, honestly. It, well, it didn’t live in the app store when we checked.', c: 'This is where people get stuck. The Courses app wasn’t in the app store when we checked.' },
       { n: 'One card per module', d: 34, v: 'Name it by what the buyer actually walks away with. One’s a topic. One’s a result.', c: 'Name it by what the buyer walks away with. One’s a topic, one’s a result.' },
-      { n: 'Chapters, then lessons', d: 32, v: 'Put something in the wrong order? You- you just drag the handle, it’s fine.', c: 'Wrong order? Drag the handle.' },
+      { n: 'Chapters, then lessons', d: 32, v: 'Put something in the wrong order? You… you just drag the handle, it’s fine.', c: 'Wrong order? Drag the handle.' },
       { n: 'Lesson type', d: 34, v: 'Most of yours are gonna be Multimedia, so text, video, downloads, all in one.', c: 'Most will be Multimedia: text, video and downloads together.' },
       { n: 'Content and files', d: 30, v: 'Each file lives in one lesson. Its home. Not like three of them.', c: 'Each file lives in one lesson.' },
       { n: 'Timing', d: 26, v: 'Honestly? Leave it open. Delays kind of just annoy people.', c: 'Leave it open. Delays annoy people.' },
@@ -253,7 +253,7 @@ class Component extends DCLogic {
       D.written ? (D.max > 0 ? 'Approved. You can still change any line.' : 'Not approved yet. ' + this.secs.length + ' sections, about ' + lengthText) : 'Claude is writing the script',
       voiceOk ? voicePretty + (changed ? ', ' + changed + ' setting' + (changed === 1 ? '' : 's') + ' changed' : ', recommended for a ' + kindName) : voicePretty + ' needs Eleven ' + vInfo.models[0] + '. Pick another voice, or',
       pvFoot + (D.recorded ? '' : ' · recording uses about ' + this.num(videoCost) + ' credits'),
-      D.recorded ? 'Recorded, ' + lengthText : (st.recStopped ? 'Stopped. Finished sections are kept.' : (st.recPaused ? (isPhone ? 'Paused.' : 'Paused. The draft is ready when recording finishes.') : (isPhone ? 'The draft comes when it’s done.' : 'The draft is ready when recording finishes.'))),
+      D.recorded ? 'Recorded, ' + lengthText : (st.recStopped ? 'Stopped. Finished sections are kept.' : (st.recPaused ? 'Paused. The draft is ready when recording finishes.' : 'The draft is ready when recording finishes.')),
       marks ? 'Marked sections are redone, then you watch them again. About ' + this.num(markedSecs.length * 420) + ' credits.' : (unsure ? this.plural(unsure, 'blur') + ' to check' : 'Nothing marked'),
       D.exported ? (D.dirty ? 'Changed. Export again to update the files.' : 'Exported ' + (D.exportedOn || 'Nov 5') + ' · ' + this.plural(1 + ((D.capMode || 'burn') === 'file' ? 1 : 0) + 1 + (st.p720 ? 1 : 0), 'file')) : 'Free to change, no credits'
     ];
@@ -469,7 +469,7 @@ class Component extends DCLogic {
       recNowName: this.secs[Math.min(N - 1, st.recPos)].n, recNowLine: lineOf(Math.min(N - 1, st.recPos)),
       recNext: [st.recPos + 1, st.recPos + 2].map((k) => ({ n: k < N ? this.secs[k].n : '' })),
       recHeadLine: D.recorded ? 'All ' + N + ' sections recorded · ' + lengthText : st.recStopped ? 'Stopped after ' + st.recPos + ' of ' + N + ' sections' : 'Section ' + Math.min(N, st.recPos + 1) + ' of ' + N + ' · about ' + Math.max(1, Math.ceil((N - st.recPos) * 0.4)) + ' min left',
-      hasLastDone: st.recPos > 0, recLastDone: st.recPos > 0 ? this.secs[Math.min(N, st.recPos) - 1].n : '', recNowMark: st.recPaused || st.recStopped ? 'ring' : 'spin',
+      hasLastDone: st.recPos > 0 || st.recStopped, recLastDone: st.recStopped ? (isPhone ? 'Stopped at ' + Math.min(N, st.recPos + 1) + ' of ' + N + '. ' + (st.recPos ? this.plural(st.recPos, 'section') + ' kept.' : 'Nothing kept yet.') : 'Stopped at section ' + Math.min(N, st.recPos + 1) + '. ' + (st.recPos ? this.plural(st.recPos, 'finished section') + (st.recPos === 1 ? ' is' : ' are') + ' kept.' : 'Nothing finished yet.')) : this.plural(Math.min(N, st.recPos), 'section') + ' done', recDoneMark: st.recStopped && !st.recPos ? 'ring' : 'tick', recNowMark: st.recPaused || st.recStopped ? 'ring' : 'spin',
       recPaused: st.recPaused, recStopped: st.recStopped, recControls: !D.recorded && !st.recStopped,
       recSlidePct: String(st.recSlide || 0), recSlideNow: String(Math.round((st.recSlide || 0) * 100)), recSliding: !!st.recSliding,
       slideDown: (e) => { const el = e.currentTarget; const tr = el.parentElement.getBoundingClientRect(); this.slideDrag = { x0: e.clientX - (st.recSlide || 0) * (tr.width - 48), travel: tr.width - 48 }; try { el.setPointerCapture(e.pointerId); } catch (x) {} this.setState({ recSliding: true }); },

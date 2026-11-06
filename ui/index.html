@@ -204,7 +204,7 @@ textarea{resize:none}
 .dot.k-wait{background:transparent;box-shadow:inset 0 0 0 1.5px var(--dc,var(--ink2))}
 .dot.k-done{width:10px;height:10px;background:transparent;position:relative}
 .dot.k-done::after{content:'';position:absolute;left:3px;top:0;width:3px;height:7px;border:solid var(--dc,var(--ink));border-width:0 1.8px 1.8px 0;transform:rotate(45deg)}
-.dot.k-busy{width:10px;height:10px;border-radius:5px;box-sizing:border-box;background:transparent;border:1.6px solid var(--fill);border-top-color:var(--dc,var(--ink));animation:spin 900ms linear infinite}
+.dot.k-busy{width:10px;height:10px;border-radius:5px;box-sizing:border-box;background:transparent;border:2px solid var(--dc,var(--ink2));border-top-color:transparent;animation:spin 900ms linear infinite}
 .dot.k-bad{background:var(--danger)}
 .dot.k-rec{background:#FF5A4E}
 .pill{--dc:#FFFFFF}
@@ -255,7 +255,7 @@ textarea{resize:none}
 .pmark.tick::after{content:'';position:absolute;left:5.5px;top:3px;width:3px;height:7px;border:solid var(--sheet);border-width:0 1.6px 1.6px 0;transform:rotate(45deg)}
 .pmark.dash{border:1.5px dashed var(--ink2)}
 .pmark.ring{box-shadow:inset 0 0 0 1.5px var(--ink)}
-.pmark.spin{border:1.8px solid var(--fill);border-top-color:var(--ink);animation:spin 900ms linear infinite}
+.pmark.spin{border:2px solid var(--ink2);border-top-color:transparent;animation:spin 900ms linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 .t-dark{--segOn:#4A4A52;--knobOff:#A2A2A8}
 .t-dark .seg button[aria-pressed=true]{box-shadow:inset 0 0 0 1px rgba(242,242,240,0.28)}
@@ -357,8 +357,8 @@ textarea{resize:none}
   .welcome-art img{object-position:50% 40%!important}
   .wfield{justify-content:flex-end}
   .pquote{--ql:4;font-size:15px}
-  .pausebtn{width:84px;padding:0 12px}
-  .slide .slabel{right:8px}
+  .pausebtn{width:80px;padding:0 10px}
+  .slide .slabel{left:50px;right:6px}
   .sliders{grid-template-columns:minmax(0,1fr)}
   .setrow,.list > div > .row,.list > .row{flex-wrap:wrap}
   .page{padding:4px 12px 120px}
@@ -807,13 +807,13 @@ textarea{resize:none}
 <div style="height: 6px; border-radius: 3px; background: var(--fill); margin-top: 10px; overflow: hidden"><span :style="'display: block; width: ' + (recPct) + '; height: 6px; background: var(--ink); transition: width 400ms ease'"></span></div>
 <div v-if="isRecording" style="display: contents">
 <ol class="prog" aria-label="Sections">
-<li class="pdone" :style="hasLastDone ? '' : 'visibility: hidden'"><span class="pmark tick" aria-hidden="true"></span><span class="pn">{{recLastDone}}</span><span class="sr">, done</span></li>
-<li class="pnow"><div class="pnowtop"><span :class="'pmark ' + (recNowMark)" aria-hidden="true"></span><span class="pn">{{recNowName}}</span></div><p class="pquote">“{{recNowLine}}”</p></li>
+<li class="pdone" :style="hasLastDone ? '' : 'visibility: hidden'"><span :class="'pmark ' + (recDoneMark)" aria-hidden="true"></span><span class="pn">{{recLastDone}}</span></li>
+<li class="pnow"><div class="pnowtop"><span :class="'pmark ' + (recNowMark)" aria-hidden="true"></span><span class="pn">{{recNowName}}</span></div><p class="pquote"><span class="muted">{{voiceName}}: </span>“{{recNowLine}}”</p></li>
 <div v-for="n in recNext" style="display: contents"><li class="pnext" :style="n.n ? '' : 'visibility: hidden'"><span class="pmark dash" aria-hidden="true"></span><span class="pn">{{n.n}}</span></li></div>
 </ol>
 <div class="recctl">
 <div v-if="recControls" style="display: contents"><button id="recpause" type="button" class="btn pausebtn" @click="pauseRec($event)">{{pauseLabel}}</button>
-<div class="slide" :class="recSliding ? 'slide dragging' : 'slide'"><span class="sfill" :style="'width: calc(' + (recSlidePct) + ' * (100% - 48px) + 46px)'"></span><span class="slabel"><span class="slt">Slide to stop</span><span class="sls"><span class="lg-only">Finished sections are kept</span><span class="sm-only">Finished parts are kept</span></span></span><span id="slidehandle" class="shandle" role="slider" tabindex="0" aria-label="Slide to stop recording. Finished sections are kept." aria-valuemin="0" aria-valuemax="100" :aria-valuenow="(recSlideNow)" :style="'left: calc(4px + ' + (recSlidePct) + ' * (100% - 48px))'" @pointerdown="slideDown($event)" @pointermove="slideMove($event)" @pointerup="slideUp($event)" @pointercancel="slideUp($event)" @keydown="slideKey($event)"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="5" y="5" width="14" height="14" rx="2"></rect></svg></span></div></div>
+<div class="slide" :class="recSliding ? 'slide dragging' : 'slide'"><span class="sfill" :style="'width: calc(' + (recSlidePct) + ' * (100% - 48px) + 46px)'"></span><span class="slabel"><span class="slt">Slide to stop</span><span class="sls">Finished sections are kept</span></span><span id="slidehandle" class="shandle" role="slider" tabindex="0" aria-label="Slide to stop recording. Finished sections are kept." aria-valuemin="0" aria-valuemax="100" :aria-valuenow="(recSlideNow)" :style="'left: calc(4px + ' + (recSlidePct) + ' * (100% - 48px))'" @pointerdown="slideDown($event)" @pointermove="slideMove($event)" @pointerup="slideUp($event)" @pointercancel="slideUp($event)" @keydown="slideKey($event)"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="5" y="5" width="14" height="14" rx="2"></rect></svg></span></div></div>
 <div v-if="recStopped" style="display: contents"><button id="reccarry" type="button" class="btn" @click="resumeStopped($event)">Carry on recording</button></div>
 </div>
 </div>
