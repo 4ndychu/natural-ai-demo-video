@@ -230,8 +230,14 @@ textarea{resize:none}
 .nw{white-space:nowrap}
 .fline{display:flex;align-items:center;justify-content:space-between;gap:12px}
 .fname,.fname0{min-width:0;overflow-wrap:anywhere;text-align:left}
-.fname{border:0;background:none;padding:0;color:var(--ink);font:inherit;text-decoration:underline;text-decoration-color:transparent;text-underline-offset:3px}
-@media (hover:hover){.fname:hover{text-decoration-color:var(--fill)}}
+.fname{border:0;background:none;padding:0;color:var(--ink);font:inherit;text-decoration:underline;text-decoration-color:var(--fill);text-underline-offset:3px}
+@media (hover:hover){.fname:hover{text-decoration-color:var(--ink2)}}
+/* Export files: one line each, the name in ink on the left and its detail on the right (wrapping under the name only when it doesn't fit). */
+.filerow{flex-wrap:wrap;gap:0 16px;min-height:34px;padding:6px 0;box-sizing:border-box;align-items:baseline}
+.filerow .fline{flex:0 1 auto;min-width:0;justify-content:flex-start;gap:8px}
+.filerow .fdet{margin-left:auto;text-align:right}
+/* The settings column keeps the height of its largest state (label open, 720p copy, captions file), so no setting moves Export video. */
+@media (min-width: 861px){.excol{min-height:467px}.excol .caprow{min-height:60px}}
 .fline .dot.k-done{margin-right:4px}
 /* chat */
 .chatwrap{position:fixed;left:0;right:0;bottom:0;z-index:6;pointer-events:none}
@@ -358,7 +364,7 @@ textarea{resize:none}
   .sc{gap:0}
   .newtile .muted{display:none}
   /* The list keeps room for the captions file, so picking Separate file moves nothing below it. */
-  .fileslist{min-height:calc(3 * 68px + 2px)}
+  .fileslist{min-height:124px}
   .addrow{flex-wrap:wrap;row-gap:8px}
   .addrow .inp{flex:1 1 100%!important}
   .addrow .btn{margin-left:auto}
@@ -939,22 +945,22 @@ textarea{resize:none}
 <div v-if="cornerShown" style="display: contents"><span :style="'position: absolute; ' + (cornerStyle) + '; background: rgba(17,17,17,0.85); color: #F2F2F2; border-radius: 6px; padding: 4px 10px; font-size: 13px; font-weight: 500; max-width: 40%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin: 10px'">{{cornerTextShown}}</span></div>
 </div>
 </div>
-<div class="list" style="min-width: 0; display: flex; flex-direction: column">
+<div class="list excol" style="min-width: 0; display: flex; flex-direction: column">
 <div class="srow caprow"><span class="sl"><h2 class="h-sec" id="caplbl" style="font-size: 16px">Captions</h2></span><div class="pills" role="group" aria-labelledby="caplbl"><div v-for="o in revCaps" style="display: contents"><button type="button" :aria-pressed="(o.on)" @click="o.pick($event)">{{o.label}}</button></div></div></div>
-<div style="border-top: 1px solid var(--line); padding: 14px 0">
+<div style="border-top: 1px solid var(--line); padding: 12px 0">
 <div style="display: flex; align-items: center; gap: 12px"><span style="flex: 1"><h2 class="h-sec" id="rclbl" style="font-size: 16px">Corner label</h2><span class="muted small">Your name or brand in a corner of the video</span></span><button type="button" :class="(revCorner.cls)" role="switch" :aria-checked="(revCorner.onStr)" aria-labelledby="rclbl" @click="revCorner.toggle($event)"><span></span></button></div>
 <div v-if="revCorner.on" style="display: contents">
-<div class="fade" style="margin-top: 10px; display: grid; gap: 8px">
+<div class="fade" style="margin-top: 8px; display: grid; gap: 8px">
 <label for="rct" class="sr">Label text</label><input id="rct" class="inp" type="text" :value="(revCornerText)" @input="onRevCornerText($event)" @change="onRevCornerText($event)" placeholder="Label text, e.g. your logo name">
 <div class="seg seg4" role="group" aria-label="Corner"><div v-for="o in revCorner.seg" style="display: contents"><button type="button" :aria-pressed="(o.on)" @click="o.pick($event)">{{o.label}}</button></div></div>
 </div>
 </div>
 </div>
-<div class="row" style="border-top: 1px solid var(--line); padding: 10px 0"><span style="flex: 1"><span id="p720" style="display: block; font-weight: 500">Also make a small 720p copy</span><span class="muted small">For email and chat</span></span><button type="button" :class="(p720Cls)" role="switch" :aria-checked="(p720On)" aria-labelledby="p720" @click="toggle720($event)"><span></span></button></div>
-<div style="margin-top: 18px">
+<div class="row" style="border-top: 1px solid var(--line); padding: 10px 0; min-height: 64px; box-sizing: border-box"><span style="flex: 1"><span id="p720" style="display: block; font-weight: 500">Also make a small 720p copy</span><span class="muted small">For email and chat</span></span><button type="button" :class="(p720Cls)" role="switch" :aria-checked="(p720On)" aria-labelledby="p720" @click="toggle720($event)"><span></span></button></div>
+<div style="margin-top: 9px">
 <h2 class="h-sec">{{filesHead}}</h2>
-<div class="list fileslist" style="margin-top: 4px">
-<div v-for="f in files" style="display: contents"><div class="row filerow" style="min-height: 56px; padding: 6px 0"><span style="flex: 1; min-width: 0"><span class="fline"><span v-if="fileMark" style="display: contents"><button type="button" class="fname" @click="showInFinder($event)" :aria-label="'Show ' + f.n + ' in Finder'" title="Show in Finder">{{f.n}}</button><span class="dot k-done" role="img" aria-label="Saved"></span></span><span v-if="!fileMark" class="fname0">{{f.n}}</span></span><span class="muted small" style="display: block">{{fileWill ? 'Will be saved' : f.s}}</span></span></div></div>
+<div class="list fileslist" style="margin-top: 2px">
+<div v-for="f in files" style="display: contents"><div class="row filerow"><span class="fline"><span v-if="fileMark" style="display: contents"><button type="button" class="fname" @click="showInFinder($event)" :aria-label="'Show ' + f.n + ' in Finder'" title="Show in Finder">{{f.n}}</button><span class="dot k-done" role="img" aria-label="Saved"></span></span><span v-if="!fileMark" class="fname0">{{f.n}}</span></span><span class="fdet muted small">{{fileWill ? 'Will be saved' : f.s}}</span></div></div>
 </div>
 </div>
 </div>

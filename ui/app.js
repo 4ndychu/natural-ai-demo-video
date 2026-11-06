@@ -256,7 +256,7 @@ class Component extends DCLogic {
       pvFoot + (D.recorded ? '' : ' · recording uses about ' + this.num(videoCost) + ' credits'),
       D.recorded ? 'Recorded, ' + lengthText : (st.recStopped ? 'Stopped. Finished sections are kept.' : (st.recPaused ? 'Paused. The draft is ready when recording finishes.' : 'The draft is ready when recording finishes.')),
       marks ? 'Marked sections are redone, then you watch them again. About ' + this.num(markedSecs.length * 420) + ' credits.' : (unsure ? this.plural(unsure, 'blur') + ' to check' : 'Nothing marked'),
-      D.exported ? (D.dirty ? 'Changed. Export again to update the files.' : 'Exported ' + (D.exportedOn || 'Nov 5') + ' · ' + this.plural(1 + ((D.capMode || 'burn') === 'file' ? 1 : 0) + 1 + (st.p720 ? 1 : 0), 'file')) : 'Free to change, no credits'
+      D.exported ? (D.dirty ? 'Changed. Export again to update the files.' : 'Exported ' + (D.exportedOn || 'Nov 5') + ' · ' + this.plural(1 + ((D.capMode || 'burn') === 'file' ? 1 : 0) + 1 + (st.p720 ? 1 : 0), 'file')) : 'Saves to Movies/NAVI'
     ];
     const footBad = (st.step === 1 && !voiceOk);
     const footKinds = [D.written ? (D.max > 0 ? 'done' : 'ready') : 'busy', 'ready', 'ready', D.recorded ? 'done' : (st.recPaused || st.recStopped ? 'wait' : 'busy'), 'ready', D.exported && !D.dirty ? 'done' : 'ready'];
@@ -505,7 +505,7 @@ class Component extends DCLogic {
       revCorner: cornerCtl(dCorner, (x) => this.patchDemo({ corner: x, dirty: !!D.exported }), 'rct'),
       revCornerText: dCornerText, onRevCornerText: (e) => this.patchDemo({ cornerText: e.target.value, dirty: !!D.exported }), revCornerOff: dCorner === 'off',
       showCapPreview: dCap === 'burn', cornerShown: dCorner !== 'off', cornerStyle: posCss[dCorner] || '', cornerTextShown: dCornerText.trim() || 'Your label here',
-      files: [{ n: base + '.mp4', s: '1080p, ' + lengthText + (dCap === 'burn' ? ', captions in the video' : '') }].concat(dCap === 'file' ? [{ n: base + '.srt', s: 'Captions file' }] : []).concat([{ n: base + '.txt', s: 'Transcript' }]).concat(st.p720 ? [{ n: base + ' (720p).mp4', s: 'Small preview' }] : []),
+      files: [{ n: base + '.mp4', s: '1080p · ' + lengthText + (dCap === 'burn' ? ' · captions in the video' : '') }].concat(dCap === 'file' ? [{ n: base + '.srt', s: 'Captions file' }] : []).concat([{ n: base + '.txt', s: 'Transcript' }]).concat(st.p720 ? [{ n: base + ' (720p).mp4', s: 'Small preview' }] : []),
       filesHead: D.exported && !D.dirty ? 'Saved files' : 'You’ll get', fileMark: D.exported && !D.dirty ? '✓' : '', fileWill: D.exported && D.dirty,
       firstCaption: this.secs[0].c, showInFinder: () => this.say('Showing it in Finder'), p720On: p.onStr, p720Cls: p.cls, toggle720: () => { this.setState({ p720: !st.p720 }); if (D.exported) this.patchDemo({ dirty: true }); },
       
