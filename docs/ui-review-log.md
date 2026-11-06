@@ -203,3 +203,44 @@ The User reviewer now gives 9.0 to 12 of 14 screens. The gap to 9.5 is mostly Vi
 The New batch drop comes from one round-3 regression: an inline `flex-basis` that turns into a 440 px tall row on phones. It is fix 1 for round 4.
 
 **Checkpoint after 3 rounds:** shown to Andy (`docs/screens/climb2/`).
+
+## Round 4: 12 fixes, decided by blind A/B
+
+| Screen | User | Visual | QA | Verdict |
+|---|---|---|---|---|
+| welcome, new-options, script, record, review, export (before export), export | new | new | new | New stays |
+| new, new-batch, batch, voice | old | new | new | New stays (2 of 3) |
+| privacy | new | old | new | New stays (2 of 3) |
+| settings | new | new | old | New stays (2 of 3) |
+| home | same | same | same | Tie |
+
+No guard hits on the candidate. Every dissent was traced to a specific cause. Each is fixed in round 5, except one:
+- **Batch (U):** the list starts at #3, and the footer is cut off at 390.
+- **New (U):** the defaults line lost "Using:". It comes back at 1440 only.
+- **Voice (U):** the greyed captions switch had no explanation.
+- **Privacy (V):** an empty band at 390.
+- **Settings (Q):** focus landed under the chat bar.
+- **New batch (U):** wanted a faded 8th line back as a scroll cue. Not a regression, so nothing changes; V and Q prefer whole lines.
+
+**Scores (candidate)**
+
+| Screen | User | Visual | QA | Min | vs round 3 |
+|---|---|---|---|---|---|
+| welcome | 9.0 | 9.0 | 9.0 | 9.0 | +1.0 |
+| home | 9.0 | 8.5 | 9.0 | 8.5 | 0 |
+| new | 9.0 | 9.0 | 9.0 | 9.0 | +0.5 |
+| new-options | 8.5 | 9.0 | 9.0 | 8.5 | +0.5 |
+| new-batch | 9.0 | 8.5 | 8.5 | 8.5 | +1.5 |
+| batch | 8.5 | 8.5 | 8.5 | 8.5 | 0 |
+| script | 9.0 | 9.0 | 9.0 | 9.0 | +1.0 |
+| voice | 8.5 | 9.0 | 9.0 | 8.5 | 0 |
+| privacy | 9.0 | 9.0 | 9.0 | 9.0 | +0.5 |
+| record | 9.0 | 8.5 | 9.0 | 8.5 | 0 |
+| review | 8.5 | 9.0 | 9.0 | 8.5 | 0 |
+| export (before export) | 9.0 | 9.0 | 8.5 | 8.5 | 0 |
+| export | 9.0 | 9.0 | 8.5 | 8.5 | 0 |
+| settings | 9.0 | 9.0 | 8.0 | 8.0 | −0.5 |
+
+The average minimum rose from 8.3 to 8.6. Four screens score 9.0 on every lens.
+
+The Visual reviewer's main block to 9.5 is type weights: it wants two weights only, 400 plus 560 for the wide caps. QA's is the last few click-time shifts (Export, Settings).
