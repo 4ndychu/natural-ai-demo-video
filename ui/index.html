@@ -143,6 +143,9 @@ textarea{resize:none}
 .sctop{display:flex;align-items:center;gap:12px;min-height:40px}
 .scname{flex:1;min-width:0;font-size:18px;overflow-wrap:anywhere}
 .sctime{white-space:nowrap}
+/* The header readout ("0:46–1:14 · 3 of 11") is one left-aligned box as wide as its widest value ("10 of 11", 118.5 px), so it never slides as sections change. */
+.screadout{display:inline-block;min-width:119px;text-align:left}
+.t-dark .sclist button[aria-pressed=true] .sctime{color:var(--ink)}
 .scarrows{display:flex;gap:8px;flex:none}
 .scpanel .scline{margin-top:14px}
 .sclist{display:flex;flex-direction:column;gap:2px}
@@ -781,7 +784,7 @@ textarea{resize:none}
 <div class="sctop">
 <div id="scname" class="wide caps scname">{{scName}}</div>
 <p class="muted small sclen sm-only" style="margin: 0; flex: 1">{{scriptLenLine}}</p>
-<span class="muted hide-sm sctime" style="font-size: 13px"><span class="mono">{{scTime}}</span> · {{scNum}}</span>
+<span class="muted hide-sm sctime screadout" style="font-size: 13px"><span class="mono">{{scTime}}</span> · {{scNum}}</span>
 <span class="scarrows"><button type="button" class="icon fill" @click="scPrev($event)" :disabled="(scPrevOff)" aria-label="Previous section" title="Previous section"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"></path></svg></button><button type="button" class="icon fill" @click="scNext($event)" :disabled="(scNextOff)" aria-label="Next section" title="Next section"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg></button></span>
 </div>
 <div class="scpick" style="margin-top: 10px"><label for="scsel" class="sr">Section</label><select id="scsel" class="inp" @change="scPickSel($event)"><option v-for="r in scList" :value="r.i" :selected="r.on === 'true'">{{r.i + 1}} · {{r.n}}</option></select></div>
