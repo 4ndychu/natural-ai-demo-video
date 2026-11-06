@@ -244,3 +244,42 @@ No guard hits on the candidate. Every dissent was traced to a specific cause. Ea
 The average minimum rose from 8.3 to 8.6. Four screens score 9.0 on every lens.
 
 The Visual reviewer's main block to 9.5 is type weights: it wants two weights only, 400 plus 560 for the wide caps. QA's is the last few click-time shifts (Export, Settings).
+
+## Round 5: 12 fixes (including two-weight type), decided by blind A/B
+
+| Screen | User | Visual | QA | Verdict |
+|---|---|---|---|---|
+| batch, new-options, voice, settings, export (before export), export | new | new | new | New stays |
+| new, script, record, privacy | new | new | same | New stays (2 of 2, with one same) |
+| new-batch, review | old | new | new | New stays (2 of 3) |
+| home | old | new | same | **No majority: reverted** |
+| welcome | same | new | same | **Only one vote for new: reverted** |
+
+**What was reverted:**
+- **Home:** the stretched setup card (User: big gaps between its rows), and the two-weight type on Home. The radius cleanup, the balanced title wraps at 390, the "All set · Check setup" line at 390 and the proportional credit figures stay. They fix earlier verified defects, and no reviewer saw them as regressions.
+- **Welcome:** the "Optional." and hairline changes, and the two-weight type on Welcome.
+
+**Override by Claude, per Andy's explicit instruction:**
+- **"Some experience":** round 5 shortened this pill to "Some" at 390, against Andy's fix 3. Round 6 restores "Some experience" at every width.
+- **"Familiar":** the judge suggested this as a replacement. It is rejected for the same reason.
+
+**Scores (candidate)**
+
+| Screen | User | Visual | QA | Min | vs round 4 |
+|---|---|---|---|---|---|
+| welcome (reverted) | 9.0 | 9.0 | 8.5 | 8.5 | −0.5 |
+| home (partly reverted) | 9.0 | 9.0 | 9.0 | 9.0 | +0.5 |
+| new | 9.0 | 9.0 | 9.0 | 9.0 | 0 |
+| new-options | 9.0 | 8.5 | 9.0 | 8.5 | 0 |
+| new-batch | 9.0 | 8.5 | 9.0 | 8.5 | 0 |
+| batch | 9.0 | 9.0 | 8.5 | 8.5 | 0 |
+| script | 9.0 | 9.0 | 8.5 | 8.5 | −0.5 |
+| voice | 9.0 | 8.5 | 8.5 | 8.5 | 0 |
+| privacy | 9.0 | 9.0 | 9.0 | 9.0 | 0 |
+| record | 9.0 | 9.0 | 9.0 | 9.0 | +0.5 |
+| review | 8.5 | 9.0 | 8.5 | 8.5 | 0 |
+| export (before export) | 9.0 | 8.5 | 8.5 | 8.5 | 0 |
+| export | 9.0 | 8.5 | 8.5 | 8.5 | 0 |
+| settings | 9.0 | 9.0 | 9.0 | 9.0 | +1.0 |
+
+The average minimum rose from 8.61 to 8.68, and the average across all lenses is 8.85. The two drops are QA finding defects that also exist in the old app, not regressions: Escape doesn't cancel the Install confirm on Welcome, and the page scrolls sideways at 390 during a line rewrite on Script.
