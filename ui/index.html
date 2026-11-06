@@ -1115,10 +1115,10 @@ textarea{resize:none}
 <div v-if="modeOne" style="display: contents">
 <div class="tray">
 <div class="sheet nsheet" style="padding: 26px 26px 22px; display: flex; flex-direction: column; gap: 24px">
-<div><label for="bw" class="wide" style="display: block; font-size: 24px; line-height: 1.2; margin-bottom: 12px; font-weight: 500">What should the demo show?</label><textarea id="bw" rows="3" class="inp" autofocus :value="(bWhat)" @input="onBWhat($event)" @change="onBWhat($event)" placeholder="e.g. How to build a course in Whop, from creating the whop to checking it on a phone" style="height: auto; padding: 14px 16px; font-size: 18px; line-height: 1.4"></textarea></div>
+<div><label for="bw" class="wide" style="display: block; font-size: 24px; line-height: 1.2; margin-bottom: 12px; font-weight: 500">What should the demo show?</label><textarea id="bw" rows="3" class="inp" autofocus :aria-describedby="bWhat.trim() ? null : 'briefwhy'" :value="(bWhat)" @input="onBWhat($event)" @change="onBWhat($event)" placeholder="e.g. How to build a course in Whop, from creating the whop to checking it on a phone" style="height: auto; padding: 14px 16px; font-size: 18px; line-height: 1.4"></textarea></div>
 <div><div class="wide" style="font-size: 20px; margin-bottom: 10px; font-weight: 500">On which site?</div>
 <div class="chips" role="group" aria-label="Site"><div v-for="o in bSites" style="display: contents"><button type="button" :aria-pressed="(o.on)" @click="o.pick($event)">{{o.label}}</button></div><button type="button" id="bnewchip" class="newchip" :aria-expanded="bSiteNew ? 'true' : 'false'" @click="openBNew($event)">+ New site</button></div>
-<div v-if="bSiteNew" style="display: contents"><div class="fade" style="margin-top: 10px"><label for="bns" class="sr">New site address</label><input id="bns" class="inp" type="text" :value="(bNew)" @input="onBNew($event)" @change="onBNew($event)" placeholder="The site’s address, e.g. app.yourproduct.com" :aria-invalid="bNewBad ? 'true' : 'false'"><div class="small" :style="'margin-top: 6px; min-height: 20px; color: ' + (bNewBad ? 'var(--danger)' : 'var(--ink2)')">{{bNewBad ? 'That doesn’t look like a web address.' : 'A browser opens so you can log in once. Then it’s saved.'}}</div></div></div>
+<div v-if="bSiteNew" style="display: contents"><div class="fade" style="margin-top: 10px"><label for="bns" class="sr">New site address</label><input id="bns" class="inp" type="text" :aria-describedby="briefWhy && bWhat.trim() ? 'briefwhy' : null" :value="(bNew)" @input="onBNew($event)" @change="onBNew($event)" placeholder="The site’s address, e.g. app.yourproduct.com" :aria-invalid="bNewBad ? 'true' : 'false'"><div class="small" :style="'margin-top: 6px; min-height: 20px; color: ' + (bNewBad ? 'var(--danger)' : 'var(--ink2)')">{{bNewBad ? 'That doesn’t look like a web address.' : 'A browser opens so you can log in once. Then it’s saved.'}}</div></div></div>
 </div>
 <div>
 <div :class="bMore ? 'sumrow open' : 'sumrow'"><span style="flex: 1 1 260px; min-width: 0"><span v-if="bLess"><span class="lg-only">{{bSummary}}</span><span class="sm-only">{{bSummaryShort}}</span></span><span v-if="bMore" class="muted">For this demo only.<span class="lg-only"> Voice and captions can change later.</span></span></span><button type="button" class="btn sm" @click="toggleMore($event)" :aria-expanded="bMore ? 'true' : 'false'" style="background: var(--sheet)">{{bMore ? 'Hide options' : 'Change'}}</button></div>
@@ -1135,7 +1135,7 @@ textarea{resize:none}
 </div>
 </div>
 </div>
-<div class="foot"><span class="ftext muted">{{briefWhy || briefHint}}</span><span class="fbtns"><button type="button" class="btn ghost" @click="cancelBrief($event)">Cancel</button><button type="button" class="pri" @click="submitBrief($event)" :aria-disabled="briefEmpty ? 'true' : 'false'">{{briefCta}}</button></span></div>
+<div class="foot"><span id="briefwhy" class="ftext muted">{{briefWhy || briefHint}}</span><span class="fbtns"><button type="button" class="btn ghost" @click="cancelBrief($event)">Cancel</button><button type="button" class="pri" @click="submitBrief($event)" :aria-disabled="briefEmpty ? 'true' : 'false'">{{briefCta}}</button></span></div>
 </div>
 </div>
 
@@ -1145,8 +1145,8 @@ textarea{resize:none}
 <div>
 <label for="btt" class="wide" style="display: block; font-size: 24px; line-height: 1.2; font-weight: 500">Which videos?</label>
 <p class="muted" style="margin: 6px 0 12px">One video per line, for example every lesson in a course. Or choose a course outline (.txt, .md or .csv).</p>
-<div class="btbox"><textarea id="btt" :rows="(btRows)" :value="(btText)" @input="onBtText($event)" @change="onBtText($event)" placeholder="Create your whop&#10;Add the Courses app&#10;Plan your modules" class="inp"></textarea></div>
-<div style="display: flex; align-items: center; gap: 12px; margin-top: 10px; flex-wrap: wrap"><button type="button" class="btn sm" @click="pickFile($event)">Choose a file</button><input id="btfile" type="file" accept=".txt,.md,.csv,text/plain,text/markdown,text/csv" @change="onFile($event)" class="sr" tabindex="-1" aria-hidden="true"><span class="muted small btcount">{{btHasFile ? 'From ' + btFileName + '. ' : ''}}{{btLinesText}}</span></div>
+<div class="btbox"><textarea id="btt" :aria-describedby="btText.trim() ? null : 'btcount'" :rows="(btRows)" :value="(btText)" @input="onBtText($event)" @change="onBtText($event)" placeholder="Create your whop&#10;Add the Courses app&#10;Plan your modules" class="inp"></textarea></div>
+<div style="display: flex; align-items: center; gap: 12px; margin-top: 10px; flex-wrap: wrap"><button type="button" class="btn sm" @click="pickFile($event)">Choose a file</button><input id="btfile" type="file" accept=".txt,.md,.csv,text/plain,text/markdown,text/csv" @change="onFile($event)" class="sr" tabindex="-1" aria-hidden="true"><span id="btcount" class="muted small btcount">{{btHasFile ? 'From ' + btFileName + '. ' : ''}}{{btLinesText}}</span></div>
 </div>
 <div>
 <h2 class="h-sec" style="margin-bottom: 4px">Shared settings</h2>
