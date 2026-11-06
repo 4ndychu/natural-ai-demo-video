@@ -320,6 +320,7 @@ textarea{resize:none}
 .prog li{display:flex;align-items:center;gap:10px;height:32px;padding:0 4px}
 .prog .pn{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .prog .pdone{color:var(--ink2)}
+.prog .pmore{font-size:14px}
 .prog .pnow{display:block;height:auto;margin:4px 0;padding:12px 14px 14px;border-radius:12px;background:var(--sheet);box-shadow:inset 0 0 0 1px var(--line)}
 .pnowtop{display:flex;align-items:center;gap:10px;font-weight:500}
 .pquote{margin:8px 0 0;font-size:var(--qf);line-height:1.45;max-height:calc(var(--ql) * 1.45em);overflow:hidden;display:-webkit-box;-webkit-line-clamp:var(--ql);-webkit-box-orient:vertical}
@@ -346,6 +347,9 @@ textarea{resize:none}
 .privoice{min-width:142px}
 /* Export's primary is as wide as its widest label (Export again, 134.2 px), so Export video -> Open folder -> Export again keep one box. */
 .priex{min-width:135px}
+/* Record: the Record again confirm keeps the footer's three slots. Back stays, Cancel takes Record again's 130 px slot and "Yes, record again" the primary's 163 px slot. */
+.secrec{min-width:130px;box-sizing:border-box}
+.prirec{min-width:163px}
 .bprimary{min-width:160px;overflow:hidden;text-overflow:ellipsis}
 @media (min-width: 861px){.caprow{border-top:0!important;padding-top:0!important}}
 .srows{display:flex;flex-direction:column}
@@ -967,11 +971,11 @@ textarea{resize:none}
 <li class="pdone" :style="hasLastDone ? '' : 'visibility: hidden'"><span :class="'pmark ' + (recDoneMark)" aria-hidden="true"></span><span class="pn">{{recLastDone}}</span></li>
 <li class="pnow"><div class="pnowtop"><span :class="'pmark ' + (recNowMark)" aria-hidden="true"></span><span class="pn">{{recNowName}}</span></div><p class="pquote"><span class="muted">{{voiceName}}: </span>“{{recNowLine}}”</p></li>
 <div v-for="n in recNext" style="display: contents"><li class="pnext" :style="n.n ? '' : 'visibility: hidden'"><span class="pmark dash" aria-hidden="true"></span><span class="pn">{{n.n}}</span></li></div>
-<li class="pdone" :style="recMoreN > 0 ? '' : 'visibility: hidden'"><span class="pmark" aria-hidden="true"></span><span class="pn">and {{recMoreN}} more</span></li>
+<li class="pdone pmore" :style="recMoreN > 0 ? '' : 'visibility: hidden'"><span class="pn">and {{recMoreN}} more</span></li>
 </ol>
 <div class="recctl">
 <div v-if="recControls" style="display: contents"><button id="recpause" type="button" class="btn pausebtn" @click="pauseRec($event)">{{pauseLabel}}</button>
-<div class="slide" :class="recSliding ? 'slide dragging' : 'slide'"><span class="sfill" :style="'width: calc(' + (recSlidePct) + ' * (100% - 48px) + 46px)'"></span><span class="slabel"><span class="slt">Slide to stop</span><span class="sls">Finished sections are kept</span></span><span id="slidehandle" class="shandle" role="slider" tabindex="0" aria-label="Slide to stop recording. Finished sections are kept." aria-valuemin="0" aria-valuemax="100" :aria-valuenow="(recSlideNow)" :style="'left: calc(4px + ' + (recSlidePct) + ' * (100% - 48px))'" @pointerdown="slideDown($event)" @pointermove="slideMove($event)" @pointerup="slideUp($event)" @pointercancel="slideUp($event)" @keydown="slideKey($event)"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="5" y="5" width="14" height="14" rx="4"></rect></svg></span></div></div>
+<div class="slide" :class="recSliding ? 'slide dragging' : 'slide'"><span class="sfill" :style="'width: calc(' + (recSlidePct) + ' * (100% - 48px) + 46px)'"></span><span class="slabel"><span class="slt">Slide to stop</span><span class="sls"><span class="lg-only">Finished sections are kept</span><span class="sm-only">Keeps finished sections</span></span></span><span id="slidehandle" class="shandle" role="slider" tabindex="0" aria-label="Slide to stop recording. Finished sections are kept." aria-valuemin="0" aria-valuemax="100" :aria-valuenow="(recSlideNow)" :style="'left: calc(4px + ' + (recSlidePct) + ' * (100% - 48px))'" @pointerdown="slideDown($event)" @pointermove="slideMove($event)" @pointerup="slideUp($event)" @pointercancel="slideUp($event)" @keydown="slideKey($event)"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="5" y="5" width="14" height="14" rx="4"></rect></svg></span></div></div>
 <div v-if="recStopped" style="display: contents"><button id="reccarry" type="button" class="btn" @click="resumeStopped($event)">Carry on recording</button></div>
 </div>
 </div>
@@ -1079,13 +1083,13 @@ textarea{resize:none}
 <div :class="st4 && hasSkip ? 'foot stepfoot revfoot' : 'foot stepfoot'">
 <span class="ftext" :style="'color: ' + (footColor)"><span :class="'dot k-' + footDot"></span><span>{{footText}}<span v-if="footLinkOn"> <button type="button" class="link" @click="footLinkAct($event)">{{footLinkLabel}}</button></span></span></span>
 <span class="fbtns">
-<div v-if="confirming" style="display: contents"><button id="cfno" type="button" class="btn" @click="cancelConfirm($event)">{{confirmNo}}</button><button id="cfyes" type="button" class="pri" @click="doConfirm($event)">{{confirmYes}}</button></div>
+<div v-if="confirming" style="display: contents"><div v-if="cfRerec" style="display: contents"><button type="button" class="btn ghost backbtn" @click="back($event)">Back</button></div><button id="cfno" type="button" :class="cfRerec ? 'btn secrec' : 'btn'" @click="cancelConfirm($event)">{{confirmNo}}</button><button id="cfyes" type="button" :class="cfRerec ? 'pri prirec' : 'pri'" @click="doConfirm($event)">{{confirmYes}}</button></div>
 <div v-if="notConfirming" style="display: contents">
-<div v-if="recHold" style="display: contents"><span class="fhold" aria-hidden="true"><span class="btn ghost backbtn">Back</span><span class="btn">Record again</span></span></div>
+<div v-if="recHold" style="display: contents"><span class="fhold" aria-hidden="true"><span class="btn ghost backbtn">Back</span><span class="btn secrec">Record again</span></span></div>
 <div v-if="canBack" style="display: contents"><button type="button" class="btn ghost backbtn" @click="back($event)">Back</button></div>
 <div v-if="hasSkip" style="display: contents"><button type="button" class="btn" @click="doSkip($event)">Export without redos</button></div>
-<div v-if="hasSecondary" style="display: contents"><button id="secbtn" type="button" class="btn" @click="secondary($event)">{{cur.second}}</button></div>
-<button type="button" :class="st1 ? 'pri privoice' : (st4b ? 'pri prirev prib' : (st4 ? 'pri prirev' : (st5 ? 'pri priex' : 'pri')))" @click="primary($event)" :disabled="(primaryBlocked)"><span class="lg-only">{{cur.cta}}</span><span class="sm-only">{{cur.ctaShort || cur.cta}}</span></button>
+<div v-if="hasSecondary" style="display: contents"><button id="secbtn" type="button" :class="st3 ? 'btn secrec' : 'btn'" @click="secondary($event)">{{cur.second}}</button></div>
+<button type="button" :class="st1 ? 'pri privoice' : (st4b ? 'pri prirev prib' : (st4 ? 'pri prirev' : (st5 ? 'pri priex' : (st3 ? 'pri prirec' : 'pri'))))" @click="primary($event)" :disabled="(primaryBlocked)"><span class="lg-only">{{cur.cta}}</span><span class="sm-only">{{cur.ctaShort || cur.cta}}</span></button>
 </div>
 </span>
 </div>
