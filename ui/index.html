@@ -152,19 +152,24 @@ textarea{resize:none}
 .vimg{position:relative;display:block;height:200px;border-radius:20px;overflow:hidden}
 .vimg img{width:100%;height:100%;object-fit:cover;object-position:50% 30%;display:block}
 .hear{position:absolute;right:15px;top:163px;height:32px;padding:0 12px;border-radius:16px;border:0;background:rgba(255,255,255,0.94);color:#111;display:inline-flex;align-items:center;gap:6px;font-size:13px}
-.vtag{display:inline-block;margin-top:4px;font-size:12px;padding:2px 8px;border-radius:999px;background:var(--wash);color:var(--ink2)}
+.vtag{display:block;width:max-content;margin-top:4px;font-size:12px;padding:2px 8px;border-radius:999px;background:var(--wash);color:var(--ink2)}
 .sliders{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;align-items:start}
-.paceslot{min-height:46px}
+.paceslot:empty{display:none}
 .swrow{display:flex;align-items:center;justify-content:space-between;gap:8px;height:46px;padding:0 6px 0 14px;border-radius:12px;background:var(--wash);box-sizing:border-box}
 .swl{font-weight:400;white-space:nowrap}
 .mpills{display:flex;gap:2px}
 .mpills button{height:34px;padding:0 12px;border:0;border-radius:999px;background:transparent;color:var(--ink2);font-size:14px;white-space:nowrap}
 .mpills button[aria-pressed=true]{background:var(--segOn);color:var(--ink);font-weight:400;box-shadow:0 1px 2px rgba(0,0,0,0.14),inset 0 0 0 1px var(--fill)}
 @media (hover:hover){.mpills button[aria-pressed=false]:hover{color:var(--ink);background:var(--wash)}}
-.swcap{display:flex;align-items:center;justify-content:space-between;gap:10px;height:46px;margin-top:14px;padding:0 8px 0 14px;border-radius:12px;background:var(--wash);box-sizing:border-box}
+.swcap{display:flex;align-items:center;justify-content:space-between;gap:10px;height:46px;padding:0 6px 0 14px;border-radius:12px;background:var(--wash);box-sizing:border-box}
 /* While Swearing is Off the captions switch stays in place, shown disabled, so picking a level moves nothing. */
 .swcap.swoff{color:var(--ink2)}
 .swcap.swoff .sw{opacity:0.4;cursor:not-allowed}
+/* The hint says why the switch is off; it keeps its room while Swearing is on, so nothing moves. */
+.capl{display:flex;flex-direction:column;gap:1px;min-width:0;white-space:nowrap;line-height:1.2}
+.capl > span{overflow:hidden;text-overflow:ellipsis}
+.caphint{font-size:13px;color:var(--ink2)}
+.swcap:not(.swoff) .caphint{visibility:hidden}
 .finenote{display:inline-block;min-width:8.5em;font-variant-numeric:tabular-nums}
 /* privacy */
 .presets{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
@@ -752,6 +757,7 @@ textarea{resize:none}
 <div class="swrow"><span class="swl" id="swlbl">Swearing</span><span class="mpills" role="group" aria-labelledby="swlbl"><div v-for="o in swearPills" style="display: contents"><button type="button" :aria-pressed="(o.on)" @click="o.pick($event)">{{o.label}}</button></div></span></div>
 <div v-if="sliderHelp" style="display: contents"><p class="muted small" style="margin: 6px 0 0">{{swearHelp}}</p></div>
 </div>
+<div :class="swearOn ? 'swcap' : 'swcap swoff'"><span class="capl"><span id="capsLbl">Swears in captions too</span><span id="capsHint" class="caphint">Turn on Swearing first</span></span><button type="button" :class="(capsCls)" role="switch" :aria-checked="(capsOn)" :aria-disabled="swearOn ? null : 'true'" aria-labelledby="capsLbl" aria-describedby="capsHint" @click="toggleCaps($event)" :tabindex="swearOn ? null : '-1'"><span></span></button></div>
 <div class="paceslot"><div v-if="isV3" style="display: contents"><div v-for="s in paceSliders" style="display: contents">
 <div>
 <div class="slwrap">
@@ -762,7 +768,6 @@ textarea{resize:none}
 </div>
 </div></div></div>
 </div>
-<div :class="swearOn ? 'swcap' : 'swcap swoff'"><span id="capsLbl">Swears in captions too</span><button type="button" :class="(capsCls)" role="switch" :aria-checked="(capsOn)" :aria-disabled="swearOn ? null : 'true'" aria-labelledby="capsLbl" @click="toggleCaps($event)" :tabindex="swearOn ? null : '-1'"><span></span></button></div>
 </div>
 </div>
 
