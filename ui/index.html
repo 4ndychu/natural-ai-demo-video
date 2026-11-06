@@ -139,7 +139,7 @@ textarea{resize:none}
 .sclist button[aria-pressed=true]{background:var(--tray);color:var(--ink);font-weight:400}
 @media (hover:hover){.sclist button[aria-pressed=false]:hover{background:var(--wash);color:var(--ink)}}
 .scpick{display:none}
-.scpanel{display:flex;flex-direction:column;background:var(--tray);border-radius:18px;padding:20px 24px;align-self:start}
+.scpanel{display:flex;flex-direction:column;background:var(--tray);border-radius:20px;padding:20px 24px;align-self:start}
 .scline{font-size:28px;line-height:1.4;margin:0;letter-spacing:-0.005em;min-height:calc(3 * 1.4em)}
 .capbox{margin:0;padding:12px 16px;border-radius:12px;background:var(--wash);font-size:16px}
 .capchip{margin:0;padding:10px 14px;border-radius:10px;background:#1B1B1E;color:#F2F2F0;font-size:15px;line-height:1.4}
@@ -354,8 +354,10 @@ textarea{resize:none}
   .folderrow{flex-wrap:wrap;justify-content:flex-end}
   .ftrow{flex-wrap:nowrap!important;height:40px}
   .sc .scleft{display:none}
-  .sctop{align-items:flex-start}
-  .scname{min-height:calc(2 * 1.45em);padding-top:8px}
+  /* On phones the dropdown names the section, so the title stays for screen readers only; the length line takes its place beside the arrows. */
+  .sctop .sclen{margin:0!important}
+  .sctop .scname{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+  .capchip{min-height:calc(3 * 1.4em)}
   .scbtns{flex-wrap:nowrap!important}
   #scsel{appearance:none;-webkit-appearance:none;background:var(--wash) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2.4' stroke-linecap='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") no-repeat right 14px center;border:0;border-radius:999px;padding-right:36px}
   .sumrow{height:auto;min-height:calc(3 * 1.45em + 16px);padding:8px 8px 8px 14px}
@@ -418,7 +420,7 @@ textarea{resize:none}
   .presets{grid-template-columns:minmax(0,1fr)}
   .preset{padding:12px 14px}
   .scline{font-size:21px;min-height:calc(5 * 1.4em)}
-  .skpanel{min-height:391.5px}
+  .skpanel{min-height:341px}
   .sclist{display:none}
   .scpick{display:block}
   .scpanel{padding:16px}
@@ -646,13 +648,14 @@ textarea{resize:none}
 <div v-for="r in scList" style="display: contents"><button type="button" :aria-pressed="(r.on)" :tabindex="r.on === 'true' ? '0' : '-1'" @click="r.pick($event)"><span class="mono sctime muted">{{r.t}}<span v-if="r.edited" class="edot" aria-hidden="true"></span></span><span>{{r.n}}<span v-if="r.edited" class="sr">, edited</span></span></button></div>
 </div>
 </div>
-<div class="scpanel">
-<div class="scpick" style="margin-bottom: 12px"><p class="muted small sclen sm-only" style="margin: 0 0 8px">{{scriptLenLine}}</p><label for="scsel" class="sr">Section</label><select id="scsel" class="inp" @change="scPickSel($event)"><option v-for="r in scList" :value="r.i" :selected="r.on === 'true'">{{r.i + 1}} · {{r.n}}</option></select></div>
+<div class="scpanel" role="region" aria-labelledby="scname">
 <div class="sctop">
-<div class="wide caps scname">{{scName}}</div>
+<div id="scname" class="wide caps scname">{{scName}}</div>
+<p class="muted small sclen sm-only" style="margin: 0; flex: 1">{{scriptLenLine}}</p>
 <span class="muted hide-sm sctime"><span class="mono">{{scTime}}</span> · {{scNum}}</span>
 <span class="scarrows"><button type="button" class="icon fill" @click="scPrev($event)" :disabled="(scPrevOff)" aria-label="Previous section" title="Previous section"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"></path></svg></button><button type="button" class="icon fill" @click="scNext($event)" :disabled="(scNextOff)" aria-label="Next section" title="Next section"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg></button></span>
 </div>
+<div class="scpick" style="margin-top: 10px"><label for="scsel" class="sr">Section</label><select id="scsel" class="inp" @change="scPickSel($event)"><option v-for="r in scList" :value="r.i" :selected="r.on === 'true'">{{r.i + 1}} · {{r.n}}</option></select></div>
 <p class="scline">{{scLine}}</p>
 <div class="scslot">
 <div class="scbtns" style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center">
