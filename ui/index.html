@@ -26,7 +26,7 @@ html{scroll-padding-bottom:104px;scroll-padding-top:12px}
 .small{font-size:14px}
 button,input,textarea,select{font:inherit;color:inherit}
 button{cursor:pointer;transition:background-color 160ms ease,box-shadow 160ms ease,opacity 160ms ease,color 160ms ease}
-button[disabled],.pri[aria-disabled=true]{cursor:not-allowed}
+button[disabled],button[aria-disabled=true]{cursor:not-allowed}
 :focus{outline:none}
 :focus-visible{outline:2px solid var(--focus);outline-offset:2px}
 h1[tabindex="-1"]:focus,p[tabindex="-1"]:focus,div[tabindex="-1"]:focus{outline:none}
@@ -46,8 +46,8 @@ textarea{resize:none}
 .btn.line{background:transparent;box-shadow:inset 0 0 0 1.5px var(--fill)}
 .btn.strong{background:transparent;box-shadow:inset 0 0 0 1.5px var(--ink)}
 .btn.danger{color:var(--danger)}
-@media (hover:hover){.btn:not([disabled]):hover{background:var(--fill)}.btn.line:hover,.btn.strong:hover{background:var(--wash)}}
-.btn[disabled]{opacity:0.4}
+@media (hover:hover){.btn:not([disabled]):not([aria-disabled=true]):hover{background:var(--fill)}.btn.line:hover,.btn.strong:hover{background:var(--wash)}}
+.btn[disabled],.btn[aria-disabled=true]{opacity:0.4}
 .pri{height:44px;padding:0 22px;border-radius:999px;border:0;background:var(--ink);color:var(--sheet);font-size:15px;font-weight:500;white-space:nowrap}
 /* Review: the primary keeps the width of its longest label ('Looks good, go to Export'), so adding marks never moves Back or Export without redos. */
 @media (min-width: 861px){.prirev{min-width:218px}.prirev.prib{min-width:232px}}
@@ -60,8 +60,8 @@ textarea{resize:none}
 .link{border:0;background:none;padding:4px 0;color:var(--ink);text-decoration:underline;text-decoration-color:var(--fill);text-underline-offset:3px;font-size:inherit;white-space:nowrap}
 .icon{width:40px;height:40px;border-radius:20px;border:0;background:transparent;display:inline-flex;align-items:center;justify-content:center;color:var(--ink);flex:none}
 .icon.fill{background:var(--wash)}
-.icon[disabled]{opacity:0.35}
-@media (hover:hover){.icon:not([disabled]):hover{background:var(--fill)}}
+.icon[disabled],.icon[aria-disabled=true]{opacity:0.35}
+@media (hover:hover){.icon:not([disabled]):not([aria-disabled=true]):hover{background:var(--fill)}}
 .inp{width:100%;min-width:0;height:44px;border-radius:12px;border:1px solid var(--line);background:var(--sheet);padding:0 14px;box-sizing:border-box;font-size:15px}
 .inp::placeholder,textarea::placeholder{color:var(--ink2);opacity:0.85}
 #chatin::placeholder{color:var(--ink2);opacity:1}
@@ -672,8 +672,8 @@ textarea{resize:none}
 </div>
 
 <div class="wfoot" style="margin-top: auto; padding-top: 18px; display: flex; justify-content: flex-end; align-items: center; gap: 14px; flex-wrap: wrap">
-<span class="muted">{{welcomeStatus}}</span>
-<button type="button" class="pri" @click="finishWelcome($event)" :disabled="(welcomeBlocked)">Done, show my demos</button>
+<span id="wstatus" class="muted">{{welcomeStatus}}</span>
+<button type="button" class="pri" @click="finishWelcome($event)" :aria-disabled="welcomeBlocked ? 'true' : 'false'" aria-describedby="wstatus">Done, show my demos</button>
 </div>
 </div>
 </div>
@@ -799,7 +799,7 @@ textarea{resize:none}
 <div id="scname" class="wide caps scname">{{scName}}</div>
 <p class="muted small sclen sm-only" style="margin: 0; flex: 1">{{scriptLenLine}}</p>
 <span class="muted hide-sm sctime screadout" style="font-size: 13px"><span class="mono">{{scTime}}</span> · {{scNum}}</span>
-<span class="scarrows"><button type="button" class="icon fill" @click="scPrev($event)" :disabled="(scPrevOff)" aria-label="Previous section" title="Previous section"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"></path></svg></button><button type="button" class="icon fill" @click="scNext($event)" :disabled="(scNextOff)" aria-label="Next section" title="Next section"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg></button></span>
+<span class="scarrows"><button type="button" class="icon fill" @click="scPrev($event)" :aria-disabled="scPrevOff ? 'true' : 'false'" aria-label="Previous section" title="Previous section"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"></path></svg></button><button type="button" class="icon fill" @click="scNext($event)" :aria-disabled="scNextOff ? 'true' : 'false'" aria-label="Next section" title="Next section"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg></button></span>
 </div>
 <div class="scpick" style="margin-top: 10px"><label for="scsel" class="sr">Section</label><select id="scsel" class="inp" @change="scPickSel($event)"><option v-for="r in scList" :value="r.i" :selected="r.on === 'true'">{{r.i + 1}} · {{r.n}}</option></select></div>
 <p class="scline">{{scLine}}</p>
@@ -1087,7 +1087,7 @@ textarea{resize:none}
 </div>
 </div>
 <div :class="st4 && hasSkip ? 'foot stepfoot revfoot' : 'foot stepfoot'">
-<span class="ftext" :style="'color: ' + (footColor)"><span :class="'dot k-' + footDot"></span><span>{{footText}}<span v-if="footLinkOn"> <button type="button" class="link" @click="footLinkAct($event)">{{footLinkLabel}}</button></span></span></span>
+<span class="ftext" :style="'color: ' + (footColor)"><span :class="'dot k-' + footDot"></span><span id="stepwhy">{{footText}}<span v-if="footLinkOn"> <button type="button" class="link" @click="footLinkAct($event)">{{footLinkLabel}}</button></span></span></span>
 <span class="fbtns">
 <div v-if="confirming" style="display: contents"><div v-if="cfRerec" style="display: contents"><button type="button" class="btn ghost backbtn" @click="back($event)">Back</button></div><button id="cfno" type="button" :class="cfRerec ? 'btn secrec' : 'btn'" @click="cancelConfirm($event)">{{confirmNo}}</button><button id="cfyes" type="button" :class="cfRerec ? 'pri prirec' : (cfApprove ? (st4b ? 'pri prirev prib' : 'pri prirev') : 'pri')" @click="doConfirm($event)">{{confirmYes}}</button></div>
 <div v-if="notConfirming" style="display: contents">
@@ -1096,7 +1096,7 @@ textarea{resize:none}
 <div v-if="recStopHold" style="display: contents"><span class="fhold" aria-hidden="true"><span class="btn secrec">Record again</span></span></div>
 <div v-if="hasSkip" style="display: contents"><button type="button" class="btn" @click="doSkip($event)">Export without redos</button></div>
 <div v-if="hasSecondary" style="display: contents"><button id="secbtn" type="button" :class="st3 ? 'btn secrec' : 'btn'" @click="secondary($event)">{{cur.second}}</button></div>
-<button type="button" :class="st1 ? 'pri privoice' : (st4b ? 'pri prirev prib' : (st4 ? 'pri prirev' : (st5 ? 'pri priex' : (st3 ? 'pri prirec' : 'pri'))))" @click="primary($event)" :disabled="(primaryBlocked)"><span class="lg-only">{{cur.cta}}</span><span class="sm-only">{{cur.ctaShort || cur.cta}}</span></button>
+<button type="button" :class="st1 ? 'pri privoice' : (st4b ? 'pri prirev prib' : (st4 ? 'pri prirev' : (st5 ? 'pri priex' : (st3 ? 'pri prirec' : 'pri'))))" @click="primary($event)" :aria-disabled="primaryBlocked ? 'true' : 'false'" :aria-describedby="primaryBlocked ? 'stepwhy' : null"><span class="lg-only">{{cur.cta}}</span><span class="sm-only">{{cur.ctaShort || cur.cta}}</span></button>
 </div>
 </span>
 </div>
@@ -1213,7 +1213,7 @@ textarea{resize:none}
 <div v-if="bShowToggle" class="bmore"><button type="button" class="link" @click="bShowAll($event)" :aria-expanded="bAllOpenRaw ? 'true' : 'false'">{{bShowAllLabel}}</button></div>
 </div>
 </div>
-<div :class="bCfSlot ? 'foot bfoot bfcf' : 'foot bfoot'"><span v-if="bConfirm" class="ftext" style="color: var(--ink)"><span class="dot k-ready"></span><span class="bcf">{{bConfirmText}}</span></span><span v-if="bNotConfirm" class="ftext muted"><span><span class="lg-only">{{bFooter}}</span><span class="sm-only">{{bFooterShort}}</span></span></span><span class="fbtns"><div v-if="bConfirm" style="display: contents"><button type="button" class="btn" @click="bConfirmNo($event)">Cancel</button><button id="bcfyes" type="button" class="pri bprimary" @click="bConfirmYes($event)">Yes, record all</button></div><div v-if="bNotConfirm" style="display: contents"><div v-if="hasBSecondary" style="display: contents"><button type="button" class="btn bsecond" @click="bSecondary($event)" :disabled="(bSecondaryOff)"><span class="lg-only">{{bSecondaryLabel}}</span><span class="sm-only">{{bSecondaryShort}}</span></button></div><button type="button" class="pri bprimary" @click="bPrimary($event)" :disabled="(bPrimaryOff)"><span class="lg-only">{{bPrimaryLabel}}</span><span class="sm-only">{{bPrimaryShort}}</span></button></div></span></div>
+<div :class="bCfSlot ? 'foot bfoot bfcf' : 'foot bfoot'"><span v-if="bConfirm" class="ftext" style="color: var(--ink)"><span class="dot k-ready"></span><span class="bcf">{{bConfirmText}}</span></span><span v-if="bNotConfirm" class="ftext muted"><span id="bwhy"><span class="lg-only">{{bFooter}}</span><span class="sm-only">{{bFooterShort}}</span></span></span><span class="fbtns"><div v-if="bConfirm" style="display: contents"><button type="button" class="btn" @click="bConfirmNo($event)">Cancel</button><button id="bcfyes" type="button" class="pri bprimary" @click="bConfirmYes($event)">Yes, record all</button></div><div v-if="bNotConfirm" style="display: contents"><div v-if="hasBSecondary" style="display: contents"><button type="button" class="btn bsecond" @click="bSecondary($event)" :aria-disabled="bSecondaryOff ? 'true' : 'false'"><span class="lg-only">{{bSecondaryLabel}}</span><span class="sm-only">{{bSecondaryShort}}</span></button></div><button type="button" class="pri bprimary" @click="bPrimary($event)" :aria-disabled="bPrimaryOff ? 'true' : 'false'" :aria-describedby="bPrimaryOff ? 'bwhy' : null"><span class="lg-only">{{bPrimaryLabel}}</span><span class="sm-only">{{bPrimaryShort}}</span></button></div></span></div>
 </section>
 </main>
 </div>
