@@ -364,13 +364,13 @@ class Component extends DCLogic {
       bSummary: 'Using: ' + summaryParts.join(' · '), bSummaryShort: summaryParts.join(' · '), bMore: st.bMore, bLess: !st.bMore, toggleMore: () => this.setState({ bMore: !st.bMore }),
       bKinds: segOf([['course', 'Walkthrough'], ['saas', 'Quick demo'], ['tour', 'Product tour']], st.bKind, (x) => this.setState({ bKind: x })).map((o, i) => Object.assign(o, { short: ['Course', 'SaaS', 'Tour'][i], ph: ['Walkthrough', 'Quick demo', 'Product tour'][i] })), bKindHint: { course: 'Step by step, at a teaching pace.', saas: 'Short and lively, for a product page.', tour: 'A calm look around the main screens.' }[st.bKind],
       bWho: ['Beginners', 'Some experience', 'Pros'].map((s, i) => ({ label: s, on: st.bWho === i ? 'true' : 'false', pick: () => this.setState({ bWho: i }) })),
-      bLen: ['1 min', '3 min', '5 min', '8 min'].map((s, i) => ({ label: s, star: i === suggestLen, on: st.bLen === i ? 'true' : 'false', pick: () => this.setState({ bLen: i }) })),
+      bLen: ['1 min', '3 min', '5 min', '8 min'].map((s, i) => ({ label: s, star: false, on: st.bLen === i ? 'true' : 'false', pick: () => this.setState({ bLen: i }) })),
       bVoices: st.mine.map((k) => ({ label: pretty(k), on: st.bVoice === k ? 'true' : 'false', pick: () => this.setState({ bVoice: k }) })),
       bCaps: segOf(capOpts, st.bCap, (x) => this.setState({ bCap: x })).map((o, i) => Object.assign(o, { short: ['In video', 'File', 'Off'][i] })),
       bCorner: cornerCtl(st.bCorner, (x) => this.setState({ bCorner: x }), 'bct'),
       bCornerText: st.bCornerText, onBCornerText: (e) => this.setState({ bCornerText: e.target.value }), bCornerOff: st.bCorner === 'off',
       bCornerPh: 'Text for the corner, e.g. your brand name',
-      lenHint: suggestLen < 0 ? lenOpts[st.bLen] + ' min for now. Claude suggests a length once you say what to show.' : '★ Suggested for what you typed. Your pick wins.',
+      lenHint: suggestLen < 0 ? lenOpts[st.bLen] + ' min for now. Claude suggests a length once you say what to show.' : 'Claude suggests ' + lenOpts[suggestLen] + ' min for what you typed. Your pick wins.',
       cancelBrief: () => this.setState({ screen: st.editing ? 'demo' : 'home' }),
       submitBrief: () => {
         const w = st.bWhat.trim(); if (!w) { this.focusLater('#bw'); return; } if (st.bSiteNew && !siteOk(st.bNew)) { this.focusLater('#bns'); return; } const site = bSiteVal || 'whop.com'; if (!site) return; const t = w.length > 34 ? w.slice(0, 32).replace(/\s+\S*$/, '') + '…' : w;
