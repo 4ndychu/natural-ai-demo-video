@@ -8,7 +8,7 @@ const PRESETS = {
   test: { email: true, phone: true, names: true, address: true, money: false, customers: false, counts: false, usage: true, prices: true, dates: true }
 };
 // R5 fix 11 (two weights): screens listed here keep the old third weight (500). Keys: welcome home new new-batch batch script voice privacy record review export settings.
-const W2_OFF = [];
+const W2_OFF = ['welcome', 'home'];
 const SAMPLE_COST = 120; // credits to hear a voice the first time (preview card, Hear badge, library)
 const ITEM_NAMES = { email: 'emails', phone: 'phone numbers', names: 'names and photos', address: 'addresses', money: 'revenue and balances', customers: 'customer details', counts: 'follower and member counts', usage: 'usage stats', prices: 'public prices', dates: 'dates' };
 const COURSE = ['Welcome to the course', 'Create your whop', 'Add the Courses app', 'Plan your modules', 'Chapters and lessons', 'Pick a lesson type', 'Upload videos and files', 'Write lesson text', 'Add a quiz', 'Drip or open access', 'Brand your course', 'Set a cover image', 'Preview as a buyer', 'Check it on a phone', 'Write the product page', 'Set a price', 'Add a free trial', 'Connect payouts', 'Invite your first members', 'Post an announcement', 'Answer comments', 'Read your stats', 'What to do next'];
