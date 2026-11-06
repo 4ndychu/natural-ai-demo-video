@@ -428,6 +428,9 @@ textarea{resize:none}
 /* New options: label + hint pairs fit the 64 px row, so every option row has the same pitch. */
 .srows .shelp{line-height:1.35}
 @media (min-width: 861px){.srows .srow{min-height:65px}}
+/* New options: the Corner label line keeps the height the closed row gives it (row minus padding and border), so the switch holds still when the field opens. */
+.srow.swcorner > .sl{min-height:43px;justify-content:center}
+@media (min-width: 861px){.srow.swcorner > .sl{min-height:44px}}
 /* Welcome: Show key is an eye button inside the key field's right end, so the row holds the field and Test key only. */
 .keybox{position:relative;display:flex;flex:1 1 auto;min-width:0}
 .keybox .inp{flex:1 1 auto;padding-right:48px}
@@ -1131,7 +1134,7 @@ textarea{resize:none}
 <div class="srow"><span class="sl"><span class="slab">Voice</span></span><div class="pills" role="group" aria-label="Voice"><div v-for="o in bVoices" style="display: contents"><button type="button" :aria-pressed="(o.on)" @click="o.pick($event)">{{o.label}}</button></div></div></div>
 <div class="srow"><span class="sl"><label for="bh" class="slab">Pages to avoid</label><span class="muted small shelp">Pages the browser should never open.</span></span><input id="bh" class="inp sctl" type="text" :value="(bHide)" @input="onBHide($event)" @change="onBHide($event)" placeholder="e.g. the billing page, settings"></div>
 <div class="srow"><span class="sl"><span class="slab">Captions</span></span><div class="pills" role="group" aria-label="Captions"><div v-for="o in bCaps" style="display: contents"><button type="button" :aria-pressed="(o.on)" @click="o.pick($event)">{{o.label}}</button></div></div></div>
-<div class="srow swrap"><span class="sl"><span class="slab" id="bclbl">Corner label</span><span class="muted small shelp">Your name or brand in a corner</span></span><button type="button" :class="(bCorner.cls)" role="switch" :aria-checked="(bCorner.onStr)" aria-labelledby="bclbl" @click="bCorner.toggle($event)"><span></span></button><div v-if="bCorner.on" style="display: contents"><div class="fade sexpand"><label for="bct" class="sr">Label text</label><input id="bct" class="inp" type="text" :value="(bCornerText)" @input="onBCornerText($event)" @change="onBCornerText($event)" placeholder="Label text, e.g. your logo name"><div class="seg seg4" role="group" aria-label="Corner"><div v-for="o in bCorner.seg" style="display: contents"><button type="button" :aria-pressed="(o.on)" @click="o.pick($event)">{{o.label}}</button></div></div></div></div></div>
+<div class="srow swrap swcorner"><span class="sl"><span class="slab" id="bclbl">Corner label</span><span class="muted small shelp">Your name or brand in a corner</span></span><button type="button" :class="(bCorner.cls)" role="switch" :aria-checked="(bCorner.onStr)" aria-labelledby="bclbl" @click="bCorner.toggle($event)"><span></span></button><div v-if="bCorner.on" style="display: contents"><div class="fade sexpand"><label for="bct" class="sr">Label text</label><input id="bct" class="inp" type="text" :value="(bCornerText)" @input="onBCornerText($event)" @change="onBCornerText($event)" placeholder="Label text, e.g. your logo name"><div class="seg seg4" role="group" aria-label="Corner"><div v-for="o in bCorner.seg" style="display: contents"><button type="button" :aria-pressed="(o.on)" @click="o.pick($event)">{{o.label}}</button></div></div></div></div></div>
 </div>
 </div>
 </div>
