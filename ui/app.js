@@ -359,7 +359,7 @@ class Component extends DCLogic {
       bSiteNew: st.bSiteNew, bNewBad: st.bSiteNew && !!st.bNew.trim() && !/^[a-z0-9-]+(\.[a-z0-9-]+)+(\/.*)?$/i.test(st.bNew.trim().replace(/^https?:\/\//i, '')), 
       bSummary: 'Using: ' + summaryParts.join(' · '), bSummaryShort: summaryParts.join(' · '), bMore: st.bMore, bLess: !st.bMore, toggleMore: () => this.setState({ bMore: !st.bMore }),
       bKinds: segOf([['course', 'Course walkthrough'], ['saas', 'Quick demo'], ['tour', 'Product tour']], st.bKind, (x) => this.setState({ bKind: x })).map((o, i) => Object.assign(o, { short: ['Course', 'SaaS', 'Tour'][i], ph: ['Walkthrough', 'Quick demo', 'Product tour'][i] })), bKindHint: { course: 'Step by step, at a teaching pace.', saas: 'Short and lively, for a product page.', tour: 'A calm look around the main screens.' }[st.bKind],
-      bWho: ['Beginners', 'Some experience', 'Pros'].map((s, i) => ({ label: s, ph: ['Beginners', 'Some', 'Pros'][i], on: st.bWho === i ? 'true' : 'false', pick: () => this.setState({ bWho: i }) })),
+      bWho: ['Beginners', 'Some experience', 'Pros'].map((s, i) => ({ label: s, on: st.bWho === i ? 'true' : 'false', pick: () => this.setState({ bWho: i }) })),
       bLen: ['1 min', '3 min', '5 min', '8 min'].map((s, i) => ({ label: s, star: i === suggestLen, on: st.bLen === i ? 'true' : 'false', pick: () => this.setState({ bLen: i }) })),
       bVoices: st.mine.map((k) => ({ label: pretty(k), on: st.bVoice === k ? 'true' : 'false', pick: () => this.setState({ bVoice: k }) })),
       bCaps: segOf(capOpts, st.bCap, (x) => this.setState({ bCap: x })).map((o, i) => Object.assign(o, { short: ['In video', 'File', 'Off'][i] })),
