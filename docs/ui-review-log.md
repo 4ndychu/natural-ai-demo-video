@@ -653,3 +653,74 @@ Swings that size are as big as a round's real gains. The blind A/B still separat
 8. New options: the Corner label switch holds still.
 9. Welcome at 1440: the status sits level with Done, and the help is plainer.
 10. Batch: "Watch next" becomes "Watch #5".
+
+## Round 12: 10 fixes (bugs behind QA's low scores), decided by blind A/B. Checkpoint 4, paused for Andy
+
+The previous accepted version is commit e452695. The candidate is R12 fixes 1–10 (up to b0f7f66).
+
+| Screen | User | Visual | QA | Verdict |
+|---|---|---|---|---|
+| welcome, batch, script | new | new | new | New stays |
+| record | old | same | new | Split. **The 1440 slide hint goes back** to "Finished sections are kept" (1f9e485). The fixes stay: Record again in the Stopped state, focus on blocked buttons, and Privacy resumes the recording |
+| new-options, voice, privacy, settings | same | same | new | The fixes stay: blocked buttons keep focus, key errors are tied to their field, Add with an empty field focuses it, and the Corner switch holds still |
+| home, new, new-batch, review, export (before export), export | same | same | same | Tie |
+
+**Scores (candidate)**
+
+| Screen | User | Visual | QA | Min | vs round 11 |
+|---|---|---|---|---|---|
+| welcome | 9.0 | 9.0 | 9.5 | 9.0 | +0.5 |
+| home | 9.0 | 9.0 | 9.0 | 9.0 | 0 |
+| new | 9.0 | 9.0 | 9.5 | 9.0 | 0 |
+| new-options | 9.0 | 9.0 | 9.0 | 9.0 | 0 |
+| new-batch | 9.0 | 8.5 | 9.0 | 8.5 | 0 |
+| batch | 9.0 | 9.0 | 9.0 | 9.0 | +1.0 |
+| script | 9.0 | 8.5 | 8.5 | 8.5 | 0 |
+| voice | 8.5 | 8.5 | 8.5 | 8.5 | 0 |
+| privacy | 9.0 | 9.0 | 8.0 | 8.0 | −0.5 |
+| record | 9.0 | 9.0 | 8.0 | 8.0 | 0 |
+| review | 9.0 | 9.0 | 8.5 | 8.5 | −0.5 |
+| export (before export) | 9.0 | 9.0 | 9.0 | 9.0 | +0.5 |
+| export | 9.0 | 9.0 | 9.0 | 9.0 | +0.5 |
+| settings | 9.0 | 9.0 | 9.0 | 9.0 | +0.5 |
+
+The average minimum is 8.71, up from 8.57. The lens averages are User 8.96, Visual 8.89 and QA 8.82.
+
+The judge ran each defect behind QA's 8.0 and 8.5 scores on both app copies. All of them are in the old version too:
+- Locked steps in the step list drop focus when clicked.
+- At 390, the Privacy Customize rows move 1–2 px when a warning appears.
+- At 390, the stop toast covers the Record footer.
+
+The judge has prototyped fixes for all three for round 13; they aren't applied yet.
+
+**Convergence (rounds 4–12):**
+
+| | R4 | R5 | R6 | R7 | R8 | R9 | R10 | R11 | R12 |
+|---|---|---|---|---|---|---|---|---|---|
+| Screens won | 13 | 12 | 8 | 6 | 6 | 7 | 9 | 7 | 3 |
+| Lost or reverted | 0 | 2 | 4 | 3 | 1 | 1 (part) | 3 (part) | 0 | 1 (part) |
+| Tied | 1 | 0 | 2 | 5 | 7 | 6 | 2 | 7 | 10 |
+| Mean minimum | 8.61 | 8.68 | 8.68 | 8.68 | 8.75 | 8.86 | 8.61 | 8.57 | 8.71 |
+
+**Why the climb paused here.** Neither stop condition is met. But wins have fallen 9 → 7 → 3, and this round's were all planned bug and copy fixes. Reviewers' scores now move ±0.5 on identical pixels. Without Andy's decisions, the judge puts the ceiling at an average minimum of about 8.9.
+
+**Checkpoint after 12 rounds:** shown to Andy (`docs/screens/climb2/r12-*`, before = round 9 checkpoint, after = round 12).
+
+**What each of Andy's decisions would change (judge):**
+1. **Fold Voice's Fine-tune.** Voice is the only screen at 8.5 on all three lenses. Folding should lift it to about 9.0 on every lens.
+2. **Reserve space or let it grow.** Affects the empty space at 390 on Privacy, both Export screens and Record. It is now a lever for 9.5, not for the minimum.
+3. **Half-empty columns.** Lifts Visual on Script from 8.5 to 9.0, and on Review and Home from 9.0 to 9.5.
+4. **Chat bar on every step.** Lifts QA on New options from 9.0 to 9.5, and part of Voice.
+5. **"Change / Hide options" at 390.** No reviewer named it this round.
+
+With the round 13 bug fixes plus decisions 1 and 3, the average minimum should reach about 9.0. A minimum of 9.5 needs decision 2 plus the Visual reviewer's craft asks.
+
+**Next fixes, if Andy says keep going** (none depend on his decisions):
+1. Locked steps keep focus.
+2. Privacy rows hold their height.
+3. Stopping a recording shows no toast.
+4. Batch: focus stays on Export after exporting.
+5. "Finished sections are kept" at both widths.
+6. New summary: "For beginners · …".
+7. Batch list status in grey.
+8. One selection style for site chips.
