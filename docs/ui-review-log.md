@@ -449,3 +449,72 @@ No reviewer found a guard hit on the candidate.
 8. Voice: More voices tile at 390, v4 note spacing, reset badge clear of the focus ring.
 9. Script, dark: the selected section turns lighter than the sheet.
 10. Toasts: Undo holds still, and one Undo restores several removed marks.
+
+## Round 9: 10 fixes, decided by blind A/B (two-step protocol)
+
+The previous accepted version is commit 379d6f3 (round 8 with Batch's recording line reverted). The candidate is R9 fixes 1–10 (up to ca30c43).
+
+| Screen | User | Visual | QA | Verdict |
+|---|---|---|---|---|
+| new, new-batch, batch, script | new | new | new | New stays (unanimous) |
+| voice, export (before export), export | new | new | same | New stays |
+| privacy, record, review, settings | same | same | new | The fixes stay. They're verified click-time fixes: Undo holds still, Record again asks first (it costs credits), one Undo restores several marks |
+| new-options | new (slightly) | old | old | **Reverted** at 390. Picking an audience resized the Length pills (66→84 px), a guard hit. Label-sized pills stay on New batch, Export and Who's watching |
+| welcome, home | same | same | same | Tie |
+
+**Scores (candidate; QA scores the candidate app)**
+
+| Screen | User | Visual | QA | Min | vs round 8 |
+|---|---|---|---|---|---|
+| welcome | 9.0 | 9.0 | 8.5 | 8.5 | −0.5 |
+| home | 9.0 | 9.0 | 9.5 | 9.0 | 0 |
+| new | 9.5 | 9.0 | 9.0 | 9.0 | 0 |
+| new-options (390 reverted) | 9.0 | 9.0 | 8.5 | 8.5 | −0.5 |
+| new-batch | 9.0 | 9.0 | 9.0 | 9.0 | +0.5 |
+| batch | 9.0 | 9.0 | 9.0 | 9.0 | +0.5 |
+| script | 9.0 | 9.0 | 9.0 | 9.0 | +0.5 |
+| voice | 8.5 | 8.5 | 8.5 | 8.5 | 0 |
+| privacy | 9.0 | 9.0 | 9.5 | 9.0 | 0 |
+| record | 9.0 | 9.0 | 9.0 | 9.0 | +0.5 |
+| review | 9.0 | 9.0 | 9.5 | 9.0 | 0 |
+| export (before export) | 9.0 | 9.0 | 9.5 | 9.0 | +0.5 |
+| export | 9.0 | 9.0 | 9.0 | 9.0 | +0.5 |
+| settings | 9.0 | 9.0 | 8.5 | 8.5 | −0.5 |
+
+**Results**
+- The average minimum is **8.86**, up from 8.75. The lens averages are User 9.00, Visual 8.96 and QA 9.00.
+- User gave its first 9.5 of this climb (New).
+- The three −0.5 rows are bugs QA newly found in both versions, so they aren't regressions:
+  - Welcome's install confirm scrolls sideways at 390.
+  - Forgetting two logins leaves only one Undo.
+  - New options' Length pills resize at 1440.
+
+**Convergence (rounds 4–9):**
+
+| | R4 | R5 | R6 | R7 | R8 | R9 |
+|---|---|---|---|---|---|---|
+| Screens won | 13 | 12 | 8 | 6 | 6 | 7 |
+| Lost or reverted | 0 | 2 | 4 | 3 | 1 | 1 (part) |
+| Tied | 1 | 0 | 2 | 5 | 7 | 6 |
+| Mean minimum | 8.61 | 8.68 | 8.68 | 8.68 | 8.75 | 8.86 |
+
+**Checkpoint after 9 rounds:** shown to Andy (`docs/screens/climb2/r9-*`, before = the round 6 checkpoint, after = round 9).
+
+**Decisions only Andy can make (each blocks 9.5):**
+1. **Voice:** keep Fine-tune open as is (User and Visual stay at 8.5), fold it into one line, or fold everything except Pace and Casualness.
+2. **Reserve space or let it grow:** Export, phone Privacy and the Corner label hint. Keep the empty room so nothing jumps, let it grow (buttons move), or restructure so the growing part sits below the buttons.
+3. **Half-empty columns** on Home, Script, Review and Voice: leave them, rebalance the layouts, or narrow the left columns.
+4. **Chat bar on every step:** keep it, hide it on New and while recording, or give it a prompt for each step.
+5. **"Change / Hide options" at 390** grows 30 px when opened. Accept it, use "Change" with an arrow that flips, or use a fixed box.
+
+**Round 10 plan (judge, ranked; real bugs first):**
+1. Welcome: the install confirm fits at 390.
+2. Settings: one Undo for several forgotten logins.
+3. New options at 1440: the Length pills don't resize.
+4. Batch: Watch next holds still when the first video is ready.
+5. Script: the time readout holds still.
+6. Voice: the Pace reset badge sits inside the bar.
+7. Export: the primary keeps one box.
+8. Record: the Record again confirm keeps Back in place.
+9. New batch: the primary holds still after a paste; "top up" becomes "add credits".
+10. Plain words on Home, Privacy and Review.
