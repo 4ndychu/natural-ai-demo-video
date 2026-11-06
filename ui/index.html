@@ -155,9 +155,9 @@ textarea{resize:none}
 .hear{position:absolute;right:15px;top:163px;height:32px;padding:0 12px;border-radius:16px;border:0;background:rgba(255,255,255,0.94);color:#111;display:inline-flex;align-items:center;gap:6px;font-size:13px}
 .vtag{display:block;width:max-content;margin-top:4px;font-size:13px;padding:2px 8px;border-radius:999px;background:var(--wash);color:var(--ink2)}
 .sliders{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;align-items:start}
-/* The Pace slot is always there: v3 shows the Pace bar, v4 a muted line at the same 46 px, so switching models moves nothing. */
-.swrow.paceoff{color:var(--ink2);padding-right:20px}
-.paceoff .swl{color:var(--ink2)}
+.paceslot:empty{display:none}
+/* At desktop width the fine-tune grid keeps room for v3's Pace row, so switching models moves nothing below it. */
+@media (min-width: 861px){.sliders{min-height:calc(4 * 46px + 3 * 14px);align-content:start}}
 .ftrow .link{text-decoration-color:var(--ink2)}
 .swrow{display:flex;align-items:center;justify-content:space-between;gap:8px;height:46px;padding:0 6px 0 14px;border-radius:12px;background:var(--wash);box-sizing:border-box}
 .swl{font-weight:400;white-space:nowrap}
@@ -440,9 +440,9 @@ textarea{resize:none}
   .sumrow{height:auto;min-height:calc(2 * 1.45em + 16px);padding:8px 8px 8px 14px}
   .nsheet{gap:20px!important}
   .sumrow > span:first-child{white-space:normal;overflow:visible}
-  .sumrow{align-items:flex-start}
+  .sumrow.open{align-items:flex-start}
   .sumrow.open > span:first-child{padding-top:7px}
-  .sumrow .btn{width:112px;background:var(--sheet)!important;text-decoration:none!important;padding:0 12px!important}
+  .sumrow .btn{width:auto;background:var(--sheet)!important;text-decoration:none!important;padding:0 12px!important}
   .vmore{min-height:56px!important;grid-column:1 / -1;flex-direction:row!important}
   .phone-setup{background:transparent!important;padding:4px 2px!important;color:var(--ink2)!important}
   .dcard .meta{margin-top:0!important;margin-left:6px}
@@ -458,15 +458,15 @@ textarea{resize:none}
   .welcome-art img{object-position:50% 40%!important}
   .wfield{justify-content:flex-end}
   /* Stacked on phones, the panel keeps the height of its longest quote instead. */
-  .recpanel{--ql:4;--qf:15px}
-  .prog{margin:14px 0 0}
-  .pquote{min-height:calc(var(--ql) * 1.45em)}
+  .recpanel{--ql:4;--qf:15px;--progmin:calc(4 * 36px + 4 * 2px + 8px + 26px + 21.75px + 8px + var(--ql) * 1.45 * var(--qf));min-height:calc(var(--progmin) + 150.65px)}
+  .prog{min-height:var(--progmin);margin:14px 0 0}
   .prog li{height:36px}
-  .recpanel .recctl{margin-top:24px}
+  .recpanel .recctl{margin-top:16px}
   .pausebtn{width:80px;padding:0 10px}
   .slide .slabel{left:50px;right:6px}
   .slide .sls{font-size:12px}
   .sliders{grid-template-columns:minmax(0,1fr)}
+  .paceslot:empty{display:none}
   .setrow,.list > div > .row,.list > .row{flex-wrap:wrap}
   .page{padding:4px 12px 120px}
   .hdr{padding:0 8px 0 14px;gap:4px}
@@ -675,14 +675,14 @@ textarea{resize:none}
 <div v-for="b in batchCards" style="display: contents">
 <button type="button" class="tray dcard" @click="b.open($event)">
 <span class="cover" style="height: 176px; display: grid; grid-template-columns: 1fr 1fr; gap: 4px; background: var(--tray)"><img src="assets/cover-3.jpg" alt="" style="border-radius: 12px"><span style="display: grid; grid-template-rows: 1fr 1fr; gap: 4px; min-height: 0"><img src="assets/cover-1.jpg" alt="" style="border-radius: 12px; min-height: 0"><img src="assets/cover-4.jpg" alt="" style="border-radius: 12px; min-height: 0"></span></span>
-<span class="meta"><span class="name" style="font-size: 16px">{{b.name}}</span><span class="muted">{{b.meta}}</span><span style="display: inline-flex; align-items: center; gap: 8px; margin-top: 4px"><span class="dot k-ready"></span><span>{{b.nextText}}</span><span v-if="b.nextArrow" aria-hidden="true">→</span></span>
+<span class="meta"><span class="name" style="font-size: 16px">{{b.name}}</span><span class="muted">{{b.meta}}</span><span style="display: inline-flex; align-items: center; gap: 8px; margin-top: 4px"><span class="dot k-ready"></span>{{b.next}}</span>
 <span style="display: flex; align-items: center; gap: 10px; margin-top: 6px"><span style="flex: 1; height: 6px; border-radius: 999px; background: var(--fill); overflow: hidden"><span :style="'display: block; height: 6px; background: var(--ink); width: ' + (b.pct)"></span></span><span class="small" style="white-space: nowrap">{{b.status}}</span></span></span>
 </button>
 </div>
 <div v-for="d in demos" style="display: contents">
 <button type="button" class="tray dcard" @click="d.open($event)">
 <span class="cover" style="height: 176px; display: block"><img :src="(d.cover)" alt="" :style="d.tint ? 'filter: ' + d.tint : ''"></span>
-<span class="meta"><span class="name" style="font-size: 16px">{{d.title}}</span><span class="muted">{{d.meta}}</span><span style="display: inline-flex; align-items: center; gap: 8px; margin-top: 4px"><span :class="'dot k-' + (d.dot || 'ready')"></span><span>{{d.statusText}}</span><span v-if="d.arrow" aria-hidden="true">→</span></span></span>
+<span class="meta"><span class="name" style="font-size: 16px">{{d.title}}</span><span class="muted">{{d.meta}}</span><span style="display: inline-flex; align-items: center; gap: 8px; margin-top: 4px"><span :class="'dot k-' + (d.dot || 'ready')"></span>{{d.status}}</span></span>
 </button>
 </div>
 </div>
@@ -815,7 +815,7 @@ textarea{resize:none}
 <div v-if="sliderHelp" style="display: contents"><p class="muted small" style="margin: 6px 0 0">{{swearHelp}}</p></div>
 </div>
 <div :class="swearOn ? 'swcap' : 'swcap swoff'"><span class="capl"><span id="capsLbl">Swears in captions too</span><span id="capsHint" class="caphint">Turn on Swearing first</span></span><button type="button" :class="(capsCls)" role="switch" :aria-checked="(capsOn)" :aria-disabled="swearOn ? null : 'true'" aria-labelledby="capsLbl" aria-describedby="capsHint" @click="toggleCaps($event)" @mousedown="capsDown($event)" :tabindex="swearOn ? null : '-1'"><span></span></button></div>
-<div class="paceslot"><div v-if="!isV3" style="display: contents"><div class="swrow paceoff"><span class="swl">Pace</span><span class="small">Only with Eleven v3</span></div><div v-if="sliderHelp" style="display: contents"><p class="muted small" style="margin: 6px 0 0">Slower: easy to follow, can drag.<br>Faster: snappy, can rush the clicks.</p></div></div><div v-if="isV3" style="display: contents"><div v-for="s in paceSliders" style="display: contents">
+<div class="paceslot"><div v-if="isV3" style="display: contents"><div v-for="s in paceSliders" style="display: contents">
 <div>
 <div class="slwrap">
 <div class="bar" @pointerdown="s.down($event)" @pointermove="s.move($event)" @pointerup="s.up($event)" @pointercancel="s.up($event)"><span class="fill" :style="'width: ' + (s.pct)"></span><span class="rec" :style="'left: ' + (s.rec)"></span><span class="bl">{{s.label}}</span><span class="bv">{{s.display}}</span><input type="range" :id="'rng-' + s.k" :aria-label="(s.label)" :min="(s.min)" :max="(s.max)" step="1" :value="(s.value)" @input="s.onChange($event)" @change="s.onChange($event)"></div>
