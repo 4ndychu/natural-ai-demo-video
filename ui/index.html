@@ -458,10 +458,11 @@ textarea{resize:none}
   .welcome-art img{object-position:50% 40%!important}
   .wfield{justify-content:flex-end}
   /* Stacked on phones, the panel keeps the height of its longest quote instead. */
-  .recpanel{--ql:4;--qf:15px;--progmin:calc(4 * 36px + 4 * 2px + 8px + 26px + 21.75px + 8px + var(--ql) * 1.45 * var(--qf));min-height:calc(var(--progmin) + 150.65px)}
-  .prog{min-height:var(--progmin);margin:14px 0 0}
+  .recpanel{--ql:4;--qf:15px}
+  .prog{margin:14px 0 0}
+  .pquote{min-height:calc(var(--ql) * 1.45em)}
   .prog li{height:36px}
-  .recpanel .recctl{margin-top:16px}
+  .recpanel .recctl{margin-top:24px}
   .pausebtn{width:80px;padding:0 10px}
   .slide .slabel{left:50px;right:6px}
   .slide .sls{font-size:12px}
@@ -674,14 +675,14 @@ textarea{resize:none}
 <div v-for="b in batchCards" style="display: contents">
 <button type="button" class="tray dcard" @click="b.open($event)">
 <span class="cover" style="height: 176px; display: grid; grid-template-columns: 1fr 1fr; gap: 4px; background: var(--tray)"><img src="assets/cover-3.jpg" alt="" style="border-radius: 12px"><span style="display: grid; grid-template-rows: 1fr 1fr; gap: 4px; min-height: 0"><img src="assets/cover-1.jpg" alt="" style="border-radius: 12px; min-height: 0"><img src="assets/cover-4.jpg" alt="" style="border-radius: 12px; min-height: 0"></span></span>
-<span class="meta"><span class="name" style="font-size: 16px">{{b.name}}</span><span class="muted">{{b.meta}}</span><span style="display: inline-flex; align-items: center; gap: 8px; margin-top: 4px"><span class="dot k-ready"></span>{{b.next}}</span>
+<span class="meta"><span class="name" style="font-size: 16px">{{b.name}}</span><span class="muted">{{b.meta}}</span><span style="display: inline-flex; align-items: center; gap: 8px; margin-top: 4px"><span class="dot k-ready"></span><span>{{b.nextText}}</span><span v-if="b.nextArrow" aria-hidden="true">→</span></span>
 <span style="display: flex; align-items: center; gap: 10px; margin-top: 6px"><span style="flex: 1; height: 6px; border-radius: 999px; background: var(--fill); overflow: hidden"><span :style="'display: block; height: 6px; background: var(--ink); width: ' + (b.pct)"></span></span><span class="small" style="white-space: nowrap">{{b.status}}</span></span></span>
 </button>
 </div>
 <div v-for="d in demos" style="display: contents">
 <button type="button" class="tray dcard" @click="d.open($event)">
 <span class="cover" style="height: 176px; display: block"><img :src="(d.cover)" alt="" :style="d.tint ? 'filter: ' + d.tint : ''"></span>
-<span class="meta"><span class="name" style="font-size: 16px">{{d.title}}</span><span class="muted">{{d.meta}}</span><span style="display: inline-flex; align-items: center; gap: 8px; margin-top: 4px"><span :class="'dot k-' + (d.dot || 'ready')"></span>{{d.status}}</span></span>
+<span class="meta"><span class="name" style="font-size: 16px">{{d.title}}</span><span class="muted">{{d.meta}}</span><span style="display: inline-flex; align-items: center; gap: 8px; margin-top: 4px"><span :class="'dot k-' + (d.dot || 'ready')"></span><span>{{d.statusText}}</span><span v-if="d.arrow" aria-hidden="true">→</span></span></span>
 </button>
 </div>
 </div>
