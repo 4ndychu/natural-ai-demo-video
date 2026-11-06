@@ -58,7 +58,7 @@ class Component extends DCLogic {
     this.presetVals = { course: { casual: 7, energy: 3, pace: 100, hes: 1, breath: 1, swear: 0 }, saas: { casual: 8, energy: 5, pace: 105, hes: 2, breath: 1, swear: 0 }, tour: { casual: 5, energy: 4, pace: 100, hes: 0, breath: 1, swear: 0 } };
     this.ranges = { casual: [3, 8], energy: [1, 6], pace: [94, 108], hes: [0, 3], breath: [0, 2], swear: [0, 2] };
     const whop = { id: 'whop', title: 'Build it in Whop', site: 'whop.com', len: 2, who: 0, voice: 'alex', model: 'v4', kind: 'course', max: 4, cover: 'assets/cover-1.jpg', status: 'Watch the draft →', dot: 'ready', recorded: true, written: true,
-      notes: { 2: [{ t: 60, text: 'Too cheerful after Add app' }], 4: [{ t: 125, text: 'Too fast' }] },
+      notes: { 2: [{ t: 60, text: 'Sounds too cheerful' }], 4: [{ t: 125, text: 'Too fast' }] },
       blurs: [{ id: 'b1', t: '1:58', what: 'A name inside the course cover image', s: '' }, { id: 'b2', t: '3:53', what: 'What might be a price in a banner', s: '' }] };
     const demos = [whop,
       { id: 'pay', title: 'Connect payouts', site: 'whop.com', len: 0, who: 0, voice: 'alex', model: 'v4', kind: 'course', max: 5, cover: 'assets/cover-3.jpg', status: 'Exported Nov 2 · Open the video →', exportedOn: 'Nov 2', dot: 'done', recorded: true, written: true, exported: true, notes: {}, blurs: [] },
@@ -242,7 +242,7 @@ class Component extends DCLogic {
       () => { if (!voiceOk) return; goStep(2); this.say(st.lock ? voicePretty + ' is set for every demo in this project' : 'Using ' + voicePretty + ' for this demo'); },
       () => { const fresh = !D.recorded && st.recPos === 0 && !this.timers.rec; if (fresh) { if (this.needKey()) return; this.setState({ confirm: 'record' }); this.focusLater('#cfyes'); return; } goStep(3); if (!D.recorded && !this.timers.rec && !st.recPaused && !st.recStopped) { if (this.needKey()) return; this.startRecording(st.recPos); } },
       () => goStep(4),
-      () => { if (marks) { this.setState({ confirm: 'redo' }); this.focusLater('#cfyes'); return; } if (unsure) { this.setState({ confirm: 'approve' }); this.focusLater('#cfno'); return; } if (st.fromBatch) { batchApproveNext(); return; } goStep(5); },
+      () => { if (marks) { this.setState({ confirm: 'redo' }); this.focusLater('#cfyes'); return; } if (unsure) { this.setState({ confirm: 'approve' }); this.focusLater('#cfyes'); return; } if (st.fromBatch) { batchApproveNext(); return; } goStep(5); },
       () => { if (!D.exported || D.dirty) doExport(); else this.say('Opening Movies/NAVI'); }
     ];
     const secondaryFor = [null, null, null, () => { if (this.needKey()) return; this.setState({ confirm: 'rerecord' }); this.focusLater('#cfyes'); }, () => this.setState({ confirm: 'approve' }), () => this.say('Opening Movies/NAVI')];
@@ -419,7 +419,7 @@ class Component extends DCLogic {
       writing: !D.written, scriptReady: !!D.written, skelRows: this.secs.map((x, i) => ['62%', '80%', '70%', '86%', '58%', '74%', '66%'][i % 7]),
       canBack: st.step > 0 && st.step < 5 && !(st.step === 3 && !D.recorded && !st.recStopped), recHold: st.step === 3 && !D.recorded && !st.recStopped, recStopHold: st.step === 3 && !D.recorded && !!st.recStopped, back: () => { const bid = st.step === 4 ? (st.fromBatch || D.batchOf) : null; if (bid) { const i = st.batchItem; this.setState({ fromBatch: null, batchItem: null, markOpen: false }); this.openBatch(bid); this.focusLater('#bwatch-' + i); return; } this.setState({ step: st.step - 1, confirm: null, markOpen: false }); }, hasSecondary: !!cur.second, secondary: secondaryFor[st.step] || (() => {}), primary: primaryFor[st.step],
       primaryBlocked: (st.step === 0 && !D.written) || (st.step === 3 && !D.recorded) || (st.step === 1 && !voiceOk),
-      confirming: !!cf, cfRerec: st.confirm === 'rerecord' && st.step === 3, notConfirming: !cf, confirmNo: cf ? cf.no : '', confirmYes: cf ? cf.yes : '', cancelConfirm: () => { const sel = st.confirm === 'rerecord' ? '#secbtn' : '.stepfoot .pri'; this.setState({ confirm: null }); this.focusLater(sel); }, doConfirm: () => { if (cf) cf.act(); },
+      confirming: !!cf, cfRerec: st.confirm === 'rerecord' && st.step === 3, cfApprove: st.confirm === 'approve' && st.step === 4, notConfirming: !cf, confirmNo: cf ? cf.no : '', confirmYes: cf ? cf.yes : '', cancelConfirm: () => { const sel = st.confirm === 'rerecord' ? '#secbtn' : '.stepfoot .pri'; this.setState({ confirm: null }); this.focusLater(sel); }, doConfirm: () => { if (cf) cf.act(); },
       footText: foot.text, footDot: foot.dot, footColor: foot.color,
       footLinkOn: !cf && footBad, footLinkLabel: 'switch back to ' + vInfo.models[0], footLinkAct: () => { this.patchDemo({ model: vInfo.models[0] }); this.say('Switched to Eleven ' + vInfo.models[0] + ' for ' + voicePretty); this.focusLater('.stepfoot .pri'); },
       // script

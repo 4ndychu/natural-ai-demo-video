@@ -51,6 +51,7 @@ textarea{resize:none}
 .pri{height:44px;padding:0 22px;border-radius:999px;border:0;background:var(--ink);color:var(--sheet);font-size:15px;font-weight:500;white-space:nowrap}
 /* Review: the primary keeps the width of its longest label ('Looks good, go to Export'), so adding marks never moves Back or Export without redos. */
 @media (min-width: 861px){.prirev{min-width:218px}.prirev.prib{min-width:232px}}
+@media (max-width: 860px){.prirev{min-width:160px}}
 .pri[disabled],.pri[aria-disabled=true]{opacity:1;background:var(--wash);color:var(--ink2);box-shadow:inset 0 0 0 1px var(--line)}
 .btn.ghost{background:transparent;color:var(--ink2)}
 @media (hover:hover){.btn.ghost:hover{background:var(--wash);color:var(--ink)}}
@@ -1083,7 +1084,7 @@ textarea{resize:none}
 <div :class="st4 && hasSkip ? 'foot stepfoot revfoot' : 'foot stepfoot'">
 <span class="ftext" :style="'color: ' + (footColor)"><span :class="'dot k-' + footDot"></span><span>{{footText}}<span v-if="footLinkOn"> <button type="button" class="link" @click="footLinkAct($event)">{{footLinkLabel}}</button></span></span></span>
 <span class="fbtns">
-<div v-if="confirming" style="display: contents"><div v-if="cfRerec" style="display: contents"><button type="button" class="btn ghost backbtn" @click="back($event)">Back</button></div><button id="cfno" type="button" :class="cfRerec ? 'btn secrec' : 'btn'" @click="cancelConfirm($event)">{{confirmNo}}</button><button id="cfyes" type="button" :class="cfRerec ? 'pri prirec' : 'pri'" @click="doConfirm($event)">{{confirmYes}}</button></div>
+<div v-if="confirming" style="display: contents"><div v-if="cfRerec" style="display: contents"><button type="button" class="btn ghost backbtn" @click="back($event)">Back</button></div><button id="cfno" type="button" :class="cfRerec ? 'btn secrec' : 'btn'" @click="cancelConfirm($event)">{{confirmNo}}</button><button id="cfyes" type="button" :class="cfRerec ? 'pri prirec' : (cfApprove ? (st4b ? 'pri prirev prib' : 'pri prirev') : 'pri')" @click="doConfirm($event)">{{confirmYes}}</button></div>
 <div v-if="notConfirming" style="display: contents">
 <div v-if="recHold" style="display: contents"><span class="fhold" aria-hidden="true"><span class="btn ghost backbtn">Back</span><span class="btn secrec">Record again</span></span></div>
 <div v-if="canBack" style="display: contents"><button type="button" class="btn ghost backbtn" @click="back($event)">Back</button></div>
