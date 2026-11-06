@@ -50,7 +50,7 @@ textarea{resize:none}
 .btn[disabled]{opacity:0.4}
 .pri{height:44px;padding:0 22px;border-radius:999px;border:0;background:var(--ink);color:var(--sheet);font-size:15px;font-weight:500;white-space:nowrap}
 /* Review: the primary keeps the width of its longest label ('Looks good, go to Export'), so adding marks never moves Back or Export without redos. */
-@media (min-width: 861px){.prirev{min-width:218px}}
+@media (min-width: 861px){.prirev{min-width:218px}.prirev.prib{min-width:232px}}
 .pri[disabled]{opacity:1;background:var(--wash);color:var(--ink2);box-shadow:inset 0 0 0 1px var(--line)}
 .btn.ghost{background:transparent;color:var(--ink2)}
 @media (hover:hover){.btn.ghost:hover{background:var(--wash);color:var(--ink)}}
@@ -1060,7 +1060,7 @@ textarea{resize:none}
 <div v-if="canBack" style="display: contents"><button type="button" class="btn ghost backbtn" @click="back($event)">Back</button></div>
 <div v-if="hasSkip" style="display: contents"><button type="button" class="btn" @click="doSkip($event)">Export without redos</button></div>
 <div v-if="hasSecondary" style="display: contents"><button type="button" class="btn" @click="secondary($event)">{{cur.second}}</button></div>
-<button type="button" :class="st1 ? 'pri privoice' : (st4 ? 'pri prirev' : 'pri')" @click="primary($event)" :disabled="(primaryBlocked)"><span class="lg-only">{{cur.cta}}</span><span class="sm-only">{{cur.ctaShort || cur.cta}}</span></button>
+<button type="button" :class="st1 ? 'pri privoice' : (st4b ? 'pri prirev prib' : (st4 ? 'pri prirev' : 'pri'))" @click="primary($event)" :disabled="(primaryBlocked)"><span class="lg-only">{{cur.cta}}</span><span class="sm-only">{{cur.ctaShort || cur.cta}}</span></button>
 </div>
 </span>
 </div>
