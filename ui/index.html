@@ -363,8 +363,6 @@ textarea{resize:none}
 .pills button[aria-pressed=true]{background:var(--segOn);color:var(--ink);font-weight:400;box-shadow:0 1px 2px rgba(0,0,0,0.14),inset 0 0 0 1px var(--fill)}
 @media (hover:hover){.pills button[aria-pressed=false]:hover{color:var(--ink);background:var(--wash)}}
 .pills .star{margin-left:4px}
-/* New options Length: on desktop every pill is as wide as the widest starred label ("8 min ★"), so the ★ moving between pills never resizes one. */
-@media (min-width: 861px){.lenpills button{min-width:83px}}
 .srow .sctl{flex:0 1 360px;min-width:0}
 .srow .sctl2{flex:0 1 auto;display:flex;flex-direction:column;align-items:flex-end;min-width:0;max-width:100%}
 .srow .sctl2 .chips{justify-content:flex-end}
@@ -1032,7 +1030,7 @@ textarea{resize:none}
 </div>
 <aside aria-label="Your marks" class="revaside"><div class="revcap">
 <div v-if="hasUnsure" style="display: contents">
-<button type="button" class="warnbtn" @click="toggleBlurs($event)" :aria-expanded="(blurOpen)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l9.5 17h-19z"></path><path d="M12 10v4M12 17.5v.01"></path></svg><span style="flex: 1">{{unsureText}}<span class="lg-only"> before export</span><span class="sm-only"> first</span></span><span class="wpill">{{blurOpen ? 'Hide' : 'Show'}}</span></button>
+<button type="button" class="warnbtn" @click="toggleBlurs($event)" :aria-expanded="(blurOpen)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l9.5 17h-19z"></path><path d="M12 10v4M12 17.5v.01"></path></svg><span style="flex: 1">{{unsureText}}<span class="lg-only"> before export</span></span><span class="wpill">{{blurOpen ? 'Hide' : 'Show'}}</span></button>
 <div v-if="blurOpen" style="display: contents">
 <div class="fade panel list" style="padding: 8px 16px">
 <div v-for="b in blurs" style="display: contents"><div class="row" style="flex-wrap: wrap; padding: 8px 0"><span class="mono muted">{{b.t}}</span><span style="flex: 1 1 160px">{{b.what}}</span><span style="display: inline-flex; gap: 6px"><button type="button" class="btn sm" @click="b.keep($event)" style="background: var(--sheet)">Keep blurred</button><button type="button" class="btn sm" @click="b.show($event)" style="background: var(--sheet)">Show it</button></span></div></div>
@@ -1121,7 +1119,7 @@ textarea{resize:none}
 <div class="fade srows" style="margin-top: 6px">
 <div class="srow"><span class="sl"><span class="slab">Who’s watching</span></span><div class="pills pillsfit" role="group" aria-label="Who's watching"><div v-for="o in bWho" style="display: contents"><button type="button" :aria-pressed="(o.on)" @click="o.pick($event)">{{o.label}}</button></div></div></div>
 <div class="srow"><span class="sl"><span class="slab">Kind of demo</span><span class="muted small shelp shelp2">{{bKindHint}}</span></span><div class="pills" role="group" aria-label="Kind of demo"><div v-for="o in bKinds" style="display: contents"><button type="button" :aria-pressed="(o.on)" @click="o.pick($event)"><span class="lg-only">{{o.label}}</span><span class="sm-only">{{o.ph}}</span></button></div></div></div>
-<div class="srow"><span class="sl"><span class="slab">Length</span><span class="muted small shelp">{{lenHint}}</span></span><div class="pills lenpills" role="group" aria-label="How long"><div v-for="o in bLen" style="display: contents"><button type="button" :aria-pressed="(o.on)" @click="o.pick($event)">{{o.label}}<span v-if="o.star" class="star" aria-label="suggested">★</span></button></div></div></div>
+<div class="srow"><span class="sl"><span class="slab">Length</span><span class="muted small shelp">{{lenHint}}</span></span><div class="pills" role="group" aria-label="How long"><div v-for="o in bLen" style="display: contents"><button type="button" :aria-pressed="(o.on)" @click="o.pick($event)">{{o.label}}<span v-if="o.star" class="star" aria-label="suggested">★</span></button></div></div></div>
 <div class="srow"><span class="sl"><span class="slab">Voice</span></span><div class="pills" role="group" aria-label="Voice"><div v-for="o in bVoices" style="display: contents"><button type="button" :aria-pressed="(o.on)" @click="o.pick($event)">{{o.label}}</button></div></div></div>
 <div class="srow"><span class="sl"><label for="bh" class="slab">Pages to avoid</label><span class="muted small shelp">Pages the browser should never open.</span></span><input id="bh" class="inp sctl" type="text" :value="(bHide)" @input="onBHide($event)" @change="onBHide($event)" placeholder="e.g. the billing page, settings"></div>
 <div class="srow"><span class="sl"><span class="slab">Captions</span></span><div class="pills" role="group" aria-label="Captions"><div v-for="o in bCaps" style="display: contents"><button type="button" :aria-pressed="(o.on)" @click="o.pick($event)">{{o.label}}</button></div></div></div>
@@ -1242,13 +1240,13 @@ textarea{resize:none}
 <div style="height: 4px"></div>
 </div></div>
 
-<div class="tray"><div class="sheet" style="padding: 18px 18px 6px">
+<div class="tray"><div class="sheet" style="padding: 18px 18px 8px">
 <div style="display: flex; align-items: center; gap: 10px; min-height: 36px; margin-bottom: 10px"><h2 class="h-big" style="flex: 1; margin: 0">Saved logins</h2><div v-if="!noSites" style="display: contents"><button type="button" class="btn sm" @click="forgetAll($event)">Forget all logins</button></div></div>
 <div class="list">
-<div v-for="s in sites" style="display: contents"><div class="row" style="flex-wrap: wrap; padding: 8px 0"><span style="flex: 1 1 200px; min-width: 0"><span style="display: block">{{s.u}}</span><span class="muted small">{{s.note}}</span></span><span style="display: flex; gap: 6px; margin-left: auto"><button type="button" class="link" @click="s.forget($event)" style="padding: 0 8px; min-height: 36px">Forget</button><button type="button" class="btn sm" @click="s.relog($event)">Log in again</button></span></div></div>
+<div v-for="s in sites" style="display: contents"><div class="row" style="flex-wrap: wrap; padding: 8px 0"><span style="flex: 1 1 200px; min-width: 0"><span style="display: block">{{s.u}}</span><span class="muted small">{{s.note}}</span></span><span style="display: flex; gap: 6px; margin-left: auto"><button type="button" class="btn sm" @click="s.forget($event)">Forget</button><button type="button" class="btn sm" @click="s.relog($event)">Log in again</button></span></div></div>
 <div v-if="noSites" style="display: contents"><div id="nosites" tabindex="-1" class="row muted">No saved logins. Add a site below, or Claude asks when a demo needs one.</div></div>
 <div class="row addrow" style="padding: 8px 0 0; min-height: 0"><label for="addsite" class="sr">New site</label><input id="addsite" class="inp" type="text" :value="(siteDraft)" @input="onSiteDraft($event)" @change="onSiteDraft($event)" @keydown="siteKey($event)" :aria-invalid="siteBad ? 'true' : 'false'" aria-describedby="nserr" :style="'flex: 1; height: 40px' + (siteBad ? '; border-color: var(--danger)' : '')" placeholder="Add a site"><button type="button" class="btn sm" @click="addSite($event)" style="height: 40px">Add and log in</button></div>
-<p id="nserr" class="small" style="margin: 2px 0 0; min-height: 20px; color: var(--danger)">{{siteBadText}}</p>
+<p id="nserr" class="small" style="margin: 4px 0 0; min-height: 20px; color: var(--danger)">{{siteBadText}}</p>
 </div>
 </div></div>
 
