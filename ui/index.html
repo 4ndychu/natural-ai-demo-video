@@ -84,6 +84,13 @@ textarea{resize:none}
 .sw.on span{background:var(--sheet);transform:translateX(18px)}
 .chip{display:inline-flex;align-items:center;gap:6px;height:34px;padding:0 6px 0 12px;border-radius:999px;background:var(--wash);font-size:14px}
 .row{display:flex;align-items:center;gap:12px;min-height:56px;border-top:1px solid var(--line)}
+/* Settings corner label: the first line keeps the closed row's 56 px when the field opens below, so the switch holds still. */
+.crow2{align-content:flex-start}
+.crow2l{flex:1;min-height:56px;display:flex;flex-direction:column;justify-content:center}
+/* Your data rows: one rule. The button sits beside its text when there is room, under it (right-aligned) when there isn't. */
+.drow{padding:8px 0;row-gap:8px;flex-wrap:wrap}
+.drow > span:first-child{flex:1 1 220px}
+.drow .btn{margin-left:auto}
 .list > :first-child > .row,.list > .row:first-child,.list > :first-child > .brow,.list > .brow:first-child,.list > :first-child > .markrow{border-top:0}
 .wv span{display:block;width:3px;border-radius:2px;background:currentColor}
 .wv.on span{animation:wv 900ms cubic-bezier(.22,1,.36,1) infinite alternate}
@@ -1179,7 +1186,7 @@ textarea{resize:none}
 <div class="row setrow" style="padding: 10px 0"><span style="flex: 1"><span style="display: block">Appearance</span><span class="muted small">Follows your Mac unless you pick one</span></span><div class="seg ctl" role="group" aria-label="Appearance" style="width: 360px"><div v-for="a in appear" style="display: contents"><button type="button" :aria-pressed="(a.on)" @click="a.pick($event)">{{a.label}}</button></div></div></div>
 <div class="row setrow" style="padding: 10px 0"><span style="flex: 1"><span style="display: block">Voice for new demos</span><span class="muted small">Add more in any demo’s Voice step</span></span><div class="seg ctl" role="group" aria-label="Default voice" style="width: 360px"><div v-for="a in defVoices" style="display: contents"><button type="button" :aria-pressed="(a.on)" @click="a.pick($event)">{{a.label}}</button></div></div></div>
 <div class="row setrow" style="padding: 10px 0"><span style="flex: 1"><span style="display: block">Captions</span><span class="muted small">You can change it per demo</span></span><div class="seg ctl" role="group" aria-label="Default captions" style="width: 360px"><div v-for="a in defCaps" style="display: contents"><button type="button" :aria-pressed="(a.on)" @click="a.pick($event)">{{a.label}}</button></div></div></div>
-<div class="row" style="padding: 12px 0; flex-wrap: wrap"><span style="flex: 1"><span id="dclbl" style="display: block">Corner label</span><span class="muted small">Your name or brand in a corner of the video</span></span><button type="button" :class="(defCorner.cls)" role="switch" :aria-checked="(defCorner.onStr)" aria-labelledby="dclbl" @click="defCorner.toggle($event)"><span></span></button>
+<div class="row crow2" style="padding: 12px 0; flex-wrap: wrap"><span class="crow2l"><span><span id="dclbl" style="display: block">Corner label</span><span class="muted small">Your name or brand in a corner of the video</span></span></span><button type="button" :class="(defCorner.cls)" role="switch" :aria-checked="(defCorner.onStr)" aria-labelledby="dclbl" @click="defCorner.toggle($event)"><span></span></button>
 <div v-if="defCorner.on" style="display: contents"><div class="fade" style="flex: 1 1 100%; display: grid; gap: 8px; padding-bottom: 4px"><label for="dct" class="sr">Label text</label><input id="dct" class="inp" type="text" :value="(defCornerText)" @input="onDefCornerText($event)" @change="onDefCornerText($event)" placeholder="Label text, e.g. your logo name"><div class="seg seg4" role="group" aria-label="Corner"><div v-for="o in defCorner.seg" style="display: contents"><button type="button" :aria-pressed="(o.on)" @click="o.pick($event)">{{o.label}}</button></div></div></div></div></div>
 </div>
 </div></div>
@@ -1203,15 +1210,15 @@ textarea{resize:none}
 <div v-for="s in sites" style="display: contents"><div class="row" style="flex-wrap: wrap; padding: 8px 0"><span style="flex: 1 1 200px; min-width: 0"><span style="display: block">{{s.u}}</span><span class="muted small">{{s.note}}</span></span><span style="display: flex; gap: 6px; margin-left: auto"><button type="button" class="btn sm" @click="s.forget($event)">Forget</button><button type="button" class="btn sm" @click="s.relog($event)">Log in again</button></span></div></div>
 <div v-if="noSites" style="display: contents"><div id="nosites" tabindex="-1" class="row muted">No saved logins. Add a site below, or Claude asks when a demo needs one.</div></div>
 <div class="row addrow" style="padding: 8px 0 0; min-height: 0"><label for="addsite" class="sr">New site</label><input id="addsite" class="inp" type="text" :value="(siteDraft)" @input="onSiteDraft($event)" @change="onSiteDraft($event)" @keydown="siteKey($event)" :aria-invalid="siteBad ? 'true' : 'false'" aria-describedby="nserr" :style="'flex: 1; height: 40px' + (siteBad ? '; border-color: var(--danger)' : '')" placeholder="Add a site"><button type="button" class="btn sm" @click="addSite($event)" style="height: 40px">Add and log in</button></div>
-<p id="nserr" class="small" style="margin: 4px 0 0; min-height: 20px; color: var(--danger)">{{siteBad ? 'That doesn’t look like a web address.' : ''}}</p>
+<p id="nserr" class="small" style="margin: 4px 0 0; min-height: 20px; color: var(--danger)">{{siteBadText}}</p>
 </div>
 </div></div>
 
 <div class="tray"><div class="sheet" style="padding: 18px 18px 8px">
 <h2 class="h-big" style="margin-bottom: 10px">Your data</h2>
 <div class="list">
-<div v-for="d in data" style="display: contents"><div class="row" style="padding: 8px 0; row-gap: 8px"><span style="flex: 1 1 220px"><span style="display: block">{{d.n}}</span><span class="muted small">{{d.w}}</span></span><div v-if="d.can" style="display: contents"><button type="button" class="btn sm" @click="d.act($event)" style="margin-left: auto">{{d.l}}</button></div></div></div>
-<div class="row" style="padding: 8px 0"><span style="flex: 1"><span style="display: block">First-time setup</span><span class="muted small">Walk through the key, tools and login again</span></span><button type="button" class="btn sm" @click="showWelcome($event)">Run again</button></div>
+<div v-for="d in data" style="display: contents"><div class="row drow"><span><span style="display: block">{{d.n}}</span><span class="muted small">{{d.w}}</span></span><div v-if="d.can" style="display: contents"><button type="button" class="btn sm" @click="d.act($event)">{{d.l}}</button></div></div></div>
+<div class="row drow"><span><span style="display: block">First-time setup</span><span class="muted small">Walk through the key, tools and login again</span></span><button type="button" class="btn sm" @click="showWelcome($event)">Run again</button></div>
 <div id="wiperow" class="row" style="padding: 8px 0; flex-wrap: wrap"><span style="flex: 1 1 260px"><span style="display: block">Erase NAVI data</span><span class="muted small">Your key, logins and preferences. Your videos are kept.</span></span>
 <span style="display: flex; gap: 6px; margin-left: auto">
 <div v-if="notWipeConfirm" style="display: contents"><button id="wipebtn" type="button" class="btn sm danger" @click="askWipe($event)">Delete everything</button></div>
