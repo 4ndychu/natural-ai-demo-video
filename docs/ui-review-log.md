@@ -165,3 +165,41 @@ Each reviewer compared 44 shot pairs (old vs new, unlabelled, random order). The
 | settings | 9.0 | 9.0 | 8.5 | 8.5 |
 
 The minimums moved from 6.0–8.0 to 7.5–8.5. Using the app, QA scored the new version much higher than the old one: record 6.0 → 9.0, review 5.5 → 8.5, batch 5.5 → 8.0. Round 3: the Welcome revert plus 12 ranked fixes.
+
+## Round 3: Welcome revert plus 12 fixes, decided by blind A/B
+
+The previous accepted version is round 2 with Welcome reverted (commit 3d3ed4e). The candidate is that plus fixes 1–12. The connection dropped during QA's review, but its file had already been saved in full (44 A/B rows), so it wasn't re-run.
+
+| Screen | User | Visual | QA | Verdict |
+|---|---|---|---|---|
+| new, new-options, batch, record, export (before export), export | new | new | new | New stays |
+| new-batch | new | new | new | New stays (but all three preferred the old image at 390: a regression, fixed in round 4) |
+| voice | new | new | guard loss | New stays (2 of 3). QA's guard: picking Swearing pushed content 60 px at 390 |
+| script | new | old | new | New stays (2 of 3) |
+| settings | old | new | new | New stays (2 of 3) |
+| home, privacy, review, welcome | same | same | same | Tie. The images are identical; the behaviour fixes stay because they fix verified bugs and no reviewer found a regression |
+
+**Scores (candidate)**
+
+| Screen | User | Visual | QA | Min | vs round 2 |
+|---|---|---|---|---|---|
+| welcome | 9.0 | 8.0 | 8.5 | 8.0 | 0 |
+| home | 9.0 | 8.5 | 9.0 | 8.5 | 0 |
+| new | 9.0 | 8.5 | 8.5 | 8.5 | 0 |
+| new-options | 8.5 | 8.0 | 8.5 | 8.0 | −0.5 |
+| new-batch | 8.0 | 7.0 | 7.5 | 7.0 | −1.0 |
+| batch | 8.5 | 8.5 | 8.5 | 8.5 | +1.0 |
+| script | 9.0 | 8.0 | 9.0 | 8.0 | −0.5 |
+| voice | 9.0 | 8.5 | 8.5 | 8.5 | +0.5 |
+| privacy | 9.0 | 8.5 | 8.5 | 8.5 | 0 |
+| record | 9.0 | 8.5 | 8.5 | 8.5 | +0.5 |
+| review | 8.5 | 8.5 | 8.5 | 8.5 | 0 |
+| export (before export) | 9.0 | 8.5 | 8.5 | 8.5 | 0 |
+| export | 9.0 | 8.5 | 8.5 | 8.5 | 0 |
+| settings | 9.0 | 8.5 | 9.0 | 8.5 | 0 |
+
+The User reviewer now gives 9.0 to 12 of 14 screens. The gap to 9.5 is mostly Visual (corner radii, weights, dark contrast) and QA (one click-time shift per screen).
+
+The New batch drop comes from one round-3 regression: an inline `flex-basis` that turns into a 440 px tall row on phones. It is fix 1 for round 4.
+
+**Checkpoint after 3 rounds:** shown to Andy (`docs/screens/climb2/`).
