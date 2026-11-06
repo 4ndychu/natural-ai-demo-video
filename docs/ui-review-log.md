@@ -518,3 +518,68 @@ The previous accepted version is commit 379d6f3 (round 8 with Batch's recording 
 8. Record: the Record again confirm keeps Back in place.
 9. New batch: the primary holds still after a paste; "top up" becomes "add credits".
 10. Plain words on Home, Privacy and Review.
+
+## Round 10: 10 fixes, real bugs first, decided by blind A/B
+
+The previous accepted version is commit 0234177 (round 9 with New options at 390 reverted). The candidate is R10 fixes 1–10 (up to 0f01b67).
+
+| Screen | User | Visual | QA | Verdict |
+|---|---|---|---|---|
+| batch, privacy, record | new | new | new | New stays |
+| welcome, new-batch | new | new | new | New stays. Visual preferred the old 390 shot on both, and New batch's cut path "…l/Whop course" gets fixed in round 11 |
+| home, export (before export) | new | new / same | same / new | New stays |
+| script | same | new | new | New stays |
+| export | old | new | new | New stays (2 of 3). The hint copy goes back to "Saved to Movies/NAVI. Change a setting to export again, free.", the line User preferred |
+| voice | same | same | new | The fixes stay: the Pace reset badge sits inside the bar, and Hear no longer shifts |
+| new-options | old | old | new | **Reverted.** The 83 px Length pills and the dropped "5 min for now." hint both lost |
+| settings | old | old | new | **Forget goes back to a pill.** The merged "2 logins forgotten" Undo and the focus fix stay |
+| review | new (slightly) | same | same | **Reverted.** The 390 wording "first" had only one vote |
+| new | same | same | same | Tie |
+
+**Scores (candidate; QA scores the candidate app; reverted rows score the losing candidate)**
+
+| Screen | User | Visual | QA | Min | vs round 9 |
+|---|---|---|---|---|---|
+| welcome | 9.0 | 9.0 | 9.5 | 9.0 | +0.5 |
+| home | 9.0 | 9.0 | 9.5 | 9.0 | 0 |
+| new | 9.0 | 9.0 | 9.0 | 9.0 | 0 |
+| new-options (reverted) | 9.0 | 8.5 | 9.0 | 8.5 | 0 |
+| new-batch | 9.0 | 8.5 | 9.0 | 8.5 | −0.5 |
+| batch | 9.0 | 9.0 | 8.5 | 8.5 | −0.5 |
+| script | 9.0 | 8.5 | 9.5 | 8.5 | −0.5 |
+| voice | 8.5 | 8.5 | 9.5 | 8.5 | 0 |
+| privacy | 9.0 | 9.0 | 8.5 | 8.5 | −0.5 |
+| record | 9.0 | 9.0 | 8.5 | 8.5 | −0.5 |
+| review | 9.0 | 8.5 | 8.5 | 8.5 | −0.5 |
+| export (before export) | 9.0 | 8.5 | 9.5 | 8.5 | −0.5 |
+| export | 9.0 | 8.5 | 9.5 | 8.5 | −0.5 |
+| settings (Forget reverted) | 9.0 | 9.0 | 8.5 | 8.5 | 0 |
+
+The average minimum is 8.61, down from 8.86, though this round won the most screens since round 5. The drop isn't the candidate's doing:
+- Visual took 0.5 off five layouts it had scored 9.0 last round. One of them, Review at 1440, is pixel-identical to round 9.
+- QA newly found click-time bugs on five screens, and every one of them is in both versions.
+
+The judge's reading is that the scores have reached their noise floor: a 0.5 swing on identical pixels is as large as a round's gains.
+
+**Convergence (rounds 4–10):**
+
+| | R4 | R5 | R6 | R7 | R8 | R9 | R10 |
+|---|---|---|---|---|---|---|---|
+| Screens won | 13 | 12 | 8 | 6 | 6 | 7 | 9 |
+| Lost or reverted | 0 | 2 | 4 | 3 | 1 | 1 (part) | 3 (part) |
+| Tied | 1 | 0 | 2 | 5 | 7 | 6 | 2 |
+| Mean minimum | 8.61 | 8.68 | 8.68 | 8.68 | 8.75 | 8.86 | 8.61 |
+
+**Screenshot setup:** the Script and Voice shots now open as a first visit (`max:0` and `max:1`), so the step rail no longer shows later steps as done. Both sides of the comparison were reshot with this setup.
+
+**Round 11 plan (judge, ranked; click-time bugs first):**
+1. Record: Back holds still when a recording is stopped.
+2. Review: the "Approve anyway" confirm keeps the primary's box.
+3. Privacy: Undo focuses the restored word.
+4. Settings: the bad-key message has a slot at 390.
+5. Batch: no jump when the list starts summarizing.
+6. New / New batch: "+ New site" closes on a second click.
+7. New options: the ★ stops resizing the Length pills.
+8. New batch at 390: the path is cut at a slash.
+9. Welcome: plainer Text to Speech wording.
+10. Script: the length line appears once.
