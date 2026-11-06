@@ -820,7 +820,7 @@ textarea{resize:none}
 </div>
 </div>
 </div>
-<p class="muted small sclen sclenrow">{{scriptLenLine}}</p>
+<p class="muted small sclen sclenrow" :style="scLenInFoot ? 'visibility: hidden' : null" :aria-hidden="scLenInFoot ? 'true' : null">{{scriptLenLine}}</p>
 </div>
 </div>
 </div>
