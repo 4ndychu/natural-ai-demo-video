@@ -344,6 +344,8 @@ textarea{resize:none}
 .batchrail .stepbtn:not(.now):hover{background:transparent!important}
 .waitlist{max-height:360px;overflow:auto}
 .privoice{min-width:142px}
+/* Export's primary is as wide as its widest label (Export again, 134.2 px), so Export video -> Open folder -> Export again keep one box. */
+.priex{min-width:135px}
 .bprimary{min-width:160px;overflow:hidden;text-overflow:ellipsis}
 @media (min-width: 861px){.caprow{border-top:0!important;padding-top:0!important}}
 .srows{display:flex;flex-direction:column}
@@ -1083,7 +1085,7 @@ textarea{resize:none}
 <div v-if="canBack" style="display: contents"><button type="button" class="btn ghost backbtn" @click="back($event)">Back</button></div>
 <div v-if="hasSkip" style="display: contents"><button type="button" class="btn" @click="doSkip($event)">Export without redos</button></div>
 <div v-if="hasSecondary" style="display: contents"><button id="secbtn" type="button" class="btn" @click="secondary($event)">{{cur.second}}</button></div>
-<button type="button" :class="st1 ? 'pri privoice' : (st4b ? 'pri prirev prib' : (st4 ? 'pri prirev' : 'pri'))" @click="primary($event)" :disabled="(primaryBlocked)"><span class="lg-only">{{cur.cta}}</span><span class="sm-only">{{cur.ctaShort || cur.cta}}</span></button>
+<button type="button" :class="st1 ? 'pri privoice' : (st4b ? 'pri prirev prib' : (st4 ? 'pri prirev' : (st5 ? 'pri priex' : 'pri')))" @click="primary($event)" :disabled="(primaryBlocked)"><span class="lg-only">{{cur.cta}}</span><span class="sm-only">{{cur.ctaShort || cur.cta}}</span></button>
 </div>
 </span>
 </div>
