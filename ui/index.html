@@ -642,11 +642,11 @@ textarea{resize:none}
 <div style="display: flex; align-items: center; gap: 12px; font-weight: 500; font-size: 17px"><span :class="(w1Cls)" class="disc">{{w1Mark}}</span>Connect ElevenLabs</div>
 <div class="wpad wkslot" style="margin: 8px 0 0 40px; display: grid">
 <p class="muted" :style="'grid-area: 1/1; margin: 0' + (keyMsg ? '; visibility: hidden' : '')" :aria-hidden="keyMsg ? 'true' : 'false'">At <a href="https://elevenlabs.io/app/settings/api-keys" target="_blank" rel="noopener" style="color: var(--ink)" :tabindex="keyMsg ? '-1' : null">elevenlabs.io</a> go to Developers, then API keys, and create a key and turn on Text to Speech. Paste it here.</p>
-<p role="status" :style="'grid-area: 1/1; margin: 0; color: ' + (keyMsgColor)">{{keyMsg}}</p>
+<p id="wkeymsg" role="status" :style="'grid-area: 1/1; margin: 0; color: ' + (keyMsgColor)">{{keyMsg}}</p>
 </div>
 <div class="wfield wrow1" style="display: flex; gap: 8px; margin: 12px 0 0 40px">
 <label for="key" class="sr">ElevenLabs API key</label>
-<span class="keybox"><input id="key" class="inp" :type="(keyType)" :value="(key)" @input="onKey($event)" @change="onKey($event)" @keydown="keyEnter($event)" :placeholder="isPhone ? 'Paste your key' : 'Paste your API key'" autocomplete="off" spellcheck="false"><button type="button" class="icon keyeye" @click="toggleKeyType($event)" :aria-label="(keyTypeLabel)" :title="(keyTypeLabel)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"></path><circle cx="12" cy="12" r="3"></circle><path :style="keyShown ? 'visibility: hidden' : ''" d="M4 4l16 16"></path></svg></button></span>
+<span class="keybox"><input id="key" class="inp" aria-describedby="wkeymsg" :aria-invalid="keyBad ? 'true' : null" :type="(keyType)" :value="(key)" @input="onKey($event)" @change="onKey($event)" @keydown="keyEnter($event)" :placeholder="isPhone ? 'Paste your key' : 'Paste your API key'" autocomplete="off" spellcheck="false"><button type="button" class="icon keyeye" @click="toggleKeyType($event)" :aria-label="(keyTypeLabel)" :title="(keyTypeLabel)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"></path><circle cx="12" cy="12" r="3"></circle><path :style="keyShown ? 'visibility: hidden' : ''" d="M4 4l16 16"></path></svg></button></span>
 <button type="button" class="btn wtest" @click="testKey($event)" style="width: 150px">Test key</button>
 </div>
 </div>
@@ -1241,8 +1241,8 @@ textarea{resize:none}
 <div v-if="keyEdit" style="display: contents">
 <div class="fade" style="padding: 4px 0 14px">
 <p class="muted small" style="margin: 0 0 8px">At elevenlabs.io: Developers, then API keys, then create a key and turn on Text to Speech.</p>
-<div class="wfield" style="display: flex; gap: 8px"><label for="key2" class="sr">ElevenLabs API key</label><input id="key2" class="inp" :type="(keyType)" :value="(key)" @input="onKey($event)" @change="onKey($event)" @keydown="keyEnter($event)" placeholder="Paste your API key" autocomplete="off" spellcheck="false" style="flex: 1"><button type="button" class="btn" @click="toggleKeyType($event)" style="width: 76px">{{keyTypeLabel}}</button><button type="button" class="btn" @click="testKey($event)">Test and save</button></div>
-<p role="status" class="keystat" :style="'margin: 8px 0 0; color: ' + (keyMsgColor)">{{keyMsg}}</p>
+<div class="wfield" style="display: flex; gap: 8px"><label for="key2" class="sr">ElevenLabs API key</label><input id="key2" class="inp" aria-describedby="skeymsg" :aria-invalid="keyBad ? 'true' : null" :type="(keyType)" :value="(key)" @input="onKey($event)" @change="onKey($event)" @keydown="keyEnter($event)" placeholder="Paste your API key" autocomplete="off" spellcheck="false" style="flex: 1"><button type="button" class="btn" @click="toggleKeyType($event)" style="width: 76px">{{keyTypeLabel}}</button><button type="button" class="btn" @click="testKey($event)">Test and save</button></div>
+<p id="skeymsg" role="status" class="keystat" :style="'margin: 8px 0 0; color: ' + (keyMsgColor)">{{keyMsg}}</p>
 </div>
 </div>
 <div style="height: 4px"></div>

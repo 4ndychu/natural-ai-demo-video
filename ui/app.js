@@ -534,7 +534,7 @@ class Component extends DCLogic {
       keyEnter: (e) => { if (e.key === 'Enter') { e.preventDefault(); this.state.key = e.target.value; this.renderVals().testKey(); } },
       wSiteKey: (e) => { if (e.key === 'Enter') { e.preventDefault(); this.state.wSite = e.target.value; this.renderVals().loginSite(); } },
       siteKey: (e) => { if (e.key === 'Enter') { e.preventDefault(); this.state.siteDraft = e.target.value; this.renderVals().addSite(); } },
-      keyMsg: keyMsg, keyMsgColor: st.keyRes === 'bad' || st.keyRes === 'empty' ? 'var(--danger)' : 'var(--ink)',
+      keyMsg: keyMsg, keyMsgColor: st.keyRes === 'bad' || st.keyRes === 'empty' ? 'var(--danger)' : 'var(--ink)', keyBad: st.keyRes === 'bad' || st.keyRes === 'empty',
       w1Cls: wsw(st.keyRes === 'ok'), w1Mark: st.keyRes === 'ok' ? '✓' : '1', w2Cls: wsw(st.tools === 'done'), w2Mark: st.tools === 'done' ? '✓' : '2', w3Cls: wsw(st.logged), w3Mark: st.logged ? '✓' : '3',
       toolsIdle: st.tools === 'idle', toolsAsking: st.tools === 'ask',
       toolsText: st.tools === 'done' ? 'Installed. NAVI can drive a browser and save video.' : st.tools === 'ask' ? 'Install now? About 300 MB, takes about 2 minutes, one time.' : st.tools === 'busy' ? 'Installing… about 2 minutes.' : 'Lets NAVI drive a browser and save video. About 300 MB, one time.',
