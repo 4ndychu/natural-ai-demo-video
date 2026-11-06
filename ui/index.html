@@ -251,6 +251,8 @@ textarea{resize:none}
 .babove > :nth-child(2){grid-column:2 / -1}
 /* The collapsed "Videos 1–6 approved" row starts the list on the same hairline as the rows under it. */
 .list.btable > .brow.babove{border-top:1px solid var(--line)}
+/* Before anything collapses, the first row keeps the same 1 px top edge (transparent), so the list is the same height when the summary row takes over. */
+.list.btable > :first-child > .brow{border-top:1px solid transparent}
 .brow > .bacts{grid-column:5}
 .bmore{display:flex;align-items:center;height:48px;border-top:1px solid var(--line);padding-left:44px}
 .bacts .btn{width:88px;padding:0}
@@ -489,8 +491,8 @@ textarea{resize:none}
   .bfoot .ftext > span{white-space:normal;display:block!important}
   .bfoot .ftext > span.bcf{white-space:normal;display:-webkit-box!important}
   .bfoot .ftext > .dot{display:inline-block!important}
-  /* Outside the confirm, the footer line keeps two lines, so "Exports go to…" (2 lines) and "Nothing is published automatically." (1) fill one slot and Watch next holds. */
-  .bfoot .ftext.muted{min-height:calc(2 * 1.45em)}
+  /* While the scripts wait for approval, the footer line keeps the two lines of the record-all confirm, so opening it moves nothing. */
+  .bfcf .ftext{min-height:calc(2 * 1.45em)}
   .bacts .btn,.bnone{width:76px}
   .welcome-art{min-height:320px!important}
   .welcome-art img{object-position:50% 40%!important}
@@ -550,7 +552,7 @@ textarea{resize:none}
   .brow > :nth-child(1){grid-column:1;grid-row:1}
   .brow > :nth-child(2){grid-column:2;grid-row:1}
   .brow .bmin{display:none!important}
-  .brow.babove{grid-template-rows:auto;min-height:0;padding:10px 0}
+  .brow.babove{grid-template-rows:auto}
   .brow .bst{grid-column:2!important;grid-row:2}
   .brow .bacts{grid-column:3!important;grid-row:1 / 3!important}
   /* With Pause showing, row 1 is the count and Pause, and row 2 is the bar at full width. */
@@ -1211,7 +1213,7 @@ textarea{resize:none}
 <div v-if="bShowToggle" class="bmore"><button type="button" class="link" @click="bShowAll($event)" :aria-expanded="bAllOpenRaw ? 'true' : 'false'">{{bShowAllLabel}}</button></div>
 </div>
 </div>
-<div class="foot bfoot"><span v-if="bConfirm" class="ftext" style="color: var(--ink)"><span class="dot k-ready"></span><span class="bcf">{{bConfirmText}}</span></span><span v-if="bNotConfirm" class="ftext muted"><span>{{bFooter}}</span></span><span class="fbtns"><div v-if="bConfirm" style="display: contents"><button type="button" class="btn" @click="bConfirmNo($event)">Cancel</button><button id="bcfyes" type="button" class="pri bprimary" @click="bConfirmYes($event)">Yes, record all</button></div><div v-if="bNotConfirm" style="display: contents"><div v-if="hasBSecondary" style="display: contents"><button type="button" class="btn bsecond" @click="bSecondary($event)" :disabled="(bSecondaryOff)"><span class="lg-only">{{bSecondaryLabel}}</span><span class="sm-only">{{bSecondaryShort}}</span></button></div><button type="button" class="pri bprimary" @click="bPrimary($event)" :disabled="(bPrimaryOff)"><span class="lg-only">{{bPrimaryLabel}}</span><span class="sm-only">{{bPrimaryShort}}</span></button></div></span></div>
+<div :class="bCfSlot ? 'foot bfoot bfcf' : 'foot bfoot'"><span v-if="bConfirm" class="ftext" style="color: var(--ink)"><span class="dot k-ready"></span><span class="bcf">{{bConfirmText}}</span></span><span v-if="bNotConfirm" class="ftext muted"><span><span class="lg-only">{{bFooter}}</span><span class="sm-only">{{bFooterShort}}</span></span></span><span class="fbtns"><div v-if="bConfirm" style="display: contents"><button type="button" class="btn" @click="bConfirmNo($event)">Cancel</button><button id="bcfyes" type="button" class="pri bprimary" @click="bConfirmYes($event)">Yes, record all</button></div><div v-if="bNotConfirm" style="display: contents"><div v-if="hasBSecondary" style="display: contents"><button type="button" class="btn bsecond" @click="bSecondary($event)" :disabled="(bSecondaryOff)"><span class="lg-only">{{bSecondaryLabel}}</span><span class="sm-only">{{bSecondaryShort}}</span></button></div><button type="button" class="pri bprimary" @click="bPrimary($event)" :disabled="(bPrimaryOff)"><span class="lg-only">{{bPrimaryLabel}}</span><span class="sm-only">{{bPrimaryShort}}</span></button></div></span></div>
 </section>
 </main>
 </div>
