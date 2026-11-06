@@ -239,6 +239,8 @@ textarea{resize:none}
 .bacts .btn{width:88px;padding:0}
 .bnone{display:inline-block;width:88px;text-align:center}
 .bnote{min-height:22px}
+/* While recording, the status line keeps two lines at phone width, so Pause / Resume (one line vs two) moves nothing below it. */
+@media (max-width: 860px){.bsub.brec{min-height:calc(2 * 1.45em)}}
 .bsecond{min-width:232px}
 .brow .mono{font-size:14px}
 .bacts{display:flex;gap:6px;justify-content:flex-end}
@@ -637,7 +639,7 @@ textarea{resize:none}
 
 <div v-if="inApp" style="display: contents">
 <header class="hdr">
-<div v-if="crumb" style="display: contents"><button type="button" class="icon fill phoneback" @click="goHome($event)" aria-label="All demos" title="All demos"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"></path></svg></button></div>
+<div v-if="crumb" style="display: contents"><button type="button" class="icon fill phoneback" @click="phoneBack($event)" :aria-label="(phoneBackLabel)" :title="(phoneBackLabel)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"></path></svg></button></div>
 <button type="button" @click="goHome($event)" class="wide" style="border: 0; background: none; padding: 0 6px 0 0; font-size: 22px; white-space: nowrap" title="Natural AI demo video">NAVI</button>
 <nav aria-label="You are here" class="crumbs">
 <button type="button" @click="goHome($event)">All demos</button>
@@ -1144,13 +1146,13 @@ textarea{resize:none}
 <section class="tray" aria-labelledby="batch-h">
 <div class="sheet stepsheet" style="min-height: 0">
 <h1 id="batch-h" tabindex="-1" class="h-step">Your batch</h1>
-<p class="muted bsub" style="margin: 8px 0 0; max-width: 70ch">{{bHead}} {{bSub}}</p>
+<p :class="bCreditSlot ? 'muted bsub brec' : 'muted bsub'" style="margin: 8px 0 0; max-width: 70ch">{{bHead}} {{bSub}}</p>
 <div style="display: flex; align-items: center; gap: 10px 16px; margin-top: 16px; flex-wrap: wrap">
 <span v-if="bRecLabel" class="muted small" style="white-space: nowrap">{{bRecLabel}}</span>
 <div style="flex: 1 1 100px; min-width: 80px; height: 6px; border-radius: 999px; background: var(--fill); overflow: hidden"><span :style="'display: block; height: 6px; background: var(--ink); width: ' + (bPct)"></span></div>
 <div v-if="hasBPause" class="bpause"><button type="button" class="btn sm" @click="bPause($event)" style="width: 168px">{{bPauseLabel}}</button></div>
 </div>
-<div v-if="bCreditSlot" style="display: contents"><p class="note small bnote"><svg class="warnic" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" :style="hasBCreditNote ? '' : 'visibility: hidden'"><path d="M12 3l9.5 17h-19z"></path><path d="M12 10v4M12 17.5v.01"></path></svg><span>{{bCreditNote}}</span></p></div>
+<div v-if="bCreditSlot" style="display: contents"><p class="note small bnote" :style="bCreditHidden ? 'visibility: hidden' : ''"><svg class="warnic" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" :style="hasBCreditNote ? '' : 'visibility: hidden'"><path d="M12 3l9.5 17h-19z"></path><path d="M12 10v4M12 17.5v.01"></path></svg><span>{{bCreditNote}}</span></p></div>
 <div class="list btable" style="margin-top: 14px">
 <div v-if="bAbove" class="brow babove"><span class="muted">{{bAboveNums}}</span><span class="muted" style="display: inline-flex; align-items: center; gap: 8px; min-width: 0; white-space: nowrap"><span v-if="bAboveDone" class="pmark tick" aria-hidden="true"></span>{{bAboveText}}</span></div>
 <div v-for="it in bItems" style="display: contents">
@@ -1161,7 +1163,7 @@ textarea{resize:none}
 <span class="bst small" style="display: inline-flex; align-items: center; gap: 6px; white-space: nowrap"><span :class="'dot lg-only k-' + it.dot"></span><span class="sm-only">{{it.min}} ·</span><span :class="'dot sm-only k-' + it.dot"></span>{{it.status}}</span>
 <span class="bacts">
 <div v-if="it.canOpen" style="display: contents"><button type="button" class="btn sm" :id="'bread-' + it.i" @click="it.toggle($event)" :aria-expanded="(it.openStr)">{{it.open ? 'Close' : 'Read'}}</button></div>
-<div v-if="it.canWatch" style="display: contents"><button type="button" class="btn sm" @click="it.watch($event)" :aria-label="'Watch ' + it.t">Watch</button></div>
+<div v-if="it.canWatch" style="display: contents"><button type="button" class="btn sm" :id="'bwatch-' + it.i" @click="it.watch($event)" :aria-label="'Watch ' + it.t">Watch</button></div>
 <div v-if="it.noAct" style="display: contents"><span class="bnone" aria-hidden="true"></span></div>
 </span>
 </div>
