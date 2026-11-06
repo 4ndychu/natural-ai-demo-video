@@ -349,6 +349,9 @@ textarea{resize:none}
   .newtile .muted{display:none}
   /* The list keeps room for the captions file, so picking Separate file moves nothing below it. */
   .fileslist{min-height:calc(3 * 68px + 2px)}
+  .addrow{flex-wrap:wrap;row-gap:8px}
+  .addrow .inp{flex:1 1 100%!important}
+  .addrow .btn{margin-left:auto}
   /* The blur summary keeps the height of its longest preset (Test account), so presets move nothing below it. */
   .pvsum{min-height:calc(5 * 1.45em + 32px)!important;box-sizing:border-box}
   .folderrow{flex-wrap:wrap;justify-content:flex-end}
@@ -1106,12 +1109,12 @@ textarea{resize:none}
 </div></div>
 
 <div class="tray"><div class="sheet" style="padding: 18px 18px 8px">
-<div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px"><h2 class="h-big" style="flex: 1; margin: 0">Saved logins</h2><div v-if="!noSites" style="display: contents"><button type="button" class="btn sm ghost" @click="forgetAll($event)">Forget all logins</button></div></div>
+<div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px"><h2 class="h-big" style="flex: 1; margin: 0">Saved logins</h2><div v-if="!noSites" style="display: contents"><button type="button" class="btn sm" @click="forgetAll($event)">Forget all logins</button></div></div>
 <div class="list">
-<div v-for="s in sites" style="display: contents"><div class="row" style="flex-wrap: wrap; padding: 8px 0"><span style="flex: 1 1 200px; min-width: 0"><span style="display: block">{{s.u}}</span><span class="muted small">{{s.note}}</span></span><span style="display: flex; gap: 6px; margin-left: auto"><button type="button" class="btn sm" @click="s.relog($event)">Log in again</button><button type="button" class="btn sm" @click="s.forget($event)">Forget</button></span></div></div>
+<div v-for="s in sites" style="display: contents"><div class="row" style="flex-wrap: wrap; padding: 8px 0"><span style="flex: 1 1 200px; min-width: 0"><span style="display: block">{{s.u}}</span><span class="muted small">{{s.note}}</span></span><span style="display: flex; gap: 6px; margin-left: auto"><button type="button" class="btn sm" @click="s.forget($event)">Forget</button><button type="button" class="btn sm" @click="s.relog($event)">Log in again</button></span></div></div>
 <div v-if="noSites" style="display: contents"><div id="nosites" tabindex="-1" class="row muted">No saved logins. Add a site below, or Claude asks when a demo needs one.</div></div>
-<div class="row" style="padding: 8px 0"><label for="ns" class="sr">New site</label><input id="ns" class="inp" type="text" :value="(siteDraft)" @input="onSiteDraft($event)" @change="onSiteDraft($event)" @keydown="siteKey($event)" :aria-invalid="siteBad ? 'true' : 'false'" aria-describedby="nserr" :style="'flex: 1; height: 40px' + (siteBad ? '; border-color: var(--danger)' : '')" placeholder="Add a site"><button type="button" class="btn sm" @click="addSite($event)" style="height: 40px">Add and log in</button></div>
-<p id="nserr" class="small" style="margin: 0 0 6px; min-height: 20px; color: var(--danger)">{{siteBad ? 'That doesn’t look like a web address.' : ''}}</p>
+<div class="row addrow" style="padding: 8px 0 0; min-height: 0"><label for="addsite" class="sr">New site</label><input id="addsite" class="inp" type="text" :value="(siteDraft)" @input="onSiteDraft($event)" @change="onSiteDraft($event)" @keydown="siteKey($event)" :aria-invalid="siteBad ? 'true' : 'false'" aria-describedby="nserr" :style="'flex: 1; height: 40px' + (siteBad ? '; border-color: var(--danger)' : '')" placeholder="Add a site"><button type="button" class="btn sm" @click="addSite($event)" style="height: 40px">Add and log in</button></div>
+<p id="nserr" class="small" style="margin: 4px 0 0; min-height: 20px; color: var(--danger)">{{siteBad ? 'That doesn’t look like a web address.' : ''}}</p>
 </div>
 </div></div>
 

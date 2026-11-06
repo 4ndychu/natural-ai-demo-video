@@ -265,7 +265,7 @@ class Component extends DCLogic {
     const l = sw(st.lock), p = sw(st.p720), a = sw(st.caps);
     const dataDefs = [{ id: 'settings', n: 'Voice, privacy and learned preferences', w: 'Stored on this Mac. You can undo a reset.', l: 'Reset to defaults' }, { id: 'videos', n: 'Finished videos', w: 'Movies/NAVI. Never deleted from here.', l: 'Open folder' }];
     const dataAct = {
-      logins: () => { const prev = st.sites; this.setState({ sites: [] }); this.focusAt = Date.now(); requestAnimationFrame(() => { const el = document.getElementById('nosites'); if (el) el.focus({ preventScroll: true }); }); this.say('All saved logins forgotten', () => this.setState({ sites: prev })); },
+      logins: () => { const prev = st.sites; this.setState({ sites: [] }); this.focusAt = Date.now(); requestAnimationFrame(() => { const el = document.getElementById('addsite'); if (el) el.focus({ preventScroll: true }); }); this.say('All saved logins forgotten', () => this.setState({ sites: prev })); },
       videos: () => this.say('Opening Movies/NAVI'),
       settings: () => { const prev = { vals: st.vals, hide: st.hide, shown: st.shown, defVoice: st.defVoice, defCap: st.defCap, defCorner: st.defCorner, defCornerText: st.defCornerText }; this.setState({ vals: Object.assign({}, this.presetVals.course), hide: [], shown: Object.assign({}, PRESETS.standard), defVoice: 'alex', defCap: 'burn', defCorner: 'off', defCornerText: '' }); this.say('Settings reset', () => this.setState(prev)); }
     };
