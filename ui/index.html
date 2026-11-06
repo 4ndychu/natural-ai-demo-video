@@ -799,7 +799,7 @@ textarea{resize:none}
 <div class="scpanel" role="region" aria-labelledby="scname">
 <div class="sctop">
 <div id="scname" class="wide caps scname">{{scName}}</div>
-<p class="muted small sclen sm-only" style="margin: 0; flex: 1">{{scriptLenLine}}</p>
+<p class="muted small sclen sm-only" style="margin: 0; flex: 1">{{scLenInFoot ? scNum : scriptLenLine}}</p>
 <span class="muted hide-sm sctime screadout" style="font-size: 13px"><span class="mono">{{scTime}}</span> · {{scNum}}</span>
 <span class="scarrows"><button type="button" class="icon fill" @click="scPrev($event)" :aria-disabled="scPrevOff ? 'true' : 'false'" aria-label="Previous section" title="Previous section"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"></path></svg></button><button type="button" class="icon fill" @click="scNext($event)" :aria-disabled="scNextOff ? 'true' : 'false'" aria-label="Next section" title="Next section"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg></button></span>
 </div>
