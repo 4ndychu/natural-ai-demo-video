@@ -506,7 +506,7 @@ class Component extends DCLogic {
       showCapPreview: dCap === 'burn', cornerShown: dCorner !== 'off', cornerStyle: posCss[dCorner] || '', cornerTextShown: dCornerText.trim() || 'Your label here',
       files: [{ n: base + '.mp4', s: '1080p, ' + lengthText + (dCap === 'burn' ? ', captions in the video' : '') }].concat(dCap === 'file' ? [{ n: base + '.srt', s: 'Captions file' }] : []).concat([{ n: base + '.txt', s: 'Transcript' }]).concat(st.p720 ? [{ n: base + ' (720p).mp4', s: 'Small preview' }] : []),
       filesHead: D.exported && !D.dirty ? 'Saved files' : 'You’ll get', fileMark: D.exported && !D.dirty ? '✓' : '', fileWill: D.exported && D.dirty,
-      firstCaption: this.secs[0].c, showInFinder: () => this.say('Showing it in Finder'), p720On: p.onStr, p720Cls: p.cls, toggle720: () => this.setState({ p720: !st.p720 }),
+      firstCaption: this.secs[0].c, showInFinder: () => this.say('Showing it in Finder'), p720On: p.onStr, p720Cls: p.cls, toggle720: () => { this.setState({ p720: !st.p720 }); if (D.exported) this.patchDemo({ dirty: true }); },
       
       // settings / welcome
       defCaps: segOf(capOpts, st.defCap, (x) => { this.setState({ defCap: x }); this.say('Saved'); }),

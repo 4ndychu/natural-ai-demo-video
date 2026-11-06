@@ -903,10 +903,7 @@ textarea{resize:none}
 </div>
 </div>
 <div class="list" style="min-width: 0; display: flex; flex-direction: column">
-<div class="caprow" style="padding: 14px 0 16px; border-top: 1px solid var(--line)">
-<h2 class="h-sec" style="font-size: 16px">Captions</h2>
-<div class="seg" role="group" aria-label="Captions" style="margin-top: 8px"><div v-for="o in revCaps" style="display: contents"><button type="button" :aria-pressed="(o.on)" @click="o.pick($event)">{{o.label}}</button></div></div>
-</div>
+<div class="srow caprow"><span class="sl"><h2 class="h-sec" id="caplbl" style="font-size: 16px">Captions</h2></span><div class="pills" role="group" aria-labelledby="caplbl"><div v-for="o in revCaps" style="display: contents"><button type="button" :aria-pressed="(o.on)" @click="o.pick($event)">{{o.label}}</button></div></div></div>
 <div style="border-top: 1px solid var(--line); padding: 14px 0">
 <div style="display: flex; align-items: center; gap: 12px"><span style="flex: 1"><h2 class="h-sec" id="rclbl" style="font-size: 16px">Corner label</h2><span class="muted small">Your name or brand in a corner of the video</span></span><button type="button" :class="(revCorner.cls)" role="switch" :aria-checked="(revCorner.onStr)" aria-labelledby="rclbl" @click="revCorner.toggle($event)"><span></span></button></div>
 <div v-if="revCorner.on" style="display: contents">
@@ -920,7 +917,7 @@ textarea{resize:none}
 <div style="margin-top: 18px">
 <h2 class="h-sec">{{filesHead}}</h2>
 <div class="list" style="margin-top: 4px">
-<div v-for="f in files" style="display: contents"><div class="row filerow" style="min-height: 56px; padding: 6px 0"><span :class="fileMark ? 'disc done' : 'disc'" :style="'width: 20px; height: 20px; font-size: 11px; ' + (fileMark ? '' : 'box-shadow: inset 0 0 0 1.5px var(--line)')">{{fileMark}}</span><span style="flex: 1; min-width: 0"><span style="display: block; overflow-wrap: anywhere">{{f.n}}</span><span class="muted small">{{fileWill ? 'Will be saved' : f.s}}</span></span><div v-if="fileMark" style="display: contents"><button type="button" class="btn sm" @click="showInFinder($event)">Show in Finder</button></div></div></div>
+<div v-for="f in files" style="display: contents"><div class="row filerow" style="min-height: 56px; padding: 6px 0"><span style="width: 20px; flex: none; display: inline-flex; justify-content: center"><span v-if="fileMark" class="dot k-done" role="img" aria-label="Saved"></span></span><span style="flex: 1; min-width: 0"><span style="display: block; overflow-wrap: anywhere">{{f.n}}</span><span class="muted small">{{fileWill ? 'Will be saved' : f.s}}</span></span><div v-if="fileMark" style="display: contents"><button type="button" class="btn sm" @click="showInFinder($event)">Show in Finder</button></div></div></div>
 </div>
 </div>
 </div>
