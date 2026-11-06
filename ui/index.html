@@ -341,8 +341,6 @@ textarea{resize:none}
 @media (prefers-reduced-motion: reduce){.wv.on span,.fade,.toast,.skel,.pmark.spin,.dot.k-busy{animation:none}.bar .fill,button,.sw span,.disclose svg{transition:none}}
 /* phone width */
 .wfoot > .muted{flex:1 1 100%;text-align:right}
-.t-light .wfoot .pri[disabled]{background:color-mix(in srgb,var(--ink) 55%,var(--tray));color:#fff;box-shadow:none}
-.t-dark .wfoot .pri[disabled]{background:color-mix(in srgb,var(--ink) 50%,var(--tray));color:var(--ground);box-shadow:none}
 @media (min-width: 861px){.sm-only{display:none!important}}
 @media (max-width: 860px){
   .lg-only{display:none!important}
@@ -451,7 +449,6 @@ textarea{resize:none}
   .wfield{flex-wrap:wrap;margin-left:0!important}
   .wfield .inp{flex:1 1 100%!important}
   .wpad{margin-left:0!important}
-  .wfoot .pri{flex:1 1 100%}
   .wwrap{padding-top:16px!important}
   .stepfoot .ftext{min-height:calc(2 * 1.45em)}
   .wthead{min-height:50px!important}
@@ -503,7 +500,7 @@ textarea{resize:none}
 <label for="key" class="sr">ElevenLabs API key</label>
 <input id="key" class="inp" :type="(keyType)" :value="(key)" @input="onKey($event)" @change="onKey($event)" @keydown="keyEnter($event)" placeholder="Paste your API key" autocomplete="off" spellcheck="false" style="flex: 1">
 <button type="button" class="btn" @click="testKey($event)">Test key</button>
-<button type="button" class="btn" @click="toggleKeyType($event)">{{keyTypeLabel}}</button>
+<button type="button" class="btn" @click="toggleKeyType($event)" style="width: 104px; padding: 0">{{keyTypeLabel}}</button>
 </div>
 </div>
 
@@ -516,13 +513,13 @@ textarea{resize:none}
 </div>
 
 <div style="border-top: 1px solid var(--line); padding: 16px 0">
-<div style="display: flex; align-items: center; gap: 12px; font-weight: 500; font-size: 17px"><span :class="(w3Cls)" class="disc">{{w3Mark}}</span><span>Log in to your test account <span class="muted small" style="font-weight: 400">optional</span></span></div>
+<div style="display: flex; align-items: center; gap: 12px; font-weight: 500; font-size: 17px"><span :class="(w3Cls)" class="disc">{{w3Mark}}</span><span>Log in to your test account <span class="muted small lg-only" style="font-weight: 400">optional</span></span></div>
 <div class="wfield" style="display: flex; gap: 8px; margin: 12px 0 0 40px">
 <label for="wsite" class="sr">Site you'll demo</label>
 <input id="wsite" class="inp" type="text" :value="(wSite)" @input="onWSite($event)" @change="onWSite($event)" @keydown="wSiteKey($event)" placeholder="Site you'll demo, e.g. whop.com" style="flex: 1">
 <button type="button" class="btn" @click="loginSite($event)" style="width: 150px">{{loginLabel}}</button>
 </div>
-<p class="muted wpad" style="margin: 8px 0 0 40px">A browser opens and you log in yourself. Use a test account with fake data. NAVI never types your passwords.</p>
+<p class="muted wpad" style="margin: 8px 0 0 40px"><span class="sm-only">Optional. </span>A browser opens and you log in yourself. Use a test account with fake data. NAVI never types your passwords.</p>
 </div>
 </div>
 
