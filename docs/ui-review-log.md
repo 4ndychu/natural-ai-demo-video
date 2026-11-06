@@ -583,3 +583,73 @@ The judge's reading is that the scores have reached their noise floor: a 0.5 swi
 8. New batch at 390: the path is cut at a slash.
 9. Welcome: plainer Text to Speech wording.
 10. Script: the length line appears once.
+
+## Round 11: 10 fixes (click-time bugs first), decided by blind A/B, no losses
+
+The previous accepted version is commit 41065e4 (round 10 after its partial reverts). The candidate is R11 fixes 1–10 (up to 6a4842b).
+
+| Screen | User | Visual | QA | Verdict |
+|---|---|---|---|---|
+| welcome, new-batch, batch, script, review, settings | new | new | new | New stays |
+| privacy | new | new | same | New stays |
+| new, new-options, record | same | same | new | The fixes stay. They're verified click-time fixes: "+ New site" toggles, the ★ no longer resizes the Length pills, and Back holds after Slide to stop |
+| home, voice, export (before export), export | same | same | same | Tie |
+
+This is the first round since round 4 with no losses. No reviewer found a guard hit on the candidate. One cost: the Record "Stopped" footer has an empty 146 px slot at 1440, which round 12 fills.
+
+**Scores (candidate)**
+
+| Screen | User | Visual | QA | Min | vs round 10 |
+|---|---|---|---|---|---|
+| welcome | 9.0 | 9.0 | 8.5 | 8.5 | −0.5 |
+| home | 9.0 | 9.0 | 9.0 | 9.0 | 0 |
+| new | 9.0 | 9.0 | 9.0 | 9.0 | 0 |
+| new-options | 9.0 | 9.0 | 9.0 | 9.0 | +0.5 |
+| new-batch | 9.0 | 8.5 | 9.0 | 8.5 | 0 |
+| batch | 9.0 | 9.0 | 8.0 | 8.0 | −0.5 |
+| script | 9.0 | 8.5 | 8.5 | 8.5 | 0 |
+| voice | 8.5 | 8.5 | 9.0 | 8.5 | 0 |
+| privacy | 9.0 | 8.5 | 9.0 | 8.5 | 0 |
+| record | 9.0 | 9.0 | 8.0 | 8.0 | −0.5 |
+| review | 9.0 | 9.0 | 9.0 | 9.0 | +0.5 |
+| export (before export) | 9.5 | 8.5 | 9.0 | 8.5 | 0 |
+| export | 9.0 | 8.5 | 9.0 | 8.5 | 0 |
+| settings | 9.0 | 9.0 | 8.5 | 8.5 | 0 |
+
+The average minimum is 8.57. The judge re-ran every bug behind QA's lower scores (Batch 8.0, Record 8.0, Welcome 8.5), and each one is in the old version too:
+- Clicking a disabled button drops focus.
+- The batch credit pause shows the wrong state, and its footer drops.
+- After Stop → Back, recording doesn't resume.
+
+**The scores are now within reviewer noise:**
+- QA took 0.5 off Home, Voice and both Export screens, whose pixels and behaviour are identical to round 10.
+- User added 0.5 to Export (before export) on identical pixels.
+
+Swings that size are as big as a round's real gains. The blind A/B still separates good rounds from bad ones; the average minimum no longer does.
+
+**Convergence (rounds 4–11):**
+
+| | R4 | R5 | R6 | R7 | R8 | R9 | R10 | R11 |
+|---|---|---|---|---|---|---|---|---|
+| Screens won | 13 | 12 | 8 | 6 | 6 | 7 | 9 | 7 |
+| Lost or reverted | 0 | 2 | 4 | 3 | 1 | 1 (part) | 3 (part) | 0 |
+| Tied | 1 | 0 | 2 | 5 | 7 | 6 | 2 | 7 |
+| Mean minimum | 8.61 | 8.68 | 8.68 | 8.68 | 8.75 | 8.86 | 8.61 | 8.57 |
+
+**The judge's recommendation:**
+- Run round 12 to fix the bugs behind Batch and Record (below the brief's 8.5 floor).
+- Then show Andy the round 12 shots against the round 9 checkpoint, and pause until he makes the five decisions.
+- Without them, the ceiling is an average minimum of about 8.8.
+- Decisions 1–3 (Voice Fine-tune, reserve or grow, half-empty columns) would unlock most of the Visual reviewer's remaining 8.5s.
+
+**Round 12 plan (judge, ranked):**
+1. Disabled buttons keep focus and point at the reason already on screen.
+2. Batch credit pause: the right state, and the footer holds still.
+3. Record "Stopped" matches "Recorded", and Privacy's primary resumes the recording.
+4. The Batch "Yes, record all" confirm keeps the primary's box.
+5. Script at 390 shows the length once.
+6. Key errors are tied to their field for screen readers.
+7. Privacy: Add with an empty field focuses the field.
+8. New options: the Corner label switch holds still.
+9. Welcome at 1440: the status sits level with Done, and the help is plainer.
+10. Batch: "Watch next" becomes "Watch #5".
