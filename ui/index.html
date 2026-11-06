@@ -165,8 +165,6 @@ textarea{resize:none}
 .vtag{display:block;width:max-content;margin-top:4px;font-size:13px;padding:2px 8px;border-radius:999px;background:var(--wash);color:var(--ink2)}
 .sliders{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;align-items:start}
 .paceslot:empty{display:none}
-/* At desktop width the fine-tune grid keeps room for v3's Pace row, so switching models moves nothing below it. */
-@media (min-width: 861px){.sliders{min-height:calc(4 * 46px + 3 * 14px);align-content:start}}
 .ftrow .link{text-decoration-color:var(--ink2)}
 .swrow{display:flex;align-items:center;justify-content:space-between;gap:8px;height:46px;padding:0 6px 0 14px;border-radius:12px;background:var(--wash);box-sizing:border-box}
 .swl{font-weight:400;white-space:nowrap}
@@ -809,7 +807,7 @@ textarea{resize:none}
 
 
 <div style="margin-top: 22px">
-<div class="ftrow" style="display: flex; align-items: center; gap: 12px; min-height: 40px; flex-wrap: wrap"><h2 class="h-sec" style="flex: none; white-space: nowrap">Fine-tune</h2><span class="muted small lg-only finenote" style="white-space: nowrap">{{fineNote}}</span><div v-if="anyChanged" style="display: contents"><button id="resetall" type="button" class="btn sm" @click="resetAll($event)">Reset all</button></div><span style="flex: 1"></span><button id="slhelp" type="button" class="link small" @click="toggleSliderHelp($event)" :aria-expanded="(sliderHelp)">{{sliderHelpLabel}}</button></div>
+<div class="ftrow" style="display: flex; align-items: center; gap: 12px; min-height: 40px; flex-wrap: wrap"><h2 class="h-sec" style="flex: none; white-space: nowrap">Fine-tune</h2><span class="muted small lg-only finenote" style="white-space: nowrap">{{fineNote}}</span><div v-if="anyChanged" style="display: contents"><button id="resetall" type="button" class="btn sm" @click="resetAll($event)">Reset all</button></div><button id="slhelp" type="button" class="link small" style="flex: none; margin-left: auto" @click="toggleSliderHelp($event)" :aria-expanded="(sliderHelp)">{{sliderHelpLabel}}</button></div>
 <p class="muted small" style="margin: 2px 0 0">Drag a bar or click anywhere on it. The small notch marks the recommended spot for {{voiceName}}.</p>
 <div class="sliders" style="margin-top: 12px">
 <div v-for="s in sliders" style="display: contents">
