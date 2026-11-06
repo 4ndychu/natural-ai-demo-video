@@ -220,7 +220,7 @@ textarea{resize:none}
 .bacts{display:flex;gap:6px;justify-content:flex-end}
 .form{display:grid;grid-template-columns:150px minmax(0,1fr);gap:16px 18px;align-items:start}
 .form > .lbl{min-height:44px;display:flex;align-items:center}
-.est{padding:14px 16px;border-radius:14px;background:var(--wash);line-height:1.55}
+.est{padding:14px 16px;border-radius:20px;background:var(--wash);line-height:1.55}
 .note{display:flex;gap:8px;align-items:baseline;margin:8px 0 0}
 .note .dot{background:var(--amber);transform:translateY(-1px)}
 .nw{white-space:nowrap}
@@ -286,6 +286,11 @@ textarea{resize:none}
 .srow .sctl{flex:0 1 360px;min-width:0}
 .srow .sctl2{flex:0 1 auto;display:flex;flex-direction:column;align-items:flex-end;min-width:0;max-width:100%}
 .srow .sctl2 .chips{justify-content:flex-end}
+.srow > .folderrow{flex:0 1 440px}
+/* The paste box shows whole lines only: the padding sits on the frame, so the textarea clips on a line edge. */
+.btbox{border:1px solid var(--line);border-radius:12px;background:var(--sheet);padding:14px 0}
+.btbox:focus-within{border-color:var(--ink2)}
+#btt{height:calc(7 * 24px);padding:0 16px;font-size:16px;line-height:24px;border:0;border-radius:0;display:block;box-shadow:none}
 .sexpand{flex:1 1 100%;display:grid;gap:8px;padding-top:4px}
 .sumrow.open{background:transparent!important;box-shadow:inset 0 -1px 0 var(--line)!important;border-radius:0;padding-left:0}
 .sumrow.open .btn{background:var(--wash)!important}
@@ -450,6 +455,8 @@ textarea{resize:none}
   .pills button{white-space:normal;height:auto;min-height:36px;padding:4px 8px;line-height:1.15}
   .srow.swrap > .sctl2{flex:1 1 100%;align-items:flex-start}
   .srow.swrap > .sctl2 .chips{justify-content:flex-start}
+  .srow > .folderrow{flex:1 1 auto;flex-wrap:nowrap;justify-content:space-between}
+  .srow > .folderrow > #btf{text-align:left}
 }
 </style>
 </head>
@@ -981,7 +988,7 @@ textarea{resize:none}
 <div>
 <label for="btt" class="wide" style="display: block; font-size: 24px; line-height: 1.2; font-weight: 500">Which videos?</label>
 <p class="muted" style="margin: 6px 0 12px">One video per line, for example every lesson in a course. Or choose a course outline (.txt, .md or .csv).</p>
-<div style="border: 1px solid var(--line); border-radius: 12px; background: var(--sheet); overflow: hidden"><textarea id="btt" :rows="(btRows)" :value="(btText)" @input="onBtText($event)" @change="onBtText($event)" placeholder="Create your whop&#10;Add the Courses app&#10;Plan your modules" style="height: 204px; padding: 12px 16px 0; font-size: 16px; line-height: 24px; border: 0 !important; border-radius: 0; display: block" :class="btMore ? 'inp fadebot' : 'inp'"></textarea></div>
+<div class="btbox"><textarea id="btt" :rows="(btRows)" :value="(btText)" @input="onBtText($event)" @change="onBtText($event)" placeholder="Create your whop&#10;Add the Courses app&#10;Plan your modules" class="inp"></textarea></div>
 <div style="display: flex; align-items: center; gap: 12px; margin-top: 10px; flex-wrap: wrap"><button type="button" class="btn sm" @click="pickFile($event)">Choose a file</button><input id="btfile" type="file" accept=".txt,.md,.csv,text/plain,text/markdown,text/csv" @change="onFile($event)" class="sr" tabindex="-1" aria-hidden="true"><span class="muted small">{{btHasFile ? 'From ' + btFileName + '. ' : ''}}{{btLinesText}}</span></div>
 </div>
 <div>
@@ -992,7 +999,7 @@ textarea{resize:none}
 <div class="srow"><span class="sl"><span class="slab">Voice</span></span><div class="pills" role="group" aria-label="Voice"><div v-for="o in btVoices" style="display: contents"><button type="button" :aria-pressed="(o.on)" @click="o.pick($event)">{{o.label}}</button></div></div></div>
 <div class="srow"><span class="sl"><span class="slab">Kind of demo</span><span class="muted small shelp shelp2">{{btKindHint}}</span></span><div class="pills" role="group" aria-label="Kind of demo"><div v-for="o in btKinds" style="display: contents"><button type="button" :aria-pressed="(o.on)" @click="o.pick($event)">{{o.label}}</button></div></div></div>
 <div class="srow"><span class="sl"><span class="slab">Privacy</span><span class="muted small shelp shelp2">{{btPresetHint}}</span></span><div class="pills" role="group" aria-label="Privacy"><div v-for="o in btPresets" style="display: contents"><button type="button" :aria-pressed="(o.on)" @click="o.pick($event)">{{o.label}}</button></div></div></div>
-<div class="srow"><span class="sl"><span class="slab">Export folder</span></span><div class="folderrow sctl" style="display: flex; align-items: center; gap: 12px; flex-basis: 440px"><span id="btf" :title="(btFolderVal)" style="flex: 1 1 auto; min-width: 0; text-align: right; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{btFolderShort}}</span><button type="button" class="btn" @click="chooseFolder($event)" aria-describedby="btf">Change folder</button></div></div>
+<div class="srow"><span class="sl"><span class="slab">Export folder</span></span><div class="folderrow sctl" style="display: flex; align-items: center; gap: 12px"><span id="btf" :title="(btFolderVal)" style="flex: 1 1 auto; min-width: 0; text-align: right; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{btFolderShort}}</span><button type="button" class="btn" @click="chooseFolder($event)" aria-describedby="btf"><span class="lg-only">Change folder</span><span class="sm-only">Change</span></button></div></div>
 </div>
 </div>
 <div class="est" aria-live="polite">
