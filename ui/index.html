@@ -1033,7 +1033,7 @@ textarea{resize:none}
 <p class="muted bsub" style="margin: 8px 0 0; max-width: 70ch">{{bHead}} {{bSub}}</p>
 <div style="display: flex; align-items: center; gap: 10px 14px; margin-top: 16px; flex-wrap: wrap">
 <span v-if="bRecLabel" class="muted small" style="white-space: nowrap">{{bRecLabel}}</span>
-<div style="flex: 1 1 100px; min-width: 80px; height: 6px; border-radius: 3px; background: var(--fill); overflow: hidden"><span :style="'display: block; height: 6px; background: var(--ink); width: ' + (bPct)"></span></div>
+<div style="flex: 1 1 100px; min-width: 80px; height: 6px; border-radius: 999px; background: var(--fill); overflow: hidden"><span :style="'display: block; height: 6px; background: var(--ink); width: ' + (bPct)"></span></div>
 <div v-if="hasBPause" class="bpause"><button type="button" class="btn sm" @click="bPause($event)" style="width: 168px">{{bPauseLabel}}</button></div>
 </div>
 <div v-if="bCreditSlot" style="display: contents"><p class="note small bnote"><span class="dot" :style="hasBCreditNote ? '' : 'visibility: hidden'"></span><span>{{bCreditNote}}</span></p></div>
