@@ -22,6 +22,9 @@ import time
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.abspath(os.path.join(HERE, '..', '..'))
+sys.path.insert(0, os.path.join(ROOT, 'scripts', 'setup'))
+import assets  # noqa: E402
+assets.need_todo_takes()          # the saved to-do takes (not in the repo); exits 77, skipped, when missing
 SRC = os.path.join(ROOT, 'output', 'test-todo-v4')
 work = os.path.join(ROOT, 'output', 'runner-test')
 shutil.rmtree(work, ignore_errors=True)

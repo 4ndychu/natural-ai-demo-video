@@ -22,8 +22,13 @@ import urllib.request
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 VENV_PY = os.path.join(ROOT, '.venv', 'bin', 'python')
 RECORDER = os.path.join(ROOT, 'recorder', 'agent-screenplay')
-SETTINGS = os.path.expanduser('~/Library/Application Support/NAVI') if sys.platform == 'darwin' \
-    else os.path.expanduser('~/.config/navi')
+SETTINGS = os.path.expanduser(os.environ.get('NAVI_DATA') or '~/Library/Application Support/NAVI')   # as scripts/app/store.py
+KEY_SERVICE = os.environ.get('NAVI_KEY_SERVICE') or 'navi-elevenlabs'
+POLISH = os.path.join(ROOT, 'recorder', 'polish')
+SKILL_LINK = os.path.join(os.path.expanduser(os.environ.get('NAVI_SKILL_DIR') or '~/.claude/skills'), 'natural-ai-demo-video')
+INSTALL = 'Run: sh scripts/setup/install.sh  (installs everything NAVI needs inside this folder; ask the user first)'
+_pin = re.search(r'^RECORDER_REV=([0-9a-f]{40})', open(os.path.join(ROOT, 'scripts', 'setup', 'install.sh')).read(), re.M)
+RECORDER_REV = _pin.group(1) if _pin else None
 CONFIG = json.load(open(os.path.join(ROOT, 'config', 'defaults.json')))
 TIMING = CONFIG.get('timing', {'engine': 'faster-whisper', 'model': 'small.en'})
 
@@ -72,12 +77,12 @@ def check_python():
     if not os.path.exists(VENV_PY):
         return report('MISSING', 'Python for NAVI', 'no .venv in the repo (the Mac\'s own python3 is '
                       f'{platform.python_version()}, NAVI needs 3.10+)',
-                      'Create it: uv venv --python 3.12 .venv')
+                      INSTALL)
     code, out, _ = run([VENV_PY, '-c', 'import sys; print("%d.%d.%d" % sys.version_info[:3])'])
     ver = out.strip()
     if code != 0 or tuple(int(x) for x in ver.split('.')[:2]) < (3, 10):
         return report('MISSING', 'Python for NAVI', f'.venv has Python {ver or "?"}, needs 3.10+',
-                      'Recreate it: uv venv --python 3.12 .venv')
+                      INSTALL)
     report('OK', 'Python for NAVI', f'{ver} in .venv')
 
 
@@ -91,7 +96,7 @@ def check_ffmpeg():
     ff = find_tool('ffmpeg')
     if not ff:
         return report('MISSING', 'ffmpeg', 'not found in .venv/bin or on the PATH',
-                      'Link the recorder\'s copy: ln -sf ../../recorder/agent-screenplay/node_modules/ffmpeg-static/ffmpeg .venv/bin/ffmpeg')
+                      INSTALL)
     _, ver, _ = run([ff, '-hide_banner', '-version'])
     _, enc, _ = run([ff, '-hide_banner', '-encoders'])
     _, dec, _ = run([ff, '-hide_banner', '-decoders'])
@@ -136,18 +141,22 @@ const version = require(require.resolve(name + '/package.json', { paths: [dir] }
 
 def check_recorder():
     if not os.path.isdir(RECORDER):
-        report('MISSING', 'Recorder', 'agent-screenplay is not set up in recorder/agent-screenplay',
-               'Clone it, apply recorder/agent-screenplay-navi.patch, npm install (see recorder/README.md).')
+        report('MISSING', 'Recorder', 'agent-screenplay is not set up in recorder/agent-screenplay', INSTALL)
         return report('MISSING', 'Playwright + Chromium', 'comes with the recorder', None)
     code, _, _ = run(['git', '-C', RECORDER, 'diff', '--quiet', '--', 'src/drivers/web.ts'])
     if code == 0:
         report('MISSING', 'Recorder', 'agent-screenplay is there but NAVI\'s patch is not applied',
-               'cd recorder/agent-screenplay && git apply ../agent-screenplay-navi.patch')
+               INSTALL)
     elif not os.path.exists(os.path.join(RECORDER, 'dist', 'cli.js')):
-        report('MISSING', 'Recorder', 'patched but not built', 'cd recorder/agent-screenplay && npm install && npm run build')
+        report('MISSING', 'Recorder', 'patched but not built', INSTALL)
     else:
-        _, rev, _ = run(['git', '-C', RECORDER, 'rev-parse', '--short', 'HEAD'])
-        report('OK', 'Recorder', f'agent-screenplay {rev.strip()} with NAVI\'s patch, built')
+        _, rev, _ = run(['git', '-C', RECORDER, 'rev-parse', 'HEAD'])
+        rev = rev.strip()
+        if RECORDER_REV and rev != RECORDER_REV:
+            report('MISSING', 'Recorder', f'agent-screenplay is at {rev[:7]}, but NAVI\'s patch is made for {RECORDER_REV[:7]}',
+                   'Move recorder/agent-screenplay aside, then ' + INSTALL[0].lower() + INSTALL[1:])
+        else:
+            report('OK', 'Recorder', f'agent-screenplay {rev[:7]} with NAVI\'s patch, built')
     code, out, err = run(['node', '-e', PW_TEST, RECORDER], timeout=90)
     try:
         r = json.loads(out.strip().splitlines()[-1])
@@ -155,10 +164,10 @@ def check_recorder():
         return report('MISSING', 'Playwright + Chromium', f'test failed to run ({err.strip()[:120]})')
     if r.get('why') == 'no-package':
         return report('MISSING', 'Playwright + Chromium', 'Playwright not installed',
-                      'cd recorder/agent-screenplay && npm install')
+                      INSTALL)
     if not r.get('ok'):
         return report('MISSING', 'Playwright + Chromium', f'Playwright {r.get("version")} could not start Chromium '
-                      f'({r.get("msg", "")[:100]})', 'cd recorder/agent-screenplay && npx playwright install chromium')
+                      f'({r.get("msg", "")[:100]})', INSTALL)
     report('OK', 'Playwright + Chromium', f'Playwright {r["version"]}, Chromium opened a 1920x1080 page')
 
 
@@ -179,7 +188,7 @@ def check_whisper():
     code, _, _ = run([VENV_PY, '-c', 'import faster_whisper'])
     if code != 0:
         return report('MISSING', 'Word timings', f'{label} is not installed',
-                      '.venv/bin/python -m pip install faster-whisper, then download the model once')
+                      INSTALL)
     if sys.platform != 'darwin' or not shutil.which('say'):
         return report('WARN', 'Word timings', f'{label} installed; skipped the spoken test (needs macOS "say")')
     tmp = tempfile.mkdtemp(prefix='navi-check-')
@@ -192,7 +201,7 @@ def check_whisper():
     if code != 0:
         if 'local_files_only' in err or 'snapshot' in err.lower() or 'LocalEntryNotFound' in err:
             return report('MISSING', 'Word timings', f'the {TIMING["model"]} model is not downloaded yet',
-                          'Download it once (it then runs offline).')
+                          INSTALL)
         return report('MISSING', 'Word timings', f'test failed: {err.strip().splitlines()[-1][:140] if err.strip() else code}')
     words = json.loads(out.strip().splitlines()[-1])
     heard = ' '.join(w['w'] for w in words).lower()
@@ -206,10 +215,10 @@ def check_whisper():
 
 def get_key():
     key = os.environ.get('NAVI_ELEVENLABS_KEY')
-    if key:
+    if key and KEY_SERVICE == 'navi-elevenlabs':
         return key.strip(), 'NAVI_ELEVENLABS_KEY'
     if sys.platform == 'darwin':
-        code, out, _ = run(['security', 'find-generic-password', '-s', 'navi-elevenlabs', '-w'])
+        code, out, _ = run(['security', 'find-generic-password', '-s', KEY_SERVICE, '-w'])
         if code == 0 and out.strip():
             return out.strip(), 'Keychain'
     return None, None
@@ -233,7 +242,7 @@ def api(path, key):
 def check_key():
     key, where = get_key()
     if not key:
-        return report('MISSING', 'ElevenLabs key', 'not in the Keychain',
+        return report('MISSING', 'ElevenLabs key', 'not in the Keychain' + (f' (service "{KEY_SERVICE}")' if KEY_SERVICE != 'navi-elevenlabs' else ''),
                       'Run: sh scripts/setup/store-key.sh  (you paste the key there, hidden; never in chat)')
     code, sub = api('/v1/user/subscription', key)
     if code == 200:
@@ -263,6 +272,39 @@ def check_key():
            'Make a new key at elevenlabs.io (text to speech access), then run: sh scripts/setup/store-key.sh')
 
 
+def check_polish():
+    """The renderer (recorder/polish): Recordly's frame renderer on pixi.js, bundled on first use."""
+    if not os.path.isdir(os.path.join(POLISH, 'node_modules', 'pixi.js')):
+        return report('MISSING', 'Renderer', 'recorder/polish has no packages (pixi.js)', INSTALL)
+    if not os.path.isdir(os.path.join(RECORDER, 'node_modules', 'vite')):
+        return report('MISSING', 'Renderer', 'needs the recorder installed first (it bundles with its vite)', INSTALL)
+    code, out, err = run(['node', os.path.join(POLISH, 'build.mjs')], timeout=180)
+    if code != 0:
+        return report('MISSING', 'Renderer', 'recorder/polish would not build: ' + (out + err).strip().splitlines()[-1][:120] if (out + err).strip() else 'build failed', INSTALL)
+    report('OK', 'Renderer', 'Recordly\'s renderer (recorder/polish) builds')
+
+
+def check_swift():
+    """macOS: the privacy text reader and the focus watcher are small Swift programs built on first use."""
+    if sys.platform != 'darwin':
+        return
+    code, out, _ = run(['swiftc', '--version'])
+    if code != 0:
+        return report('MISSING', 'Swift', 'not found (builds the privacy text reader on first use)',
+                      "Install Apple's free command line tools: xcode-select --install")
+    report('OK', 'Swift', (out.strip().splitlines() or ['swiftc'])[0][:60])
+
+
+def check_skill_link():
+    """Claude Code finds NAVI in any session through ~/.claude/skills/natural-ai-demo-video (install.sh makes it)."""
+    if os.path.exists(SKILL_LINK) and os.path.realpath(SKILL_LINK) == os.path.realpath(ROOT):
+        return report('OK', 'Claude Code skill', SKILL_LINK.replace(os.path.expanduser('~'), '~') + ' is this folder')
+    if os.path.exists(SKILL_LINK):
+        return report('WARN', 'Claude Code skill', SKILL_LINK.replace(os.path.expanduser('~'), '~') + ' is another folder',
+                      'Claude Code uses that copy. Remove it and run install.sh again to use this one.')
+    report('WARN', 'Claude Code skill', 'not linked, so Claude Code finds NAVI only when started in this folder', INSTALL)
+
+
 def check_folders():
     out = os.path.join(ROOT, 'output')
     os.makedirs(out, exist_ok=True)
@@ -277,8 +319,8 @@ def check_folders():
 
 def main():
     print('NAVI readiness check\n')
-    for fn in (check_system, check_node, check_python, check_ffmpeg, check_recorder, check_whisper, check_key,
-               check_folders):
+    for fn in (check_system, check_node, check_python, check_ffmpeg, check_recorder, check_polish, check_swift, check_whisper,
+               check_key, check_folders, check_skill_link):
         try:
             fn()
         except Exception as e:  # one broken check shouldn't hide the others

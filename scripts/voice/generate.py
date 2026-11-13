@@ -57,7 +57,7 @@ os.environ['PATH'] = os.path.dirname(sys.executable) + os.pathsep + os.environ.g
 def get_key():
     key = os.environ.get('NAVI_ELEVENLABS_KEY')
     if not key and sys.platform == 'darwin':
-        r = subprocess.run(['security', 'find-generic-password', '-s', 'navi-elevenlabs', '-w'],
+        r = subprocess.run(['security', 'find-generic-password', '-s', os.environ.get('NAVI_KEY_SERVICE') or 'navi-elevenlabs', '-w'],
                            capture_output=True, text=True)
         key = r.stdout.strip() if r.returncode == 0 else None
     if not key:

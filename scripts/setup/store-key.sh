@@ -8,5 +8,5 @@ if [ "$(uname)" != "Darwin" ]; then
   exit 1
 fi
 echo "Paste your ElevenLabs API key and press Return (it stays hidden), then paste it again to confirm."
-security add-generic-password -U -a "$USER" -s navi-elevenlabs -l "NAVI ElevenLabs key" -w
-echo "Saved in the Keychain. Now run: python3 scripts/setup/check.py"
+security add-generic-password -U -a "$USER" -s "${NAVI_KEY_SERVICE:-navi-elevenlabs}" -l "NAVI ElevenLabs key" -w
+echo "Saved in the Keychain. Now run: .venv/bin/python scripts/setup/check.py"

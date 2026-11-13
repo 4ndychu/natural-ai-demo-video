@@ -23,14 +23,10 @@ NAVI drives the browser with [agent-screenplay](https://github.com/gmpetrov/agen
 
 ## Install
 
-```bash
-git clone https://github.com/gmpetrov/agent-screenplay.git
-cd agent-screenplay
-git apply ../recorder/agent-screenplay-navi.patch
-npm install
-```
-
-The patch was made against upstream as of November 2026. If it doesn't apply cleanly to a newer version, re-apply the additions above by hand; each one is small.
+`scripts/setup/install.sh` does it: it clones agent-screenplay into `recorder/agent-screenplay` (git-ignored), checks out the
+commit the patch is made for (`a063478`, pinned in install.sh as `RECORDER_REV`), applies `agent-screenplay-navi.patch`,
+and runs `npm ci`, the build and Playwright's Chromium download. To move to a newer upstream, re-make the patch against
+it and update `RECORDER_REV`; each addition above is small.
 
 ## How the video is drawn
 

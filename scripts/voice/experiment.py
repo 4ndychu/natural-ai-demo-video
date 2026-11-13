@@ -32,7 +32,7 @@ TAG_RE = re.compile(r'\[[^\]]+\]')
 
 
 def get_key():
-    r = subprocess.run(['security', 'find-generic-password', '-s', 'navi-elevenlabs', '-w'], capture_output=True, text=True)
+    r = subprocess.run(['security', 'find-generic-password', '-s', os.environ.get('NAVI_KEY_SERVICE') or 'navi-elevenlabs', '-w'], capture_output=True, text=True)
     key = os.environ.get('NAVI_ELEVENLABS_KEY') or (r.stdout.strip() if r.returncode == 0 else '')
     if not key:
         sys.exit('No ElevenLabs key in the Keychain (service "navi-elevenlabs").')
