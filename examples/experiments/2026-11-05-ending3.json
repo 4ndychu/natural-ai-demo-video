@@ -1,0 +1,31 @@
+{
+ "name": "Ending test for the last line of section 3",
+ "takes": 2,
+ "voice_id": "hLygPNd2gK6Azddorc5W",
+ "experiments": {
+  "END3": {
+   "about": "Last line of section 3, with the sentence before it for context",
+   "kind": "line",
+   "variants": [
+    {
+     "id": "in-the-list",
+     "text": "[relaxed] And to clear out the finished ones there's, where is it, Clear completed, over on the right. And now it's just the two left in the list.",
+     "model": "eleven_v4",
+     "stability": 0.7
+    },
+    {
+     "id": "so-thats-now",
+     "text": "[relaxed] And to clear out the finished ones there's, where is it, Clear completed, over on the right. So that's just the two left now.",
+     "model": "eleven_v4",
+     "stability": 0.7
+    },
+    {
+     "id": "up-top",
+     "text": "[relaxed] And to clear out the finished ones there's, where is it, Clear completed, over on the right. So now there's just the two left up top.",
+     "model": "eleven_v4",
+     "stability": 0.7
+    }
+   ]
+  }
+ }
+}

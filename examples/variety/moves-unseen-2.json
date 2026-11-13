@@ -1,0 +1,105 @@
+{
+"refuse": {
+"state-aside": [
+"I'll leave this lesson as a draft for now, so nobody in the course sees it yet.",
+"Nobody can open this checkout link yet, I haven't published the plan behind it.",
+"This payout page is still half built, so ignore the empty table.",
+"The course is hidden at the moment, which means members won't find it in their library.",
+"Only I can see this product right now, it's not live for anyone else.",
+"This pricing section isn't finished yet, so don't mind the placeholder numbers.",
+"I'm keeping the new to-do list private until I'm happy with it, so no one else has access."
+],
+"hook": [
+"You're probably thinking this takes a ton of setup, but it doesn't.",
+"Now you might expect the members page to be complicated.",
+"If you've ever wondered how a payout gets sent, this is where you'd look.",
+"Most people assume you need a developer to make a checkout link.",
+"You'd think adding a lesson means a lot of clicking around.",
+"I know what you're wondering, is it really that easy to add a contact."
+],
+"reveal": [
+"And here's the surprising part, the price changes by itself.",
+"Turns out the lesson was sitting under a different chapter the whole time.",
+"Wait for it, the whole list just sorted itself.",
+"Plot twist, the payout was already sent yesterday.",
+"Believe it or not, the CRM had filled in the company name on its own."
+],
+"selling": [
+"The checkout link builder is honestly so smooth.",
+"This table layout is really clean, which saves a lot of time.",
+"I love how the members list shows everything at a glance.",
+"The course editor is super powerful for something this simple.",
+"What a great way to track payouts, it's just a really solid feature.",
+"It's a nice touch that the to-do app remembers your sort order."
+],
+"framing": [
+"So in this video I'm going to walk you through creating a course.",
+"Stick around, because later on we'll look at payouts too.",
+"That's pretty much it for pricing, now let's move on to the members section.",
+"First up, the products page, and then we'll finish with checkout links.",
+"Before we wrap up this demo, one last look at the CRM.",
+"Quick recap of what we just covered, courses, lessons and a link."
+],
+"written": [
+"Subsequently, one may navigate to the payouts tab to review the transactions.",
+"Please note that the lesson title must be entered prior to saving.",
+"Herein we shall configure the pricing for the product.",
+"It is advisable to select a currency before proceeding further.",
+"Upon clicking the button, the member will be added accordingly."
+],
+"performed-slip": [
+"I'll click on courses, no sorry, products.",
+"Now open the lessons, I mean the members tab.",
+"Let me add a contact, oops, a task, I meant a task.",
+"Hit save, wait, that's not right, hit publish, my bad.",
+"This is the price field, sorry, the title field."
+]
+},
+"pass": [
+"I'm clicking Courses because that's where the lessons live.",
+"The status says Draft.",
+"Uh, let me go to the members tab.",
+"I think this is the right plan, pretty much.",
+"I'd rather start with the title, so I'll type that first.",
+"Payouts are in the left sidebar, third from the top.",
+"The button's in the top right corner.",
+"Okay, let me start that over.",
+"It asks, do you want to delete this lesson, and I'll say no.",
+"I'll pick monthly here instead of yearly, since it's a subscription.",
+"The balance reads two hundred and forty dollars.",
+"I'm going to scroll down because the price field is below the fold.",
+"The page says Are you sure you want to leave, so I'll stay.",
+"Uh, the title field is right here.",
+"I'll set the price to twenty, mostly because it's a small course.",
+"The email column shows the address they signed up with.",
+"Let me redo that, I clicked the wrong row.",
+"I could use a one-time payment, but a recurring one fits better.",
+"This row says Pending, so the money hasn't arrived.",
+"I think I'll name it Starter Pack.",
+"Next to the name there's a little toggle.",
+"I'm adding a due date so it shows up on Friday.",
+"The checkout link is at the bottom of the product page.",
+"Pretty much everything is in this one tab.",
+"The dialog asks Add another lesson, and I'll click yes.",
+"Hmm, let me try that again.",
+"I'll choose the free tier for now, or the paid one if I want to charge.",
+"The members list is sorted by join date.",
+"I'm copying the link so I can paste it into the chat.",
+"The CRM has a stage column, and this deal is at Proposal.",
+"Uh, I think the save button is down here.",
+"I'd rather keep the description short, so just a line.",
+"It says Course created in the corner.",
+"I'm tapping the checkbox to mark this task done.",
+"The tab at the top says Settings, so I'll go there.",
+"I need the lesson to be a video, not text, so I'll switch the type.",
+"The second chapter is the one I want, so I'll expand it.",
+"Okay, starting over from the dashboard.",
+"There's a search box on the right, I'll type the name.",
+"This amount is in euros, which is why it looks different.",
+"I'll click Add contact, then fill in the name.",
+"The field says Required, so I have to fill it in.",
+"I think the date format is month first.",
+"I'll pick the top option since it has the lower fee.",
+"The last payout went out on the fifth, according to this."
+]
+}

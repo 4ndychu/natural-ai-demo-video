@@ -1,0 +1,309 @@
+{
+ "site": "whop.com",
+ "_about": "The action guard's pack for whop.com (scripts/guard/guard.mjs). Found by logging real runs (explore.mjs --learn / --log-writes) and by listing every GraphQL operation the dashboard's own scripts can send (scripts/guard/catalogue.mjs), 10 Nov 2026. whop sends changes as GraphQL mutations to /api/graphql/<Operation>, plus a few REST calls (/api/v1/...) and server functions (/_serverFn/<hash>). A match is a regex on host, path, method, op (operation name), kind (mutation, query, server-action) or text; all given parts must match.",
+ "own_hosts": "(^|\\.)whop\\.com$",
+ "ignore": [
+  {
+   "label": "analytics",
+   "host": "^(segapi\\.whop\\.com|t\\.whop\\.tw)$"
+  },
+  {
+   "label": "error reports",
+   "host": "(^|\\.)sentry\\.io$"
+  },
+  {
+   "label": "fraud and bot checks",
+   "host": "^(api\\.sardine\\.ai|r\\.stripe\\.com|m\\.stripe\\.com)$"
+  },
+  {
+   "label": "Stripe's fraud session",
+   "host": "^api\\.stripe\\.com$",
+   "path": "^/v1/radar/session"
+  },
+  {
+   "label": "Cloudflare (page timing, bot check)",
+   "path": "^/cdn-cgi/"
+  },
+  {
+   "label": "checking the tracking pixel",
+   "host": "^whop\\.com$",
+   "path": "^/api/v1/events/validate_pixel$"
+  },
+  {
+   "label": "dismissing an intro tip",
+   "host": "^whop\\.com$",
+   "path": "^/api/v1/users/me/acknowledgements$"
+  },
+  {
+   "label": "read receipts and unread badges",
+   "op": "^(chatMarkMessageAsViewed|MarkFeedPostsAsViewed|HubMarkExperienceRead|coreMarkAiChatAsRead|chatResetDmsFeedUnreadBadge|coreAcknowledgeRecommendedActionsAnnouncement)$"
+  }
+ ],
+ "reads": [
+  "^(GenerateWebsocketJwt|chatGenerateWebsocketJwt)$"
+ ],
+ "read_requests": [
+  {
+   "label": "a server function with no input (session and feature checks on every page)",
+   "host": "^whop\\.com$",
+   "path": "^/_serverFn/",
+   "empty_body": true
+  }
+ ],
+ "dangerous": [
+  {
+   "category": "pay",
+   "reason": "paying with a card (a real charge)",
+   "match": [
+    {
+     "host": "(^|\\.)stripe\\.com$",
+     "path": "^/v1/(payment_intents|setup_intents|payment_methods|tokens|sources|confirmation_tokens|charges)(/|$)"
+    },
+    {
+     "op": "billingCreatePaymentToken|processCheckout|createPaymentToken|chargeSavedCard|manualCharge|createLineItem|CreateAiCreditsCheckout",
+     "kind": "mutation|server-action|persisted"
+    }
+   ]
+  },
+  {
+   "category": "withdraw",
+   "reason": "withdrawing money",
+   "match": [
+    {
+     "op": "withdraw",
+     "kind": "mutation|server-action|persisted"
+    },
+    {
+     "path": "withdraw"
+    }
+   ]
+  },
+  {
+   "category": "team",
+   "reason": "changing the team or who owns the business",
+   "match": [
+    {
+     "op": "authorizedUser|teamMember|TeamMember|ownership|owner|transferCompany|leaveCompany|inviteUser|role|permission",
+     "kind": "mutation|server-action|persisted"
+    },
+    {
+     "path": "/(authorized[-_]?users?|team[-_]?members?|ownership)(/|$)"
+    }
+   ]
+  },
+  {
+   "category": "bank",
+   "reason": "changing bank, payout or billing details",
+   "match": [
+    {
+     "op": "bank|payoutAccount|payoutMethod|ledgerAccount|paypal|masspay|taxIdentifier|billingInformation|CompanyBilling|CompanyLegal|setupBankDeposit|PaymentProcessor|kyc|verification|DateOfBirth|identity",
+     "kind": "mutation|server-action|persisted"
+    },
+    {
+     "path": "/(payout[-_]?methods?|payout[-_]?accounts?|bank[-_]?accounts?|external[-_]?accounts?)(/|$)"
+    }
+   ]
+  },
+  {
+   "category": "refund",
+   "reason": "refunding a payment",
+   "match": [
+    {
+     "op": "refund|voidPayment|chargeback",
+     "kind": "mutation|server-action|persisted"
+    },
+    {
+     "path": "refund"
+    }
+   ]
+  },
+  {
+   "category": "api-key",
+   "reason": "creating, changing or revealing an API key or access token",
+   "match": [
+    {
+     "op": "api[-_]?key|accessToken|access[-_]?token|secret|OauthCode|oauthGrant|AppAuthorization|webhook",
+     "kind": "mutation|server-action|persisted"
+    },
+    {
+     "op": "reveal|secret|plaintext|unmask"
+    },
+    {
+     "path": "/(api[-_]?keys?|access[-_]?tokens?|webhooks?)(/|$)"
+    }
+   ]
+  },
+  {
+   "category": "transfer",
+   "reason": "moving money (a transfer, deposit or payout)",
+   "match": [
+    {
+     "op": "transfer|deposit|payout|swap|sendFunds|sendMoney|ledgerTransfer|manualCharge|retryPastDuePayments|processCardDeposit",
+     "kind": "mutation|server-action|persisted"
+    },
+    {
+     "path": "/(transfers?|deposits?|payouts?|swaps?)(/|$)"
+    }
+   ]
+  },
+  {
+   "category": "delete",
+   "reason": "deleting something",
+   "test_delete_ok": [
+    "deleteAccessPass",
+    "/products/",
+    "products_delete",
+    "deleteProduct",
+    "/api/v1/courses/",
+    "/api/v1/course_chapters/",
+    "/api/v1/course_lessons/"
+   ],
+   "match": [
+    {
+     "op": "delete|remove|destroy|archive|terminate|purge|kick|wipe",
+     "kind": "mutation|server-action|persisted"
+    },
+    {
+     "method": "^DELETE$"
+    },
+    {
+     "path": "/(delete|destroy|remove|archive)(/|$)"
+    }
+   ],
+   "test_delete_note": "NAVI's own \"NAVI test\" products, courses, chapters and lessons, deleted by scripts/cleanup/test_products.mjs in a business the user marked as a test (Andy, 13 Nov 2026: courses, chapters and lessons too); only that step may, never in a real business"
+  }
+ ],
+ "changes": [
+  {
+   "id": "product",
+   "label": "creating or editing a product",
+   "asked_by": "\\b(create|add|make|edit|rename|update|change)\\b.{0,40}\\b(product|plan|price|pricing|access pass)",
+   "match": [
+    {
+     "op": "AccessPass|Product|Plan|Pricing|cloneAccessPass",
+     "kind": "mutation|server-action|persisted"
+    },
+    {
+     "host": "^(api\\.)?whop\\.com$",
+     "path": "^/api/v\\d+/(products|plans|access_passes)(/|$)",
+     "method": "^(POST|PATCH|PUT)$"
+    }
+   ]
+  },
+  {
+   "id": "checkout",
+   "label": "changing the checkout",
+   "asked_by": "\\b(edit|change|update|customi[sz]e)\\b.{0,40}\\bcheckout",
+   "match": [
+    {
+     "op": "Checkout",
+     "kind": "mutation|server-action|persisted"
+    }
+   ]
+  },
+  {
+   "id": "member",
+   "label": "changing a member (notes, access, membership)",
+   "asked_by": "\\b(edit|change|update|add a note|pause|resume|extend)\\b.{0,40}\\b(member|membership|customer)",
+   "match": [
+    {
+     "op": "Member|Membership|UserNote|Waitlist|Suspension|admitWaitlist",
+     "kind": "mutation|server-action|persisted"
+    }
+   ]
+  },
+  {
+   "id": "affiliate",
+   "label": "changing affiliates",
+   "asked_by": "\\b(add|create|edit|change|update)\\b.{0,40}\\baffiliate",
+   "match": [
+    {
+     "op": "Affiliate|RevShare",
+     "kind": "mutation|server-action|persisted"
+    }
+   ]
+  },
+  {
+   "id": "chat",
+   "label": "posting or reacting in chat",
+   "asked_by": "\\b(post|send|write|reply)\\b.{0,40}\\b(message|chat|dm|post)",
+   "match": [
+    {
+     "op": "^chat|Message|Reaction|DmChannel|DmMember|ForumPost|sendChatMessage|createReview",
+     "kind": "mutation|server-action|persisted"
+    }
+   ]
+  },
+  {
+   "id": "app",
+   "label": "installing or changing an app",
+   "asked_by": "\\b(install|add|set up|configure)\\b.{0,40}\\bapp\\b",
+   "match": [
+    {
+     "op": "installApp|CompanyApp|updateApp|Experience",
+     "kind": "mutation|server-action|persisted"
+    }
+   ]
+  },
+  {
+   "id": "settings",
+   "label": "changing business or profile settings",
+   "asked_by": "\\b(change|edit|update)\\b.{0,40}\\b(settings|profile|name|description|logo|banner)",
+   "match": [
+    {
+     "op": "Company|UserProfile|UserPreferences|AutomatedMessages|AutoRespond|SocialLink",
+     "kind": "mutation|server-action|persisted"
+    }
+   ]
+  }
+ ],
+ "member_view": {
+  "_about": "A buyer's view filmed with the owner login (Andy, 11 Nov 2026: no second login). whop's own 'Preview as <product>' is set before the first frame with its cookie, so the page shows what that product's buyers can open; what still shows only to the owner is blurred (owner_only), and pages that only the owner sees as an editor are avoided (avoid: a take that opens one fails with the reason). Found on Real Biz's member pages, 11 Nov 2026.",
+  "preview_cookie": "whop-core.preview-as-access-pass-{business_id}",
+  "owner_only": [
+   {
+    "label": "Preview as switch",
+    "text": "^Preview as.+",
+    "max_chars": 80
+   },
+   {
+    "label": "Dashboard and Support links",
+    "css": "a[href^='/dashboard/']"
+   },
+   {
+    "label": "Add app",
+    "css": "a[href*='/app-store/']"
+   },
+   {
+    "label": "Add team, edit links, create post",
+    "css": "button",
+    "label_re": "^(Add team|Edit social links|Create post)$"
+   },
+   {
+    "label": "the owner's other businesses in the left rail",
+    "css": "li a[href^='/'][href$='/']",
+    "max_x": 60,
+    "not_current": true
+   },
+   {
+    "label": "course, app and lesson menus (View analytics, Edit, Hide, Delete)",
+    "css": "button[aria-haspopup='menu'], button[aria-haspopup='true']",
+    "min_x": 64,
+    "max_w": 48
+   },
+   {
+    "label": "app settings menu in the sidebar",
+    "css": "[class*='app-settings-dropdown-button']"
+   },
+   {
+    "label": "drag handles for reordering modules and lessons",
+    "css": "[aria-roledescription='sortable']",
+    "max_w": 48
+   }
+  ],
+  "avoid": {
+   "url": "/app/courses/[^/]+/lessons/",
+   "reason": "the owner sees the course editor on lesson pages (drag handles, add and delete chapter, upload, drip settings), not a buyer's lesson"
+  }
+ }
+}

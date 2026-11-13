@@ -1,0 +1,73 @@
+{
+ "title": "A look at the money pages",
+ "site": "whop.com",
+ "kind": "saas",
+ "voice_id": "hLygPNd2gK6Azddorc5W",
+ "sections": [
+  {
+   "name": "balance",
+   "talk": "[relaxed] What does NAVI do when the whole page is money? This is the balance report, in the real business, and every number on it stays blurred, cash flow, money in, money out.",
+   "caption": "This is the balance report in the real business. Every number stays blurred: cash flow, money in and money out.",
+   "actions": [
+    {
+     "on": "start",
+     "do": "goto",
+     "kind": "wait",
+     "target": "https://whop.com/dashboard/biz_RealBiz0000001/reports/balance/"
+    },
+    {
+     "on": "report",
+     "do": "hover",
+     "kind": "explain",
+     "target": "text=Starting balance"
+    },
+    {
+     "on": "number",
+     "do": "hover",
+     "kind": "explain",
+     "target": "text=Net cashflow"
+    },
+    {
+     "on": "in",
+     "do": "hover",
+     "kind": "explain",
+     "target": "text=Money in"
+    },
+    {
+     "on": "out",
+     "do": "hover",
+     "kind": "explain",
+     "target": "text=Money out"
+    }
+   ]
+  },
+  {
+   "name": "keys",
+   "talk": "[relaxed] API keys, uh, those are under Developer. And NAVI can, so it'll open this page and film it no problem, it just can't make a key from here.",
+   "caption": "API keys live under Developer. NAVI can open and film this page, but it can't make a key here.",
+   "actions": [
+    {
+     "on": "Developer",
+     "do": "click",
+     "kind": "click",
+     "target": "a[href$='/developer/']"
+    },
+    {
+     "on": "film",
+     "do": "hover",
+     "kind": "explain",
+     "target": "text=Company API keys"
+    },
+    {
+     "on": "key",
+     "do": "hover",
+     "kind": "explain",
+     "target": "text=Create API key"
+    }
+   ]
+  }
+ ],
+ "style": {
+  "opening": "question"
+ }
+}

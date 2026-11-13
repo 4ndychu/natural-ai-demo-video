@@ -1,0 +1,70 @@
+{
+  "_about": "NAVI privacy patterns (reference/privacy.md). One file for both the in-page blur (blur.js) and the frame scan (scan.py), so they look for the same things. Regexes use the syntax JavaScript and Python share. 'group' blurs only that group; 'luhn' keeps card-like numbers that pass the Luhn check; 'min_digits' needs that many digits; 'near' needs one of these words in the same element or frame (context-only categories); 'price_suffix' turns a money match into a public price when a per-month or per-seat suffix follows.",
+  "categories": {
+    "secret":   {"tier": 1, "label": "API keys, tokens and private keys"},
+    "password": {"tier": 1, "label": "passwords"},
+    "code":     {"tier": 1, "label": "2FA, recovery and one-time codes"},
+    "card":     {"tier": 1, "label": "card and bank numbers"},
+    "gov_id":   {"tier": 1, "label": "government ID numbers"},
+    "login_link": {"tier": 1, "label": "login, reset and magic links"},
+    "money_page": {"tier": 1, "label": "every number, field and account detail on payout, balance, billing, bank, card and API key pages"},
+    "owner_only": {"tier": 1, "label": "controls only the owner sees, in a buyer's view (edit menus, dashboard links, other businesses)"},
+    "email":    {"tier": 2, "label": "email addresses", "other_people": true},
+    "phone":    {"tier": 2, "label": "phone numbers", "other_people": true},
+    "name":     {"tier": 2, "label": "real names, account menus and workspace switchers", "other_people": true},
+    "photo":    {"tier": 2, "label": "profile photos", "other_people": true},
+    "address":  {"tier": 2, "label": "addresses", "other_people": true},
+    "money":    {"tier": 2, "label": "revenue and money figures", "warn": "Showing earnings or results in marketing can count as a claim you have to back up."},
+    "count":    {"tier": 2, "label": "follower, member and customer counts", "warn": "Showing earnings or results in marketing can count as a claim you have to back up."},
+    "usage":    {"tier": 3, "label": "usage stats (like token usage)"},
+    "price":    {"tier": 3, "label": "prices on public pages"},
+    "date":     {"tier": 3, "label": "dates"}
+  },
+  "patterns": [
+    {"cat": "secret", "re": "\\bsk-(?:proj-|ant-|live-|test-)?[A-Za-z0-9_-]{16,}"},
+    {"cat": "secret", "re": "\\b(?:sk|pk|rk)_(?:live|test)_[A-Za-z0-9]{10,}"},
+    {"cat": "secret", "re": "\\bsk_[a-f0-9]{32,}"},
+    {"cat": "secret", "re": "\\b(?:ghp|gho|ghu|ghs|ghr)_[A-Za-z0-9]{30,}|\\bgithub_pat_[A-Za-z0-9_]{30,}"},
+    {"cat": "secret", "re": "\\bxox[abposr]-[A-Za-z0-9-]{10,}"},
+    {"cat": "secret", "re": "\\bAKIA[0-9A-Z]{16}\\b|\\bAIza[0-9A-Za-z_-]{35}"},
+    {"cat": "secret", "re": "\\beyJ[A-Za-z0-9_-]{8,}\\.[A-Za-z0-9_-]{8,}\\.[A-Za-z0-9_-]{8,}"},
+    {"cat": "secret", "re": "-----BEGIN [A-Z ]*PRIVATE KEY-----"},
+    {"cat": "secret", "re": "\\b(?:whsec|key|token|secret|api|apikey|access)[_-][A-Za-z0-9_-]{16,}", "flags": "i"},
+    {"cat": "secret", "re": "\\b(?![0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\\b)(?=[A-Za-z0-9_-]*[0-9])(?=[A-Za-z0-9_-]*[A-Za-z])[A-Za-z0-9_-]{32,}"},
+    {"cat": "card", "re": "\\b(?:\\d[ -]?){12,18}\\d\\b", "luhn": true},
+    {"cat": "card", "re": "(?:\\*{2,4}|•{2,4}|x{4}|X{4})[ -]?\\d{4}\\b"},
+    {"cat": "card", "re": "\\b[A-Z]{2}\\d{2}(?: ?[A-Z0-9]{4}){3,7}(?: ?[A-Z0-9]{1,3})?\\b"},
+    {"cat": "card", "re": "\\b\\d[\\d -]{4,}\\d\\b", "min_digits": 6, "near": "account number|acct|routing|sort code|iban|swift|bic|bank account"},
+    {"cat": "gov_id", "re": "\\b\\d{3}-\\d{2}-\\d{4}\\b"},
+    {"cat": "gov_id", "re": "\\b[A-CEGHJ-PR-TW-Z]{2} ?\\d{2} ?\\d{2} ?\\d{2} ?[A-D]\\b"},
+    {"cat": "code", "re": "\\b(?=[A-Za-z0-9-]*\\d)[A-Za-z0-9]{4,6}(?:-[A-Za-z0-9]{4,6}){1,7}\\b|\\b\\d{6,8}\\b", "near": "recovery code|backup code|2fa|two-factor|authenticator|one-time|verification code|security code|otp|seed phrase|secret key"},
+    {"cat": "login_link", "re": "https?://[^\\s\"'<>]*(?:token|magic|signin|sign-in|login|verify|reset|invite|auth|otp|session)[^\\s\"'<>]*[?&/=][A-Za-z0-9_-]{16,}", "flags": "i"},
+    {"cat": "email", "re": "[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+(?:\\.[A-Za-z0-9-]+)*\\.[A-Za-z]{2,}"},
+    {"cat": "phone", "re": "(?:\\+\\d{1,3}[ .-]?)?(?:\\(\\d{2,5}\\)[ .-]?\\d{3,4}[ .-]?\\d{3,4}|\\d{2,5}[ .-]\\d{3,4}[ .-]?\\d{3,4})\\b", "min_digits": 9},
+    {"cat": "name", "re": "(?:signed in as|logged in as|welcome back,?|hi,|hello,)\\s+([A-Z][a-z]+(?: [A-Z][a-z]+){0,2})", "flags": "i", "group": 1},
+    {"cat": "address", "re": "\\b\\d{1,5} [A-Z][a-z]+(?: [A-Z][a-z]+)* (?:Street|St|Road|Rd|Avenue|Ave|Lane|Ln|Drive|Dr|Boulevard|Blvd|Way|Court|Ct|Place|Pl|Square|Sq|Terrace)\\b\\.?"},
+    {"cat": "address", "re": "\\b[A-Z]{1,2}\\d[A-Z\\d]? \\d[A-Z]{2}\\b"},
+    {"cat": "address", "re": "\\b(?:AL|AK|AZ|AR|CA|CO|CT|DE|FL|GA|HI|ID|IL|IN|IA|KS|KY|LA|ME|MD|MA|MI|MN|MS|MO|MT|NE|NV|NH|NJ|NM|NY|NC|ND|OH|OK|OR|PA|RI|SC|SD|TN|TX|UT|VT|VA|WA|WV|WI|WY) \\d{5}(?:-\\d{4})?\\b"},
+    {"cat": "money", "re": "(?:[$£€¥₹]|\\b(?:USD|GBP|EUR|CAD|AUD) ?)-?\\d[\\d,]*(?:\\.\\d+)?(?: ?(?:[kKmM]|bn|BN)\\b)?|\\b\\d[\\d,]*(?:\\.\\d+)? ?(?:USD|GBP|EUR|dollars|pounds|euros)\\b", "price_suffix": "^\\s*(?:/|per |a )\\s*(?:mo|month|yr|year|seat|user|member|annum)\\b"},
+    {"cat": "count", "re": "\\b\\d[\\d,.]*\\s?[kKmM]?\\s(?:followers|members|subscribers|customers|users|students|fans|views)\\b", "flags": "i"},
+    {"cat": "usage", "re": "\\b\\d[\\d,.]*\\s?[kKmM]?\\s(?:tokens|requests|credits|calls|minutes)(?: used)?\\b", "flags": "i"},
+    {"cat": "date", "re": "\\b\\d{4}-\\d{2}-\\d{2}\\b|\\b\\d{1,2} (?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]* \\d{4}\\b|\\b(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]* \\d{1,2},? \\d{4}\\b"},
+    {"cat": "name", "re": "(?:[Jj]oined|[Ll]iked|[Ff]ollowed|[Bb]ought|[Pp]urchased|[Rr]eviewed|[Ss]ubscribed) by\\s+([A-Z][\\w'’.-]+(?: [A-Z][\\w'’.-]+){0,2}(?:,\\s*(?:and\\s+)?[A-Z][\\w'’.-]+(?: [A-Z][\\w'’.-]+){0,2})*)", "group": 1, "_why": "'Joined by Charlie, Henry Lai, and 3 others' on whop's member pages (11 Nov 2026)"},
+    {"cat": "name", "re": "^\\s*[A-Z][\\w'’.-]+(?: [A-Z][\\w'’.-]+){0,2}\\s*$", "near": "(?:joined|liked|followed|bought|purchased|reviewed|subscribed) by\\b", "_why": "the same, when each name is its own piece of text", "near_scope": "control"},
+    {"cat": "count", "re": "^\\s*\\d[\\d,.]*\\s*[kKmM]?\\s*$", "near": "\\b\\d[\\d,.]*\\s*[kKmM]?\\s*(?:followers|members|subscribers|customers|users|students|fans)\\b", "_why": "'6 members' when the number is its own piece of text", "near_scope": "control"}
+  ],
+  "element_hints": {
+    "photo": "avatar|profile[-_ ]?(?:pic|photo|image|img)|user[-_ ]?(?:pic|photo|image|img)|gravatar|headshot",
+    "name": "(?:user|author|owner|member|customer|contact|account|profile)[-_ ]?name|display[-_ ]?name|full[-_ ]?name|(?:user|account|profile)[-_ ]?(?:menu|button|dropdown|switcher)|workspace[-_ ]?(?:switch|menu|list|picker)|team[-_ ]?switch|org(?:anization)?[-_ ]?switch"
+  },
+  "ignore": {
+    "email": "@(?:example\\.(?:com|org|net)|[A-Za-z0-9-]+\\.(?:test|invalid|localhost|example))$"
+  },
+  "typing_prefixes": {
+    "email": "@",
+    "secret": "\\b(?:sk|pk|rk)[-_]|\\bghp_|\\bgithub_pat_|\\bxox[a-z]-|\\bAKIA|\\bAIza|\\beyJ",
+    "card": "\\d{8}"
+  },
+  "sensitive_pages": "(payout|balance|billing|bank|wallet|withdraw|ledger|finance|invoices?|tax|cards?(/|$)|api[-_]?keys?|developer|webhooks?|tokens?|secrets?|credentials|subaccounts|settings=(billing|payouts?|tax|api|developer|banking|wallet))",
+  "sensitive_categories": ["email", "phone", "name", "photo", "address", "money", "count", "price", "usage", "date"]
+}

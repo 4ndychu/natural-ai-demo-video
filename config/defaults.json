@@ -1,0 +1,545 @@
+{
+  "_about": "NAVI defaults. Slider ranges are deliberately narrow so no setting can tip into AI slop. Values come from the W01 listening rounds; see reference/voice-rules.md. Every new review complaint should end up as a change here or a rule there.",
+  "voice": {
+    "model": "eleven_v4",
+    "models": {
+      "eleven_v4": {
+        "label": "Eleven v4",
+        "recommended": true,
+        "speed": false,
+        "settings": [
+          "stability",
+          "similarity_boost"
+        ],
+        "note": "Sounds more natural. No speed setting, so pace comes from the script wording. Preferred over v3 overall in a blind comparison on 2026-11-05 (equal or better in every section); Alex is fully trained for it."
+      },
+      "eleven_v3": {
+        "label": "Eleven v3",
+        "recommended": false,
+        "speed": true,
+        "settings": [
+          "stability",
+          "similarity_boost",
+          "style",
+          "use_speaker_boost",
+          "speed"
+        ],
+        "note": "For anyone who needs speed control: the Pace slider only applies to v3. Alex is not fully trained for it."
+      }
+    },
+    "reads": "one continuous read per section",
+    "takes_per_section": 2,
+    "opening_tag": "[relaxed]",
+    "banned_tags": [
+      "[inhales]",
+      "[exhales]",
+      "[clears throat]",
+      "[coughs]",
+      "[sighs]",
+      "[casually]"
+    ],
+    "unreliable_tags": [
+      "[short pause]"
+    ],
+    "stability_default": 0.7,
+    "stability_window": [
+      0.6,
+      0.75
+    ],
+    "speed_default": 1.0,
+    "speed_applies_to": [
+      "eleven_v3"
+    ],
+    "never_speed_up_after": true,
+    "never_pass_next_text": true,
+    "rank_takes_by": "finality of the last sentence (scripts/audio/finality.py), or pace closest to reference_pace_wps when set; then the ear. measure_speech.py flags problems but must not pick takes: it disagreed with Andy on 4 of 7 experiments (2026-11-05)",
+    "reference_pace_wps": 3.16,
+    "reference_take": "output/test-todo-v4 (examples/test-todo-b.json, eleven_v4, Alex, approved by Andy 2026-11-05)"
+  },
+  "audio_edit": {
+    "trim_after_sentence": false,
+    "shorten_silences_longer_than_s": 0.8,
+    "keep_hunt_pauses": true,
+    "hunt_words": [
+      "where is it",
+      "where's the",
+      "where's it",
+      "hang on",
+      "let's see",
+      "um"
+    ],
+    "min_tail_after_last_word_ms": 250,
+    "end_fade_ms_if_clipped": 150,
+    "section_gap_s": [
+      0.35,
+      0.45
+    ],
+    "treatment": [
+      "de-ess",
+      "high shelf -2.5 dB",
+      "light compression"
+    ],
+    "room_tone": true,
+    "music_bed": false,
+    "voice_lufs": -16.4,
+    "limiter_ceiling_dbfs": -2.5,
+    "room_tone_lufs": -62,
+    "room_tone_band_hz": [
+      90,
+      2500
+    ],
+    "find_speech_end_from_audio": true
+  },
+  "timing": {
+    "engine": "faster-whisper",
+    "model": "small.en",
+    "runs": "locally, no API call",
+    "word_timestamps": true
+  },
+  "sliders": {
+    "casual": {
+      "label": "Casualness",
+      "min": 3,
+      "max": 8,
+      "drives": "script writing: contractions, 'gonna', 'kind of', run-on casual lines",
+      "low": "Cleaner, can sound scripted",
+      "high": "More 'gonna' and 'kind of'"
+    },
+    "energy": {
+      "label": "Energy",
+      "min": 1,
+      "max": 6,
+      "names": [
+        "",
+        "Very calm",
+        "Calm",
+        "Relaxed",
+        "Warm",
+        "Lively",
+        "Upbeat"
+      ],
+      "drives": "stability within the window (higher energy = lower stability) and word choice; tag stays [relaxed]",
+      "low": "Steady, can go flat",
+      "high": "Livelier, can sound overexcited"
+    },
+    "pace": {
+      "label": "Pace",
+      "min": 94,
+      "max": 108,
+      "unit": "ElevenLabs speed x 100 (eleven_v3 only; eleven_v4 has no speed setting)",
+      "low": "Easy to follow, can drag",
+      "high": "Snappy, can rush the clicks",
+      "models": [
+        "eleven_v3"
+      ]
+    },
+    "hes": {
+      "label": "Hesitations",
+      "min": 0,
+      "max": 3,
+      "names": [
+        "None",
+        "A few",
+        "Some",
+        "More"
+      ],
+      "drives": "fillers and restarts per section written into the talking script; restarts never more than one per section",
+      "low": "Can sound too perfect",
+      "high": "Human, but too many sounds nervous"
+    },
+    "breath": {
+      "label": "Breaths",
+      "min": 0,
+      "max": 2,
+      "names": [
+        "Trimmed",
+        "Natural",
+        "Kept"
+      ],
+      "drives": "how much of the model's own breathing survives the edit; never adds breaths",
+      "low": "Can sound stitched together",
+      "high": "Only natural breaths, never forced"
+    },
+    "swear": {
+      "label": "Swearing",
+      "min": 0,
+      "max": 2,
+      "names": [
+        "Off",
+        "One",
+        "A few"
+      ],
+      "drives": "light swears only at a slip or a surprise, or emphasis aimed at the product; never inside an instruction, number or warning, never at the viewer",
+      "low": "Fine for any audience",
+      "high": "Only at a slip or a surprise, never in instructions",
+      "captions_clean_by_default": true,
+      "caps": {
+        "1": "one per video",
+        "2": "at most one per 2 minutes, never more than 2 in a video"
+      },
+      "allowed_kinds": [
+        "saas"
+      ],
+      "never": [
+        "course",
+        "tour",
+        "sponsored or brand videos"
+      ],
+      "default": 0
+    }
+  },
+  "presets": {
+    "course": {
+      "label": "Course walkthrough",
+      "casual": 7,
+      "energy": 3,
+      "pace": 100,
+      "hes": 1,
+      "breath": 1,
+      "swear": 0,
+      "mumbles": false
+    },
+    "saas": {
+      "label": "Quick SaaS demo",
+      "casual": 8,
+      "energy": 5,
+      "pace": 105,
+      "hes": 2,
+      "breath": 1,
+      "swear": 0,
+      "mumbles": true
+    },
+    "tour": {
+      "label": "Product tour",
+      "casual": 5,
+      "energy": 4,
+      "pace": 100,
+      "hes": 0,
+      "breath": 1,
+      "swear": 0,
+      "mumbles": false
+    }
+  },
+  "voices": {
+    "alex": {
+      "status": "recommended",
+      "tested": true,
+      "gender": "m",
+      "color": "#0000F2",
+      "adjust": {},
+      "voice_id": "hLygPNd2gK6Azddorc5W",
+      "elevenlabs_name": "Alex - Warm Conversational Business"
+    },
+    "jessica": {
+      "status": "untested",
+      "tested": false,
+      "gender": "f",
+      "color": "#C2300C",
+      "adjust": {
+        "energy": 1
+      }
+    },
+    "george": {
+      "status": "untested",
+      "tested": false,
+      "gender": "m",
+      "color": "#0B4F37",
+      "adjust": {
+        "energy": -1,
+        "pace": -2
+      }
+    },
+    "brian": {
+      "status": "untested",
+      "tested": false,
+      "gender": "m",
+      "color": "#111111",
+      "adjust": {
+        "casual": 1
+      }
+    },
+    "lily": {
+      "status": "untested",
+      "tested": false,
+      "gender": "f",
+      "color": "#4B22D6",
+      "adjust": {
+        "pace": 2,
+        "energy": 1
+      }
+    },
+    "matilda": {
+      "status": "untested",
+      "tested": false,
+      "gender": "f",
+      "color": "#000091",
+      "adjust": {
+        "energy": -1
+      }
+    },
+    "_note": "Only Alex has been through listening rounds. Untested voices start from these guesses and must be judged by ear before being marked recommended."
+  },
+  "on_screen": {
+    "captions": "burn",
+    "captions_options": [
+      "burn",
+      "file",
+      "off"
+    ],
+    "caption_look": "mona-rounded",
+    "caption_look_options": [
+      "helvetica-square",
+      "mona-rounded"
+    ],
+    "caption_look_note": "Andy picked Mona Sans on slightly rounded boxes (Phase 5, 8 Nov 2026). Helvetica Neue on square boxes stays as an option",
+    "corner_label": "off",
+    "corner_options": [
+      "off",
+      "tl",
+      "tr",
+      "bl",
+      "br"
+    ],
+    "corner_text": "",
+    "extra_overlays": "never, unless the user adds them"
+  },
+  "recording": {
+    "viewport": [
+      1440,
+      810
+    ],
+    "viewport_note": "browser size; the video is always 1920x1080. 1440x810 makes a narrow app about a third bigger (Andy picked it, Phase 3)",
+    "capture_scale": 2,
+    "capture_scale_note": "the browser's frames are 2x (2880x1620), so the 1080p video is sharp and a Recordly zoom (1.8x) still isn't blown up. 3x drops the capture to ~25 frames a second",
+    "style": "casual",
+    "styles": {
+      "casual": {
+        "label": "Casual style",
+        "zoom_on_click": "none",
+        "click": "none",
+        "cursor": "Recordly's cursor exactly, drawn by Recordly's own renderer with its fresh-install defaults (tahoe, size 2.5, sway 0.4, hides after 2 s idle, dips on click)",
+        "built": true
+      },
+      "recordly": {
+        "label": "Recordly style",
+        "engine": "Recordly (github.com/webadderallorg/Recordly, AGPL-3.0)",
+        "settings": "Recordly's fresh-install defaults (DEFAULT_EDITOR_PREFERENCES / normalizeProjectEditor({})), unedited",
+        "built": true,
+        "zooms": "what Recordly's auto-zoom button adds (buildInteractionZoomSuggestions), depth 3"
+      }
+    },
+    "cursor": "Recordly's tahoe cursor in both styles, with the page's real cursor shape (arrow, I-beam, hand)",
+    "click_feedback": "none: no ring or ripple; the cursor dips briefly (Recordly's click)",
+    "zoom_on_click": "none",
+    "fps": 60,
+    "max_still_s": 5,
+    "max_frozen_frame_s": 1.5,
+    "no_cut_within_s_of_click": 1.5,
+    "record_live_to_voice": true,
+    "retime_footage_after": false,
+    "polish": "recorder/polish: Recordly's own export renderer (2.0.0-beta.1, commit b2b2f2b, pinned in recorder/polish/recordly/PINNED.json). Recordly's files are never edited",
+    "passes_note": "one live take: the recorder's cursor arrives on each word by itself (landAt). A second take only when the first fails the join check (an action over 0.5 s from its word)",
+    "hide_on_page": [
+      {
+        "site": "whop.com",
+        "text": "Confirm your tax details",
+        "max_chars": 400,
+        "max_height": 160
+      }
+    ],
+    "hide_on_page_note": "Page parts taken off the page (hidden, not blurred) before every take, the live page check and rehearsal: a site's own nag banner that is never part of a lesson. The largest element around the text that still holds little else. Andy, 13 Nov 2026: Whop's yellow 'Confirm your tax details' banner."
+  },
+  "export": {
+    "video": "1080p mp4",
+    "captions_file": ".srt (unless captions are off)",
+    "transcript": ".txt",
+    "preview_720p": false,
+    "folder": "~/Movies/NAVI",
+    "folder_note": "the user can name any folder (their own project folder); never inside the skill's repo",
+    "file_names": "named after the demo title: <title>.mp4, <title>.srt, <title> transcript.txt, <title> (720p preview).mp4",
+    "speed_copy": {
+      "on": false,
+      "speed": 1.35,
+      "range": [
+        1.05,
+        2.0
+      ],
+      "note": "off by default; when on, export both the normal file and a sped-up copy (Andy uses 1.35x for his course). The voice keeps its natural pitch (ffmpeg atempo)"
+    }
+  },
+  "script": {
+    "first_mention": "name plus where it is or what it looks like; after that the bare name",
+    "checks_on_tricky_steps": true,
+    "provisional": {
+      "_note": "Starting values from our own coding of 18 demos (one coder, small sample); not yet judged by ear. See voice-rules.md section 1.",
+      "asides_per_min": {
+        "saas": 1.0,
+        "course": 0.4,
+        "tour": "about 1 per video"
+      },
+      "max_asides_per_section": 1,
+      "examples": {
+        "saas": "at most 1 per video under 5 min, personal only from the brief",
+        "course": "1 per module",
+        "tour": "user-centred, never first person"
+      },
+      "tangents": 0
+    }
+  },
+  "privacy": {
+    "_about": "reference/privacy.md. The three tiers and the patterns live in scripts/privacy/patterns.json. A demo picks a preset and can show or blur single categories ('privacy': {'preset', 'show', 'blur', 'hide_words'} in its script). Tier 1 can never be shown.",
+    "preset": "standard",
+    "presets": {
+      "strict": {
+        "label": "Strict",
+        "blur_tiers": [
+          1,
+          2,
+          3
+        ],
+        "about": "blur all personal info, usage, prices and dates too"
+      },
+      "standard": {
+        "label": "Standard (recommended)",
+        "blur_tiers": [
+          1,
+          2
+        ]
+      },
+      "test_account": {
+        "label": "Test account",
+        "blur_tiers": [
+          1,
+          2
+        ],
+        "show": [
+          "email",
+          "phone",
+          "name",
+          "photo",
+          "address"
+        ],
+        "about": "fake data, so names and emails show; money, customers and counts stay blurred"
+      }
+    },
+    "blur_px": 12,
+    "blur_px_note": "CSS pixels of blur on matched text and elements (24 real pixels at 2x). Apple's text recognition reads none of it",
+    "frame_scan": "every distinct browser frame, read with Apple's built-in text recognition (Vision); anything readable that matches is blurred over its time and listed",
+    "unsure_below_confidence": 0.5
+  },
+  "app": {
+    "_about": "The local app's engine side (Phase 7): scripts/app/ and scripts/batch/. Settings, saved logins and the data live in ~/Library/Application Support/NAVI; the key in the Keychain.",
+    "port": 4747,
+    "work_dir": "output/demos",
+    "default_voice": "alex",
+    "batch": {
+      "credit_margin": 1000,
+      "credit_margin_note": "a video is never part-generated: if finishing it would leave fewer credits than this, it's skipped with that reason",
+      "credit_limit": 10000,
+      "credit_limit_note": "the most a batch may spend without asking (Settings: batch spending limit); over it, the Go screen asks first",
+      "quiet_load": 4.0,
+      "quiet_wait_min": 20,
+      "quiet_note": "live recording drifts on a busy Mac: before each recording the batch waits (up to quiet_wait_min minutes) until the 1-minute load average is under quiet_load, then records anyway and says so in the report",
+      "takes": 2,
+      "render_while_recording": false,
+      "record_parallel": 1,
+      "parallel_note": "the render of one video always runs while the next is voiced and timed. render_while_recording (also while the next is being recorded live) and record_parallel (2 or 3 live takes at once) are switched on only when scripts/focus/load_check.py shows a live take comes out the same that way on this Mac; a video that creates things in a test business is always recorded alone",
+      "heavy_apps": [
+        "Spotify",
+        "Roblox",
+        "Google Chrome"
+      ],
+      "heavy_cpu": 25,
+      "heavy_note": "before each batch the user is told to quit these when they are running, and any other app using more than heavy_cpu % of a core; the Go screen shows the Mac's load (Andy, 12 Nov 2026: a busy Mac made takes land late and renders slow)"
+    }
+  },
+  "jobs": {
+    "_about": "Per-job models (Andy, 12 Nov 2026). Each job runs as its own headless Claude Code subagent (scripts/jobs/jobs.py) on the model and effort named here. Full model IDs only, never an alias. If a model is unavailable the next one in 'fallback' runs and the batch report says so. Every run is logged in the batch report with its model, effort, time and tokens.",
+    "planning": {
+      "model": "claude-fable-5-2",
+      "effort": "high",
+      "fallback": [
+        "claude-opus-5-5"
+      ],
+      "blind_test": {
+        "enabled": true,
+        "arms": [
+          {
+            "model": "claude-fable-5-2",
+            "effort": "high"
+          },
+          {
+            "model": "claude-opus-5-5",
+            "effort": "high"
+          },
+          {
+            "model": "claude-opus-5-5",
+            "effort": "medium"
+          }
+        ],
+        "note": "while on, every real batch's outline is planned once per arm; the plans are shown unlabelled (A/B/C, shuffled) and Andy picks one before anything is explored or written"
+      }
+    },
+    "explore": {
+      "model": "claude-haiku-5-5",
+      "effort": "medium",
+      "fallback": [
+        "claude-sonnet-5-5"
+      ]
+    },
+    "writing": {
+      "model": "claude-opus-5-5",
+      "effort": "medium",
+      "fallback": [
+        "claude-sonnet-5-5"
+      ],
+      "blind_test": {
+        "enabled": false,
+        "lessons": 2,
+        "arms": [
+          {
+            "model": "claude-opus-5-5",
+            "effort": "medium"
+          },
+          {
+            "model": "claude-opus-5-5",
+            "effort": "low"
+          }
+        ],
+        "note": "for the first 2 videos (Andy, 12 Nov 2026: 2, not 5, to fit the credits) of a real batch: one draft per arm (same style of the day, same facts), each voiced once, shown as A/B/C shuffled with the arm hidden; Andy's pick is recorded ($NAVI_DATA/blind-picks.jsonl) and the picked take is the one that ships. An arm whose model is unavailable is left out, never swapped for another model. 13 Nov 2026: claude-opus-4-6 dropped (19 min a draft, too slow for production); only claude-opus-5-5 medium against low. 13 Nov 2026, test lessons 1 and 2: claude-opus-5-5 medium won both picks (2 of 2) and is locked in as the writing model; the writing test is off. Turn it back on (enabled: true) to compare again"
+      }
+    },
+    "checks": {
+      "model": "claude-sonnet-5-5",
+      "effort": "medium",
+      "fallback": [
+        "claude-opus-5-5"
+      ]
+    },
+    "batch_qa": {
+      "model": "claude-opus-5-5",
+      "effort": "high",
+      "fallback": [
+        "claude-sonnet-5-5"
+      ]
+    },
+    "headless_never_fallback_to": [
+      "claude-fable-5-2"
+    ],
+    "headless_note": "a run nobody is watching (a batch) never falls back to Fable, whatever a fallback list says; a job whose own model is Fable (planning) still uses it",
+    "warn_after": [
+      {
+        "model": "claude-opus-4-6",
+        "after": "2027-01-15",
+        "why": "Andy's cut-off for this model"
+      }
+    ],
+    "timeout_min": 30
+  },
+  "explore": {
+    "remember_days": 14,
+    "remember_most": 3,
+    "remember_chars": 14000,
+    "note": "what was explored on a site (per login and view) is kept in $NAVI_DATA/sites and given to the next video's explorer for this many days, so it only walks what is new (scripts/explore/memory.py)"
+  }
+}

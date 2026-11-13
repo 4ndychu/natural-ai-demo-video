@@ -1,0 +1,42 @@
+{
+  "title": "A simple to-do list",
+  "site": "demo.playwright.dev/todomvc",
+  "_about": "Phase 1 to 3 test script: generic content, 3 short sections, recordable on a public practice site. Written to reference/voice-rules.md.",
+  "voice_id": "hLygPNd2gK6Azddorc5W",
+  "voice": { "id": "alex", "stability": 0.7, "style": "relaxed", "pace": 1.0 },
+  "sections": [
+    {
+      "name": "open",
+      "talk": "[relaxed] Okay, so this is a pretty basic to-do list. You type in the box up top, call the dentist, hit Enter and it's on the list.",
+      "caption": "This is a simple to-do list. Type a task in the box at the top and press Enter to add it.",
+      "actions": [
+        { "on": "box", "do": "click", "kind": "click", "target": "placeholder=What needs to be done?" },
+        { "on": "dentist", "do": "type", "kind": "click", "text": "Call the dentist" },
+        { "on": "Enter", "do": "press", "kind": "click", "key": "Enter" }
+      ]
+    },
+    {
+      "name": "add-and-tick",
+      "talk": "[relaxed] I'll add a couple more so there's something to work with. Pay the gas bill, and book the, uh, book the train tickets. Okay, three. When you've done one you just click the little circle next to it and it gets crossed out.",
+      "caption": "Add a couple more tasks. When a task is done, click the circle next to it to tick it off.",
+      "actions": [
+        { "on": "gas", "do": "type", "kind": "click", "text": "Pay the gas bill", "then": "Enter" },
+        { "on": "train", "do": "type", "kind": "click", "text": "Book the train tickets", "then": "Enter" },
+        { "on": "three", "do": "highlight", "kind": "explain", "target": "ul.todo-list" },
+        { "on": "circle", "do": "click", "kind": "click", "target": "li:has-text('Call the dentist') >> input.toggle" }
+      ]
+    },
+    {
+      "name": "filter-and-clear",
+      "talk": "[relaxed] Down at the bottom you can switch to just the active ones or just the completed ones. I'd just leave it on Active, you don't really need to see what's done. And to clear out the finished ones there's, where is it, Clear completed, over on the right. Now it's just the two left.",
+      "caption": "At the bottom, switch between active and completed tasks. Clear completed removes the finished ones.",
+      "actions": [
+        { "on": "bottom", "do": "highlight", "kind": "explain", "target": "footer.footer" },
+        { "on": "Active", "do": "click", "kind": "click", "target": "a[href='#/active']" },
+        { "on": "where", "do": "hover", "kind": "hunt", "target": "footer.footer" },
+        { "on": "Clear", "do": "click", "kind": "click", "target": "button.clear-completed" },
+        { "on": "two", "do": "highlight", "kind": "explain", "target": "ul.todo-list" }
+      ]
+    }
+  ]
+}

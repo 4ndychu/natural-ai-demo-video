@@ -1,0 +1,4 @@
+{"_about": "The one control the position test needs, copied from exploring whop.com's Add product form (10 Nov 2026): the form fills the left 540 px of a 1440 px page, so its Create product button is bottom left on screen but bottom right of the form.",
+ "viewport": [1440, 810],
+ "screens": [{"file": "add-product-form.png", "elements": [
+   {"tag": "button", "text": "Create product", "box": [375, 754, 144, 40], "panel": {"box": [0, 0, 540, 810], "kind": "div"}}]}]}

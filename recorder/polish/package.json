@@ -1,0 +1,11 @@
+{
+  "name": "navi-polish",
+  "private": true,
+  "description": "NAVI's polish step: renders the recording with Recordly's own frame renderer (AGPL-3.0). See README.md.",
+  "license": "AGPL-3.0-only",
+  "type": "module",
+  "dependencies": {
+    "pixi-filters": "6.1.5",
+    "pixi.js": "8.14.0"
+  }
+}

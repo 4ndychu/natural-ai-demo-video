@@ -1,0 +1,10 @@
+{
+ "title": "Position check: whop's Create product button",
+ "explore": "explore",
+ "sections": [
+  {"name": "price",
+   "talk": "[relaxed] That's honestly all it needs for now, so Create product, bottom left.",
+   "caption": "That's all it needs for now, so click Create product at the bottom left.",
+   "actions": [{"on": "Create", "do": "click", "kind": "click", "target": "role=button[name='Create product']"}]}
+ ]
+}

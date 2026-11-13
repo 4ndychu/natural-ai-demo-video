@@ -1,0 +1,32 @@
+{
+ "name": "Ending test for rule 6",
+ "takes": 2,
+ "voice_id": "hLygPNd2gK6Azddorc5W",
+ "experiments": {
+  "END": {
+   "about": "Last line of section 1 lands low: a trailing place vs a plain \"so that's on the list now\"",
+   "kind": "line",
+   "variants": [
+    {
+     "id": "current",
+     "text": "[relaxed] So this is a pretty basic to-do list. I'm gonna type in the box up top, call the dentist, hit Enter and it's on the list.",
+     "model": "eleven_v4",
+     "stability": 0.7,
+     "reuse": "output/experiments/2026-11-05-ab/takes/03fbe3570a"
+    },
+    {
+     "id": "trailing-place",
+     "text": "[relaxed] So this is a pretty basic to-do list. I'm gonna type in the box up top, call the dentist, hit Enter, and it just goes on the list down here.",
+     "model": "eleven_v4",
+     "stability": 0.7
+    },
+    {
+     "id": "plain-now",
+     "text": "[relaxed] So this is a pretty basic to-do list. I'm gonna type in the box up top, call the dentist, and hit Enter, so that's on the list now.",
+     "model": "eleven_v4",
+     "stability": 0.7
+    }
+   ]
+  }
+ }
+}

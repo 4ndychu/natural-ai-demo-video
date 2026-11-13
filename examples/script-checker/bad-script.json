@@ -1,0 +1,307 @@
+{
+ "title": "Script checker test (every banned pattern)",
+ "_about": "Each section breaks one rule from reference/voice-rules.md on purpose (expect = the error the checker must raise); the ok- sections follow the rules and must raise no error. Used by scripts/script/test_check.py.",
+ "sections": [
+  {
+   "name": "cheerful-easy",
+   "talk": "[relaxed] Okay, so you hit Save up top on the form. Easy. And the next page opens.",
+   "caption": "Click the button to continue.",
+   "actions": [
+    {
+     "on": "Save",
+     "do": "click",
+     "kind": "click",
+     "target": "text=Save"
+    }
+   ],
+   "expect": [
+    "cheerful-line",
+    "position"
+   ]
+  },
+  {
+   "name": "cheerful-there-we-go",
+   "talk": "[relaxed] Right, so you pick Monthly from the list there. There we go. That's the plan set.",
+   "caption": "Click the button to continue.",
+   "actions": [
+    {
+     "on": "Monthly",
+     "do": "click",
+     "kind": "click",
+     "target": "text=Monthly"
+    }
+   ],
+   "expect": [
+    "cheerful-line"
+   ]
+  },
+  {
+   "name": "cheerful-there-it-is",
+   "talk": "[relaxed] And you scroll down to Billing at the bottom. There it is! Then you open it.",
+   "caption": "Click the button to continue.",
+   "actions": [
+    {
+     "on": "Billing",
+     "do": "click",
+     "kind": "click",
+     "target": "text=Billing"
+    }
+   ],
+   "expect": [
+    "cheerful-line",
+    "position"
+   ]
+  },
+  {
+   "name": "ellipsis",
+   "talk": "[relaxed] So you open the, um… Settings page from the menu on the left.",
+   "caption": "Click the button to continue.",
+   "actions": [
+    {
+     "on": "Settings",
+     "do": "click",
+     "kind": "click",
+     "target": "text=Settings"
+    }
+   ],
+   "expect": [
+    "ellipsis",
+    "position"
+   ]
+  },
+  {
+   "name": "tag",
+   "talk": "[relaxed] Right, so you click Export [laughs] and pick the file you want.",
+   "caption": "Click the button to continue.",
+   "actions": [
+    {
+     "on": "Export",
+     "do": "click",
+     "kind": "click",
+     "target": "text=Export"
+    }
+   ],
+   "expect": [
+    "tag"
+   ]
+  },
+  {
+   "name": "two-restarts",
+   "talk": "[relaxed] I'm, uh, I'm gonna open the, the Menu and pick Billing from it.",
+   "caption": "Click the button to continue.",
+   "actions": [
+    {
+     "on": "Menu",
+     "do": "click",
+     "kind": "click",
+     "target": "text=Menu"
+    }
+   ],
+   "expect": [
+    "restarts"
+   ]
+  },
+  {
+   "name": "cut-off",
+   "talk": "[relaxed] You- you just drag the Card over to the done column here.",
+   "caption": "Click the button to continue.",
+   "actions": [
+    {
+     "on": "Card",
+     "do": "click",
+     "kind": "click",
+     "target": "text=Card"
+    }
+   ],
+   "expect": [
+    "cut-off"
+   ]
+  },
+  {
+   "name": "filler-sentence",
+   "talk": "[relaxed] Then you scroll down the page a bit. Um. Then you click Archive at the bottom.",
+   "caption": "Click the button to continue.",
+   "actions": [
+    {
+     "on": "scroll",
+     "do": "hover",
+     "kind": "explain",
+     "target": "text=Footer"
+    },
+    {
+     "on": "Archive",
+     "do": "click",
+     "kind": "click",
+     "target": "text=Archive"
+    }
+   ],
+   "expect": [
+    "filler-sentence",
+    "position"
+   ]
+  },
+  {
+   "name": "still-screen",
+   "talk": "[relaxed] So this page is where all your invoices live, and honestly it took me a while to get used to how they group everything by month and then by client, but once you get the hang of it it's fine, and you click Export.",
+   "caption": "Click the button to continue.",
+   "actions": [
+    {
+     "on": "Export",
+     "do": "click",
+     "kind": "click",
+     "target": "text=Export"
+    }
+   ],
+   "expect": [
+    "still-screen"
+   ]
+  },
+  {
+   "name": "missing-cue",
+   "talk": "[relaxed] So now you hit the Download button up in the corner.",
+   "caption": "Click the button to continue.",
+   "actions": [
+    {
+     "on": "Share",
+     "do": "click",
+     "kind": "click",
+     "target": "text=Share"
+    }
+   ],
+   "expect": [
+    "structure"
+   ]
+  },
+  {
+   "name": "dirty-caption",
+   "talk": "[relaxed] So you type the name in the box and hit Enter.",
+   "caption": "Type the, uh, name in the box.",
+   "actions": [
+    {
+     "on": "box",
+     "do": "click",
+     "kind": "click",
+     "target": "text=box"
+    }
+   ],
+   "expect": [
+    "structure"
+   ]
+  },
+  {
+   "name": "ok-one-restart",
+   "talk": "[relaxed] Then you book the, uh, book the train in the box up top.",
+   "caption": "Click the button to continue.",
+   "actions": [
+    {
+     "on": "book the train",
+     "do": "click",
+     "kind": "click",
+     "target": "text=book the train"
+    }
+   ],
+   "expect": []
+  },
+  {
+   "name": "ok-hunt-and-filler",
+   "talk": "[relaxed] And to clear the finished ones there's, where is it, Clear completed over on the right.",
+   "caption": "Click the button to continue.",
+   "actions": [
+    {
+     "on": "where",
+     "do": "hover",
+     "kind": "hunt",
+     "target": "text=Footer"
+    },
+    {
+     "on": "Clear",
+     "do": "click",
+     "kind": "click",
+     "target": "text=Clear"
+    }
+   ],
+   "expect": []
+  },
+  {
+   "name": "ok-flat-ending",
+   "talk": "[relaxed] You just click the, uh, little circle next to it, so that's one.",
+   "caption": "Click the button to continue.",
+   "actions": [
+    {
+     "on": "circle",
+     "do": "click",
+     "kind": "click",
+     "target": "text=circle"
+    }
+   ],
+   "expect": []
+  },
+  {
+   "name": "crowded",
+   "expect": [
+    "crowded"
+   ],
+   "talk": "[relaxed] The form has Details, Pricing, Apps, Settings and Generate, all in one long column you scroll through.",
+   "caption": "The form has Details, Pricing, Apps, Settings and Generate.",
+   "actions": [
+    {
+     "on": "Details",
+     "do": "hover",
+     "kind": "explain",
+     "target": "text=Details"
+    },
+    {
+     "on": "Pricing",
+     "do": "hover",
+     "kind": "explain",
+     "target": "text=Pricing"
+    },
+    {
+     "on": "Apps",
+     "do": "hover",
+     "kind": "explain",
+     "target": "text=Apps"
+    },
+    {
+     "on": "Settings",
+     "do": "hover",
+     "kind": "explain",
+     "target": "text=Settings"
+    },
+    {
+     "on": "Generate",
+     "do": "hover",
+     "kind": "explain",
+     "target": "text=Generate"
+    }
+   ]
+  },
+  {
+   "name": "ok-spread-out",
+   "expect": [],
+   "talk": "[relaxed] Details is the first block on the form. Under it there's Pricing, which is where the money side lives, and further down you get Apps, for whatever comes with it.",
+   "caption": "Details comes first, then Pricing, then Apps.",
+   "actions": [
+    {
+     "on": "Details",
+     "do": "hover",
+     "kind": "explain",
+     "target": "text=Details"
+    },
+    {
+     "on": "Pricing",
+     "do": "hover",
+     "kind": "explain",
+     "target": "text=Pricing"
+    },
+    {
+     "on": "Apps",
+     "do": "hover",
+     "kind": "explain",
+     "target": "text=Apps"
+    }
+   ]
+  }
+ ],
+ "explore": "../explore-test-todo"
+}

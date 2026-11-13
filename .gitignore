@@ -1,0 +1,27 @@
+# secrets: never commit keys
+*.key
+*_key.txt
+.env
+.env.*
+# outputs and caches
+output/
+renders/
+*.mp4
+*.webm
+*.wav
+*.mp3
+node_modules/
+__pycache__/
+.DS_Store
+output/
+.venv/
+recorder/agent-screenplay/
+# browser profiles and saved logins live outside the repo; never commit them
+*storage-state*.json
+profiles/
+recorder/polish/dist/
+# the script history (scripts/script/variety.py) lives in $NAVI_DATA, outside the repo; never commit one
+script-history*.jsonl
+# the work folder is kept out of iCloud sync while the repo lives in ~/Documents: output -> output.nosync
+output
+output.nosync/

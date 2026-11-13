@@ -1,0 +1,666 @@
+diff --git a/package-lock.json b/package-lock.json
+index 6a6a89f..bf5abb0 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -665,6 +665,7 @@
+       "integrity": "sha512-MzQj+8Kx3XI40OmUAE6Qoh58ZMNstNNMwn2nfd3qWsfe7nDNSqJNzes4njhz6AHwrSHOffSLwXU6yb474Q4aog==",
+       "dev": true,
+       "license": "MIT",
++      "peer": true,
+       "dependencies": {
+         "undici-types": "~8.9.0"
+       }
+@@ -1855,6 +1856,7 @@
+       "resolved": "https://registry.npmjs.org/hono/-/hono-4.13.16.tgz",
+       "integrity": "sha512-AOLOEhvrV+iH92xXCnFr/5+3KjPKcI3xP63XJtX5spAnkznPdHijlIsUTpi7/9EhWqrTCekw5c5zh1K+YsVw7A==",
+       "license": "MIT",
++      "peer": true,
+       "engines": {
+         "node": ">=16.9.0"
+       }
+@@ -2477,6 +2479,7 @@
+       "integrity": "sha512-qcJu88Q2IWqJsDD529JKMdwGm/dvInW4HvQnRwiH9JtihJvzGOscDtHE3x1pBKeUOTysQ8kVmLnJ2kJu7yhcGA==",
+       "dev": true,
+       "license": "MIT",
++      "peer": true,
+       "engines": {
+         "node": ">=12"
+       },
+@@ -3058,6 +3061,7 @@
+       "integrity": "sha512-z1YpjieJ9g0ebTmQpLBv/oq9E3F9EIlOe+7LahW8SrE3LTiG3udBRUXQOlYXP9b+IC2q2phHeVxj9xGlw34OEQ==",
+       "dev": true,
+       "license": "MIT",
++      "peer": true,
+       "dependencies": {
+         "lightningcss": "^1.33.0",
+         "picomatch": "^4.0.7",
+@@ -3263,6 +3267,7 @@
+       "resolved": "https://registry.npmjs.org/zod/-/zod-4.6.7.tgz",
+       "integrity": "sha512-g8W2D2kU6a8untc053fX1uVBKzM7yqAxW/3zwk83+6RyF2+SKOuV+c0wBDhUwzV1PaGapmZH+rmcUzPf+3CGwg==",
+       "license": "MIT",
++      "peer": true,
+       "funding": {
+         "url": "https://github.com/sponsors/colinhacks"
+       }
+diff --git a/schema/scenario.schema.json b/schema/scenario.schema.json
+index cb9aab3..54f0791 100644
+--- a/schema/scenario.schema.json
++++ b/schema/scenario.schema.json
+@@ -80,6 +80,65 @@
+       "description": "Web: hide scrollbars (default true).",
+       "type": "boolean"
+     },
++    "css": {
++      "description": "Web: a stylesheet added to every page (for example to blur private details).",
++      "type": "string"
++    },
++    "initScript": {
++      "description": "Web: JavaScript source run in every page and frame before the page's own scripts. It can call window.__screenplayReport(entry); entries are kept in the take's reports with their time.",
++      "type": "string"
++    },
++    "schedule": {
++      "description": "Output time (seconds) at which each step's action must land, one entry per step (null: not scheduled). The edit holds the frame when the recording is early and speeds it up when it is late; external narration is added afterwards.",
++      "type": "array",
++      "items": {
++        "type": [
++          "number",
++          "null"
++        ]
++      }
++    },
++    "startAt": {
++      "description": "Web, recording to a voice track: wall-clock time (seconds after the first step starts) at which each step starts, one entry per step (null: as soon as the previous step ends). The browser waits live; nothing is retimed in the edit.",
++      "type": "array",
++      "items": {
++        "type": [
++          "number",
++          "null"
++        ]
++      }
++    },
++    "landAt": {
++      "description": "Web, recording to a voice track: wall-clock time (seconds after the first step starts) at which each step's cursor should arrive on its target (and click), one entry per step (null: as soon as it can). The step still starts at its startAt, to find its target; the cursor then waits and sets off so that it arrives on time, however far it has to travel.",
++      "type": "array",
++      "items": {
++        "type": [
++          "number",
++          "null"
++        ]
++      }
++    },
++    "realtime": {
++      "description": "Edit: play the whole recording at normal speed (page loads and waits are not sped up). Default false.",
++      "type": "boolean"
++    },
++    "guard": {
++      "description": "Web: an action guard. `module` (absolute path) exports installFromFile(context, config, onBlock); it intercepts requests and calls onBlock when it blocks one, which ends the take.",
++      "type": "object",
++      "properties": {
++        "module": {
++          "type": "string"
++        },
++        "config": {
++          "type": "string"
++        }
++      },
++      "required": [
++        "module",
++        "config"
++      ],
++      "additionalProperties": false
++    },
+     "typingSpeed": {
+       "description": "Typing speed multiplier (default 1, about 14 characters/second).",
+       "type": "number",
+@@ -419,6 +478,18 @@
+               "double": {
+                 "type": "boolean"
+               },
++              "files": {
++                "description": "Web: the click opens a file chooser; these files (relative to the scenario) are chosen in it.",
++                "type": "array",
++                "items": {
++                  "type": "string"
++                }
++              },
++              "dragTo": {
++                "description": "Web: press on the element and drag it onto this one instead of clicking.",
++                "type": "string",
++                "minLength": 1
++              },
+               "say": {
+                 "description": "Narration for this step: shown as a caption, and spoken when voice is enabled. The step lasts at least as long as the sentence.",
+                 "type": "string"
+diff --git a/src/cli.ts b/src/cli.ts
+index ae48d92..5863e6c 100644
+--- a/src/cli.ts
++++ b/src/cli.ts
+@@ -28,11 +28,13 @@ program
+   .description("Film the scenario and edit the video (MP4 + storyboard).")
+   .option("--no-voice", "skip the voice-over even if the scenario enables it")
+   .option("--gif", "also write a GIF")
++  .option("--take-only", "film only: keep the take (frames, cursor log, step times) and skip editing a video from it")
+   .option("--json", "print the result as JSON")
+-  .action(async (file: string, o: { voice: boolean; gif?: boolean; json?: boolean }) => {
++  .action(async (file: string, o: { voice: boolean; gif?: boolean; json?: boolean; takeOnly?: boolean }) => {
+     try {
+-      const r = await record(file, { noVoice: !o.voice, gif: o.gif, log });
++      const r = await record(file, { noVoice: !o.voice, gif: o.gif, takeOnly: o.takeOnly, log });
+       if (o.json) console.log(JSON.stringify(r, null, 2));
++      else if (o.takeOnly) log(`\n✓ take kept: ${r.take} (${r.duration.toFixed(1)}s, ${r.steps} steps)`);
+       else {
+         log(`\n✓ ${r.mp4} (${r.duration.toFixed(1)}s, ${r.steps} steps, edited in ${r.seconds.toFixed(0)}s)`);
+         log(`  storyboard: ${r.storyboard}`);
+diff --git a/src/core.ts b/src/core.ts
+index f1eaa68..8ae4359 100644
+--- a/src/core.ts
++++ b/src/core.ts
+@@ -13,6 +13,8 @@ export interface RunOptions {
+   /** Force the voice-over off (true) regardless of the scenario. */
+   noVoice?: boolean;
+   gif?: boolean;
++  /** NAVI: film only; keep the take and don't edit a video from it. */
++  takeOnly?: boolean;
+   log?: (msg: string) => void;
+   /** Editing progress, 0 to 1, a few times a second. */
+   onProgress?: (fraction: number) => void;
+@@ -51,6 +53,11 @@ export async function record(file: string, opts: RunOptions = {}): Promise<Recor
+   }
+   take.inputs = captureInputs(loaded.scenario);
+   const takeFile = writeTake(loaded.takeDir, take);
++  // NAVI: the take is all that is wanted (frames, cursor log, step times). NAVI's own renderer draws the video
++  // from it, so this editor's draft, which took as long again as the recording, is not made.
++  if (opts.takeOnly) {
++    return { mp4: "", storyboard: "", duration: take.duration, seconds: 0, take: takeFile, steps: take.steps.length } as RecordResult;
++  }
+   opts.log?.("Editing the video");
+   const result = await renderTake(loaded, take, { audio, gif: opts.gif, log: opts.log });
+   return { ...result, take: takeFile, steps: take.steps.length };
+diff --git a/src/direct/plan.ts b/src/direct/plan.ts
+index 078f33c..2ab1373 100644
+--- a/src/direct/plan.ts
++++ b/src/direct/plan.ts
+@@ -96,7 +96,7 @@ export function planTake(take: Take, scenario: Scenario, opts: PlanOptions): Pla
+ 
+   const emitCapture = (sEnd: number) => {
+     if (sEnd <= sp + 1e-6) return;
+-    const waits = mergeSpans(steps.flatMap((s) => s.waits)).filter(([a, b]) => b > sp && a < sEnd);
++    const waits = scenario.realtime ? [] : mergeSpans(steps.flatMap((s) => s.waits)).filter(([a, b]) => b > sp && a < sEnd);
+     let cur = sp;
+     for (const [a0, b0] of waits) {
+       const a = Math.max(a0, cur);
+@@ -132,7 +132,48 @@ export function planTake(take: Take, scenario: Scenario, opts: PlanOptions): Pla
+ 
+   const stepTimes: Plan["stepTimes"] = [];
+   const voice: VoiceClip[] = [];
+-  for (const st of steps) {
++  const schedule = scenario.schedule;
++  if (schedule) {
++    // Scheduled edit: each scheduled step's action lands at its given output time. Between two anchors the
++    // recording plays at normal speed and the frame is held just before the next cursor move when there is time
++    // to spare; when the recording is late the stretch is sped up evenly. Nothing else is cut.
++    const anchors: Array<{ s: number; o: number; hold: number }> = [{ s: 0, o: 0, hold: 0 }];
++    for (const st of steps) {
++      const target = schedule[st.index];
++      if (target === null || target === undefined) continue;
++      const s = st.actionAt ?? st.start;
++      const prev = anchors[anchors.length - 1];
++      if (s <= prev.s || target <= prev.o) continue;
++      anchors.push({ s, o: target, hold: Math.max(prev.s, Math.min(s, st.travelStart ?? st.start)) });
++    }
++    for (let k = 1; k < anchors.length; k++) {
++      const a = anchors[k - 1];
++      const b = anchors[k];
++      const ds = b.s - a.s;
++      const dO = b.o - a.o;
++      if (ds <= dO) {
++        const h = b.hold;
++        if (h > a.s) pieces.push({ kind: "capture", o0: op, o1: op + (h - a.s), s0: a.s, s1: h });
++        op += h - a.s;
++        const freeze = dO - ds;
++        if (freeze > 1e-3) pieces.push({ kind: "capture", o0: op, o1: op + freeze, s0: h, s1: h });
++        op += freeze;
++        if (b.s > h) pieces.push({ kind: "capture", o0: op, o1: op + (b.s - h), s0: h, s1: b.s });
++        op += b.s - h;
++      } else {
++        pieces.push({ kind: "capture", o0: op, o1: op + dO, s0: a.s, s1: b.s });
++        op += dO;
++      }
++    }
++    const last = anchors[anchors.length - 1].s;
++    if (take.duration > last) pieces.push({ kind: "capture", o0: op, o1: op + (take.duration - last), s0: last, s1: take.duration });
++    op += Math.max(0, take.duration - last);
++    sp = take.duration;
++    for (const st of steps) {
++      stepTimes[st.index] = { o0: srcToOut(st.start), o1: srcToOut(st.end), oAction: st.actionAt !== undefined ? srcToOut(st.actionAt) : undefined };
++    }
++  }
++  for (const st of schedule ? [] : steps) {
+     const audio = opts.audio.get(st.index);
+     if (st.card && opts.cards === false) {
+       // Cards are off: the step takes no time in the video. A video that started with one
+@@ -168,7 +209,7 @@ export function planTake(take: Take, scenario: Scenario, opts: PlanOptions): Pla
+     stepTimes[st.index] = { o0, o1: op, oAction: st.actionAt !== undefined ? srcToOut(st.actionAt) : undefined };
+     if (audio) voice.push({ file: audio.file, at: o0 + 0.05, duration: audio.duration });
+   }
+-  emitCapture(take.duration);
++  if (!schedule) emitCapture(take.duration);
+   const duration = op;
+   const frameCount = Math.max(1, Math.ceil(duration * opts.fps));
+ 
+diff --git a/src/drivers/browser.ts b/src/drivers/browser.ts
+index 02c08a3..9966539 100644
+--- a/src/drivers/browser.ts
++++ b/src/drivers/browser.ts
+@@ -10,10 +10,16 @@ export class BrowserNotFoundError extends Error {
+ }
+ 
+ /** Launch Chromium: SCREENPLAY_CHROME, then Playwright's Chromium, then an installed Google Chrome. */
+-export async function launchBrowser(opts: { headless?: boolean } = {}): Promise<Browser> {
++export async function launchBrowser(opts: { headless?: boolean; scale?: number } = {}): Promise<Browser> {
+   const headless = opts.headless ?? true;
+   // Without the automation flag, pages see an ordinary browser (navigator.webdriver is false).
+   const args = ["--hide-scrollbars", "--disable-features=Translate", "--force-color-profile=srgb", "--disable-blink-features=AutomationControlled"];
++  // NAVI: never slow down when not in front (recording-rules.md rule 22). Playwright passes these too; they are
++  // listed here so a Playwright update can't drop them: timers, rendering and frames keep full speed in the background.
++  args.push("--disable-background-timer-throttling", "--disable-backgrounding-occluded-windows", "--disable-renderer-backgrounding");
++  // NAVI: headless Chromium's screencast sends frames at 1x whatever the page's deviceScaleFactor; this flag makes
++  // the frames themselves 2x (2880x1620 for a 1440x810 page, ~56 fps; 3x drops to ~25 fps).
++  if (opts.scale && opts.scale !== 1) args.push(`--force-device-scale-factor=${opts.scale}`);
+   const explicit = process.env.SCREENPLAY_CHROME;
+   if (explicit) {
+     if (!fs.existsSync(explicit)) throw new Error(`SCREENPLAY_CHROME points to a missing file: ${explicit}`);
+diff --git a/src/drivers/web.ts b/src/drivers/web.ts
+index 7857c45..822317c 100644
+--- a/src/drivers/web.ts
++++ b/src/drivers/web.ts
+@@ -1,5 +1,6 @@
+ import fs from "node:fs";
+ import path from "node:path";
++import { pathToFileURL } from "node:url";
+ import type { BrowserContext, CDPSession, Locator, Page } from "playwright-core";
+ import type { LoadedScenario } from "../scenario/load.js";
+ import { describeStep, stepKind, type Step } from "../scenario/schema.js";
+@@ -64,7 +65,7 @@ export async function runWeb(loaded: LoadedScenario, opts: WebRunOptions): Promi
+   const scale = record ? (scenario.scale ?? 2) : 1;
+   const baseUrl = scenario.url!;
+ 
+-  const browser = await launchBrowser();
++  const browser = await launchBrowser({ scale });
+   let context: BrowserContext | undefined;
+   const takeDir = loaded.takeDir;
+   const framesDir = path.join(takeDir, "frames");
+@@ -99,6 +100,36 @@ export async function runWeb(loaded: LoadedScenario, opts: WebRunOptions): Promi
+         else add();
+       });
+     }
++    if (scenario.css) {
++      await context.addInitScript((css: string) => {
++        const add = () => {
++          const style = document.createElement("style");
++          style.setAttribute("data-screenplay-css", "");
++          style.textContent = css;
++          (document.head ?? document.documentElement).appendChild(style);
++        };
++        if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", add);
++        else add();
++      }, scenario.css);
++    }
++    // NAVI: a script run in every page (the privacy blur), and what it reports, timed on the take's clock
++    const reports: Array<Record<string, unknown>> = [];
++    await context.exposeBinding("__screenplayReport", (_src, entry: unknown) => {
++      if (entry && typeof entry === "object") reports.push({ ...(entry as Record<string, unknown>), wall: Date.now() / 1000 });
++    });
++    if (scenario.initScript) await context.addInitScript({ content: scenario.initScript });
++    // NAVI: the action guard (Playwright route interception, before any request leaves the browser). Pages can be
++    // opened and filmed; a blocked action (withdraw, refund, API keys, deleting...) ends the take with its reason.
++    let guardBlock: { why?: string; method?: string; path?: string } | undefined;
++    if (scenario.guard) {
++      const g = await import(pathToFileURL(scenario.guard.module).href);
++      await g.installFromFile(context, scenario.guard.config, (e: { why?: string }) => {
++        guardBlock = e;
++      });
++    }
++    const guardCheck = () => {
++      if (guardBlock) throw new Error(`Blocked by NAVI's action guard: ${guardBlock.why} (${guardBlock.method} ${guardBlock.path})`);
++    };
+     const page = await context.newPage();
+     page.setDefaultTimeout(ACTION_TIMEOUT_MS);
+ 
+@@ -151,7 +182,9 @@ export async function runWeb(loaded: LoadedScenario, opts: WebRunOptions): Promi
+     const checks: CheckStepResult[] = [];
+     await sleepIf(0.6);
+ 
++    let liveZero: number | undefined;
+     for (let i = 0; i < scenario.steps.length; i++) {
++      guardCheck();
+       const step = scenario.steps[i];
+       const kind = stepKind(step);
+       const label = describeStep(step);
+@@ -159,6 +192,21 @@ export async function runWeb(loaded: LoadedScenario, opts: WebRunOptions): Promi
+       navigated = false;
+       const ts: TakeStep = { index: i, kind, label, start: now(), end: 0, waits: [] };
+       const minDuration = opts.minDurations?.[i] ?? 0;
++      const startAt = record ? scenario.startAt?.[i] : undefined;
++      if (startAt !== null && startAt !== undefined) {
++        if (i === 0) liveZero = now();
++        else if (liveZero !== undefined) {
++          const late = now() - (liveZero + startAt);
++          if (late < 0) await sleepIf(-late);
++          else if (late > 0.05) log(`  step ${i + 1} starts ${late.toFixed(2)} s late`);
++        }
++        ts.start = now();
++      }
++      // NAVI: recording to a voice, a click's wait for the network to go quiet ends when the next step is due.
++      // Apps with live connections (whop.com) never go quiet, so the full wait made every click 4 s late and the
++      // lateness added up. The next step still waits for its own target to appear, so slow loads are still shown.
++      const nextAt = record ? scenario.startAt?.[i + 1] : undefined;
++      settleBy = liveZero !== undefined && nextAt !== null && nextAt !== undefined ? liveZero + nextAt : undefined;
+       try {
+         cursor = await runStep(page, step, ts, cursor, {
+           record,
+@@ -166,8 +214,11 @@ export async function runWeb(loaded: LoadedScenario, opts: WebRunOptions): Promi
+           baseUrl,
+           sleepIf,
+           minDuration,
++          // NAVI: the moment this step's cursor should arrive (recording to a voice): see travelTo
++          landBy: (() => { const l = record ? scenario.landAt?.[i] : undefined; return liveZero !== undefined && l !== null && l !== undefined ? liveZero + l : undefined; })(),
+           typingSpeed: scenario.typingSpeed ?? 1,
+           seed: i + 1,
++          dir: loaded.dir,
+         });
+       } catch (e) {
+         const err = e instanceof StepError ? e : new StepError(i, label, (e as Error).message);
+@@ -186,7 +237,9 @@ export async function runWeb(loaded: LoadedScenario, opts: WebRunOptions): Promi
+       if (navigated) ts.navigated = true;
+       if (!ts.card && record) {
+         // Let the result of the action show, and give the narration time to finish.
+-        const hold = ("hold" in step && step.hold ? step.hold : 0) + (isAction(kind) ? 0.7 : 0.2);
++        let hold = ("hold" in step && step.hold ? step.hold : 0) + (isAction(kind) ? 0.7 : 0.2);
++        // NAVI: on a voice schedule the next step waits for its own word anyway; never hold past when it's due.
++        if (settleBy !== undefined) hold = Math.min(hold, Math.max(0, settleBy - now()));
+         await sleepIf(hold);
+         const elapsed = now() - ts.start;
+         if (elapsed < minDuration) await sleepIf(minDuration - elapsed);
+@@ -202,6 +255,7 @@ export async function runWeb(loaded: LoadedScenario, opts: WebRunOptions): Promi
+     const duration = now();
+     await cdp!.send("Page.stopScreencast").catch(() => {});
+     await Promise.all(writes);
++    guardCheck();
+     frames.sort((a, b) => a[0] - b[0]);
+     if (frames.length === 0) throw new Error("The browser produced no frames. Is the page blank?");
+ 
+@@ -218,6 +272,7 @@ export async function runWeb(loaded: LoadedScenario, opts: WebRunOptions): Promi
+       cursorStart,
+       source: { kind: "frames", dir: "frames", frames },
+       steps,
++      ...(reports.length ? { reports: reports.map(({ wall, ...r }) => ({ ...r, t: Math.max(0, (wall as number) - t0) })) } : {}),
+     };
+     return { take };
+   } finally {
+@@ -238,15 +293,71 @@ interface StepCtx {
+   minDuration: number;
+   typingSpeed: number;
+   seed: number;
++  /** The scenario's folder, for files chosen in a file chooser. */
++  dir: string;
++  /** NAVI: when this step's cursor should arrive on its target, on the recording's clock (recording to a voice). */
++  landBy?: number;
++}
++
++/**
++ * NAVI: the cursor shape the browser would show at points along the straight line from `a` to `b`, as
++ * [fraction of the distance, shape] at each change. Shapes use Recordly's names (arrow, text, pointer, ...),
++ * from the page's CSS cursor; "auto" becomes the I-beam over editable or selectable text, as in Chrome.
++ */
++async function cursorShapes(page: Page, a: Point, b: Point): Promise<Array<[number, string]>> {
++  return page.evaluate(([a, b]) => {
++    const MAP: Record<string, string> = {
++      pointer: "pointer", text: "text", "vertical-text": "text", crosshair: "crosshair", grab: "open-hand",
++      grabbing: "closed-hand", "ew-resize": "resize-ew", "col-resize": "resize-ew", "e-resize": "resize-ew",
++      "w-resize": "resize-ew", "ns-resize": "resize-ns", "row-resize": "resize-ns", "n-resize": "resize-ns",
++      "s-resize": "resize-ns", "not-allowed": "not-allowed", "no-drop": "not-allowed",
++    };
++    const editable = (el: Element) => (el as HTMLElement).isContentEditable || el.tagName === "TEXTAREA" ||
++      (el.tagName === "INPUT" && /^(text|search|email|url|tel|password|number|)$/.test((el as HTMLInputElement).type));
++    const shape = (x: number, y: number) => {
++      const el = document.elementFromPoint(x, y);
++      if (!el) return "arrow";
++      const css = getComputedStyle(el).cursor.split(",").pop()!.trim();
++      if (css !== "auto") return MAP[css] ?? "arrow";
++      if (editable(el)) return "text";
++      if (el.closest("button, a, label, select, summary, [role=button], [role=link]")) return "arrow";
++      const r = (document as any).caretRangeFromPoint?.(x, y) as Range | null;
++      if (!r || r.startContainer.nodeType !== Node.TEXT_NODE || getComputedStyle(el).userSelect === "none") return "arrow";
++      const range = document.createRange();
++      range.selectNodeContents(r.startContainer);
++      return [...range.getClientRects()].some((q) => x >= q.left && x <= q.right && y >= q.top && y <= q.bottom) ? "text" : "arrow";
++    };
++    const out: Array<[number, string]> = [];
++    const N = 24;
++    for (let i = 0; i <= N; i++) {
++      const k = i / N, s = shape(a.x + (b.x - a.x) * k, a.y + (b.y - a.y) * k);
++      if (!out.length || out[out.length - 1][1] !== s) out.push([k, s]);
++    }
++    return out;
++  }, [a, b] as const);
+ }
+ 
+ async function runStep(page: Page, step: Step, ts: TakeStep, cursor: Point, ctx: StepCtx): Promise<Point> {
+   const { now, sleepIf, record } = ctx;
++  let landed = false; // only the first travel of a step is timed to its word (a drag's second leg just follows)
+ 
+   const travelTo = async (box: Box, target?: Point): Promise<Point> => {
+     const point = target ?? { x: box.x + box.width / 2, y: box.y + box.height / 2 };
++    // NAVI: recording to a voice, the cursor arrives on its word. The travel time depends on the distance, which is
++    // only known here, once the target is found; so the cursor waits where it is and sets off exactly that long
++    // before the word. (Before, every step started a fixed time before its word and a second take was recorded
++    // with the measured times.) If the target was slow to appear, it sets off at once, as before.
++    if (ctx.landBy !== undefined && !landed) {
++      const wait = ctx.landBy - travelDuration(cursor, point) - 0.02 - now();
++      if (wait > 0) await sleepIf(wait);
++      landed = true;
++    }
+     ts.travelStart = now();
++    // NAVI: log the page's own cursor shape along the way (read while the cursor travels, so no time is lost)
++    const shapes = record ? cursorShapes(page, cursor, point).catch(() => undefined) : undefined;
+     await sleepIf(travelDuration(cursor, point));
++    const sh = await shapes;
++    if (sh) ts.cursorShapes = sh;
+     await page.mouse.move(point.x, point.y);
+     ts.point = point;
+     ts.box = box;
+@@ -308,6 +419,32 @@ async function runStep(page: Page, step: Step, ts: TakeStep, cursor: Point, ctx:
+       const { box, point } = await resolve(s.click);
+       const p = await travelTo(box, point);
+       ts.actionAt = now();
++      if (s.dragTo) {
++        const to = await resolve(s.dragTo);
++        if (!to.point) throw new StepError(ts.index, ts.label, "dragTo needs an element with a position.");
++        const dest = to.point;
++        await page.mouse.down();
++        const n = 24;
++        for (let k = 1; k <= n; k++) {
++          const e = easeInOut(k / n);
++          await page.mouse.move(p.x + (dest.x - p.x) * e, p.y + (dest.y - p.y) * e);
++          await sleep(28);
++        }
++        await sleep(120);
++        await page.mouse.up();
++        await settleAfterAction(page, ts, now, record);
++        return dest;
++      }
++      if (s.files) {
++        const files = (s.files as string[]).map((f) => path.resolve(ctx.dir, f));
++        const [chooser] = await Promise.all([
++          page.waitForEvent("filechooser", { timeout: ACTION_TIMEOUT_MS }),
++          page.mouse.click(p.x, p.y),
++        ]);
++        await chooser.setFiles(files);
++        await settleAfterAction(page, ts, now, record);
++        return p;
++      }
+       await page.mouse.click(p.x, p.y, { button: s.button ?? "left", clickCount: s.double ? 2 : 1 });
+       await settleAfterAction(page, ts, now, record);
+       return p;
+@@ -495,10 +632,14 @@ async function clickablePoint(locator: Locator, box: Box, ts: TakeStep, target:
+ }
+ 
+ /** After a click or a key: wait for a navigation or network burst, and mark the time as waiting. */
++let settleBy: number | undefined; // NAVI: when the next step is due (seconds on the take's clock), if scheduled
++
+ async function settleAfterAction(page: Page, ts: TakeStep, now: () => number, record: boolean) {
+   const w0 = now();
+   await page.waitForLoadState("load", { timeout: 15_000 }).catch(() => {});
+-  await page.waitForLoadState("networkidle", { timeout: record ? 4_000 : 1_500 }).catch(() => {});
++  let quiet = record ? 4_000 : 1_500;
++  if (settleBy !== undefined) quiet = Math.min(quiet, Math.max(0, (settleBy - now()) * 1000));
++  if (quiet > 0) await page.waitForLoadState("networkidle", { timeout: quiet }).catch(() => {});
+   const waited = now() - w0;
+   if (waited > 0.6) ts.waits.push([w0, now()]);
+ }
+diff --git a/src/login.ts b/src/login.ts
+index a7e65c6..65cd4a0 100644
+--- a/src/login.ts
++++ b/src/login.ts
+@@ -22,14 +22,69 @@ export async function login(url: string, out: string, log: (msg: string) => void
+   fs.mkdirSync(path.dirname(file), { recursive: true });
+   const browser = await launchBrowser({ headless: false });
+   const context = await browser.newContext({ viewport: null });
++  // NAVI: tick "remember me" wherever the site offers it (Andy, 11 Nov 2026), so a saved login lasts as long as the
++  // site allows. Only a checkbox whose own label says so, only once (if the person unticks it, it stays unticked);
++  // nothing is typed or submitted.
++  await context.addInitScript(() => {
++    const RX = /remember me|keep me (signed|logged) in|stay (signed|logged) in|remember (this|my) (device|computer|browser)|trust this (device|browser)|don.t ask again on this/i;
++    const done = new WeakSet<Element>();
++    const labelOf = (el: Element) => {
++      const input = el as HTMLInputElement;
++      const parts = [el.getAttribute("aria-label"), el.getAttribute("name"), el.id, el.closest("label")?.textContent];
++      if (input.labels) for (const l of Array.from(input.labels)) parts.push(l.textContent);
++      const by = el.getAttribute("aria-labelledby");
++      if (by) for (const id of by.split(/\s+/)) parts.push(document.getElementById(id)?.textContent ?? "");
++      parts.push(el.parentElement?.textContent?.slice(0, 80) ?? "");
++      return parts.filter(Boolean).join(" ");
++    };
++    const tick = () => {
++      for (const el of Array.from(document.querySelectorAll('input[type=checkbox], [role=checkbox]'))) {
++        if (done.has(el) || !RX.test(labelOf(el))) continue;
++        done.add(el);
++        const on = el instanceof HTMLInputElement ? el.checked : el.getAttribute("aria-checked") === "true";
++        if (!on && !(el as HTMLInputElement).disabled) (el as HTMLElement).click();
++      }
++    };
++    new MutationObserver(tick).observe(document, { subtree: true, childList: true });
++    document.addEventListener("DOMContentLoaded", tick);
++  });
+   const page = await context.newPage();
+ 
+   let saved = false;
++  // NAVI: never use context.storageState() here. For any site visited earlier whose tab has moved on, Playwright
++  // opens a helper tab to read its storage; in this visible browser that tab is real, so macOS brings the browser to
++  // the front on every save (every 2 seconds), taking over the Mac. Instead read cookies from the browser and each
++  // open frame's localStorage, keeping what earlier pages had, which never opens anything.
++  const storage = new Map<string, { name: string; value: string }[]>();
++  const readStorage = async () => {
++    for (const p of context.pages()) {
++      for (const f of p.frames()) {
++        try {
++          const s = await f.evaluate(() => {
++            const items: { name: string; value: string }[] = [];
++            for (let i = 0; i < localStorage.length; i++) {
++              const name = localStorage.key(i)!;
++              items.push({ name, value: localStorage.getItem(name) ?? "" });
++            }
++            return { origin: location.origin, items };
++          });
++          if (s.origin && s.origin !== "null" && /^https?:/.test(s.origin)) storage.set(s.origin, s.items);
++        } catch {
++          /* a frame that is navigating or blocks storage: keep what was read before */
++        }
++      }
++    }
++  };
++  const snapshot = async () => {
++    const cookies = await context.cookies();
++    await readStorage();
++    return { cookies, origins: [...storage].filter(([, items]) => items.length).map(([origin, localStorage]) => ({ origin, localStorage })) };
++  };
+   const save = async () => {
+     try {
+       // A closing browser may never answer: give up after a few seconds, keeping the last saved state.
+       const state = await Promise.race([
+-        context.storageState(),
++        snapshot(),
+         new Promise<never>((_, reject) => setTimeout(() => reject(new Error("timeout")), 3000)),
+       ]);
+       fs.writeFileSync(`${file}.part`, JSON.stringify(state, null, 2), { mode: 0o600 });
+diff --git a/src/scenario/schema.ts b/src/scenario/schema.ts
+index d9193de..6ad3fb1 100644
+--- a/src/scenario/schema.ts
++++ b/src/scenario/schema.ts
+@@ -69,6 +69,11 @@ const Click = z
+     click: Target,
+     button: z.enum(["left", "right"]).optional(),
+     double: z.boolean().optional(),
++    files: z
++      .array(z.string())
++      .optional()
++      .describe("Web: the click opens a file chooser; these files (relative to the scenario) are chosen in it."),
++    dragTo: Target.optional().describe("Web: press on the element and drag it onto this one instead of clicking."),
+     ...Common,
+   })
+   .strict();
+@@ -270,6 +275,31 @@ export const Scenario = z
+       .object({ storageState: z.string().describe("Path to a session saved by `screenplay login`.") })
+       .optional(),
+     hideScrollbars: z.boolean().optional().describe("Web: hide scrollbars (default true)."),
++    css: z.string().optional().describe("Web: a stylesheet added to every page (for example to blur private details)."),
++    initScript: z.string().optional().describe("Web: JavaScript source run in every page and frame before the page's own scripts. It can call window.__screenplayReport(entry); entries are kept in the take's reports with their time."),
++    schedule: z
++      .array(z.number().nullable())
++      .optional()
++      .describe(
++        "Output time (seconds) at which each step's action must land, one entry per step (null: not scheduled). The edit holds the frame when the recording is early and speeds it up when it is late; external narration is added afterwards.",
++      ),
++    startAt: z
++      .array(z.number().nullable())
++      .optional()
++      .describe(
++        "Web, recording to a voice track: wall-clock time (seconds after the first step starts) at which each step starts, one entry per step (null: as soon as the previous step ends). The browser waits live; nothing is retimed in the edit.",
++      ),
++    landAt: z
++      .array(z.number().nullable())
++      .optional()
++      .describe(
++        "Web, recording to a voice track: wall-clock time (seconds after the first step starts) at which each step's cursor should arrive on its target (and click), one entry per step (null: as soon as it can). The step still starts at its startAt, to find its target; the cursor then waits and sets off so that it arrives on time, however far it has to travel.",
++      ),
++    realtime: z.boolean().optional().describe("Edit: play the whole recording at normal speed (page loads and waits are not sped up). Default false."),
++    guard: z
++      .object({ module: z.string(), config: z.string() })
++      .optional()
++      .describe("Web: an action guard. `module` (absolute path) exports installFromFile(context, config, onBlock); it intercepts requests and calls onBlock when it blocks one, which ends the take."),
+     typingSpeed: z.number().min(0.2).max(5).optional().describe("Typing speed multiplier (default 1, about 14 characters/second)."),
+     style: Style.optional(),
+     voice: Voice.optional(),
+diff --git a/src/take.ts b/src/take.ts
+index 7c0f0dc..accd84f 100644
+--- a/src/take.ts
++++ b/src/take.ts
+@@ -33,6 +33,8 @@ export interface TakeStep {
+   actionEnd?: number;
+   /** Where the cursor goes. */
+   point?: Point;
++  /** NAVI: the cursor shape along the way, [fraction of the distance, shape] at each change (Recordly's names). */
++  cursorShapes?: Array<[number, string]>;
+   /** The element's box at action time. */
+   box?: Box;
+   /** Spans spent waiting (page loads, slow elements): sped up in the video. */
+@@ -83,6 +85,8 @@ export interface Take {
+   steps: TakeStep[];
+   /** What the recording depends on (see scenario/fingerprint.ts), to refuse re-rendering a changed scenario. */
+   inputs?: { setup: string; steps: string[] };
++  /** NAVI: what the scenario's initScript reported (window.__screenplayReport), with `t` on the take's clock. */
++  reports?: Array<Record<string, unknown>>;
+ }
+ 
+ export function writeTake(dir: string, take: Take): string {

@@ -1,0 +1,64 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Acme Dashboard (NAVI privacy test)</title>
+<script src="fake.js"></script>
+<style>
+  body{margin:0;font:15px/1.45 -apple-system,system-ui,sans-serif;color:#1d1d1f;background:#f6f6f4}
+  header{display:flex;align-items:center;justify-content:space-between;padding:14px 28px;background:#fff;border-bottom:1px solid #e5e5e2}
+  h1{font-size:20px;margin:0} h2{font-size:17px;margin:0 0 12px}
+  .user-menu{display:flex;align-items:center;gap:10px;font-weight:600}
+  .avatar{width:36px;height:36px;border-radius:50%}
+  main{max-width:1100px;margin:0 auto;padding:24px 28px}
+  .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+  .card{background:#fff;border:1px solid #e5e5e2;border-radius:12px;padding:16px;margin-bottom:16px}
+  .big{font-size:24px;font-weight:650} .muted{color:#6b6b66;font-size:13px}
+  code{font:13px ui-monospace,Menlo,monospace;background:#f1f1ee;padding:3px 6px;border-radius:6px}
+  input{font:14px system-ui;padding:8px 10px;border:1px solid #d5d5d0;border-radius:8px;width:320px}
+  button{font:14px system-ui;padding:8px 14px;border-radius:8px;border:1px solid #1d1d1f;background:#1d1d1f;color:#fff;cursor:pointer}
+  table{width:100%;border-collapse:collapse} td,th{text-align:left;padding:10px 8px;border-bottom:1px solid #eee}
+  .spacer{height:420px}
+</style></head><body>
+<header><h1>Acme Dashboard</h1>
+  <div class="user-menu"><span id="who"></span><img class="avatar" alt="Profile photo" id="avatar"></div></header>
+<main>
+  <p id="hello"></p>
+  <p id="client"></p>
+  <div class="grid">
+    <div class="card"><div class="muted">Revenue this month</div><div class="big" id="rev"></div></div>
+    <div class="card"><div class="muted">MRR</div><div class="big" id="mrr"></div></div>
+    <div class="card"><div class="muted">Audience</div><div class="big" id="cust"></div><div class="muted" id="foll"></div></div>
+    <div class="card"><div class="muted">Plan</div><div class="big">Pro $29/month</div><div class="muted">48,210 tokens used · renews 8 Nov 2026</div></div>
+  </div>
+  <div class="card"><h2>API keys</h2>
+    <p>Live key: <code id="key1"></code></p>
+    <p>Deploy key: <input id="key2" readonly></p>
+    <p><button id="reveal">Reveal key</button> <span id="revealed"></span></p>
+    <p class="muted" id="link"></p></div>
+  <div class="card"><h2>Invite a teammate</h2><input id="invite" placeholder="Their email"> <button>Send</button>
+    <p class="muted">Example: you@example.com</p></div>
+  <div class="card"><h2>Billing</h2><p>Card on file: <span id="card"></span> (<span id="mcard"></span>). Last payment <span id="pay"></span>.</p>
+    <p>Recovery codes: <span id="codes"></span></p><p>Tax ID: <span id="ssn"></span></p></div>
+  <div class="card"><h2>Latest invoice (image)</h2><canvas id="inv" width="560" height="120"></canvas></div>
+  <div class="spacer"></div>
+  <div class="card"><h2>Customers</h2><table id="customers"><tr><th>Name</th><th>Email</th><th>Phone</th><th>Address</th></tr></table></div>
+  <div class="spacer"></div>
+</main>
+<script>
+const F = window.FAKE.blur, J = window.FAKE.join, $ = (id) => document.getElementById(id);
+$("who").textContent = F.account_name;
+$("hello").textContent = "Signed in as " + F.account_name + ". Contact: " + F.emails[0];
+$("client").textContent = "Our client " + F.hide_word + " Traders renewed today.";
+$("rev").textContent = F.money[0]; $("mrr").textContent = F.money[1];
+$("cust").textContent = F.counts[0]; $("foll").textContent = F.counts[1];
+$("key1").textContent = J.key(F.keys[0]);
+$("key2").value = J.key(F.keys[2]);                     // set by script, like a React field: no event, no mutation
+$("reveal").onclick = () => { $("revealed").innerHTML = "<code>" + J.key(F.keys[1]) + "</code>"; };
+$("link").textContent = "Magic sign-in link: " + J.link(F.login_link);
+$("card").textContent = J.card(F.card); $("mcard").textContent = F.masked_card; $("pay").textContent = F.money[2];
+$("codes").textContent = F.codes.join("  "); $("ssn").textContent = F.gov_id;
+const rows = F.customer_names.map((n, i) => `<tr><td class="customer-name">${n}</td><td>${F.emails[i + 1]}</td><td>${F.phones[i % 2]}</td><td>${i ? F.addresses[1] : F.addresses[0]}</td></tr>`);
+$("customers").insertAdjacentHTML("beforeend", rows.join(""));
+const c = $("inv").getContext("2d"); c.fillStyle = "#fff"; c.fillRect(0, 0, 560, 120); c.fillStyle = "#222"; c.font = "22px Helvetica";
+c.fillText("Invoice to " + F.in_image[0], 16, 48); c.fillText("Total " + F.in_image[1], 16, 90);
+const a = document.createElement("canvas"); a.width = a.height = 72; const g = a.getContext("2d");
+g.fillStyle = "#c98a5e"; g.beginPath(); g.arc(36, 36, 36, 0, 7); g.fill(); g.fillStyle = "#3b2a20"; g.beginPath(); g.arc(36, 28, 14, 0, 7); g.fill();
+$("avatar").src = a.toDataURL();
+</script></body></html>

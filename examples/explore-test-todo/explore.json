@@ -1,0 +1,1464 @@
+{
+ "url": "https://demo.playwright.dev/todomvc",
+ "viewport": [
+  1440,
+  810
+ ],
+ "screens": [
+  {
+   "n": 0,
+   "step": "start",
+   "file": "00-start.png",
+   "url": "https://demo.playwright.dev/todomvc/#/",
+   "title": "React • TodoMVC",
+   "settle_ms": 1139,
+   "elements": [
+    {
+     "tag": "a",
+     "text": "real TodoMVC app.",
+     "box": [
+      813,
+      13,
+      112,
+      17
+     ],
+     "panel": null
+    },
+    {
+     "tag": "input",
+     "cls": "new-todo",
+     "label": "What needs to be done?",
+     "box": [
+      445,
+      175,
+      550,
+      66
+     ],
+     "panel": null
+    },
+    {
+     "tag": "a",
+     "text": "Remo H. Jansen",
+     "box": [
+      707,
+      324,
+      74,
+      12
+     ],
+     "panel": null
+    },
+    {
+     "tag": "a",
+     "text": "TodoMVC",
+     "box": [
+      713,
+      344,
+      44,
+      12
+     ],
+     "panel": null
+    },
+    {
+     "tag": "section",
+     "cls": "todoapp",
+     "area": true,
+     "text": "todos",
+     "box": [
+      445,
+      175,
+      550,
+      66
+     ],
+     "panel": null
+    },
+    {
+     "tag": "header",
+     "cls": "header",
+     "area": true,
+     "text": "todos",
+     "box": [
+      445,
+      175,
+      550,
+      66
+     ],
+     "panel": null
+    },
+    {
+     "tag": "footer",
+     "cls": "info",
+     "area": true,
+     "text": "Double-click to edit a todo Created by Remo H. Jansen Part of TodoMVC",
+     "box": [
+      445,
+      305,
+      550,
+      50
+     ],
+     "panel": null
+    }
+   ]
+  },
+  {
+   "n": 1,
+   "step": "fill-what-needs-to-be-done-call-the-dent",
+   "file": "01-fill-what-needs-to-be-done-call-the-dent.png",
+   "url": "https://demo.playwright.dev/todomvc/#/",
+   "title": "React • TodoMVC",
+   "settle_ms": 27,
+   "elements": [
+    {
+     "tag": "a",
+     "text": "real TodoMVC app.",
+     "box": [
+      813,
+      13,
+      112,
+      17
+     ],
+     "panel": null
+    },
+    {
+     "tag": "input",
+     "cls": "new-todo",
+     "text": "Call the dentist",
+     "label": "What needs to be done?",
+     "box": [
+      445,
+      175,
+      550,
+      66
+     ],
+     "panel": null
+    },
+    {
+     "tag": "a",
+     "text": "Remo H. Jansen",
+     "box": [
+      707,
+      324,
+      74,
+      12
+     ],
+     "panel": null
+    },
+    {
+     "tag": "a",
+     "text": "TodoMVC",
+     "box": [
+      713,
+      344,
+      44,
+      12
+     ],
+     "panel": null
+    },
+    {
+     "tag": "section",
+     "cls": "todoapp",
+     "area": true,
+     "text": "todos",
+     "box": [
+      445,
+      175,
+      550,
+      66
+     ],
+     "panel": null
+    },
+    {
+     "tag": "header",
+     "cls": "header",
+     "area": true,
+     "text": "todos",
+     "box": [
+      445,
+      175,
+      550,
+      66
+     ],
+     "panel": null
+    },
+    {
+     "tag": "footer",
+     "cls": "info",
+     "area": true,
+     "text": "Double-click to edit a todo Created by Remo H. Jansen Part of TodoMVC",
+     "box": [
+      445,
+      305,
+      550,
+      50
+     ],
+     "panel": null
+    }
+   ]
+  },
+  {
+   "n": 2,
+   "step": "press-enter",
+   "file": "02-press-enter.png",
+   "url": "https://demo.playwright.dev/todomvc/#/",
+   "title": "React • TodoMVC",
+   "settle_ms": 33,
+   "elements": [
+    {
+     "tag": "a",
+     "text": "real TodoMVC app.",
+     "box": [
+      813,
+      13,
+      112,
+      17
+     ],
+     "panel": null
+    },
+    {
+     "tag": "input",
+     "cls": "new-todo",
+     "label": "What needs to be done?",
+     "box": [
+      445,
+      175,
+      550,
+      66
+     ],
+     "panel": null
+    },
+    {
+     "tag": "a",
+     "cls": "selected",
+     "text": "All",
+     "box": [
+      630,
+      308,
+      29,
+      25
+     ],
+     "panel": null
+    },
+    {
+     "tag": "a",
+     "text": "Active",
+     "box": [
+      669,
+      308,
+      51,
+      25
+     ],
+     "panel": null
+    },
+    {
+     "tag": "a",
+     "text": "Completed",
+     "box": [
+      730,
+      308,
+      80,
+      25
+     ],
+     "panel": null
+    },
+    {
+     "tag": "a",
+     "text": "Remo H. Jansen",
+     "box": [
+      707,
+      425,
+      74,
+      12
+     ],
+     "panel": null
+    },
+    {
+     "tag": "a",
+     "text": "TodoMVC",
+     "box": [
+      713,
+      445,
+      44,
+      12
+     ],
+     "panel": null
+    },
+    {
+     "tag": "section",
+     "cls": "todoapp",
+     "area": true,
+     "text": "todos Mark all as complete Call the dentist 1 item left All Active Completed",
+     "box": [
+      445,
+      175,
+      550,
+      166
+     ],
+     "panel": null
+    },
+    {
+     "tag": "header",
+     "cls": "header",
+     "area": true,
+     "text": "todos",
+     "box": [
+      445,
+      175,
+      550,
+      66
+     ],
+     "panel": null
+    },
+    {
+     "tag": "section",
+     "cls": "main",
+     "area": true,
+     "text": "Mark all as complete Call the dentist",
+     "box": [
+      445,
+      240,
+      550,
+      60
+     ],
+     "panel": null
+    },
+    {
+     "tag": "ul",
+     "cls": "todo-list",
+     "area": true,
+     "text": "Call the dentist",
+     "box": [
+      445,
+      241,
+      550,
+      59
+     ],
+     "panel": null
+    },
+    {
+     "tag": "footer",
+     "cls": "footer",
+     "area": true,
+     "text": "1 item left All Active Completed",
+     "box": [
+      445,
+      300,
+      550,
+      41
+     ],
+     "panel": null
+    },
+    {
+     "tag": "ul",
+     "cls": "filters",
+     "area": true,
+     "text": "All Active Completed",
+     "box": [
+      445,
+      311,
+      550,
+      20
+     ],
+     "panel": null
+    },
+    {
+     "tag": "footer",
+     "cls": "info",
+     "area": true,
+     "text": "Double-click to edit a todo Created by Remo H. Jansen Part of TodoMVC",
+     "box": [
+      445,
+      406,
+      550,
+      50
+     ],
+     "panel": null
+    }
+   ]
+  },
+  {
+   "n": 3,
+   "step": "fill-what-needs-to-be-done-pay-the-gas-b",
+   "file": "03-fill-what-needs-to-be-done-pay-the-gas-b.png",
+   "url": "https://demo.playwright.dev/todomvc/#/",
+   "title": "React • TodoMVC",
+   "settle_ms": 5,
+   "elements": [
+    {
+     "tag": "a",
+     "text": "real TodoMVC app.",
+     "box": [
+      813,
+      13,
+      112,
+      17
+     ],
+     "panel": null
+    },
+    {
+     "tag": "input",
+     "cls": "new-todo",
+     "text": "Pay the gas bill",
+     "label": "What needs to be done?",
+     "box": [
+      445,
+      175,
+      550,
+      66
+     ],
+     "panel": null
+    },
+    {
+     "tag": "a",
+     "cls": "selected",
+     "text": "All",
+     "box": [
+      630,
+      308,
+      29,
+      25
+     ],
+     "panel": null
+    },
+    {
+     "tag": "a",
+     "text": "Active",
+     "box": [
+      669,
+      308,
+      51,
+      25
+     ],
+     "panel": null
+    },
+    {
+     "tag": "a",
+     "text": "Completed",
+     "box": [
+      730,
+      308,
+      80,
+      25
+     ],
+     "panel": null
+    },
+    {
+     "tag": "a",
+     "text": "Remo H. Jansen",
+     "box": [
+      707,
+      425,
+      74,
+      12
+     ],
+     "panel": null
+    },
+    {
+     "tag": "a",
+     "text": "TodoMVC",
+     "box": [
+      713,
+      445,
+      44,
+      12
+     ],
+     "panel": null
+    },
+    {
+     "tag": "section",
+     "cls": "todoapp",
+     "area": true,
+     "text": "todos Mark all as complete Call the dentist 1 item left All Active Completed",
+     "box": [
+      445,
+      175,
+      550,
+      166
+     ],
+     "panel": null
+    },
+    {
+     "tag": "header",
+     "cls": "header",
+     "area": true,
+     "text": "todos",
+     "box": [
+      445,
+      175,
+      550,
+      66
+     ],
+     "panel": null
+    },
+    {
+     "tag": "section",
+     "cls": "main",
+     "area": true,
+     "text": "Mark all as complete Call the dentist",
+     "box": [
+      445,
+      240,
+      550,
+      60
+     ],
+     "panel": null
+    },
+    {
+     "tag": "ul",
+     "cls": "todo-list",
+     "area": true,
+     "text": "Call the dentist",
+     "box": [
+      445,
+      241,
+      550,
+      59
+     ],
+     "panel": null
+    },
+    {
+     "tag": "footer",
+     "cls": "footer",
+     "area": true,
+     "text": "1 item left All Active Completed",
+     "box": [
+      445,
+      300,
+      550,
+      41
+     ],
+     "panel": null
+    },
+    {
+     "tag": "ul",
+     "cls": "filters",
+     "area": true,
+     "text": "All Active Completed",
+     "box": [
+      445,
+      311,
+      550,
+      20
+     ],
+     "panel": null
+    },
+    {
+     "tag": "footer",
+     "cls": "info",
+     "area": true,
+     "text": "Double-click to edit a todo Created by Remo H. Jansen Part of TodoMVC",
+     "box": [
+      445,
+      406,
+      550,
+      50
+     ],
+     "panel": null
+    }
+   ]
+  },
+  {
+   "n": 4,
+   "step": "press-enter",
+   "file": "04-press-enter.png",
+   "url": "https://demo.playwright.dev/todomvc/#/",
+   "title": "React • TodoMVC",
+   "settle_ms": 2,
+   "elements": [
+    {
+     "tag": "a",
+     "text": "real TodoMVC app.",
+     "box": [
+      813,
+      13,
+      112,
+      17
+     ],
+     "panel": null
+    },
+    {
+     "tag": "input",
+     "cls": "new-todo",
+     "label": "What needs to be done?",
+     "box": [
+      445,
+      175,
+      550,
+      66
+     ],
+     "panel": null
+    },
+    {
+     "tag": "a",
+     "cls": "selected",
+     "text": "All",
+     "box": [
+      630,
+      368,
+      29,
+      25
+     ],
+     "panel": null
+    },
+    {
+     "tag": "a",
+     "text": "Active",
+     "box": [
+      669,
+      368,
+      51,
+      25
+     ],
+     "panel": null
+    },
+    {
+     "tag": "a",
+     "text": "Completed",
+     "box": [
+      730,
+      368,
+      80,
+      25
+     ],
+     "panel": null
+    },
+    {
+     "tag": "a",
+     "text": "Remo H. Jansen",
+     "box": [
+      707,
+      485,
+      74,
+      12
+     ],
+     "panel": null
+    },
+    {
+     "tag": "a",
+     "text": "TodoMVC",
+     "box": [
+      713,
+      505,
+      44,
+      12
+     ],
+     "panel": null
+    },
+    {
+     "tag": "section",
+     "cls": "todoapp",
+     "area": true,
+     "text": "todos Mark all as complete Call the dentist Pay the gas bill 2 items left All Ac",
+     "box": [
+      445,
+      175,
+      550,
+      226
+     ],
+     "panel": null
+    },
+    {
+     "tag": "header",
+     "cls": "header",
+     "area": true,
+     "text": "todos",
+     "box": [
+      445,
+      175,
+      550,
+      66
+     ],
+     "panel": null
+    },
+    {
+     "tag": "section",
+     "cls": "main",
+     "area": true,
+     "text": "Mark all as complete Call the dentist Pay the gas bill",
+     "box": [
+      445,
+      240,
+      550,
+      120
+     ],
+     "panel": null
+    },
+    {
+     "tag": "ul",
+     "cls": "todo-list",
+     "area": true,
+     "text": "Call the dentist Pay the gas bill",
+     "box": [
+      445,
+      241,
+      550,
+      119
+     ],
+     "panel": null
+    },
+    {
+     "tag": "footer",
+     "cls": "footer",
+     "area": true,
+     "text": "2 items left All Active Completed",
+     "box": [
+      445,
+      360,
+      550,
+      41
+     ],
+     "panel": null
+    },
+    {
+     "tag": "ul",
+     "cls": "filters",
+     "area": true,
+     "text": "All Active Completed",
+     "box": [
+      445,
+      371,
+      550,
+      20
+     ],
+     "panel": null
+    },
+    {
+     "tag": "footer",
+     "cls": "info",
+     "area": true,
+     "text": "Double-click to edit a todo Created by Remo H. Jansen Part of TodoMVC",
+     "box": [
+      445,
+      466,
+      550,
+      50
+     ],
+     "panel": null
+    }
+   ]
+  },
+  {
+   "n": 5,
+   "step": "fill-what-needs-to-be-done-book-the-trai",
+   "file": "05-fill-what-needs-to-be-done-book-the-trai.png",
+   "url": "https://demo.playwright.dev/todomvc/#/",
+   "title": "React • TodoMVC",
+   "settle_ms": 4,
+   "elements": [
+    {
+     "tag": "a",
+     "text": "real TodoMVC app.",
+     "box": [
+      813,
+      13,
+      112,
+      17
+     ],
+     "panel": null
+    },
+    {
+     "tag": "input",
+     "cls": "new-todo",
+     "text": "Book the train tickets",
+     "label": "What needs to be done?",
+     "box": [
+      445,
+      175,
+      550,
+      66
+     ],
+     "panel": null
+    },
+    {
+     "tag": "a",
+     "cls": "selected",
+     "text": "All",
+     "box": [
+      630,
+      368,
+      29,
+      25
+     ],
+     "panel": null
+    },
+    {
+     "tag": "a",
+     "text": "Active",
+     "box": [
+      669,
+      368,
+      51,
+      25
+     ],
+     "panel": null
+    },
+    {
+     "tag": "a",
+     "text": "Completed",
+     "box": [
+      730,
+      368,
+      80,
+      25
+     ],
+     "panel": null
+    },
+    {
+     "tag": "a",
+     "text": "Remo H. Jansen",
+     "box": [
+      707,
+      485,
+      74,
+      12
+     ],
+     "panel": null
+    },
+    {
+     "tag": "a",
+     "text": "TodoMVC",
+     "box": [
+      713,
+      505,
+      44,
+      12
+     ],
+     "panel": null
+    },
+    {
+     "tag": "section",
+     "cls": "todoapp",
+     "area": true,
+     "text": "todos Mark all as complete Call the dentist Pay the gas bill 2 items left All Ac",
+     "box": [
+      445,
+      175,
+      550,
+      226
+     ],
+     "panel": null
+    },
+    {
+     "tag": "header",
+     "cls": "header",
+     "area": true,
+     "text": "todos",
+     "box": [
+      445,
+      175,
+      550,
+      66
+     ],
+     "panel": null
+    },
+    {
+     "tag": "section",
+     "cls": "main",
+     "area": true,
+     "text": "Mark all as complete Call the dentist Pay the gas bill",
+     "box": [
+      445,
+      240,
+      550,
+      120
+     ],
+     "panel": null
+    },
+    {
+     "tag": "ul",
+     "cls": "todo-list",
+     "area": true,
+     "text": "Call the dentist Pay the gas bill",
+     "box": [
+      445,
+      241,
+      550,
+      119
+     ],
+     "panel": null
+    },
+    {
+     "tag": "footer",
+     "cls": "footer",
+     "area": true,
+     "text": "2 items left All Active Completed",
+     "box": [
+      445,
+      360,
+      550,
+      41
+     ],
+     "panel": null
+    },
+    {
+     "tag": "ul",
+     "cls": "filters",
+     "area": true,
+     "text": "All Active Completed",
+     "box": [
+      445,
+      371,
+      550,
+      20
+     ],
+     "panel": null
+    },
+    {
+     "tag": "footer",
+     "cls": "info",
+     "area": true,
+     "text": "Double-click to edit a todo Created by Remo H. Jansen Part of TodoMVC",
+     "box": [
+      445,
+      466,
+      550,
+      50
+     ],
+     "panel": null
+    }
+   ]
+  },
+  {
+   "n": 6,
+   "step": "press-enter",
+   "file": "06-press-enter.png",
+   "url": "https://demo.playwright.dev/todomvc/#/",
+   "title": "React • TodoMVC",
+   "settle_ms": 2,
+   "elements": [
+    {
+     "tag": "a",
+     "text": "real TodoMVC app.",
+     "box": [
+      813,
+      13,
+      112,
+      17
+     ],
+     "panel": null
+    },
+    {
+     "tag": "input",
+     "cls": "new-todo",
+     "label": "What needs to be done?",
+     "box": [
+      445,
+      175,
+      550,
+      66
+     ],
+     "panel": {
+      "box": [
+       445,
+       175,
+       550,
+       286
+      ],
+      "kind": "div"
+     }
+    },
+    {
+     "tag": "a",
+     "cls": "selected",
+     "text": "All",
+     "box": [
+      630,
+      428,
+      29,
+      25
+     ],
+     "panel": {
+      "box": [
+       445,
+       175,
+       550,
+       286
+      ],
+      "kind": "div"
+     }
+    },
+    {
+     "tag": "a",
+     "text": "Active",
+     "box": [
+      669,
+      428,
+      51,
+      25
+     ],
+     "panel": {
+      "box": [
+       445,
+       175,
+       550,
+       286
+      ],
+      "kind": "div"
+     }
+    },
+    {
+     "tag": "a",
+     "text": "Completed",
+     "box": [
+      730,
+      428,
+      80,
+      25
+     ],
+     "panel": {
+      "box": [
+       445,
+       175,
+       550,
+       286
+      ],
+      "kind": "div"
+     }
+    },
+    {
+     "tag": "a",
+     "text": "Remo H. Jansen",
+     "box": [
+      707,
+      545,
+      74,
+      12
+     ],
+     "panel": null
+    },
+    {
+     "tag": "a",
+     "text": "TodoMVC",
+     "box": [
+      713,
+      565,
+      44,
+      12
+     ],
+     "panel": null
+    },
+    {
+     "tag": "section",
+     "cls": "todoapp",
+     "area": true,
+     "text": "todos Mark all as complete Call the dentist Pay the gas bill Book the train tick",
+     "box": [
+      445,
+      175,
+      550,
+      286
+     ],
+     "panel": null
+    },
+    {
+     "tag": "header",
+     "cls": "header",
+     "area": true,
+     "text": "todos",
+     "box": [
+      445,
+      175,
+      550,
+      66
+     ],
+     "panel": {
+      "box": [
+       445,
+       175,
+       550,
+       286
+      ],
+      "kind": "div"
+     }
+    },
+    {
+     "tag": "section",
+     "cls": "main",
+     "area": true,
+     "text": "Mark all as complete Call the dentist Pay the gas bill Book the train tickets",
+     "box": [
+      445,
+      240,
+      550,
+      179
+     ],
+     "panel": {
+      "box": [
+       445,
+       175,
+       550,
+       286
+      ],
+      "kind": "div"
+     }
+    },
+    {
+     "tag": "ul",
+     "cls": "todo-list",
+     "area": true,
+     "text": "Call the dentist Pay the gas bill Book the train tickets",
+     "box": [
+      445,
+      241,
+      550,
+      178
+     ],
+     "panel": {
+      "box": [
+       445,
+       175,
+       550,
+       286
+      ],
+      "kind": "div"
+     }
+    },
+    {
+     "tag": "footer",
+     "cls": "footer",
+     "area": true,
+     "text": "3 items left All Active Completed",
+     "box": [
+      445,
+      420,
+      550,
+      41
+     ],
+     "panel": {
+      "box": [
+       445,
+       175,
+       550,
+       286
+      ],
+      "kind": "div"
+     }
+    },
+    {
+     "tag": "ul",
+     "cls": "filters",
+     "area": true,
+     "text": "All Active Completed",
+     "box": [
+      445,
+      431,
+      550,
+      20
+     ],
+     "panel": {
+      "box": [
+       445,
+       175,
+       550,
+       286
+      ],
+      "kind": "div"
+     }
+    },
+    {
+     "tag": "footer",
+     "cls": "info",
+     "area": true,
+     "text": "Double-click to edit a todo Created by Remo H. Jansen Part of TodoMVC",
+     "box": [
+      445,
+      526,
+      550,
+      50
+     ],
+     "panel": null
+    }
+   ]
+  },
+  {
+   "n": 7,
+   "step": "click-css-todo-list-li-toggle",
+   "file": "07-click-css-todo-list-li-toggle.png",
+   "url": "https://demo.playwright.dev/todomvc/#/",
+   "title": "React • TodoMVC",
+   "settle_ms": 42,
+   "elements": [
+    {
+     "tag": "a",
+     "text": "real TodoMVC app.",
+     "box": [
+      813,
+      13,
+      112,
+      17
+     ],
+     "panel": null
+    },
+    {
+     "tag": "input",
+     "cls": "new-todo",
+     "label": "What needs to be done?",
+     "box": [
+      445,
+      175,
+      550,
+      66
+     ],
+     "panel": {
+      "box": [
+       445,
+       175,
+       550,
+       286
+      ],
+      "kind": "div"
+     }
+    },
+    {
+     "tag": "button",
+     "cls": "destroy",
+     "label": "Delete",
+     "box": [
+      945,
+      249,
+      40,
+      40
+     ],
+     "panel": {
+      "box": [
+       445,
+       175,
+       550,
+       286
+      ],
+      "kind": "div"
+     }
+    },
+    {
+     "tag": "a",
+     "cls": "selected",
+     "text": "All",
+     "box": [
+      630,
+      428,
+      29,
+      25
+     ],
+     "panel": {
+      "box": [
+       445,
+       175,
+       550,
+       286
+      ],
+      "kind": "div"
+     }
+    },
+    {
+     "tag": "a",
+     "text": "Active",
+     "box": [
+      669,
+      428,
+      51,
+      25
+     ],
+     "panel": {
+      "box": [
+       445,
+       175,
+       550,
+       286
+      ],
+      "kind": "div"
+     }
+    },
+    {
+     "tag": "a",
+     "text": "Completed",
+     "box": [
+      730,
+      428,
+      80,
+      25
+     ],
+     "panel": {
+      "box": [
+       445,
+       175,
+       550,
+       286
+      ],
+      "kind": "div"
+     }
+    },
+    {
+     "tag": "button",
+     "cls": "clear-completed",
+     "text": "Clear completed",
+     "box": [
+      884,
+      431,
+      96,
+      20
+     ],
+     "panel": {
+      "box": [
+       445,
+       175,
+       550,
+       286
+      ],
+      "kind": "div"
+     }
+    },
+    {
+     "tag": "a",
+     "text": "Remo H. Jansen",
+     "box": [
+      707,
+      545,
+      74,
+      12
+     ],
+     "panel": null
+    },
+    {
+     "tag": "a",
+     "text": "TodoMVC",
+     "box": [
+      713,
+      565,
+      44,
+      12
+     ],
+     "panel": null
+    },
+    {
+     "tag": "section",
+     "cls": "todoapp",
+     "area": true,
+     "text": "todos Mark all as complete Call the dentist Pay the gas bill Book the train tick",
+     "box": [
+      445,
+      175,
+      550,
+      286
+     ],
+     "panel": null
+    },
+    {
+     "tag": "header",
+     "cls": "header",
+     "area": true,
+     "text": "todos",
+     "box": [
+      445,
+      175,
+      550,
+      66
+     ],
+     "panel": {
+      "box": [
+       445,
+       175,
+       550,
+       286
+      ],
+      "kind": "div"
+     }
+    },
+    {
+     "tag": "section",
+     "cls": "main",
+     "area": true,
+     "text": "Mark all as complete Call the dentist Pay the gas bill Book the train tickets",
+     "box": [
+      445,
+      240,
+      550,
+      179
+     ],
+     "panel": {
+      "box": [
+       445,
+       175,
+       550,
+       286
+      ],
+      "kind": "div"
+     }
+    },
+    {
+     "tag": "ul",
+     "cls": "todo-list",
+     "area": true,
+     "text": "Call the dentist Pay the gas bill Book the train tickets",
+     "box": [
+      445,
+      241,
+      550,
+      178
+     ],
+     "panel": {
+      "box": [
+       445,
+       175,
+       550,
+       286
+      ],
+      "kind": "div"
+     }
+    },
+    {
+     "tag": "footer",
+     "cls": "footer",
+     "area": true,
+     "text": "2 items left All Active Completed Clear completed",
+     "box": [
+      445,
+      420,
+      550,
+      41
+     ],
+     "panel": {
+      "box": [
+       445,
+       175,
+       550,
+       286
+      ],
+      "kind": "div"
+     }
+    },
+    {
+     "tag": "ul",
+     "cls": "filters",
+     "area": true,
+     "text": "All Active Completed",
+     "box": [
+      445,
+      431,
+      550,
+      20
+     ],
+     "panel": {
+      "box": [
+       445,
+       175,
+       550,
+       286
+      ],
+      "kind": "div"
+     }
+    },
+    {
+     "tag": "footer",
+     "cls": "info",
+     "area": true,
+     "text": "Double-click to edit a todo Created by Remo H. Jansen Part of TodoMVC",
+     "box": [
+      445,
+      526,
+      550,
+      50
+     ],
+     "panel": null
+    }
+   ]
+  }
+ ]
+}

@@ -1,0 +1,31 @@
+{
+ "name": "Ending test for section 1: stop on the action instead of announcing the result",
+ "takes": 2,
+ "voice_id": "hLygPNd2gK6Azddorc5W",
+ "experiments": {
+  "END1": {
+   "about": "Full section 1 reads; only the end differs. Replaces 'so that's on the list now' (Andy: too upbeat).",
+   "kind": "line",
+   "variants": [
+    {
+     "id": "stop-on-action",
+     "text": "[relaxed] So this is a pretty basic to-do list. I'm gonna type in the box up top, call the dentist, and hit Enter.",
+     "model": "eleven_v4",
+     "stability": 0.7
+    },
+    {
+     "id": "so-yeah",
+     "text": "[relaxed] So this is a pretty basic to-do list. I'm gonna type in the box up top, call the dentist, and hit Enter, so yeah.",
+     "model": "eleven_v4",
+     "stability": 0.7
+    },
+    {
+     "id": "thats-one",
+     "text": "[relaxed] So this is a pretty basic to-do list. I'm gonna type in the box up top, call the dentist, and hit Enter, so that's one.",
+     "model": "eleven_v4",
+     "stability": 0.7
+    }
+   ]
+  }
+ }
+}

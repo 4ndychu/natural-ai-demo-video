@@ -1,0 +1,61 @@
+{
+ "title": "Opening the course",
+ "site": "whop.com",
+ "kind": "course",
+ "voice_id": "hLygPNd2gK6Azddorc5W",
+ "sections": [
+  {
+   "name": "home",
+   "talk": "[relaxed] The first time you join Real Biz this is where it drops you, and the course you're after is Real Course, right here in the list.",
+   "caption": "This is what you see when you join Real Biz. The course is Real Course, here in the list.",
+   "actions": [
+    {
+     "on": "start",
+     "do": "goto",
+     "kind": "wait",
+     "target": "https://whop.com/x-revenue-mastery/"
+    },
+    {
+     "on": "join",
+     "do": "hover",
+     "kind": "explain",
+     "target": "text=Operating systems for authority and revenue on X."
+    },
+    {
+     "on": "System",
+     "do": "click",
+     "kind": "click",
+     "target": "a[href$='/exp_FakeCourse0001/app/']"
+    }
+   ]
+  },
+  {
+   "name": "modules",
+   "talk": "[relaxed] Inside it's just the modules, nothing else to click through. Start Here comes first, then Module 01, and after that it's in order, or, I mean, you do them in order, all the way down.",
+   "caption": "It opens on the modules. Start with Start Here, then Module 01, and work your way down.",
+   "actions": [
+    {
+     "on": "modules",
+     "do": "hover",
+     "kind": "explain",
+     "target": "text=Start Here + Implementation"
+    },
+    {
+     "on": "01",
+     "do": "hover",
+     "kind": "explain",
+     "target": "text=Module 01"
+    },
+    {
+     "on": "down",
+     "do": "hover",
+     "kind": "explain",
+     "target": "text=Module 04"
+    }
+   ]
+  }
+ ],
+ "style": {
+  "opening": "scene"
+ }
+}

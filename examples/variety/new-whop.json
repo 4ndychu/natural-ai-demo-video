@@ -1,0 +1,141 @@
+{
+ "title": "Create a product on Whop",
+ "site": "whop.com",
+ "kind": "saas",
+ "voice_id": "hLygPNd2gK6Azddorc5W",
+ "sections": [
+  {
+   "name": "open",
+   "talk": "[relaxed] If you're selling anything on Whop it starts on the Products page, and a new one is Create product, the blue button top right.",
+   "caption": "This is the Products page in Whop. To make a new product, click Create product, the blue button at the top right.",
+   "actions": [
+    {
+     "on": "start",
+     "do": "goto",
+     "kind": "wait",
+     "target": "https://whop.com/dashboard/biz_NaviTest000001/products/"
+    },
+    {
+     "on": "Products",
+     "do": "hover",
+     "kind": "explain",
+     "target": "role=button[name='Products']"
+    },
+    {
+     "on": "Create",
+     "do": "click",
+     "kind": "click",
+     "target": "role=link[name='Create product']"
+    }
+   ]
+  },
+  {
+   "name": "name",
+   "talk": "[relaxed] First thing it offers is to describe it and the AI drafts the lot, which is fine, I'd just rather fill it in myself. Name goes in this box, and I'll, I'll just call it a test for now.",
+   "caption": "You can describe your product and let AI draft it, or fill it in yourself. The name goes in this box.",
+   "actions": [
+    {
+     "on": "describe",
+     "do": "hover",
+     "kind": "explain",
+     "target": "textarea"
+    },
+    {
+     "on": "myself",
+     "do": "hover",
+     "kind": "explain",
+     "target": "text=Or fill it in yourself"
+    },
+    {
+     "on": "box",
+     "do": "click",
+     "kind": "click",
+     "target": "placeholder=Basic access"
+    },
+    {
+     "on": "just",
+     "do": "type",
+     "kind": "click",
+     "text": "NAVI test 2"
+    }
+   ]
+  },
+  {
+   "name": "price",
+   "talk": "[relaxed] Price is the only other bit I'd bother with at this point, it's this bit on the right, there's a few quick amounts so I'll take fifty, and Done. You could keep going with the rest of it, um, but none of it's needed yet, so Create product, at the bottom of the form.",
+   "caption": "Next, the price, on the right. There are a few quick amounts: pick $50 and click Done. That's all it needs for now, so click Create product at the bottom left.",
+   "actions": [
+    {
+     "on": "price",
+     "do": "hover",
+     "kind": "explain",
+     "target": "button:has-text('once')"
+    },
+    {
+     "on": "right",
+     "do": "click",
+     "kind": "click",
+     "target": "button:has-text('once')"
+    },
+    {
+     "on": "take",
+     "do": "click",
+     "kind": "click",
+     "target": "role=button[name='$50']"
+    },
+    {
+     "on": "Done",
+     "do": "click",
+     "kind": "click",
+     "target": "[role=dialog] button:has-text('Done')"
+    },
+    {
+     "on": "Create",
+     "do": "click",
+     "kind": "click",
+     "target": "role=button[name='Create product']"
+    }
+   ]
+  },
+  {
+   "name": "hide",
+   "talk": "[relaxed] And you get a link for it right away, which I'm not sharing with anyone yet, so Done. Actually while it's still half set up I'd hide it as well, that's under the three dots on the end of the row, Hide, and then it asks you again, so Hide.",
+   "caption": "Whop gives you a link to share it. Click Done. While you're still setting it up, keep it hidden: click the three dots at the end of the row, then Hide, and Hide again to confirm.",
+   "actions": [
+    {
+     "on": "link",
+     "do": "hover",
+     "kind": "explain",
+     "target": "text=Copy link"
+    },
+    {
+     "on": "Done",
+     "do": "click",
+     "kind": "click",
+     "target": "[role=dialog] button:has-text('Done')"
+    },
+    {
+     "on": "dots",
+     "do": "click",
+     "kind": "click",
+     "target": "tr:has-text('Visible') button[aria-haspopup]"
+    },
+    {
+     "on": "Hide",
+     "do": "click",
+     "kind": "click",
+     "target": "role=menuitem[name='Hide']"
+    },
+    {
+     "on": "Hide",
+     "do": "click",
+     "kind": "click",
+     "target": "[role=alertdialog] button:has-text('Hide'), [role=dialog] button:has-text('Hide')"
+    }
+   ]
+  }
+ ],
+ "style": {
+  "opening": "cond"
+ }
+}

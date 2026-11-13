@@ -1,0 +1,1532 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NAVI, natural AI demo video</title>
+<link rel="icon" href="assets/voice-alex.png">
+<style>
+@font-face{font-family:'Mona Sans';src:url(fonts/mona-sans.woff2) format('woff2');font-weight:200 900;font-stretch:75% 125%;font-display:swap}
+@font-face{font-family:'Geist Mono';src:url(fonts/geist-mono-latin-400-normal.woff2) format('woff2');font-weight:400;font-display:block}
+@font-face{font-family:'Geist Mono';src:url(fonts/geist-mono-latin-500-normal.woff2) format('woff2');font-weight:500;font-display:block}
+[v-cloak]{display:none}
+body{margin:0}
+html{scroll-padding-bottom:104px;scroll-padding-top:12px}
+.t-light{--ground:#E4E4E1;--tray:#EDEDEB;--sheet:#FFFFFF;--ink:#111111;--ink2:#55554F;--line:#DEDEDA;--wash:rgba(17,17,17,0.06);--fill:rgba(17,17,17,0.13);--segOn:#FFFFFF;--ok:#1D7A4A;--okDot:#1D9E5A;--blueDot:#2F5BEA;--amber:#D99A00;--warnBg:#FFF1D9;--warnInk:#6B4300;--danger:#B3261E;--pin:#E5484D;--screen:#0E0E10;--focus:rgba(17,17,17,0.6);--knobOff:#FFFFFF;color-scheme:light}
+.t-dark{--ground:#0C0C0E;--tray:#17171A;--sheet:#212125;--ink:#F2F2F0;--ink2:#B4B4AD;--line:#303035;--wash:rgba(242,242,240,0.07);--fill:rgba(242,242,240,0.15);--segOn:#3E3E45;--ok:#7FD9A2;--okDot:#3CCB7F;--blueDot:#7C9CFF;--amber:#F0B429;--warnBg:#3A2C10;--warnInk:#FFD892;--danger:#FF8A80;--pin:#FF6B6B;--screen:#000000;--focus:rgba(242,242,240,0.6);--knobOff:#76767E;color-scheme:dark}
+.wide{font-family:'Mona Sans',sans-serif;font-stretch:125%;font-weight:560;letter-spacing:-0.01em}
+.caps{text-transform:uppercase}
+.h-page{margin:0;font-family:'Mona Sans',sans-serif;font-stretch:125%;font-weight:560;text-transform:uppercase;font-size:40px;line-height:1;letter-spacing:-0.01em}
+.h-step{margin:0;font-family:'Mona Sans',sans-serif;font-stretch:125%;font-weight:560;text-transform:uppercase;font-size:26px;line-height:1.1;letter-spacing:-0.005em}
+.h-sec{margin:0;font-family:'Mona Sans',sans-serif;font-stretch:112%;font-weight:500;font-size:17px;line-height:1.3}
+.name{font-family:'Mona Sans',sans-serif;font-stretch:125%;font-weight:560;text-transform:uppercase;font-size:15px;letter-spacing:0.01em;line-height:1.25}
+.h-big{margin:0 0 6px;font-family:'Mona Sans',sans-serif;font-stretch:125%;font-weight:560;font-size:19px;line-height:1.3;text-transform:uppercase;letter-spacing:0.02em}
+.mono{font-family:'Geist Mono',ui-monospace,monospace;font-size:13px}
+.muted{color:var(--ink2)}
+.small{font-size:14px}
+button,input,textarea,select{font:inherit;color:inherit}
+button{cursor:pointer;transition:background-color 160ms ease,box-shadow 160ms ease,opacity 160ms ease,color 160ms ease}
+button[disabled],button[aria-disabled=true]{cursor:not-allowed}
+:focus{outline:none}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+h1[tabindex="-1"]:focus,h2[tabindex="-1"]:focus,p[tabindex="-1"]:focus,div[tabindex="-1"]:focus{outline:none}
+input,textarea,select{transition:border-color 160ms ease,box-shadow 160ms ease}
+input:focus-visible,textarea:focus-visible,select:focus-visible{outline:none;border-color:var(--ink2)!important;box-shadow:inset 0 0 0 0.5px var(--ink2)}
+textarea{resize:none}
+::selection{background:var(--fill)}
+.tray{background:var(--tray);border-radius:26px;padding:6px}
+.sheet{background:var(--sheet);border-radius:20px}
+.foot{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 12px 8px 14px;min-height:48px}
+.foot .ftext{display:inline-flex;align-items:center;gap:8px;min-width:0}
+.foot .fbtns{display:flex;gap:8px;align-items:center;flex:none}
+@media (min-width: 861px){.stepfoot,.bfoot{padding-left:28px;padding-right:28px}}
+.foot.nfoot{padding-left:26px;padding-right:26px}
+@media (max-width: 860px){.nfoot .ftext{min-height:1.45em}}
+.dot{display:inline-block;width:8px;height:8px;border-radius:4px;flex:none}
+.dot.ring{box-shadow:inset 0 0 0 1.5px var(--ink2)}
+.btn{height:44px;padding:0 18px;border-radius:999px;border:0;background:var(--wash);color:var(--ink);font-size:15px;white-space:nowrap;display:inline-flex;align-items:center;justify-content:center;gap:8px}
+.btn.sm{height:36px;padding:0 14px;font-size:14px}
+.btn.line{background:transparent;box-shadow:inset 0 0 0 1.5px var(--fill)}
+.btn.strong{background:transparent;box-shadow:inset 0 0 0 1.5px var(--ink)}
+.btn.danger{color:var(--danger)}
+@media (hover:hover){.btn:not([disabled]):not([aria-disabled=true]):hover{background:var(--fill)}.btn.line:hover,.btn.strong:hover{background:var(--wash)}}
+.btn[disabled],.btn[aria-disabled=true]{opacity:0.4}
+.pri{height:44px;padding:0 22px;border-radius:999px;border:0;background:var(--ink);color:var(--sheet);font-size:15px;font-weight:500;white-space:nowrap}
+/* Review: the primary keeps the width of its longest label ('Looks good, go to Export'), so adding marks never moves Back or Export without redos. */
+@media (min-width: 861px){.prirev{min-width:218px}.prirev.prib{min-width:232px}}
+@media (max-width: 860px){.prirev{min-width:160px}}
+/* Review: Back, Approve and Redo stay on screen at every width, pinned above the chat bar while the video and marks scroll (13 Nov 2026: at 1,050 x 700 the button sat 300 px below the window). */
+.revstick{position:sticky;bottom:84px;z-index:5;background:var(--tray);border-radius:0 0 20px 20px}
+/* Settings: the key status keeps a slot, two lines at 390, so a bad key moves nothing below it. */
+.keystat{min-height:22px}
+/* Test key: "Checking…" starts with the small spinner, in the status line that already holds its height. */
+.keyspin{margin-right:8px;vertical-align:-1px}
+.pri[disabled],.pri[aria-disabled=true]{opacity:1;background:var(--wash);color:var(--ink2);box-shadow:inset 0 0 0 1px var(--line)}
+.btn.ghost{background:transparent;color:var(--ink2)}
+@media (hover:hover){.btn.ghost:hover{background:var(--wash);color:var(--ink)}}
+.link{border:0;background:none;padding:4px 0;color:var(--ink);text-decoration:underline;text-decoration-color:var(--fill);text-underline-offset:3px;font-size:inherit;white-space:nowrap}
+.icon{width:40px;height:40px;border-radius:20px;border:0;background:transparent;display:inline-flex;align-items:center;justify-content:center;color:var(--ink);flex:none}
+.icon.fill{background:var(--wash)}
+.icon[disabled],.icon[aria-disabled=true]{opacity:0.35}
+@media (hover:hover){.icon:not([disabled]):not([aria-disabled=true]):hover{background:var(--fill)}}
+.inp{width:100%;min-width:0;height:44px;border-radius:12px;border:1px solid var(--line);background:var(--sheet);padding:0 14px;box-sizing:border-box;font-size:15px}
+.inp::placeholder,textarea::placeholder{color:var(--ink2);opacity:0.85}
+#chatin::placeholder{color:var(--ink2);opacity:1}
+.inp[disabled]{opacity:0.5}
+.seg{display:flex;gap:2px;padding:3px;border-radius:999px;background:var(--wash)}
+.seg button{position:relative;flex:1 1 0;min-width:0;min-height:38px;border:0;background:transparent;font-size:14px;padding:4px 10px;line-height:1.2;white-space:nowrap;color:var(--ink2);border-radius:999px}
+.seg button[aria-pressed=true]{background:var(--segOn);color:var(--ink);font-weight:400;box-shadow:0 1px 2px rgba(0,0,0,0.14),inset 0 0 0 1px var(--fill)}
+.seg .star{margin-left:4px}
+@media (hover:hover){.seg button[aria-pressed=false]:hover{color:var(--ink);background:var(--wash)}}
+.bar{position:relative;height:46px;border-radius:12px;background:var(--wash);overflow:hidden;cursor:ew-resize;touch-action:none;user-select:none}
+.bar .fill{position:absolute;left:0;top:0;bottom:0;background:var(--fill);transition:width 120ms cubic-bezier(.22,1,.36,1)}
+.bar .bl{position:absolute;left:14px;top:50%;transform:translateY(-50%);font-weight:500;pointer-events:none;white-space:nowrap}
+.bar .bv{position:absolute;right:14px;top:50%;transform:translateY(-50%);text-align:right;white-space:nowrap;pointer-events:none}
+.bar .rec{position:absolute;top:0;bottom:0;width:2px;margin-left:-1px;pointer-events:none}
+.bar .rec::before,.bar .rec::after{content:'';position:absolute;left:0;width:2px;height:7px;background:var(--ink);opacity:0.45}
+.bar .rec::before{display:none}.bar .rec::after{bottom:0;height:5px;opacity:0.55}
+.bar .bl,.bar .bv{z-index:1}
+.bar input{position:absolute;inset:0;width:100%;height:100%;margin:0;opacity:0;pointer-events:none}
+.bar:has(input:focus-visible){outline:2px solid var(--focus);outline-offset:2px}
+.slwrap{position:relative}
+/* The reset badge sits inside the bar, 8 px after its label, while the bar is off its recommended spot. The label is left-anchored and the value right-anchored, so nothing moves when it appears, and it stays clear of the focus ring. */
+.bar .bl{display:inline-flex;align-items:center;gap:8px}
+.bar .reset{flex:none;width:22px;height:22px;border-radius:11px;border:0;background:var(--ink);color:var(--sheet);display:inline-flex;align-items:center;justify-content:center;padding:0;pointer-events:auto;cursor:pointer}
+.sw{width:46px;height:28px;border-radius:14px;border:0;padding:3px;display:inline-flex;flex:none;background:var(--fill)}
+.sw span{width:22px;height:22px;border-radius:11px;background:var(--knobOff);box-shadow:0 1px 2px rgba(0,0,0,0.2);transition:transform 200ms cubic-bezier(.22,1,.36,1)}
+.sw.on{background:var(--ink)}
+.sw.on span{background:var(--sheet);transform:translateX(18px)}
+.chip{display:inline-flex;align-items:center;gap:6px;height:34px;padding:0 6px 0 12px;border-radius:999px;background:var(--wash);font-size:14px}
+.row{display:flex;align-items:center;gap:12px;min-height:56px;border-top:1px solid var(--line)}
+/* Settings corner label: the first line keeps the closed row's 56 px when the field opens below, so the switch holds still. */
+.crow2{align-content:flex-start}
+.crow2l{flex:1;min-height:56px;display:flex;flex-direction:column;justify-content:center}
+/* Your data rows: one rule. The button sits beside its text when there is room, under it (right-aligned) when there isn't. */
+.drow{padding:8px 0;row-gap:8px;flex-wrap:wrap}
+.drow > span:first-child{flex:1 1 220px}
+.drow .btn{margin-left:auto}
+.list > :first-child > .row,.list > .row:first-child,.list > :first-child > .brow,.list > .brow:first-child,.list > :first-child > .markrow{border-top:0}
+.wv span{display:block;width:3px;border-radius:2px;background:currentColor}
+.wv.on span{animation:wv 900ms cubic-bezier(.22,1,.36,1) infinite alternate}
+@keyframes wv{from{transform:scaleY(0.35)}to{transform:scaleY(1)}}
+.fade{animation:fade 200ms ease-out}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+.toast{animation:fade 200ms ease-out;bottom:96px}
+/* A toast with Undo (or another action) has one width, so its button keeps one x from toast to toast. */
+.toast.tact{width:420px}
+.toast.tact button{align-self:flex-end}
+.skel{background:var(--wash);border-radius:6px;animation:sk 1.2s ease-in-out infinite alternate}
+@keyframes sk{from{opacity:0.5}to{opacity:1}}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.cover{position:relative;border-radius:20px;overflow:hidden}
+.cover img{width:100%;height:100%;object-fit:cover;display:block}
+.disc{width:28px;height:28px;border-radius:14px;flex:none;display:inline-flex;align-items:center;justify-content:center;box-shadow:inset 0 0 0 1.5px var(--ink);font-family:'Mona Sans',sans-serif;font-variant-numeric:tabular-nums;font-size:13px;font-weight:500}
+.disc.done{background:var(--ink);color:var(--sheet);box-shadow:none}
+.tagq{display:inline-flex;align-items:center;height:22px;padding:0 8px;border-radius:999px;box-shadow:inset 0 0 0 1.2px var(--fill);color:var(--ink2);font-size:12px;font-weight:500;white-space:nowrap}
+/* header */
+.hdr{height:64px;padding:0 16px 0 24px;display:flex;align-items:center;gap:12px}
+.crumbs{display:flex;align-items:center;gap:4px;color:var(--ink2);min-width:0}
+.crumbs .here{color:var(--ink);padding:6px 4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:300px}
+.crumbs button{border:0;background:none;padding:6px 8px;border-radius:8px;color:inherit;white-space:nowrap}
+.credits{white-space:nowrap;display:flex;align-items:center;gap:10px;height:40px;padding:0 14px;border-radius:20px;border:0;background:var(--tray);box-shadow:inset 0 0 0 1px var(--line)}
+.phoneback{display:none}
+/* layouts */
+.page{padding:8px 24px 180px}
+.home-grid{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:16px;align-items:start}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(290px,100%),1fr));gap:14px}
+.demo-grid{display:grid;grid-template-columns:250px minmax(0,1fr);gap:16px;align-items:start}
+.two{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:22px;align-items:start}
+.two-v{grid-template-columns:minmax(0,1.6fr) minmax(0,1fr)}.two-e{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.two-x{grid-template-columns:minmax(0,1.2fr) minmax(0,1fr)}
+.stepsheet{padding:26px 28px;min-height:600px;box-sizing:border-box}
+.stepbtn{box-sizing:border-box;display:flex;align-items:center;gap:12px;width:100%;min-height:58px;padding:8px 10px;border:0;border-radius:12px;background:transparent;text-align:left;color:var(--ink)}
+.stepbtn.now{background:var(--tray)}
+.stepbtn.locked{color:var(--ink2)}
+.stepbtn.locked .stepdot{box-shadow:inset 0 0 0 1.5px var(--ink2);color:var(--ink2)}
+.stepbtn .stepdot{width:28px;height:28px;border-radius:14px;flex:none;display:inline-flex;align-items:center;justify-content:center;box-shadow:inset 0 0 0 1.5px var(--ink);font-family:'Mona Sans',sans-serif;font-variant-numeric:tabular-nums;font-size:13px;font-weight:500}
+.stepbtn .stepdot.done{background:var(--ink);color:var(--sheet);box-shadow:none}
+@media (hover:hover){button.stepbtn:not(.now):not([aria-disabled=true]):hover{background:var(--wash)}}
+.dcard{border:0;text-align:left;display:flex;flex-direction:column;padding:6px;width:100%}
+.dcard{transition:background-color 160ms ease}
+.dcard .meta{padding:12px 12px 12px 14px;margin-top:6px;display:flex;flex-direction:column;gap:2px;background:var(--sheet);border-radius:20px;flex:1}
+.cards .name{text-wrap:balance}
+/* The covers are 138 px, so two rows of cards end level with the setup column beside them. */
+.dcard .cover{height:138px}
+@media (hover:hover){.dcard:hover,.dwrap:hover > .dcard{background:var(--fill)}}
+/* All demos: each card has a small Delete button over its cover's corner (a sibling of the card button, never inside it). At desktop it shows on hover and keyboard focus; on touch screens and phones it is always there. It fades, so nothing moves. */
+.dwrap{position:relative;display:flex;min-width:0}
+.dwrap > .dcard{flex:1 1 auto;min-width:0}
+.ddel{position:absolute;top:14px;right:14px;z-index:1;width:32px;height:32px;padding:0;border:0;border-radius:16px;background:rgba(17,17,17,0.5);color:#fff;display:inline-flex;align-items:center;justify-content:center;opacity:0}
+.ddel:focus-visible,.dwrap:focus-within .ddel{opacity:1}
+@media (hover:hover){.dwrap:hover .ddel{opacity:1}.ddel:hover{background:rgba(17,17,17,0.68)}}
+@media (hover:none){.ddel{opacity:1}}
+/* script */
+.sc{display:grid;grid-template-columns:260px minmax(0,1fr);grid-template-rows:auto auto;gap:0 22px;align-items:stretch}
+.sclenrow{grid-column:1;margin:12px 10px 0}
+.scseat{margin:6px 0 0}
+.bsubl{display:block;white-space:normal}
+.sctop{display:flex;align-items:center;gap:12px;min-height:40px}
+.scname{flex:1;min-width:0;font-size:18px;overflow-wrap:anywhere}
+.sctime{white-space:nowrap}
+/* The header readout ("0:46–1:14 · 3 of 11") is one left-aligned box as wide as its widest value ("10 of 11", 118.5 px), so it never slides as sections change. */
+.screadout{display:inline-block;min-width:52px;text-align:right}
+.t-dark .sclist button[aria-pressed=true] .sctime{color:var(--ink)}
+.scarrows{display:flex;gap:8px;flex:none}
+.scpanel .scline{margin-top:14px}
+.sclist{display:flex;flex-direction:column;gap:2px}
+.edot{display:inline-block;width:6px;height:6px;border-radius:3px;background:var(--ink);margin-left:5px;vertical-align:2px}
+.sclist button{display:grid;grid-template-columns:48px 1fr;gap:8px;align-items:baseline;align-content:center;min-height:44px;padding:6px 10px;border:0;border-radius:12px;background:transparent;text-align:left;color:var(--ink2)}
+.sclist button[aria-pressed=true]{background:var(--tray);color:var(--ink);font-weight:400}
+.t-dark .sclist button[aria-pressed=true]{background:var(--segOn)}
+@media (hover:hover){.sclist button[aria-pressed=false]:hover{background:var(--wash);color:var(--ink)}}
+.scpick{display:none}
+/* Desktop: the 11 sections sit in two columns of 6 rows (49.13 px, so the list is as tall as the 304.8 px reader) that end level with the reader beside them, instead of running far below it. The reader keeps room for its longest line (4 lines), so picking a section moves nothing. */
+@media (min-width: 861px){.sc{grid-template-columns:auto minmax(0,1fr)}.sc .sclist{display:grid;grid-template-rows:repeat(6,49.13px);grid-auto-flow:column;gap:2px 6px}.sc .scline{min-height:calc(4 * 1.4em)}.sc .sclist button{grid-template-columns:44px auto;padding-right:14px}.sc .sklist{display:grid;grid-template-rows:repeat(6,49.13px);grid-auto-flow:column;grid-auto-columns:219px;gap:2px 6px}.sc .skpanel{min-height:304.8px}.scsheet{min-height:0}}
+.scpanel{display:flex;flex-direction:column;background:var(--tray);border-radius:20px;padding:20px 24px;align-self:start}
+.scline{font-size:28px;line-height:1.4;margin:0;letter-spacing:-0.005em;min-height:calc(3 * 1.4em)}
+.capbox{margin:0;padding:12px 16px;border-radius:12px;background:var(--wash);font-size:16px}
+.capchip{margin:0;padding:10px 14px;border-radius:10px;background:#1B1B1E;color:#F2F2F0;font-size:15px;line-height:1.4}
+/* voice */
+.vgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.vcard{position:relative;background:var(--tray);border-radius:26px;padding:6px}
+.vcard.on{box-shadow:inset 0 0 0 2.5px var(--ink)}
+.vcard.dim .vpick > span:last-child{opacity:0.5}
+.vpick{display:block;width:100%;border:0;background:transparent;padding:0;text-align:left;border-radius:20px}
+.vimg{position:relative;display:block;height:200px;border-radius:20px;overflow:hidden}
+.vimg img{width:100%;height:100%;object-fit:cover;object-position:50% 30%;display:block}
+.hear{position:absolute;right:15px;top:163px;height:32px;padding:0 12px;border-radius:16px;border:0;background:rgba(255,255,255,0.94);color:#111;display:inline-flex;align-items:center;gap:6px;font-size:13px;min-width:82px;justify-content:center}
+.vtag{display:block;width:max-content;margin-top:4px;font-size:13px;padding:2px 8px;border-radius:999px;background:var(--wash);color:var(--ink2)}
+.sliders{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;align-items:start}
+/* Under Voice model: the v4 line or, in v3, the Pace bar, in one slot the height of the bar, so switching model moves nothing. */
+.mslot{min-height:46px;display:flex;flex-direction:column;justify-content:flex-start}
+/* The sample's cost line keeps the height of its longer text after the first play, so nothing below it moves. */
+.cstack{display:grid}
+.cstack > span{grid-area:1 / 1}
+.ftrow .link,.fhelp .link{text-decoration-color:var(--ink2)}
+.swrow{display:flex;align-items:center;justify-content:space-between;gap:8px;height:46px;padding:0 6px 0 14px;border-radius:12px;background:var(--wash);box-sizing:border-box}
+.swl{font-weight:400;white-space:nowrap}
+.mpills{display:flex;gap:2px}
+.mpills button{height:34px;padding:0 12px;border:0;border-radius:999px;background:transparent;color:var(--ink2);font-size:14px;white-space:nowrap}
+.mpills button[aria-pressed=true]{background:var(--segOn);color:var(--ink);font-weight:400;box-shadow:0 1px 2px rgba(0,0,0,0.14),inset 0 0 0 1px var(--fill)}
+@media (hover:hover){.mpills button[aria-pressed=false]:hover{color:var(--ink);background:var(--wash)}}
+.swcap{display:flex;align-items:center;justify-content:space-between;gap:10px;height:46px;padding:0 6px 0 14px;border-radius:12px;background:var(--wash);box-sizing:border-box}
+/* While Swearing is Off the captions switch stays in place, shown disabled, so picking a level moves nothing. */
+.swcap.swoff{color:var(--ink2)}
+.swcap.swoff .sw{opacity:0.4;cursor:not-allowed}
+/* The hint says why the switch is off; it keeps its room while Swearing is on, so nothing moves. */
+.capl{display:flex;flex-direction:column;gap:1px;min-width:0;white-space:nowrap;line-height:1.2}
+.capl > span{overflow:hidden;text-overflow:ellipsis}
+.caphint{font-size:13px;color:var(--ink2)}
+.swcap:not(.swoff) .caphint{visibility:hidden}
+/* Fine-tune folds into one summary line; Change opens the sliders. The label never changes, only its arrow flips, so the button keeps one box. */
+.fsum > span:first-child{flex:1 1 auto;min-width:0}
+.fhelp{display:flex;align-items:center;flex-wrap:wrap;gap:6px 12px;margin-top:4px}
+.fhelp p{flex:1 1 300px;margin:0}
+.fhbtns{display:flex;align-items:center;gap:12px;margin-left:auto}
+.chg svg{flex:none;transition:transform 160ms ease}
+.chg[aria-expanded=true] svg{transform:rotate(180deg)}
+/* privacy */
+.presets{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.preset{border:0;text-align:left;background:var(--tray);border-radius:20px;padding:16px 16px 18px;display:flex;flex-direction:column;gap:6px;color:var(--ink)}
+.preset .pd{color:var(--ink2)}
+.preset.on{box-shadow:inset 0 0 0 2.5px var(--ink);background:var(--sheet)}
+.preset.on .pd{color:var(--ink)}
+.t-dark .preset.on{background:var(--segOn)}
+.preset .pn{font-family:'Mona Sans',sans-serif;font-stretch:125%;font-weight:560;text-transform:uppercase;font-size:18px}
+.disclose{display:flex;align-items:center;gap:8px;width:100%;min-height:52px;padding:0 4px;border:0;border-top:1px solid var(--line);background:none;text-align:left;font-weight:500}
+.disclose svg{transition:transform 160ms ease}
+.disclose[aria-expanded=true] svg{transform:rotate(90deg)}
+/* Closed, the disclosure ends the sheet with the sheets' usual 24 px under its label. */
+@media (min-width: 861px){#pvmore[aria-expanded=false]{margin-bottom:-18px}}
+/* record + review */
+.screen{position:relative;aspect-ratio:16/9;border-radius:20px;overflow:hidden;background:var(--screen)}
+.screen .art{position:absolute;inset:8px;border-radius:12px;overflow:hidden;background:#2A2A2E}
+.screen .art img{width:100%;height:100%;object-fit:cover;display:block}
+.pill{position:absolute;display:inline-flex;align-items:center;gap:8px;background:rgba(17,17,17,0.85);color:#FFF;padding:6px 12px;border-radius:999px;font-size:13px}
+.panel{background:var(--tray);border-radius:20px;padding:16px}
+.timeline{position:relative;flex:1;height:40px;cursor:pointer;touch-action:none}
+.timeline .track{position:absolute;left:0;right:0;top:30px;height:6px;border-radius:3px;background:var(--fill);pointer-events:none}
+.timeline .played{position:absolute;left:0;top:30px;height:6px;border-radius:3px;background:var(--ink);pointer-events:none}
+.timeline .tick{position:absolute;top:26px;width:2px;height:14px;margin-left:-1px;background:var(--ink2);opacity:0.6;pointer-events:none}
+.timeline .head{z-index:2;position:absolute;top:26px;width:2px;height:14px;margin-left:-1px;background:var(--ink);pointer-events:none}
+.timeline .head::after{content:'';position:absolute;left:-5px;top:1px;width:12px;height:12px;border-radius:6px;background:var(--ink);box-shadow:0 0 0 2px var(--sheet)}
+.pins{position:absolute;left:0;right:0;top:0;height:22px;pointer-events:none}
+.pins .pin{pointer-events:auto}
+.revrow > #playbtn{margin-top:10px}.revrow > .mono{line-height:20px;margin-top:23px}
+.tiplbl{position:absolute;bottom:calc(100% + 2px);transform:translateX(-50%);z-index:3;pointer-events:none;white-space:nowrap;padding:5px 10px;border-radius:999px;background:var(--ink);color:var(--sheet);font-size:13px;line-height:1.2}
+.pins .pin{position:absolute;top:0;width:24px;height:17px;margin-left:-12px;border:0;padding:0;background:transparent;z-index:2}
+.pins .pin i{pointer-events:none}
+.pins .pin span{position:absolute;left:6px;top:2px;width:12px;height:12px;border-radius:6px;background:var(--pin);box-shadow:0 0 0 2px var(--sheet)}
+.pins .pin i{position:absolute;left:11px;top:14px;width:2px;height:8px;background:var(--pin)}
+.pins .pin span{display:flex;align-items:center;justify-content:center;color:#fff;font-size:10px;font-weight:500;line-height:1}
+.pins .pin.many span{left:3px;top:-2px;width:18px;height:18px;border-radius:9px}
+.pins .pin.many i{top:16px;height:6px}
+.markrow .icon:hover,.markrow .mono:hover{background:var(--fill)!important}
+.markrow{display:grid;grid-template-columns:auto minmax(0,1fr) 36px;gap:10px;align-items:center;min-height:58px;border-top:1px solid var(--line)}
+.reasons{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.warnbtn{display:flex;align-items:center;gap:10px;width:100%;min-height:50px;padding:0 8px 0 14px;border:0;border-radius:20px;background:var(--tray);color:var(--ink);text-align:left}
+.warnbtn .wpill{display:inline-flex;align-items:center;height:32px;padding:0 14px;border-radius:999px;background:var(--sheet);font-size:14px}
+@media (hover:hover){.warnbtn:hover .wpill{background:var(--wash)}}
+.dot.k-ready{background:var(--dc,var(--ink))}
+.dot.k-wait{background:transparent;box-shadow:inset 0 0 0 1.5px var(--dc,var(--ink2))}
+.dot.k-done{width:10px;height:10px;background:transparent;position:relative}
+.dot.k-done::after{content:'';position:absolute;left:3px;top:0;width:3px;height:7px;border:solid var(--dc,var(--ink));border-width:0 1.8px 1.8px 0;transform:rotate(45deg)}
+.dot.k-busy{width:10px;height:10px;border-radius:5px;box-sizing:border-box;background:transparent;border:2px solid var(--dc,var(--ink2));border-top-color:transparent;animation:spin 900ms linear infinite}
+.dot.k-bad{background:var(--danger)}
+.dot.k-rec{background:#FF5A4E}
+.pill{--dc:#FFFFFF}
+/* batch */
+/* blind A/B/C picks: the same thing made three ways, by letter only */
+.bpick{margin-top:16px;padding:16px;border-radius:18px;background:var(--wash);container-type:inline-size}
+/* side by side when there is room for all of them, otherwise one under another: never two and a stray third */
+.pickgrid{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:10px;margin-top:12px}
+@container (max-width: 700px){.pickgrid{grid-auto-flow:row;grid-auto-columns:auto;grid-template-columns:minmax(0,1fr)}}
+.pickcard{display:flex;flex-direction:column;gap:12px;min-width:0;padding:14px 14px 14px;border-radius:14px;background:var(--sheet)}
+.pickhead{display:flex;align-items:baseline;justify-content:space-between;gap:8px}
+.pickletter{font-family:'Mona Sans',sans-serif;font-stretch:125%;font-weight:560;font-size:30px;line-height:1}
+.pickplay{display:flex;align-items:center;gap:10px}
+.pickbar{flex:1 1 40px;min-width:24px;height:4px;border-radius:999px;background:var(--fill);overflow:hidden}
+.picklines{display:grid;gap:8px;font-size:15px;line-height:1.45;overflow-wrap:anywhere}
+.pickbtn{margin-top:auto;align-self:flex-start}
+.breveal{margin-top:18px;padding-top:14px;border-top:1px solid var(--line)}
+.jobval{flex:0 1 auto;text-align:right;min-width:0;overflow-wrap:anywhere}
+.brow{display:grid;grid-template-columns:32px minmax(0,1fr) 72px 160px 88px;gap:0 12px;align-items:center;min-height:48px;border-top:1px solid var(--line)}
+.babove > :nth-child(2){grid-column:2 / -1}
+/* The collapsed "Videos 1–6 approved" row starts the list on the same hairline as the rows under it. */
+.list.btable > .brow.babove{border-top:1px solid var(--line)}
+/* Before anything collapses, the first row keeps the same 1 px top edge (transparent), so the list is the same height when the summary row takes over. */
+.list.btable > :first-child > .brow{border-top:1px solid transparent}
+.brow > .bacts{grid-column:5}
+.bmore{display:flex;align-items:center;height:48px;border-top:1px solid var(--line);padding-left:44px}
+.bacts .btn{width:88px;padding:0}
+.bnone{display:inline-block;width:88px;text-align:center}
+.bnote{min-height:22px}
+/* While recording, the status line keeps two lines at phone width, so Pause / Resume (one line vs two) moves nothing below it. */
+@media (max-width: 860px){.bsub.brec{min-height:calc(2 * 1.45em)}}
+.bsecond{min-width:232px}
+.brow .mono{font-size:14px}
+.bacts{display:flex;gap:6px;justify-content:flex-end}
+.form{display:grid;grid-template-columns:150px minmax(0,1fr);gap:16px 18px;align-items:start}
+.form > .lbl{min-height:44px;display:flex;align-items:center}
+.est{padding:16px;border-radius:20px;background:var(--wash);line-height:1.55;text-wrap:pretty}
+.note{display:flex;gap:8px;align-items:baseline;margin:8px 0 0}
+.note .dot{background:var(--ink);transform:translateY(-1px)}
+.note .warnic{flex:none;align-self:flex-start;margin-top:3px;color:var(--ink)}
+.nw{white-space:nowrap}
+.fline{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.fname,.fname0{min-width:0;overflow-wrap:anywhere;text-align:left}
+.fname{border:0;background:none;padding:0;color:var(--ink);font:inherit;text-decoration:underline;text-decoration-color:var(--fill);text-underline-offset:3px}
+@media (hover:hover){.fname:hover{text-decoration-color:var(--ink2)}}
+/* Export files: one line each, the name in ink on the left and its detail on the right (wrapping under the name only when it doesn't fit). */
+.filerow{flex-wrap:wrap;gap:0 16px;min-height:34px;padding:6px 0;box-sizing:border-box;align-items:baseline}
+.filerow .fline{flex:0 1 auto;min-width:0;justify-content:flex-start;gap:8px}
+.filerow .fdet{margin-left:auto;text-align:right}
+/* Corner label: when on, the text field and the corner picker replace the sub-line inside the row, so the row keeps its height. */
+.crow{display:flex;align-items:center;gap:12px;border-top:1px solid var(--line);padding:6px 0}
+.crowl{flex:1;min-width:0}
+.cslot{display:flex;align-items:flex-start;min-height:36px}
+.cfields{display:flex;gap:8px;flex:1;min-width:0}
+.cfields .inp{height:34px;font-size:14px;padding:0 12px}
+.cfields .csel{flex:0 0 128px;appearance:none;-webkit-appearance:none;background:var(--wash) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2.4' stroke-linecap='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") no-repeat right 12px center;border:0;border-radius:999px;padding-right:30px}
+/* The settings column keeps the height of its largest state (720p copy and captions file on), so no setting moves Export video. */
+@media (min-width: 861px){.excol{min-height:366px}.excol .caprow{min-height:60px}.exsheet{min-height:0}}
+.fline .dot.k-done{margin-right:4px}
+/* chat */
+/* The chat bar is hidden on New demo and while a recording runs or is paused. It is fixed, so hiding it moves nothing on the page. */
+.chatwrap.chatoff{display:none}
+.chatwrap{position:fixed;left:0;right:0;bottom:0;z-index:6;pointer-events:none}
+.chatband{height:84px;background:var(--ground);pointer-events:auto;position:absolute;left:0;right:0;bottom:0}
+.chatinner{position:relative;margin:0 auto 18px;width:min(720px,calc(100% - 32px));pointer-events:auto}
+
+.newtile{}
+@media (max-width: 860px){.newtile{min-height:64px!important;flex-direction:row!important;justify-content:flex-start!important;padding:10px 16px!important}.newtile > span:first-child{width:40px!important;height:40px!important}.newtile .wide{font-size:16px!important}}
+.recscreen{aspect-ratio:16/10}
+.recctl{display:flex;align-items:center;gap:8px;height:48px;margin-top:16px}
+.pausebtn{width:104px;flex:none}
+.slide{position:relative;flex:1;min-width:0;height:48px;border-radius:24px;background:var(--sheet);box-shadow:inset 0 0 0 1px var(--line);overflow:hidden;user-select:none;-webkit-user-select:none}
+.slide .sfill{position:absolute;left:1px;top:1px;bottom:1px;border-radius:23px;background:var(--wash);transition:width 220ms cubic-bezier(.22,1,.36,1)}
+.slide .slabel{position:absolute;left:52px;right:12px;top:0;bottom:0;display:flex;flex-direction:column;justify-content:center;line-height:1.2;pointer-events:none;white-space:nowrap;overflow:hidden}
+.slide .slt{font-size:14px;font-weight:500}
+.slide .sls{font-size:13px;color:var(--ink2);overflow:hidden;text-overflow:ellipsis}
+.shandle{position:absolute;top:4px;width:40px;height:40px;border-radius:20px;background:var(--danger);color:var(--sheet);display:inline-flex;align-items:center;justify-content:center;cursor:grab;touch-action:none;transition:left 220ms cubic-bezier(.22,1,.36,1)}
+.slide.dragging .shandle,.slide.dragging .sfill{transition:none}
+.t-dark .shandle{background:#FF5A4E}
+.slide.dragging .shandle{cursor:grabbing}
+.rphead{font-size:17px}
+/* In a batch review the title card keeps two title lines, so watching the next video never moves the steps. */
+.name2{min-height:calc(2 * 1.25em);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+/* Beside the video the panel takes the video's height and pins Pause and Slide to stop to its bottom, so it never changes height between sections. The quote shows at most 2 lines. */
+.recpanel{--ql:2;--qf:16px;box-sizing:border-box;align-self:stretch}
+.recpanel .recctl{margin-top:auto}
+.prog{list-style:none;margin:12px 0 8px;padding:0;display:flex;flex-direction:column;gap:2px}
+/* Record ends where its columns end, and keeps one height from recording to recorded. */
+.recsheet{min-height:0}
+.stephelp{display:grid}
+.stephelp > *{grid-area:1/1}
+.stephelp .hold{visibility:hidden}
+/* While recording, the footer keeps the room its finished buttons need, so nothing moves when the draft is ready. */
+.fhold{display:inline-flex;gap:8px;visibility:hidden}
+.credits{font-variant-numeric:proportional-nums}
+.prog li{display:flex;align-items:center;gap:10px;height:32px;padding:0 4px}
+.prog .pn{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.prog .pdone{color:var(--ink2)}
+.prog .pmore{font-size:14px}
+.prog .pnow{display:block;height:auto;margin:4px 0;padding:12px 14px 14px;border-radius:12px;background:var(--sheet);box-shadow:inset 0 0 0 1px var(--line)}
+.pnowtop{display:flex;align-items:center;gap:10px;font-weight:500}
+.pquote{margin:8px 0 0;font-size:var(--qf);line-height:1.45;max-height:calc(var(--ql) * 1.45em);overflow:hidden;display:-webkit-box;-webkit-line-clamp:var(--ql);-webkit-box-orient:vertical}
+.pmark{flex:none;width:16px;height:16px;border-radius:8px;box-sizing:border-box;position:relative}
+.pmark.tick{background:var(--ink2)}
+.pmark.tick::after{content:'';position:absolute;left:5.5px;top:3px;width:3px;height:7px;border:solid var(--sheet);border-width:0 1.6px 1.6px 0;transform:rotate(45deg)}
+.pmark.dash{border:1.5px dashed var(--ink2)}
+.pmark.ring{box-shadow:inset 0 0 0 1.5px var(--ink)}
+.pmark.spin{border:2px solid var(--ink2);border-top-color:transparent;animation:spin 900ms linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.t-dark{--segOn:#4A4A52;--knobOff:#A2A2A8}
+.t-dark .seg button[aria-pressed=true]{box-shadow:inset 0 0 0 1px rgba(242,242,240,0.28)}
+.t-dark .stepbtn.now{background:var(--segOn)}
+.t-dark .stepbtn.now .sub{color:#C8C8C2}
+.sw{box-shadow:inset 0 0 0 1px var(--line)}
+.sw.on{box-shadow:none}
+.bv.chip{background:var(--track);padding:2px 8px;border-radius:8px;z-index:2;box-shadow:none}
+.t-light{--track:#F0F0F0}.t-dark{--track:#2F2F33}
+.sumrow > span:first-child{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.markrow{align-items:start!important;padding:8px 0}
+.batchrail .stepbtn{cursor:default}
+.batchrail .stepbtn:not(.now):hover{background:transparent!important}
+.waitlist{max-height:360px;overflow:auto}
+.privoice{min-width:142px}
+/* Export's primary is as wide as its widest label (Export again, 134.2 px), so Export video -> Open folder -> Export again keep one box. */
+.priex{min-width:135px}
+/* Record: the Record again confirm keeps the footer's three slots. Back stays, Cancel takes Record again's 130 px slot and "Yes, record again" the primary's 163 px slot. */
+.secrec{min-width:130px;box-sizing:border-box}
+.prirec{min-width:163px}
+.bprimary{min-width:160px;overflow:hidden;text-overflow:ellipsis}
+/* Batch: "Yes, record all" keeps the box of "Approve all and record", so the confirm moves nothing. */
+.bprimary.bapprove{min-width:202px}
+@media (min-width: 861px){.caprow{border-top:0!important;padding-top:0!important}}
+.srows{display:flex;flex-direction:column}
+.srow{display:flex;align-items:center;justify-content:space-between;gap:10px 20px;min-height:64px;padding:10px 0;border-top:1px solid var(--line);box-sizing:border-box}
+.srows > .srow:first-child{border-top:0}
+.srow.swrap{flex-wrap:wrap}
+.srow .sl{flex:1 1 200px;min-width:0;display:flex;flex-direction:column;gap:2px}
+.slab{color:var(--ink)}
+.pills{display:inline-flex;flex-wrap:wrap;justify-content:flex-end;gap:2px;padding:2px;border-radius:20px;background:var(--wash);flex:none;max-width:100%;box-sizing:border-box}
+.pills button{height:36px;padding:0 14px;border:0;border-radius:18px;background:transparent;color:var(--ink2);font-size:14px;white-space:nowrap}
+.pills button[aria-pressed=true]{background:var(--segOn);color:var(--ink);font-weight:400;box-shadow:0 1px 2px rgba(0,0,0,0.14),inset 0 0 0 1px var(--fill)}
+@media (hover:hover){.pills button[aria-pressed=false]:hover{color:var(--ink);background:var(--wash)}}
+.pills .star{margin-left:4px}
+.srow .sctl{flex:0 1 360px;min-width:0}
+.srow .sctl2{flex:0 1 auto;display:flex;flex-direction:column;align-items:flex-end;min-width:0;max-width:100%}
+.srow .sctl2 .chips{justify-content:flex-end}
+.srow > .folderrow{flex:0 1 440px}
+/* The paste box shows whole lines only: the padding sits on the frame, so the textarea clips on a line edge. */
+.btbox{border:1px solid var(--line);border-radius:12px;background:var(--sheet);padding:14px 0}
+.btbox:focus-within{border-color:var(--ink2)}
+#btt{height:calc(7 * 24px);padding:0 16px;font-size:16px;line-height:24px;border:0;border-radius:0;display:block;box-shadow:none}
+.sexpand{flex:1 1 100%;display:grid;gap:8px;padding-top:4px}
+.sumrow.open{background:transparent!important;box-shadow:inset 0 -1px 0 var(--line)!important;border-radius:0;padding-left:0}
+.sumrow.open .btn{background:var(--wash)!important}
+.t-dark .pills button[aria-pressed=true]{box-shadow:inset 0 0 0 1px rgba(242,242,240,0.28)}
+.fadebot{-webkit-mask-image:linear-gradient(#000 calc(100% - 32px),transparent);mask-image:linear-gradient(#000 calc(100% - 32px),transparent)}
+.chatpill:focus-within{box-shadow:0 0 0 2px var(--focus)!important}
+.btn.line,.btn.strong{background:var(--wash);box-shadow:none}
+.tagq.solid{box-shadow:none;background:var(--wash);color:var(--ink)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chips button{flex:0 0 auto;height:40px;padding:0 23px;border-radius:999px;border:0;background:var(--wash);color:var(--ink2);font-size:15px;white-space:nowrap}
+.chips button[aria-pressed=true]{padding:0 16px;background:var(--segOn);color:var(--ink);font-weight:400;box-shadow:inset 0 0 0 1.5px var(--ink)}
+.chips .newchip{color:var(--ink);background:transparent;box-shadow:inset 0 0 0 1.5px var(--fill);border:1.5px dashed var(--fill);box-shadow:none}
+@media (hover:hover){.chips button[aria-pressed=false]:hover{background:var(--fill);color:var(--ink)}}
+.sumrow{display:flex;align-items:center;gap:12px;height:56px;box-sizing:border-box;padding:0 10px 0 16px;border-radius:12px;background:var(--tray)}
+.sumrow > span:first-child{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* The tick sits in the padding unselected chips keep, so picking a site moves no chip. */
+.chips button[aria-pressed=true]::before{content:'✓';display:inline-block;width:14px;text-align:left}
+.chips .newchip{padding:0 16px}
+.chips .sitetrack{display:inline-flex;flex-wrap:wrap;gap:2px;padding:3px;border-radius:22px;background:var(--wash);max-width:100%}
+.chips .sitetrack button[aria-pressed]{height:38px;background:transparent;padding:0 16px;min-width:0;overflow:hidden;text-overflow:ellipsis}
+.chips .sitetrack button[aria-pressed=true]{padding:0 16px;background:var(--segOn);box-shadow:0 1px 2px rgba(0,0,0,0.14),inset 0 0 0 1px var(--fill)}
+.t-dark .chips .sitetrack button[aria-pressed=true]{box-shadow:inset 0 0 0 1px rgba(242,242,240,0.28)}
+.chips .sitetrack button[aria-pressed=true]::before{content:none}
+.chips .newchip{height:44px;border:0!important;background:var(--wash)!important;color:var(--ink2)}
+.sumrow .btn{margin-left:auto;width:120px;flex:none}
+.scslot{display:flex;flex-direction:column;gap:12px;padding-top:18px}
+.markslot{margin-top:12px;min-height:46px}
+.mrow{display:flex;align-items:center;gap:12px;height:46px;min-width:0}
+.sklist{display:flex;flex-direction:column;gap:2px}
+.skrow{display:flex;align-items:center;height:44px;padding:0 10px}
+.skpanel{gap:12px;min-height:265.6px;box-sizing:border-box}
+.markslot .reasons{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;min-height:46px}
+.markslot .reasons > *{flex:none}
+/* Cancel keeps one slot at the end of the reasons row, whether the chips or the typed reason fill it. */
+.markslot .reasons .markx{margin-left:auto;position:sticky;right:0;background:var(--sheet)}
+@media (max-width: 860px){.markslot{min-height:78px}.markslot .reasons{flex-wrap:wrap;overflow:visible;row-gap:6px}.markslot .reasons .markx{position:static}.markslot .reasons span:has(> #mown){flex:1 1 100%!important}}
+@media (max-width: 860px){.revrow{display:grid!important;grid-template-columns:46px minmax(0,1fr) auto;column-gap:14px!important;row-gap:0}.revrow > #playbtn{grid-column:1;grid-row:1 / 3}.revrow > div{grid-column:2 / 4;grid-row:1}.revrow > .revcur,.revrow > .revtot{grid-row:2;margin-top:-6px!important;line-height:16px!important;width:auto!important}.revrow > .revcur{grid-column:2;justify-self:start}.revrow > .revtot{grid-column:3;justify-self:end;color:var(--ink2)}}
+@media (hover:hover){.markslot .reasons .markx:hover{background:var(--fill)}}
+.list > :last-child > .markrow{padding-bottom:0;min-height:0}
+.phone-setup{display:none}
+.capov{font-size:15px}
+.t-dark .capchip{background:#000;box-shadow:inset 0 0 0 1px var(--line)}
+.bar .bl{font-weight:400}
+.mono{font-weight:400}
+/* ===== R5 fix 11: two weights, 400 and 560 =====
+   Every text weight is 400 except the wide names and titles (560): hierarchy comes from size, case and grey.
+   The app root carries .w2 on every screen except those listed in W2_OFF in app.js. To switch this off for one screen,
+   add its key there (e.g. const W2_OFF = ['voice']), or append :not([data-scr="voice"]) to .w2 in the selector below.
+   Keys: welcome home new new-batch batch script voice privacy record review export settings. */
+.w2 *:not(.h-page):not(.h-step):not(.name):not(.h-big):not(.preset .pn):not(.wide:not([style*="font-weight"])){font-weight:400!important}
+/* ===== end R5 fix 11 ===== */
+@media (prefers-reduced-motion: reduce){.wv.on span,.fade,.toast,.skel,.pmark.spin,.dot.k-busy{animation:none}.bar .fill,button,.sw span,.disclose svg,.chg svg{transition:none}}
+/* phone width */
+.wfoot > .muted{flex:1 1 100%;text-align:right}
+/* Welcome at 1440: the status sits at the left, level with Done, like the other footers. */
+@media (min-width: 861px){.wfoot > .muted{flex:1 1 auto;text-align:left}}
+/* New options: label + hint pairs fit the 64 px row, so every option row has the same pitch. */
+.srows .shelp{line-height:1.35}
+@media (min-width: 861px){.srows .srow{min-height:65px}}
+/* New options: the Corner label line keeps the height the closed row gives it (row minus padding and border), so the switch holds still when the field opens. */
+.srow.swcorner > .sl{min-height:43px;justify-content:center}
+@media (min-width: 861px){.srow.swcorner > .sl{min-height:44px}}
+/* Welcome: Show key is an eye button inside the key field's right end, so the row holds the field and Test key only. */
+.keybox{position:relative;display:flex;flex:1 1 auto;min-width:0}
+.keybox .inp{flex:1 1 auto;padding-right:48px}
+.keyeye{position:absolute;right:4px;top:4px;width:36px;height:36px;color:var(--ink2)}
+@media (hover:hover){.keyeye:hover{color:var(--ink);background:var(--wash)}}
+/* Review at desktop: the video and the marks share the top row and the timeline and Mark this moment run the full width under both, so the marks column sits beside the video only and the two end closer together. */
+@media (min-width: 861px){.revgrid{grid-template-areas:"vid aside" "ctl ctl";row-gap:0}.revgrid > .revvid{grid-area:vid}.revgrid > .revctl{grid-area:ctl}.revgrid > .revaside{grid-area:aside}}
+@media (max-width: 860px){.revgrid{row-gap:0}.revgrid > .revaside{margin-top:22px}}
+/* Review: the marks column never grows past the player block, so marks never move the footer. It hugs its rows until then; past that the list scrolls inside and the heading stays. */
+.revaside{min-width:0}
+.revcap{display:flex;flex-direction:column;gap:10px}
+@media (min-width: 861px){
+  .revaside{align-self:stretch;position:relative}
+  .revcap{position:absolute;top:0;left:0;right:0;max-height:100%}
+  .revcap > *{flex:none}
+  .revcap .markspanel{flex:0 1 auto;min-height:150px;display:flex;flex-direction:column}
+  .revcap .markslist{flex:0 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;margin:4px -4px -4px;padding:0 4px 4px}
+}
+/* Script: both open states take the room that is already there, so the reader never grows. Change this line swaps the button row for a 36 px field with Send and Cancel; Show captions swaps the spoken line for the caption, in the line's reserved height. */
+.scchg{display:flex;align-items:center;gap:8px}
+.scchg .inp{flex:1 1 auto;height:36px;font-size:14px;background:var(--sheet)}
+.sccapv{font-size:15px;line-height:1.45;letter-spacing:0}
+.sccapv .capchip{margin:0}
+@media (min-width: 861px){.sc .scline.sccapv{min-height:156.8px}}
+@media (max-width: 860px){.scline.sccapv{min-height:147px;font-size:15px}}
+/* Script: "Rewriting this line…" sits in the Show captions button's box while busy, so nothing wraps or moves. */
+.scbusy{position:relative;display:inline-flex;max-width:100%}
+.scbusytext{position:absolute;inset:0;display:flex;align-items:center;min-width:0;overflow:hidden;white-space:nowrap}
+.scbusytext:empty{display:none}
+/* Welcome step 2: like steps 1 and 3, the title row holds no button. The text and a fixed action slot share the row under it (the slot takes its own line on phones), so Install, Not now / Yes, install and the empty busy/done states all keep one shape. */
+.wtools{display:flex;align-items:center;gap:12px;margin:8px 0 0 40px}
+.wtools #toolstext{flex:1 1 0;min-width:0;margin:0;min-height:calc(2 * 1.45em)}
+.wtslot{flex:none;width:209px;min-height:44px;display:flex;justify-content:flex-end;gap:6px}
+@media (min-width: 861px){.sm-only{display:none!important}}
+@media (max-width: 860px){
+  .lg-only{display:none!important}
+  .sclenrow{display:none}
+  .sc{gap:0}
+  .newtile .muted{display:none}
+  /* Phone: each file's detail sits left-aligned under its name; the list keeps the height of its largest state (4 files), so no setting moves Export video. */
+  .filerow{flex-direction:column;align-items:flex-start;gap:0}
+  .filerow .fdet{margin-left:0;text-align:left}
+  .fileslist{min-height:274.3px}
+  .cslot{min-height:42px}
+  .cfields .csel{flex-basis:118px}
+  .addrow{flex-wrap:wrap;row-gap:8px}
+  .addrow .inp{flex:1 1 100%!important}
+  .addrow .btn{margin-left:auto}
+  /* The slot keeps the height of the longest summary (Test account) while the tray hugs its lines, so presets move nothing below it and the reserve is white sheet, not grey tray. */
+  .sumslot{min-height:calc(5 * 1.45em + 32px)}
+  .folderrow{flex-wrap:wrap;justify-content:flex-end}
+  .ftrow{flex-wrap:nowrap!important;height:40px}
+  .sc .scleft{display:none}
+  /* On phones the dropdown names the section, so the title stays for screen readers only; the length line takes its place beside the arrows. */
+  .sctop .sclen{margin:0!important}
+  .sctop .scname{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+  .capchip{min-height:calc(3 * 1.4em)}
+  .scbtns{flex-wrap:nowrap!important}
+  #scsel{appearance:none;-webkit-appearance:none;background:var(--wash) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2.4' stroke-linecap='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") no-repeat right 14px center;border:0;border-radius:999px;padding-right:36px}
+  .sumrow{height:auto;min-height:calc(2 * 1.45em + 16px);padding:8px 8px 8px 14px}
+  .nsheet{gap:20px!important}
+  .sumrow > span:first-child{white-space:normal;overflow:visible;overflow-wrap:break-word}
+  /* The options toggle sits at the row's top right, closed and open. */
+  .sumrow{align-items:flex-start}
+  .sumrow.open > span:first-child{padding-top:7px}
+  /* Fine-tune's line sits level with Change and always keeps room for two lines, so a longer summary moves nothing below it. */
+  .fsum{min-height:calc(2 * 1.45em + 23px)}
+  .fsum > span:first-child{padding-top:7px}
+  .sumrow .btn{width:auto;background:var(--sheet)!important;text-decoration:none!important;padding:0 12px!important}
+  .phone-setup{background:transparent!important;padding:4px 2px!important;color:var(--ink2)!important}
+  .dcard .meta{margin-top:0!important;margin-left:6px}
+  .bprimary{min-width:0}
+  /* Watch #5 keeps the box of Watch next, so the number never resizes it. */
+  .bprimary.bwatch{min-width:124.2px}
+  .bsecond{min-width:176px}
+  .bmore{padding-left:36px}
+  /* The batch footer line wraps to two lines on phones instead of ending in an ellipsis. */
+  .bfoot .ftext > span{white-space:normal;display:block!important}
+  .bfoot .ftext > span.bcf{white-space:normal;display:-webkit-box!important}
+  .bfoot .ftext > .dot{display:inline-block!important}
+  /* While the scripts wait for approval, the footer line keeps the two lines of the record-all confirm, so opening it moves nothing. */
+  .bfcf .ftext{min-height:calc(2 * 1.45em)}
+  .bacts .btn,.bnone{width:76px}
+  .welcome-art{min-height:320px!important}
+  .welcome-art img{object-position:50% 40%!important}
+  .wfield{justify-content:flex-end}
+  /* Stacked on phones, the panel keeps the height of its longest quote instead. */
+  .recpanel{--ql:4;--qf:15px;--progmin:calc(4 * 36px + 4 * 2px + 8px + 26px + 21.75px + 8px + var(--ql) * 1.45 * var(--qf));min-height:calc(var(--progmin) + 150.65px)}
+  .prog{min-height:var(--progmin);margin:14px 0 0}
+  .prog li{height:36px}
+  .recpanel .recctl{margin-top:16px}
+  .pausebtn{width:80px;padding:0 10px}
+  .slide .slabel{left:50px;right:6px}
+  .slide .sls{font-size:12px}
+  .sliders{grid-template-columns:minmax(0,1fr)}
+  .setrow,.list > div > .row,.list > .row{flex-wrap:wrap}
+  .page{padding:4px 12px 120px}
+  .hdr{padding:0 8px 0 14px;gap:4px}
+  .crumbs,.credits .cbar,.hide-sm{display:none!important}
+  .phoneback{display:inline-flex}
+  .credits{padding:0 10px}
+  .newlabel{display:none}
+  .h-page{font-size:30px}
+  .h-step{font-size:22px}
+  .home-grid,.demo-grid,.two,.sc,.form{grid-template-columns:minmax(0,1fr)}
+  .form{gap:4px}.form > .lbl{min-height:0;padding-top:12px}
+  .form .small{font-size:13px}
+  .home-aside{margin-top:0!important}
+  .stepnav .brief{display:none}
+  .stepnav .steplist{display:flex;overflow-x:auto;gap:2px;padding:6px!important;scrollbar-width:none;scroll-snap-type:x mandatory;scroll-padding-inline:6px;-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 10px,#000 calc(100% - 40px),transparent 100%);mask-image:linear-gradient(90deg,transparent 0,#000 10px,#000 calc(100% - 40px),transparent 100%)}
+  .stepnav .steplist.at-start{-webkit-mask-image:linear-gradient(90deg,#000 0,#000 calc(100% - 40px),transparent 100%);mask-image:linear-gradient(90deg,#000 0,#000 calc(100% - 40px),transparent 100%)}
+  .stepnav .steplist::after{content:'';flex:0 0 48px}
+  .stepnav .stepbtn{width:auto;min-height:44px;flex:none;padding:6px 12px 6px 6px;scroll-snap-align:start}
+  .stepnav .stepbtn.now{box-shadow:none}
+  .stepnav .stepbtn .sub{display:none!important}
+  .stepsheet{padding:18px 16px;min-height:0}
+  .foot{flex-wrap:wrap}
+  .foot .ftext{flex:1 1 100%;align-items:flex-start}
+  .foot .ftext > span:last-child{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .foot .ftext .dot{margin-top:7px}
+  .foot .fbtns{flex-wrap:nowrap!important}
+  .lg{display:none}
+  .newtile .wide{white-space:nowrap}
+  /* New demo and New batch share one row at phone width; the cards under them take the full width. */
+  .cards{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+  .cards .dwrap{grid-column:1 / -1}
+  .newtile{padding:10px 12px!important;gap:8px!important;justify-content:center!important}
+  .newtile > span:first-child{width:32px!important;height:32px!important;flex:none}
+  .newtile .wide{font-size:15px!important}
+  .vgrid{order:0}
+  .ph-first{order:-1}
+  .foot .fbtns{flex:1 1 100%;justify-content:flex-end}
+  .seg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr}
+  .seg button{white-space:normal;padding:4px 6px}
+  .seg.seg4{grid-auto-flow:row;grid-template-columns:1fr 1fr;border-radius:20px}
+  .vgrid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .presets{grid-template-columns:minmax(0,1fr)}
+  .preset{padding:12px 14px}
+  .scline{font-size:21px;min-height:calc(5 * 1.4em)}
+  .skpanel{min-height:341px}
+  .sclist{display:none}
+  .scpick{display:block}
+  .scpanel{padding:16px}
+  .brow{grid-template-columns:24px minmax(0,1fr) auto;grid-template-rows:auto auto;row-gap:2px;padding:8px 0}
+  .brow > :nth-child(1){grid-column:1;grid-row:1}
+  .brow > :nth-child(2){grid-column:2;grid-row:1}
+  .brow .bmin{display:none!important}
+  .brow.babove{grid-template-rows:auto}
+  .brow .bst{grid-column:2!important;grid-row:2}
+  .brow .bacts{grid-column:3!important;grid-row:1 / 3!important}
+  /* With Pause showing, row 1 is the count and Pause, and row 2 is the bar at full width. */
+  .bpause{display:flex;margin-left:auto}
+  /* The count line after Choose a file always has its own line, so pasting never moves Shared settings. */
+  .btcount{flex-basis:100%}
+  .bprogp .bbar{order:1;flex-basis:100%!important}
+  .stepfoot .backbtn{display:none}
+  /* Review's two footer buttons share the row inside the tray's padding, so neither touches the edge. */
+  .revfoot .fbtns button{flex:1 1 auto;min-width:0;padding:0 12px}
+  .scpanel .sclen{display:block!important}  .brow .bacts{grid-column:3;grid-row:1 / 3}
+  .chatband{height:76px}
+  .toast{bottom:88px;width:max-content}
+  .welcome-grid{grid-template-columns:minmax(0,1fr)!important}
+  .modeseg{width:100%!important}
+  .capov{font-size:12px!important;bottom:18px!important}
+  .phone-setup{display:flex;align-items:center;gap:8px;border:0;background:var(--tray);border-radius:14px;padding:10px 14px;text-align:left;font-size:14px;color:var(--ink)}
+  .home-aside{display:none!important}
+  .dcard{flex-direction:row;align-items:stretch}
+  .ddel{opacity:1;top:12px;left:12px;right:auto}
+  /* The cover fills the card's height (at least 96 px), so a two-line name leaves no empty tray under it. */
+  .dcard .cover{width:96px!important;height:auto!important;min-height:96px;contain:size;align-self:stretch;flex:none;border-radius:20px}
+  .dcard .cover img{border-radius:0!important}
+  .dcard .meta{flex:1;min-width:0;padding:8px 10px}
+  .sclen{margin:8px 0 0!important}
+
+  /* The wordmark sits straight on the statue at phone width too, scaled to the shorter image. */
+  .welcome-art .big{font-size:52px!important;left:18px!important;bottom:16px!important}
+  .welcome-art .big span{margin-top:8px!important;font-size:14px!important}
+  .wfield{flex-wrap:wrap;margin-left:0!important}
+  .wfield .inp{flex:1 1 100%!important}
+  .wfield.wrow1{flex-wrap:nowrap}
+  .wfield.wrow1 .inp{flex:1 1 auto!important}
+  .wfield.wrow1 > .btn{flex:none}
+  .wtest{width:auto!important;padding:0 16px}
+  .wlogin{width:128px!important;padding:0 12px}
+  .wpad{margin-left:0!important}
+  .wwrap{padding-top:16px!important}
+  .stepfoot .ftext{min-height:calc(2 * 1.45em)}
+  .keystat{min-height:calc(2 * 1.45em)!important}
+  .stepfoot .ftext .link{padding-top:0;padding-bottom:0}
+  .stepfoot,.bfoot{padding-left:16px;padding-right:16px}
+  .wtools{flex-wrap:wrap;gap:8px}
+  .wtslot{flex-basis:100%;width:auto}
+  .wfoot > .muted{text-align:left!important}
+  #toolstext{min-height:calc(2 * 1.45em)!important}
+  .sumclip{display:block;overflow:hidden}.sumlist{display:flex;flex-wrap:wrap;margin-left:-1em}.sumlist > span{position:relative;padding-left:1em;min-width:0;overflow-wrap:anywhere}.sumlist > span::before{content:'·';position:absolute;left:0;top:0;width:1em;text-align:center}
+  .nshint{min-height:calc(2 * 1.45em)!important}
+  .setrow{flex-wrap:wrap;padding:12px 0}
+  .setrow .ctl{flex:1 1 100%!important;width:auto!important}
+  .srow{flex-direction:column;align-items:stretch;gap:8px}
+  .srow .sl{flex:none}
+  .srow > .pills,.srow > .sctl2{align-self:flex-end}
+  .srow .sctl{flex:none;width:100%}
+  .srow.swrap{flex-direction:row;align-items:center}
+  .srow.swrap > .sl{flex:1 1 0}
+  /* Segmented tracks take equal columns. pillsfit tracks (Who's watching, New batch, Export captions) size their columns to their labels and stretch to fill, so 'Some experience' and 'Test account' keep one line with room either side. New options' other tracks stay equal, so the Length star never resizes a pill. */
+  .srow > .pills{align-self:stretch;display:grid;grid-auto-flow:column;grid-auto-columns:1fr}
+  .srow > .pills.pillsfit{grid-auto-columns:auto;justify-content:stretch}
+  .pills button{white-space:normal;height:auto;min-height:36px;padding:4px 6px;line-height:1.15}
+  .srow.swrap > .sctl2{flex:1 1 100%;align-items:flex-start}
+  .srow.swrap > .sctl2 .chips{justify-content:flex-start}
+  .chips button{padding:0 14px}
+  .chips button[aria-pressed=true]{padding:0 8px 0 6px}
+  .chips .newchip{padding:0 14px}
+  .srow > .folderrow{flex:1 1 auto;flex-wrap:nowrap;justify-content:space-between}
+  .srow > .folderrow .btn{padding:0 14px}
+  /* The credits line keeps the height of its longest version (three lines), so pasting a list doesn't move Write N scripts. */
+  .btcred{min-height:calc(3 * 1.55em)}
+}
+/* In-between widths. The step sheet and the batch table size their insides to the room they actually have (container queries), not to the window,
+   so a layout changes before it gets cramped. Step content under 860 px wide (windows under about 1240 px) stacks the side panel under the main column;
+   under 620 px the voice cards and sliders go to two and one columns. The phone layout (860 px window and under) is unchanged. */
+.stepsheet{container:sheet / inline-size}
+.btable{container:btable / inline-size}
+.steptray{container:steptray / inline-size}
+@media (min-width: 861px){
+  @container sheet (max-width: 859px){
+    .two,.two-v,.two-x{grid-template-columns:minmax(0,1fr)}
+    .sc{grid-template-columns:minmax(0,1fr)}
+    .sc .scpanel{margin-top:18px}
+    .revgrid{grid-template-areas:"vid" "ctl" "aside"}
+    .revgrid > .revaside{margin-top:22px}
+    .revaside{align-self:auto;position:static}
+    .revcap{position:static;max-height:none}
+    .revcap .markslist{overflow:visible}
+    .recpanel{align-self:auto}
+  }
+  @container sheet (max-width: 619px){
+    .vgrid{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .sliders{grid-template-columns:minmax(0,1fr)}
+    .two-e{grid-template-columns:minmax(0,1fr)}
+  }
+  /* The step footer: under 640 px its line takes its own row and the buttons sit under it at the right, as on phones. */
+  @container steptray (max-width: 639px){
+    .stepfoot{flex-wrap:wrap}
+    .stepfoot .ftext{flex:1 1 100%}
+    .stepfoot .fbtns{flex:1 1 100%;justify-content:flex-end}
+  }
+  @container btable (max-width: 699px){
+    .brow{grid-template-columns:32px minmax(0,1fr) auto;grid-template-rows:auto auto;row-gap:2px;padding:8px 0}
+    .brow > :nth-child(1){grid-column:1;grid-row:1}
+    .brow > :nth-child(2){grid-column:2;grid-row:1}
+    .brow .bmin{display:none!important}
+    .brow.babove{grid-template-rows:auto}
+    .brow .bst{grid-column:2!important;grid-row:2}
+    .brow .bacts{grid-column:3!important;grid-row:1 / 3!important}
+  }
+}
+/* Record: the quote shows the whole line. Every section's line sits in the same cell, hidden, so the box keeps the height of the longest one and never changes between sections. */
+.pquote{display:grid;max-height:none;overflow:visible;-webkit-line-clamp:unset}
+.pquote > span{grid-area:1/1}
+.pquote > .qhold{visibility:hidden}
+/* Export's extra rows (video style, caption look, sped-up copy) and the Review reminder. */
+.excol .stylerow + .caprow{border-top:1px solid var(--line)!important}
+.lookrow .pills button[aria-disabled=true]{opacity:0.45;cursor:default}
+.speedrow{border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.spdinp{width:84px;height:36px;font-size:14px;flex:none}
+.dspd{flex:1 1 100%;display:flex;align-items:center;gap:10px;padding-bottom:4px}
+.revremind{display:flex;align-items:flex-start;gap:8px;margin:14px 0 0;padding:0 2px}
+.revremind svg{flex:none;margin-top:2px}
+.screen .art video{display:block;width:100%;height:100%;object-fit:contain;background:#000}
+/* The files list keeps the height of its longest version (video, transcript, captions file, 720p copy, sped-up copy), so no setting moves Export video. */
+@media (min-width: 861px){.excol .fileslist{min-height:173px}}
+</style>
+</head>
+<body>
+<div id="app" v-cloak>
+<div :class="(themeClass)" :data-scr="(scrKey)" style="min-height: 100vh; background: var(--ground); color: var(--ink); font-family: 'Mona Sans', -apple-system, sans-serif; font-size: 15px; line-height: 1.45; position: relative">
+
+<div v-if="isWelcome" style="display: contents">
+<div class="fade wwrap" style="min-height: 100vh; box-sizing: border-box; padding: max(24px, calc((100vh - 734px) / 2)) 16px 24px; display: flex; align-items: flex-start; justify-content: center">
+<div class="tray welcome-grid" style="width: 100%; max-width: 1180px; display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); gap: 6px">
+<div class="welcome-art" style="position: relative; border-radius: 20px; overflow: hidden; background: #0000F2; min-height: 700px">
+<img src="assets/voice-alex.png" alt="Halftone marble head, the portrait for the voice Alex" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 30%">
+<div class="wide big" style="position: absolute; left: 28px; bottom: 24px; color: #F2F2F2; font-size: 112px; line-height: 0.85">NAVI</div>
+</div>
+<div class="sheet" style="padding: 34px 36px; display: flex; flex-direction: column">
+<h1 id="wel-h" tabindex="-1" class="h-page" style="font-size: 34px">Set up once</h1>
+<p class="muted" style="margin: 10px 0 0; font-size: 17px; max-width: 46ch">Three quick things, then you never see this screen again. Everything stays on this computer.</p>
+
+<div style="margin-top: 22px; display: flex; flex-direction: column">
+<div style="padding: 16px 0">
+<div style="display: flex; align-items: center; gap: 12px; font-weight: 500; font-size: 17px"><span :class="(w1Cls)" class="disc">{{w1Mark}}</span>Connect ElevenLabs</div>
+<div class="wpad wkslot" style="margin: 8px 0 0 40px; display: grid">
+<p class="muted" :style="'grid-area: 1/1; margin: 0' + (keyMsg ? '; visibility: hidden' : '')" :aria-hidden="keyMsg ? 'true' : 'false'">At <a href="https://elevenlabs.io/app/settings/api-keys" target="_blank" rel="noopener" style="color: var(--ink)" :tabindex="keyMsg ? '-1' : null">elevenlabs.io</a>, open Developers, then API keys. Create a key with Text to Speech turned on and paste it here.</p>
+<p id="wkeymsg" role="status" :aria-busy="(keyBusy)" :style="'grid-area: 1/1; margin: 0; color: ' + (keyMsgColor)"><span v-if="keyChecking" class="dot k-busy keyspin" aria-hidden="true"></span>{{keyMsg}}</p>
+</div>
+<div class="wfield wrow1" style="display: flex; gap: 8px; margin: 12px 0 0 40px">
+<label for="key" class="sr">ElevenLabs API key</label>
+<span class="keybox"><input id="key" class="inp" aria-describedby="wkeymsg" :aria-invalid="keyBad ? 'true' : null" :type="(keyType)" :value="(key)" @input="onKey($event)" @change="onKey($event)" @keydown="keyEnter($event)" :placeholder="isPhone ? 'Paste your key' : 'Paste your API key'" autocomplete="off" spellcheck="false"><button type="button" class="icon keyeye" @click="toggleKeyType($event)" :aria-label="(keyTypeLabel)" :title="(keyTypeLabel)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"></path><circle cx="12" cy="12" r="3"></circle><path :style="keyShown ? 'visibility: hidden' : ''" d="M4 4l16 16"></path></svg></button></span>
+<button type="button" class="btn wtest" @click="testKey($event)" :aria-busy="(keyBusy)" style="width: 150px">Test key</button>
+</div>
+</div>
+
+<div style="border-top: 1px solid var(--line); padding: 16px 0">
+<div style="display: flex; align-items: center; gap: 12px; font-weight: 500; font-size: 17px"><span :class="(w2Cls)" class="disc">{{w2Mark}}</span>Recording tools</div>
+<div class="wtools wpad">
+<p id="toolstext" tabindex="-1" class="muted">{{toolsText}}</p>
+<div class="wtslot">
+<div v-if="toolsIdle" style="display: contents"><button id="toolsinstall" type="button" class="btn wtest" @click="askTools($event)" style="width: 150px">Install</button></div>
+<div v-if="toolsAsking" style="display: contents"><button id="toolsno" type="button" class="btn" @click="cancelTools($event)">Not now</button><button id="toolsyes" type="button" class="btn strong" @click="installTools($event)">Yes, install</button></div>
+</div>
+</div>
+</div>
+
+<div style="border-top: 1px solid var(--line); padding: 16px 0">
+<div style="display: flex; align-items: center; gap: 12px; font-weight: 500; font-size: 17px"><span :class="(w3Cls)" class="disc">{{w3Mark}}</span><span>Log in to your test account</span></div>
+<div class="wfield wrow1" style="display: flex; gap: 8px; margin: 12px 0 0 40px">
+<label for="wsite" class="sr">Site you'll demo</label>
+<input id="wsite" class="inp" type="text" :value="(wSite)" @input="onWSite($event)" @change="onWSite($event)" @keydown="wSiteKey($event)" aria-describedby="wsitemsg" :aria-invalid="wSiteMsg ? 'true' : null" :placeholder="isPhone ? 'e.g. whop.com' : 'Site you\'ll demo, e.g. whop.com'" style="flex: 1">
+<button type="button" class="btn wlogin" @click="loginSite($event)" style="width: 150px">{{loginLabel}}</button>
+</div>
+<div class="wpad" style="margin: 8px 0 0 40px; display: grid">
+<p class="muted" :style="'grid-area: 1/1; margin: 0' + (wSiteMsg ? '; visibility: hidden' : '')" :aria-hidden="wSiteMsg ? 'true' : 'false'">Optional. A browser opens and you log in yourself. Use a test account with fake data. NAVI never types your passwords.</p>
+<p id="wsitemsg" role="status" style="grid-area: 1/1; margin: 0; color: var(--danger)">{{wSiteMsg}}</p>
+</div>
+</div>
+</div>
+
+<div class="wfoot" style="margin-top: auto; padding-top: 18px; display: flex; justify-content: flex-end; align-items: center; gap: 14px; flex-wrap: wrap">
+<span id="wstatus" class="muted">{{welcomeStatus}}</span>
+<button type="button" class="pri" @click="finishWelcome($event)" :aria-disabled="welcomeBlocked ? 'true' : 'false'" aria-describedby="wstatus">Done, show my demos</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<div v-if="inApp" style="display: contents">
+<header class="hdr">
+<div v-if="crumb" style="display: contents"><button type="button" class="icon fill phoneback" @click="phoneBack($event)" :aria-label="(phoneBackLabel)" :title="(phoneBackLabel)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"></path></svg></button></div>
+<button type="button" @click="goHome($event)" class="wide" style="border: 0; background: none; padding: 0 6px 0 0; font-size: 22px; white-space: nowrap" title="Natural AI demo video">NAVI</button>
+<nav aria-label="You are here" class="crumbs">
+<button type="button" @click="goHome($event)">All demos</button>
+<div v-if="crumbBatch" style="display: contents"><span aria-hidden="true">/</span><button type="button" @click="goBatch($event)">{{crumbBatchName}}</button></div>
+<div v-if="crumb" style="display: contents"><span aria-hidden="true">/</span><span class="here">{{crumbText}}</span></div>
+</nav>
+<div v-if="crumb" style="display: contents"></div>
+<span style="flex: 1"></span>
+<div v-if="showNewBtn" style="display: contents"><button type="button" class="btn line" @click="newDemo($event)" style="height: 40px" aria-label="New demo"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg><span class="newlabel">New demo</span></button></div>
+<button type="button" class="credits" @click="goSettings($event)" title="ElevenLabs credits left this month">
+<div v-if="keyOn" style="display: contents"><span class="small"><span style="font-size: 15px">{{creditsText}}</span> credits</span></div>
+<div v-if="keyOff" style="display: contents"><span class="dot" style="background: var(--danger)"></span><span class="small"><span class="lg-only">Connect ElevenLabs</span><span class="sm-only">Connect</span></span></div>
+</button>
+<button type="button" class="icon" @click="toggleTheme($event)" :aria-label="(themeAria)" :title="(themeAria)">
+<div v-if="isDark" style="display: contents"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg></div>
+<div v-if="isLight" style="display: contents"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"></path></svg></div>
+</button>
+<button id="helpbtn" type="button" class="icon" @click="toggleHelp($event)" aria-label="Help" title="Help" :aria-expanded="(helpOpen)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M9.6 9.3a2.5 2.5 0 0 1 4.8 1c0 1.7-2.4 2.2-2.4 3.7M12 17.2v.01"></path></svg></button>
+<button type="button" class="icon" @click="goSettings($event)" aria-label="Settings and your data" title="Settings" :aria-current="isSettings ? 'page' : null" :style="isSettings ? 'background: var(--wash)' : ''"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"></path></svg></button>
+</header>
+
+<div v-if="helpOpen" style="display: contents">
+<div id="helpdlg" class="tray fade" role="dialog" aria-label="Help" style="position: absolute; right: 64px; top: 60px; width: 360px; max-width: calc(100% - 32px); z-index: 5; box-shadow: 0 18px 40px -18px rgba(0,0,0,0.35)">
+<div class="sheet" style="padding: 16px 18px">
+<div class="h-sec">How this works</div>
+<ol class="muted" style="margin: 8px 0 0; padding-left: 18px"><li>Press New demo and say what to show.</li><li>Claude writes the script. Follow the steps on the left.</li><li>The main button is always bottom right.</li><li>Want to change anything? Type it in the bar at the bottom.</li></ol>
+</div>
+<div class="foot"><span></span><button id="helpok" type="button" class="btn sm" @click="toggleHelp($event)">Got it</button></div>
+</div>
+</div>
+
+<!-- HOME -->
+<div v-if="isHome" style="display: contents">
+<main class="page fade home-grid">
+<section aria-labelledby="demos-h">
+<div style="margin: 10px 4px 18px">
+<h1 id="demos-h" tabindex="-1" class="h-page">All demos</h1>
+<p class="muted" style="margin: 8px 0 0">{{homeSub}}</p>
+</div>
+<div class="cards">
+<button type="button" class="newtile" @click="newDemo($event)" style="border: 0; border-radius: 26px; background: var(--sheet); box-shadow: 0 0 0 6px var(--tray); margin: 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 16px"><span style="width: 56px; height: 56px; border-radius: 28px; background: var(--ink); color: var(--sheet); display: inline-flex; align-items: center; justify-content: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg></span><span class="wide caps" style="font-size: 20px">New demo</span><span class="muted">One video</span></button>
+<button type="button" class="newtile newbatch" @click="newBatch($event)" style="border: 0; border-radius: 26px; background: var(--sheet); box-shadow: 0 0 0 6px var(--tray); margin: 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 16px"><span style="width: 56px; height: 56px; border-radius: 28px; background: var(--wash); color: var(--ink); display: inline-flex; align-items: center; justify-content: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg></span><span class="wide caps" style="font-size: 20px">New batch</span><span class="muted">Many videos at once</span></button>
+<div v-for="b in batchCards" style="display: contents">
+<div class="dwrap">
+<button :id="(b.cid)" type="button" class="tray dcard" @click="b.open($event)">
+<span class="cover" style="display: grid; grid-template-columns: 1fr 1fr; gap: 4px; background: var(--tray)"><img src="assets/cover-3.jpg" alt="" style="border-radius: 12px"><span style="display: grid; grid-template-rows: 1fr 1fr; gap: 4px; min-height: 0"><img src="assets/cover-1.jpg" alt="" style="border-radius: 12px; min-height: 0"><img src="assets/cover-4.jpg" alt="" style="border-radius: 12px; min-height: 0"></span></span>
+<span class="meta"><span class="name" style="font-size: 16px">{{b.name}}</span><span class="muted">{{b.meta}}</span><span style="display: inline-flex; align-items: center; gap: 8px; margin-top: 4px"><span class="dot k-ready"></span>{{b.next}}</span>
+<span style="display: flex; align-items: center; gap: 10px; margin-top: 6px"><span style="flex: 1; height: 6px; border-radius: 999px; background: var(--fill); overflow: hidden"><span :style="'display: block; height: 6px; background: var(--ink); width: ' + (b.pct)"></span></span><span class="small" style="white-space: nowrap">{{b.status}}</span></span></span>
+</button>
+<button type="button" class="ddel" @click="b.del($event)" :aria-label="(b.delAria)" :title="(b.delAria)"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"></path></svg></button>
+</div>
+</div>
+<div v-for="d in demos" style="display: contents">
+<div class="dwrap">
+<button :id="(d.cid)" type="button" class="tray dcard" @click="d.open($event)">
+<span class="cover" style="display: block"><img :src="(d.cover)" alt="" :style="d.tint ? 'filter: ' + d.tint : ''"></span>
+<span class="meta"><span class="name" style="font-size: 16px">{{d.title}}</span><span class="muted">{{d.meta}}</span><span style="display: inline-flex; align-items: center; gap: 8px; margin-top: 4px"><span :class="'dot k-' + (d.dot || 'ready')"></span>{{d.status}}</span></span>
+</button>
+<button type="button" class="ddel" @click="d.del($event)" :aria-label="(d.delAria)" :title="(d.delAria)"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"></path></svg></button>
+</div>
+</div>
+</div>
+</section>
+<button type="button" class="phone-setup" @click="goSettings($event)"><span :class="'dot k-' + setupDot"></span>{{setupShort}} · <span class="link" style="padding: 0; font-size: inherit">Check setup</span></button>
+<aside aria-label="Your setup" class="home-aside" style="display: flex; flex-direction: column; gap: 14px; margin-top: 98px">
+<div class="tray">
+<div :style="'position: relative; height: 260px; border-radius: 20px; overflow: hidden; background: ' + (defC)"><img :src="(defImg)" alt="" style="width: 100%; height: 100%; object-fit: cover; object-position: 50% 30%"></div>
+<div class="foot"><span><span class="wide" style="display: block; font-size: 24px; line-height: 1">{{defName}}</span><span class="muted">New demos use {{defNamePretty}}</span></span><button type="button" class="btn sm" @click="goSettings($event)">Change voice</button></div>
+</div>
+<div class="tray"><div class="sheet list" style="padding: 4px 16px">
+<div class="row"><span :class="'dot k-' + keyDot"></span><span style="flex: 1">{{keyStatus}}</span><button type="button" class="btn sm" @click="goSettings($event)">{{keyAction}}</button></div>
+<div class="row"><span :class="'dot k-' + toolsDot"></span><span style="flex: 1">Recording tools</span><span class="muted small" style="padding-right: 14px; text-align: right">{{toolsReady}}</span></div>
+<div class="row"><span class="dot k-done"></span><span style="flex: 1">{{sitesStatus}}</span><button type="button" class="btn sm" @click="goSettings($event)">Manage</button></div>
+</div></div>
+</aside>
+</main>
+</div>
+
+<!-- DEMO -->
+<div v-if="isDemo" style="display: contents">
+<main class="page demo-grid">
+<nav aria-label="Steps" class="tray stepnav">
+<div class="sheet brief" style="padding: 14px 14px 12px; margin-bottom: 6px">
+<div :class="crumbBatch ? 'name name2' : 'name'">{{demoTitle}}</div>
+<div class="muted small" style="margin-top: 2px">{{briefLine}}</div>
+<button type="button" class="btn sm" @click="editBrief($event)" :aria-disabled="recLock ? 'true' : null" :title="recLock ? 'Stop the recording to edit the brief' : null" style="margin-top: 10px">Edit brief</button>
+</div>
+<div class="sheet steplist" data-lc-scroll style="padding: 8px">
+<div v-for="s in steps" style="display: contents">
+<button type="button" :class="(s.cls)" @click="s.go($event)" :aria-current="(s.cur)" :aria-disabled="s.locked ? 'true' : null" :tabindex="s.locked ? '-1' : null" :title="(s.tip)">
+<span :class="(s.dotCls)">{{s.mark}}</span>
+<span><span style="display: block; font-weight: 500">{{s.name}}</span><span class="sub muted small" style="display: block">{{s.sub}}</span></span>
+</button>
+</div>
+</div>
+</nav>
+
+<section class="tray steptray" aria-labelledby="step-h">
+<div class="sheet stepsheet" :class="st3 ? 'recsheet' : st5 ? 'exsheet' : st0 ? 'scsheet' : ''">
+<h1 id="step-h" tabindex="-1" class="h-step">{{cur.title}}</h1>
+<p class="muted stephelp" style="margin: 8px 0 22px; max-width: 70ch"><span>{{cur.help}}</span><span v-if="cur.helpHold" class="hold" aria-hidden="true">{{cur.helpHold}}</span></p>
+
+<!-- SCRIPT -->
+<div v-if="st0" style="display: contents">
+<div v-if="writing" style="display: contents">
+<div aria-label="Writing the script" class="sc">
+<div class="scleft"><div class="sklist"><div v-for="r in skelRows" style="display: contents"><span class="skrow"><span class="skel" :style="'height: 16px; width: ' + (r)"></span></span></div></div></div>
+<div class="scpanel skpanel"><span class="skel" style="height: 26px; width: 55%"></span><span class="skel" style="height: 26px; width: 92%; margin-top: 18px"></span><span class="skel" style="height: 26px; width: 84%"></span><span class="skel" style="height: 26px; width: 60%"></span></div>
+<p class="muted small sclen sclenrow">&nbsp;</p>
+</div>
+</div>
+<div v-if="scriptReady" style="display: contents">
+<div class="sc">
+<div class="scleft">
+<div role="group" aria-label="Sections" class="sclist" @keydown="scListKey($event)">
+<div v-for="r in scList" style="display: contents"><button type="button" :aria-pressed="(r.on)" :tabindex="r.on === 'true' ? '0' : '-1'" @click="r.pick($event)"><span class="mono sctime muted">{{r.t}}<span v-if="r.edited" class="edot" aria-hidden="true"></span></span><span>{{r.n}}<span v-if="r.edited" class="sr">, edited</span></span></button></div>
+</div>
+</div>
+<div class="scpanel" role="region" aria-labelledby="scname">
+<div class="sctop">
+<div id="scname" class="wide caps scname">{{scName}}</div>
+<p class="muted small sclen sm-only" style="margin: 0; flex: 1">{{scLenInFoot ? scNum : scriptLenLine}}</p>
+<span class="muted hide-sm sctime screadout" style="font-size: 13px">{{scNum}}</span>
+<span class="scarrows"><button type="button" class="icon fill" @click="scPrev($event)" :aria-disabled="scPrevOff ? 'true' : 'false'" aria-label="Previous section" title="Previous section"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"></path></svg></button><button type="button" class="icon fill" @click="scNext($event)" :aria-disabled="scNextOff ? 'true' : 'false'" aria-label="Next section" title="Next section"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg></button></span>
+</div>
+<p v-if="scSeat" class="muted small scseat">{{scSeat}}</p>
+<div class="scpick" style="margin-top: 10px"><label for="scsel" class="sr">Section</label><select id="scsel" class="inp" @change="scPickSel($event)"><option v-for="r in scList" :value="r.i" :selected="r.on === 'true'">{{r.n}}</option></select></div>
+<div v-if="!scCaps" style="display: contents"><p class="scline">{{scLine}}</p></div>
+<div v-if="scCaps" style="display: contents"><div class="scline sccapv fade"><div class="muted small" style="margin-bottom: 6px">Captions show</div><p class="capchip">{{scCaption}}</p></div></div>
+<div class="scslot">
+<div v-if="!scChange" class="scbtns" style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center">
+<button id="scopen" type="button" class="btn sm" @click="openScChange($event)" :aria-expanded="(scChange)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z"></path></svg>Change this line</button>
+<span class="scbusy"><button type="button" class="btn sm" @click="toggleScCaps($event)" :aria-expanded="(scCaps)" :style="scPending ? 'visibility: hidden' : ''">{{scCapsLabel}}</button><span class="muted small scbusytext" role="status">{{scPending ? scPendingText : ''}}</span></span>
+</div>
+<div v-if="scChange" class="fade scbtns scchg">
+<label for="scd" class="sr">What should change?</label>
+<input id="scd" class="inp" type="text" :value="(scDraft)" @input="onScDraft($event)" @change="onScDraft($event)" @keydown="scKey($event)" placeholder="What should change? e.g. less casual">
+<button id="scsend" type="button" class="btn sm" @click="sendScChange($event)">Send</button>
+<button id="sccancel" type="button" class="icon" @click="closeScChange($event)" aria-label="Cancel" title="Cancel" style="width: 36px; height: 36px"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+</div>
+</div>
+</div>
+<p class="muted small sclen sclenrow" :style="scLenInFoot ? 'visibility: hidden' : null" :aria-hidden="scLenInFoot ? 'true' : null">{{scriptLenLine}}</p>
+</div>
+</div>
+</div>
+
+<!-- VOICE -->
+<div v-if="st1" style="display: contents">
+<div class="two two-v">
+<div style="min-width: 0">
+<div class="vgrid">
+<div v-for="v in voices" style="display: contents">
+<div :class="(v.cls)">
+<button type="button" class="vpick" @click="v.pick($event)" :aria-pressed="(v.on)" :aria-label="(v.aria)">
+<span class="vimg" :style="'background: ' + (v.bg)"><img :src="(v.img)" alt=""></span>
+<span style="display: block; padding: 10px 8px 6px 10px; min-width: 0"><span class="wide" style="display: block; font-size: 19px; line-height: 1.1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{v.name}}</span><span class="muted small" style="display: block">{{v.desc}}</span><span class="vtag">{{v.modelTag}}</span></span>
+</button>
+<button type="button" class="hear" @click="v.hear($event)" :aria-label="(v.hearAria)" :title="(v.hearAria)"><svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 4.5v15l12-7.5z"></path></svg>{{v.badge}}</button>
+</div>
+</div>
+<button id="vmore" type="button" class="vmore" @click="openLib($event)" style="border: 0; border-radius: 26px; background: var(--tray); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; min-height: 200px"><span style="width: 40px; height: 40px; border-radius: 20px; background: var(--wash); display: inline-flex; align-items: center; justify-content: center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg></span><span style="font-weight: 500">More voices</span></button>
+</div>
+
+<div style="margin-top: 22px; display: grid; gap: 8px">
+<h2 class="h-sec">Voice model</h2>
+<div class="seg" role="group" aria-label="Voice model"><div v-for="k in models" style="display: contents"><button type="button" :aria-pressed="(k.on)" @click="k.pick($event)"><span class="lg-only">{{k.label}}</span><span class="sm-only">{{k.short}}</span></button></div></div>
+<div class="mslot"><div v-if="!isV3" style="display: contents"><p class="muted small" style="margin: 0">v4 sounds more natural but has no speed control. Pick v3 if you need to set the pace.</p></div><div v-if="isV3" style="display: contents"><div v-for="s in paceSliders" style="display: contents">
+<div>
+<div class="slwrap">
+<div class="bar" data-lc-layers @pointerdown="s.down($event)" @pointermove="s.move($event)" @pointerup="s.up($event)" @pointercancel="s.up($event)"><span class="fill" :style="'width: ' + (s.pct)"></span><span class="rec" :style="'left: ' + (s.rec)"></span><span class="bl">{{s.label}}<span v-if="s.off" style="display: contents"><button type="button" class="reset" @pointerdown.stop @click="s.reset($event)" :aria-label="s.label + ' back to recommended'" title="Back to recommended"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.4-5.7L4 8.5"></path><path d="M4 3.5v5h5"></path></svg></button></span></span><span class="bv">{{s.display}}</span><input type="range" :id="'rng-' + s.k" :aria-label="(s.label)" :min="(s.min)" :max="(s.max)" step="1" :value="(s.value)" @input="s.onChange($event)" @change="s.onChange($event)"></div>
+</div>
+<div v-if="sliderHelp" style="display: contents"><p class="muted small" style="margin: 6px 0 0">{{s.low}}<br>{{s.high}}</p></div>
+</div>
+</div></div></div>
+</div>
+
+
+<div style="margin-top: 22px; display: grid; gap: 8px">
+<h2 class="h-sec">Fine-tune</h2>
+<div class="sumrow fsum"><span id="finesum">{{fineLine}}</span><button id="finebtn" type="button" class="btn sm chg" @click="toggleFine($event)" :aria-expanded="fineOpen ? 'true' : 'false'" aria-describedby="finesum" style="background: var(--sheet)">Change<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg></button></div>
+<div v-if="fineOpen" style="display: contents">
+<div class="fade">
+<div class="fhelp"><p class="muted small">Drag a bar or click anywhere on it. The small notch marks the recommended spot for {{voiceName}}.</p><span class="fhbtns"><button id="resetall" type="button" class="btn sm" @click="resetAll($event)" :style="anyChanged ? null : 'visibility: hidden'" :tabindex="anyChanged ? null : '-1'" :aria-hidden="anyChanged ? null : 'true'">Reset all</button><button id="slhelp" type="button" class="link small" @click="toggleSliderHelp($event)" :aria-expanded="(sliderHelp)">{{sliderHelpLabel}}</button></span></div>
+<div class="sliders" style="margin-top: 12px">
+<div v-for="s in sliders" style="display: contents">
+<div>
+<div class="slwrap">
+<div class="bar" data-lc-layers @pointerdown="s.down($event)" @pointermove="s.move($event)" @pointerup="s.up($event)" @pointercancel="s.up($event)"><span class="fill" :style="'width: ' + (s.pct)"></span><span class="rec" :style="'left: ' + (s.rec)"></span><span class="bl">{{s.label}}<span v-if="s.off" style="display: contents"><button type="button" class="reset" @pointerdown.stop @click="s.reset($event)" :aria-label="s.label + ' back to recommended'" title="Back to recommended"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.4-5.7L4 8.5"></path><path d="M4 3.5v5h5"></path></svg></button></span></span><span class="bv">{{s.display}}</span><input type="range" :id="'rng-' + s.k" :aria-label="(s.label)" :min="(s.min)" :max="(s.max)" step="1" :value="(s.value)" @input="s.onChange($event)" @change="s.onChange($event)"></div>
+</div>
+<div v-if="sliderHelp" style="display: contents"><p class="muted small" style="margin: 6px 0 0">{{s.low}}<br>{{s.high}}</p></div>
+</div>
+</div>
+<div>
+<div class="swrow"><span class="swl" id="swlbl">Swearing</span><span class="mpills" role="group" aria-labelledby="swlbl"><div v-for="o in swearPills" style="display: contents"><button type="button" :aria-pressed="(o.on)" @click="o.pick($event)">{{o.label}}</button></div></span></div>
+<div v-if="sliderHelp" style="display: contents"><p class="muted small" style="margin: 6px 0 0">{{swearHelp}}</p></div>
+</div>
+<div :class="swearOn ? 'swcap' : 'swcap swoff'"><span class="capl"><span id="capsLbl">Swears in captions too</span><span id="capsHint" class="caphint">Turn on Swearing first</span></span><button type="button" :class="(capsCls)" role="switch" :aria-checked="(capsOn)" :aria-disabled="swearOn ? null : 'true'" aria-labelledby="capsLbl" aria-describedby="capsHint" @click="toggleCaps($event)" @mousedown="capsDown($event)" :tabindex="swearOn ? null : '-1'"><span></span></button></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<aside aria-label="Preview" style="display: flex; flex-direction: column; gap: 12px; min-width: 0">
+<div class="tray">
+<div class="sheet" style="padding: 18px">
+<div class="muted small">{{voiceName}} reads, from your script</div>
+<p style="margin: 8px 0 0; font-size: 18px; line-height: 1.45; min-height: 5.8em">{{line}}</p>
+<div :style="'margin-top: 12px; color: ' + (voiceColor)">
+<div style="display: flex; align-items: center; gap: 12px">
+<button type="button" @click="playSample($event)" :aria-label="(playAria)" :style="'width: 44px; height: 44px; border-radius: 22px; border: 0; background: ' + (voiceColor) + '; color: #FFFFFF; flex: none; display: inline-flex; align-items: center; justify-content: center'">
+<div v-if="samplePlaying" style="display: contents"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="5" width="4" height="14"></rect><rect x="14" y="5" width="4" height="14"></rect></svg></div>
+<div v-if="sampleStopped" style="display: contents"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 4.5v15l12-7.5z"></path></svg></div>
+</button>
+<div :class="(wvClass)" aria-hidden="true" style="flex: 1; height: 28px; display: flex; align-items: center; gap: 3px; overflow: hidden"><div v-for="b in wbars" style="display: contents"><span :style="'height: ' + (b.h) + '; animation-delay: ' + (b.d)"></span></div></div>
+</div>
+<div class="small cstack" style="color: var(--ink); margin: 8px 0 0"><span :style="sampleFree ? 'visibility: hidden' : null">{{sampleCostLong}}</span><span :style="sampleFree ? null : 'visibility: hidden'">Replays are free.</span></div>
+</div>
+</div>
+</div>
+<div class="tray"><div class="sheet" style="padding: 14px 16px">
+<div style="display: flex; justify-content: space-between; gap: 10px; white-space: nowrap"><span>Video length</span><span>about <span class="mono">{{lengthText}}</span><span v-if="isV3" class="muted small"> at {{paceText}}</span></span></div>
+<div style="display: flex; justify-content: space-between; gap: 10px; margin-top: 4px"><span>This video</span><span>about {{videoCostText}} credits</span></div>
+<div class="muted" style="display: flex; justify-content: space-between; gap: 10px; margin-top: 4px"><span>Credits</span><span>{{creditsNowText}} → about {{leftAfterText}}</span></div>
+<div style="border-top: 1px solid var(--line); margin-top: 12px; padding-top: 10px; display: flex; align-items: center; gap: 10px; min-height: 30px"><span id="lockLbl" style="flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">Use {{voiceName}} for new demos</span><button type="button" :class="isDefVoice ? 'sw on' : 'sw'" role="switch" :aria-checked="isDefVoice ? 'true' : 'false'" aria-labelledby="lockLbl" @click="makeDefault($event)"><span></span></button></div>
+</div>
+</div>
+</aside>
+</div>
+</div>
+
+<!-- PRIVACY -->
+<div v-if="st2" style="display: contents">
+<div class="presets" role="group" aria-label="Privacy preset">
+<div v-for="p in presets" style="display: contents">
+<button type="button" :class="(p.cls)" :aria-pressed="(p.on)" @click="p.pick($event)">
+<span style="display: flex; align-items: center; gap: 8px; min-height: 24px; flex-wrap: wrap"><span class="pn">{{p.name}}</span><span v-if="p.rec" class="tagq solid">Recommended</span></span>
+<span class="pd">{{p.desc}}</span>
+</button>
+</div>
+</div>
+<div class="sumslot" style="margin-top: 14px"><div class="pvsum" style="padding: 14px 16px; border-radius: 14px; background: var(--tray)">
+<p style="margin: 0">Blurred: <span class="muted">{{pvBlurLine}}</span></p>
+<p style="margin: 4px 0 0">Shown: <span class="muted">{{pvShowLine}}</span></p>
+</div></div>
+
+<div style="margin-top: 24px">
+<h2 class="h-sec"><label for="hw">Always blur these words</label></h2>
+<p class="muted" style="margin: 4px 0 10px"><span class="lg-only">Things only you know are private, like a client’s name.</span><span class="sm-only">Private things, like a client’s name.</span></p>
+<div style="display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; min-height: 34px; align-items: center">
+<div v-for="h in hide" style="display: contents"><span class="chip">{{h.w}}<button type="button" @click="h.rm($event)" :aria-label="(h.aria)" style="width: 26px; height: 26px; border: 0; border-radius: 13px; background: transparent; display: inline-flex; align-items: center; justify-content: center"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button></span></div>
+<span v-if="noHide" class="muted small">No words yet.</span>
+</div>
+<div style="display: flex; gap: 8px"><input id="hw" class="inp" type="text" :value="(hideDraft)" @input="onHideDraft($event)" @change="onHideDraft($event)" @keydown="hideKey($event)" placeholder="Type a word, press Enter" :aria-describedby="hideDup ? 'hwdup' : null" :aria-invalid="hideDup ? 'true' : 'false'" :style="hideDup ? 'border-color: var(--danger)' : ''"><button type="button" class="btn" @click="addHide($event)">Add</button></div>
+<p id="hwdup" class="small" style="margin: 6px 0 0; min-height: 20px; color: var(--danger)">{{hideDup ? 'Already in the list.' : ''}}</p>
+</div>
+
+<div style="margin-top: 14px">
+<button id="pvmore" type="button" class="disclose" @click="togglePvMore($event)" :aria-expanded="(pvMore)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg>{{pvMoreLabel}}<span v-if="isCustom" class="muted small" style="font-weight: 400">(changed)</span></button>
+<div v-if="pvMore" style="display: contents">
+<div class="fade two two-e" style="padding-top: 8px">
+<div>
+<h3 class="h-sec" style="margin-bottom: 4px">Personal info</h3>
+<p class="muted small" style="margin: 0 0 4px">Switch on to show it. Only show things from a test account.</p>
+<div class="list">
+<div v-for="r in tier2" style="display: contents">
+<div class="row" style="min-height: 64px"><span style="flex: 1; min-width: 0"><span :id="(r.id)" style="display: block">{{r.label}}</span><span v-if="r.hasWarn" class="small" style="display: block; color: var(--danger)">{{r.warn}}</span></span><button type="button" :class="(r.cls)" role="switch" :aria-checked="(r.onStr)" :aria-labelledby="(r.id)" @click="r.toggle($event)"><span></span></button></div>
+</div>
+</div>
+</div>
+<div>
+<h3 class="h-sec" style="margin-bottom: 4px">Everyday info</h3>
+<p class="muted small" style="margin: 0 0 4px">Switch off to blur it.</p>
+<div class="list">
+<div v-for="r in tier3" style="display: contents">
+<div class="row" style="min-height: 64px"><span :id="(r.id)" style="flex: 1; min-width: 0">{{r.label}}</span><button type="button" :class="(r.cls)" role="switch" :aria-checked="(r.onStr)" :aria-labelledby="(r.id)" @click="r.toggle($event)"><span></span></button></div>
+</div>
+</div>
+<p class="muted small" style="margin: 18px 0 0">Always blurred, can’t be switched off: {{alwaysText}}.</p>
+<p class="small" style="margin: 14px 0 0; padding: 12px 14px; border-radius: 12px; background: var(--wash)">This lowers the risk but can’t remove it. It can miss things that are only private in context, like a name in a sentence. Always watch before you publish.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<!-- RECORD -->
+<div v-if="st3" style="display: contents">
+<div class="two">
+<div>
+<div class="screen recscreen">
+<div class="art" aria-hidden="true"><img :src="(recCover)" alt="" style="filter: blur(6px) saturate(0.8); transform: scale(1.06)"></div>
+<span class="pill" style="left: 22px; top: 22px"><span :class="'dot k-' + recBadgeDot"></span>{{recBadge}}</span>
+</div>
+</div>
+<div class="panel recpanel" aria-live="polite" style="display: flex; flex-direction: column">
+<div class="rphead">{{recHeadLine}}</div>
+<div style="height: 6px; border-radius: 3px; background: var(--fill); margin-top: 10px; overflow: hidden"><span :style="'display: block; width: ' + (recPct) + '; height: 6px; background: var(--ink); transition: width 400ms ease'"></span></div>
+<div v-if="isRecording" style="display: contents">
+<ol class="prog" aria-label="Sections">
+<li class="pdone" :style="hasLastDone ? '' : 'visibility: hidden'"><span :class="'pmark ' + (recDoneMark)" aria-hidden="true"></span><span class="pn">{{recLastDone}}</span></li>
+<li class="pnow"><div class="pnowtop"><span :class="'pmark ' + (recNowMark)" aria-hidden="true"></span><span class="pn">{{recNowName}}</span></div><p class="pquote"><span><span class="muted">{{voiceName}}: </span>“{{recNowLine}}”</span><span v-for="q in recAllLines" class="qhold" aria-hidden="true"><span class="muted">{{voiceName}}: </span>“{{q}}”</span></p></li>
+<div v-for="n in recNext" style="display: contents"><li class="pnext" :style="n.n ? '' : 'visibility: hidden'"><span class="pmark dash" aria-hidden="true"></span><span class="pn">{{n.n}}</span></li></div>
+<li class="pdone pmore" :style="recMoreN > 0 ? '' : 'visibility: hidden'"><span class="pn">and {{recMoreN}} more</span></li>
+</ol>
+<div class="recctl">
+<div v-if="recControls" style="display: contents"><button id="recpause" type="button" class="btn pausebtn" @click="pauseRec($event)">{{pauseLabel}}</button>
+<div class="slide" :class="recSliding ? 'slide dragging' : 'slide'"><span class="sfill" :style="'width: calc(' + (recSlidePct) + ' * (100% - 48px) + 46px)'"></span><span class="slabel"><span class="slt">Slide to stop</span><span class="sls">Finished sections stay</span></span><span id="slidehandle" class="shandle" role="slider" tabindex="0" aria-label="Slide to stop recording. Finished sections stay." aria-valuemin="0" aria-valuemax="100" :aria-valuenow="(recSlideNow)" :style="'left: calc(4px + ' + (recSlidePct) + ' * (100% - 48px))'" @pointerdown="slideDown($event)" @pointermove="slideMove($event)" @pointerup="slideUp($event)" @pointercancel="slideUp($event)" @keydown="slideKey($event)"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="5" y="5" width="14" height="14" rx="4"></rect></svg></span></div></div>
+<div v-if="recStopped" style="display: contents"><button id="reccarry" type="button" class="btn" @click="resumeStopped($event)">Carry on recording</button></div>
+</div>
+</div>
+<div v-if="recDone" style="display: contents"><p class="muted" style="margin: 14px 0 0">All sections are in. Watch the draft to check it.</p><p class="muted" style="margin: 8px 0 0">{{recNote}}</p></div>
+</div>
+</div>
+</div>
+
+<!-- REVIEW -->
+<div v-if="st4" style="display: contents">
+<div class="two revgrid">
+<div class="revvid" style="min-width: 0">
+<div class="screen">
+<div v-if="!revVideo" class="art" aria-hidden="true"><img :src="(revCover)" alt=""></div>
+<div v-if="revVideo" class="art"><video id="revvideo" :src="(revVideo)" preload="metadata" playsinline aria-label="The draft"></video></div>
+<div v-if="showCapPreview" style="display: contents"><div class="capov" :style="'position: absolute; left: 50%; bottom: 30px; transform: translateX(-50%); max-width: 80%; width: max-content; background: rgba(17,17,17,0.88); color: #F2F2F2; border-radius: 8px; padding: 7px 14px; font-size: 15px; text-align: center; ' + (capLookStyle)">{{revCaption}}</div></div>
+</div>
+</div>
+<div class="revctl" style="min-width: 0">
+<div class="revrow" style="display: flex; align-items: flex-start; gap: 14px; margin-top: 12px">
+<button id="playbtn" type="button" @click="togglePlayer($event)" :aria-label="(playerAria)" style="width: 46px; height: 46px; border-radius: 23px; border: 0; background: var(--ink); color: var(--sheet); display: inline-flex; align-items: center; justify-content: center; flex: none">
+<div v-if="playerOn" style="display: contents"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="5" width="4" height="14"></rect><rect x="14" y="5" width="4" height="14"></rect></svg></div>
+<div v-if="playerOff" style="display: contents"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 4.5v15l12-7.5z"></path></svg></div>
+</button>
+<span class="mono revcur" style="width: 40px">{{revTime}}</span>
+<div style="position: relative; flex: 1; height: 48px">
+<div class="timeline" style="position: absolute; inset: 0" role="slider" tabindex="0" aria-label="Timeline" aria-valuemin="0" :aria-valuemax="(totalSec)" :aria-valuenow="(revSec)" :aria-valuetext="(revTime)" @pointerdown="scrub($event)" @pointermove="scrubMove($event)" @pointerup="scrubUp($event)" @pointercancel="scrubUp($event)" @pointerleave="tipLeave($event)" @keydown="scrubKey($event)" title="Click or drag to move">
+<div class="track"></div>
+<div class="played" :style="'width: ' + (revLeft)"></div>
+<div v-for="t in ticks" style="display: contents"><span class="tick" aria-hidden="true" :style="'left: ' + (t)"></span></div>
+<div class="head" :style="'left: ' + (revLeft)"></div>
+</div>
+<div v-if="tipOn" class="tiplbl" aria-hidden="true" :style="'left: ' + (tipLeft)">{{tipName}}</div>
+<div class="pins"><div v-for="m in markPins" style="display: contents"><button type="button" :class="m.count > 1 ? 'pin many' : 'pin'" :style="'left: ' + (m.left)" :title="(m.label)" :aria-label="(m.aria)" @click="m.jump($event)"><span>{{m.count > 1 ? m.count : ''}}</span><i></i></button></div></div>
+</div>
+<span class="mono revtot">{{lengthText}}</span>
+</div>
+<div class="markslot">
+<div v-if="markClosed" style="display: contents">
+<div class="mrow">
+<button id="markbtn" type="button" class="btn" @click="openMark($event)"><span style="display: block; width: 10px; height: 10px; border-radius: 5px; background: var(--pin)"></span>Mark this moment</button>
+</div>
+</div>
+<div v-if="markOpen" style="display: contents">
+<div id="reasons" class="fade reasons" role="group" aria-label="Why mark this moment">
+<span class="lg-only" style="font-weight: 500; white-space: nowrap">At <span class="mono">{{revTime}}</span>:</span>
+<div v-if="!markOther" style="display: contents"><button id="markfirst" type="button" class="btn sm" @click="markAi($event)">Sounds like AI</button><button type="button" class="btn sm" @click="markBlur($event)">Needs a blur</button><button type="button" class="btn sm" @click="markFast($event)">Too fast</button><button type="button" class="btn sm" @click="openOther($event)">Other…</button></div>
+<div v-if="markOther" style="display: contents"><span style="display: flex; gap: 6px; flex: 1 1 200px; min-width: 0"><label for="mown" class="sr">What’s off?</label><input id="mown" class="inp" type="text" :value="(markDraft)" @input="onMarkDraft($event)" @change="onMarkDraft($event)" @keydown="markKey($event)" placeholder="What’s off? Press Enter" style="height: 36px; font-size: 14px"></span></div>
+<button type="button" class="icon markx" @click="closeMark($event)" aria-label="Cancel" title="Cancel" style="width: 36px; height: 36px"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+</div>
+</div>
+</div>
+<p class="muted small revremind"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"></path><circle cx="12" cy="12" r="3"></circle></svg><span>{{reviewReminder}}</span></p>
+</div>
+<aside aria-label="Your marks" class="revaside"><div class="revcap">
+<div v-if="hasUnsure" style="display: contents">
+<button type="button" class="warnbtn" @click="toggleBlurs($event)" :aria-expanded="(blurOpen)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l9.5 17h-19z"></path><path d="M12 10v4M12 17.5v.01"></path></svg><span style="flex: 1">{{unsureText}}</span><span class="wpill">{{blurOpen ? 'Hide' : 'Show'}}</span></button>
+<div v-if="blurOpen" style="display: contents">
+<div class="fade panel list" style="padding: 8px 16px">
+<div v-for="b in blurs" style="display: contents"><div class="row" style="flex-wrap: wrap; padding: 8px 0"><span class="mono muted">{{b.t}}</span><span style="flex: 1 1 160px">{{b.what}}</span><span style="display: inline-flex; gap: 6px"><button type="button" class="btn sm" @click="b.keep($event)" style="background: var(--sheet)">Keep blurred</button><button type="button" class="btn sm" @click="b.show($event)" style="background: var(--sheet)">Show it</button></span></div></div>
+</div>
+</div>
+</div>
+<div class="panel markspanel" style="padding: 16px">
+<h2 class="h-sec" style="min-height: 30px; display: flex; align-items: center">Your marks {{marksCount}}</h2>
+<div v-if="noMarks" style="display: contents"><p class="muted" style="margin: 8px 0 4px">No marks yet. Play the draft and press Mark this moment when something’s off.</p></div>
+<div v-if="hasMarks" style="display: contents">
+<div class="list markslist" style="margin-top: 4px">
+<div v-for="m in marks" style="display: contents">
+<div class="markrow"><button type="button" class="mono" @click="m.jump($event)" :aria-label="(m.jumpAria)" :title="(m.jumpAria)" style="border: 0; background: var(--sheet); border-radius: 999px; height: 32px; padding: 0 12px; white-space: nowrap; display: inline-flex; align-items: center; gap: 6px"><svg width="9" height="9" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 4.5v15l12-7.5z"></path></svg>{{m.t}}</button><span style="min-width: 0"><span style="display: block" :title="m.text !== m.full ? m.full : null">{{m.text}}</span><span class="muted small" style="display: block">{{m.sec}}</span></span><button type="button" class="icon" @click="m.rm($event)" :aria-label="(m.rmAria)" title="Remove" style="width: 36px; height: 36px"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button></div>
+</div>
+</div>
+</div>
+</div>
+</div></aside>
+</div>
+</div>
+
+<!-- EXPORT -->
+<div v-if="st5" style="display: contents">
+<div class="two two-x">
+<div style="min-width: 0">
+<div class="screen">
+<div class="art" aria-hidden="true"><img :src="(demoCover)" alt=""></div>
+<div v-if="showCapPreview" style="display: contents"><div :style="'position: absolute; left: 50%; bottom: 28px; transform: translateX(-50%); max-width: 80%; width: max-content; background: rgba(17,17,17,0.88); color: #F2F2F2; border-radius: 8px; padding: 6px 12px; font-size: 14px; ' + (capLookStyle)">{{firstCaption}}</div></div>
+<div v-if="cornerShown" style="display: contents"><span :style="'position: absolute; ' + (cornerStyle) + '; background: rgba(17,17,17,0.85); color: #F2F2F2; border-radius: 6px; padding: 4px 10px; font-size: 13px; font-weight: 500; max-width: 40%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin: 10px'">{{cornerTextShown}}</span></div>
+</div>
+</div>
+<div class="list excol" style="min-width: 0; display: flex; flex-direction: column">
+<div class="srow caprow stylerow"><span class="sl"><h2 class="h-sec" id="stylelbl" style="font-size: 16px">Video style</h2></span><div class="pills pillsfit" role="group" aria-labelledby="stylelbl"><div v-for="o in revStyles" style="display: contents"><button type="button" :aria-pressed="(o.on)" @click="o.pick($event)">{{o.label}}</button></div></div></div>
+<div class="srow caprow"><span class="sl"><h2 class="h-sec" id="caplbl" style="font-size: 16px">Captions</h2></span><div class="pills pillsfit" role="group" aria-labelledby="caplbl"><div v-for="o in revCaps" style="display: contents"><button type="button" :aria-pressed="(o.on)" @click="o.pick($event)">{{o.label}}</button></div></div></div>
+<div class="srow lookrow"><span class="sl"><h2 class="h-sec" id="looklbl" style="font-size: 16px">Caption look</h2></span><div class="pills pillsfit" role="group" aria-labelledby="looklbl"><div v-for="o in revLooks" style="display: contents"><button type="button" :aria-pressed="(o.on)" :aria-disabled="lookOff ? 'true' : null" :title="lookOff ? 'Only for captions in the video' : null" @click="o.pick($event)">{{o.label}}</button></div></div></div>
+<div class="crow">
+<span class="crowl"><h2 class="h-sec" id="rclbl" style="font-size: 16px">Corner label</h2>
+<span class="cslot"><span v-if="revCornerOff" class="muted small">Your name or brand in a corner</span><span v-if="revCorner.on" class="fade cfields"><label for="rct" class="sr">Label text</label><input id="rct" class="inp" type="text" :value="(revCornerText)" @input="onRevCornerText($event)" @change="onRevCornerText($event)" :placeholder="isPhone ? 'Label text' : 'Label text, e.g. your logo'"><label for="rcpos" class="sr">Corner</label><select id="rcpos" class="inp csel" @change="revCorner.pickVal($event)"><option v-for="o in revCorner.seg" :value="(o.k)" :selected="o.on === 'true'">{{o.label}}</option></select></span></span></span>
+<button type="button" :class="(revCorner.cls)" role="switch" :aria-checked="(revCorner.onStr)" aria-labelledby="rclbl" @click="revCorner.toggle($event)"><span></span></button>
+</div>
+<div class="row" style="border-top: 1px solid var(--line); padding: 10px 0; min-height: 64px; box-sizing: border-box"><span style="flex: 1"><span id="p720" style="display: block; font-weight: 500">Also make a small 720p copy</span><span class="muted small">For email and chat</span></span><button type="button" :class="(p720Cls)" role="switch" :aria-checked="(p720On)" aria-labelledby="p720" @click="toggle720($event)"><span></span></button></div>
+<div class="crow speedrow"><span class="crowl"><span id="spdlbl" style="display: block; font-weight: 500">Also make a sped-up copy</span><span class="cslot"><span v-if="!revSpeed.on" class="muted small">Same voice pitch, shorter video</span><span v-if="revSpeed.on" class="fade cfields"><label for="spd" class="sr">Speed</label><input id="spd" class="inp spdinp" type="number" inputmode="decimal" min="1.05" max="2" step="0.05" :value="(revSpeedVal)" @input="onRevSpeed($event)" @change="onRevSpeed($event)" :aria-invalid="revSpeedBad ? 'true' : null" aria-describedby="spdhint"><span id="spdhint" class="muted small" :style="revSpeedBad ? 'color: var(--danger)' : null">{{revSpeedHint}}</span></span></span></span><button type="button" :class="(revSpeed.cls)" role="switch" :aria-checked="(revSpeed.onStr)" aria-labelledby="spdlbl" @click="revSpeed.toggle($event)"><span></span></button></div>
+<div style="margin-top: 8px">
+<h2 class="h-sec">{{filesHead}}</h2>
+<div class="list fileslist" style="margin-top: 2px">
+<div v-for="f in files" style="display: contents"><div class="row filerow"><span class="fline"><span v-if="fileMark" style="display: contents"><button type="button" class="fname" @click="showInFinder($event)" :aria-label="'Show ' + f.n + ' in Finder'" title="Show in Finder">{{f.n}}</button><span class="dot k-done" role="img" aria-label="Saved"></span></span><span v-if="!fileMark" class="fname0">{{f.n}}</span></span><span class="fdet muted small">{{fileWill ? 'Will be saved' : f.s}}</span></div></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div :class="(st4 && hasSkip ? 'foot stepfoot revfoot' : 'foot stepfoot') + (st4 ? ' revstick' : '')">
+<span class="ftext" :style="'color: ' + (footColor)"><span :class="'dot k-' + footDot"></span><span id="stepwhy">{{footText}}<span v-if="footLinkOn"> <button type="button" class="link" @click="footLinkAct($event)">{{footLinkLabel}}</button></span></span></span>
+<span class="fbtns">
+<div v-if="confirming" style="display: contents"><div v-if="cfRerec" style="display: contents"><button type="button" class="btn ghost backbtn" @click="back($event)">Back</button></div><button id="cfno" type="button" :class="cfRerec ? 'btn secrec' : 'btn'" @click="cancelConfirm($event)">{{confirmNo}}</button><button id="cfyes" type="button" :class="cfRerec ? 'pri prirec' : (cfApprove ? (st4b ? 'pri prirev prib' : 'pri prirev') : 'pri')" @click="doConfirm($event)">{{confirmYes}}</button></div>
+<div v-if="notConfirming" style="display: contents">
+<div v-if="recHold" style="display: contents"><span class="fhold" aria-hidden="true"><span class="btn ghost backbtn">Back</span><span class="btn secrec">Record again</span></span></div>
+<div v-if="canBack" style="display: contents"><button type="button" class="btn ghost backbtn" @click="back($event)">Back</button></div>
+<div v-if="hasSkip" style="display: contents"><button id="skipbtn" type="button" class="btn" @click="doSkip($event)">Export without redos</button></div><div v-if="skipHold" style="display: contents"><span class="btn lg-only" aria-hidden="true" style="visibility: hidden">Export without redos</span></div>
+<div v-if="hasSecondary" style="display: contents"><button id="secbtn" type="button" :class="st3 ? 'btn secrec' : 'btn'" @click="secondary($event)">{{cur.second}}</button></div>
+<button type="button" :class="st1 ? 'pri privoice' : (st4b ? 'pri prirev prib' : (st4 ? 'pri prirev' : (st5 ? 'pri priex' : (st3 ? 'pri prirec' : 'pri'))))" @click="primary($event)" :aria-disabled="primaryBlocked ? 'true' : 'false'" :aria-describedby="primaryBlocked ? 'stepwhy' : null"><span class="lg-only">{{cur.cta}}</span><span class="sm-only">{{cur.ctaShort || cur.cta}}</span></button>
+</div>
+</span>
+</div>
+</section>
+</main>
+</div>
+
+<!-- NEW DEMO / BATCH -->
+<div v-if="isNew" style="display: contents">
+<main class="page fade" style="max-width: 860px; margin: 0 auto; box-sizing: border-box">
+<div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin: 10px 4px 18px">
+<h1 class="h-page">{{newTitle}}</h1>
+<div v-if="showModeSwitch" style="display: contents"><div class="seg modeseg" role="group" aria-label="How many" style="width: 280px"><div v-for="o in modes" style="display: contents"><button type="button" :aria-pressed="(o.on)" @click="o.pick($event)">{{o.label}}</button></div></div></div>
+</div>
+<p v-if="batchExplain" class="muted" style="margin: -6px 4px 18px">Paste a list of videos, approve all the scripts, NAVI records them one by one, then you review and export.</p>
+
+<div v-if="modeOne" style="display: contents">
+<div class="tray">
+<div class="sheet nsheet" style="padding: 26px 26px 22px; display: flex; flex-direction: column; gap: 24px">
+<div><label for="bw" class="wide" style="display: block; font-size: 24px; line-height: 1.2; margin-bottom: 12px; font-weight: 500">What should the demo show?</label><textarea id="bw" rows="3" class="inp" autofocus :aria-describedby="bWhat.trim() ? null : 'briefwhy'" :value="(bWhat)" @input="onBWhat($event)" @change="onBWhat($event)" placeholder="e.g. How to build a course in Whop, from creating the whop to checking it on a phone" style="height: auto; padding: 14px 16px; font-size: 18px; line-height: 1.4"></textarea></div>
+<div><div class="wide" style="font-size: 20px; margin-bottom: 10px; font-weight: 500">On which site?</div>
+<div class="chips" role="group" aria-label="Site"><span class="sitetrack"><div v-for="o in bSites" style="display: contents"><button type="button" :aria-pressed="(o.on)" @click="o.pick($event)">{{o.label}}</button></div></span><button type="button" id="bnewchip" class="newchip" :aria-expanded="bSiteNew ? 'true' : 'false'" @click="openBNew($event)">+ New site</button></div>
+<div v-if="bSiteNew" style="display: contents"><div class="fade" style="margin-top: 10px"><label for="bns" class="sr">New site address</label><input id="bns" class="inp" type="text" :aria-describedby="briefWhy && bWhat.trim() ? 'briefwhy' : null" :value="(bNew)" @input="onBNew($event)" @change="onBNew($event)" placeholder="The site’s address, e.g. app.yourproduct.com" :aria-invalid="bNewBad ? 'true' : 'false'"><div class="small nshint" :style="'margin-top: 6px; min-height: 20px; color: ' + (bNewBad ? 'var(--danger)' : 'var(--ink2)')">{{bNewBad ? 'That doesn’t look like a web address.' : 'A browser opens so you can log in once. Then it’s saved.'}}</div></div></div>
+</div>
+<div>
+<div :class="bMore ? 'sumrow open' : 'sumrow'"><span style="flex: 1 1 260px; min-width: 0"><span v-if="bLess"><span class="lg-only">{{bSummary}}</span><span class="sm-only"><span class="sumclip"><span class="sumlist"><span v-for="x in bSumList">{{x}}</span></span></span></span></span><span v-if="bMore" class="muted">For this demo only.<span class="lg-only"> Voice and captions can change later.</span></span></span><button id="bmorebtn" type="button" class="btn sm chg" @click="toggleMore($event)" :aria-expanded="bMore ? 'true' : 'false'" style="background: var(--sheet)">Change<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg></button></div>
+<div v-if="bMore" style="display: contents">
+<div class="fade srows" style="margin-top: 6px">
+<div class="srow"><span class="sl"><span class="slab">Who’s watching</span></span><div class="pills pillsfit" role="group" aria-label="Who's watching"><div v-for="o in bWho" style="display: contents"><button type="button" :aria-pressed="(o.on)" @click="o.pick($event)">{{o.label}}</button></div></div></div>
+<div class="srow"><span class="sl"><span class="slab">Kind of demo</span><span class="muted small shelp shelp2">{{bKindHint}}</span></span><div class="pills" role="group" aria-label="Kind of demo"><div v-for="o in bKinds" style="display: contents"><button type="button" :aria-pressed="(o.on)" @click="o.pick($event)"><span class="lg-only">{{o.label}}</span><span class="sm-only">{{o.ph}}</span></button></div></div></div>
+<div class="srow"><span class="sl"><span class="slab">Length</span><span class="muted small shelp">{{lenHint}}</span></span><div class="pills" role="group" aria-label="How long"><div v-for="o in bLen" style="display: contents"><button type="button" :aria-pressed="(o.on)" @click="o.pick($event)">{{o.label}}<span v-if="o.star" class="star" aria-label="suggested">★</span></button></div></div></div>
+<div class="srow"><span class="sl"><span class="slab">Voice</span></span><div class="pills" role="group" aria-label="Voice"><div v-for="o in bVoices" style="display: contents"><button type="button" :aria-pressed="(o.on)" @click="o.pick($event)">{{o.label}}</button></div></div></div>
+<div class="srow"><span class="sl"><label for="bh" class="slab">Pages to avoid</label><span class="muted small shelp">Pages the browser should never open.</span></span><input id="bh" class="inp sctl" type="text" :value="(bHide)" @input="onBHide($event)" @change="onBHide($event)" placeholder="e.g. the billing page, settings"></div>
+<div class="srow"><span class="sl"><span class="slab">Captions</span></span><div class="pills" role="group" aria-label="Captions"><div v-for="o in bCaps" style="display: contents"><button type="button" :aria-pressed="(o.on)" @click="o.pick($event)">{{o.label}}</button></div></div></div>
+<div class="srow swrap swcorner"><span class="sl"><span class="slab" id="bclbl">Corner label</span><span class="muted small shelp">Your name or brand in a corner</span></span><button type="button" :class="(bCorner.cls)" role="switch" :aria-checked="(bCorner.onStr)" aria-labelledby="bclbl" @click="bCorner.toggle($event)"><span></span></button><div v-if="bCorner.on" style="display: contents"><div class="fade sexpand"><label for="bct" class="sr">Label text</label><input id="bct" class="inp" type="text" :value="(bCornerText)" @input="onBCornerText($event)" @change="onBCornerText($event)" placeholder="Label text, e.g. your logo name"><div class="seg seg4" role="group" aria-label="Corner"><div v-for="o in bCorner.seg" style="display: contents"><button type="button" :aria-pressed="(o.on)" @click="o.pick($event)">{{o.label}}</button></div></div></div></div></div>
+</div>
+</div>
+</div>
+</div>
+<div class="foot nfoot"><span id="briefwhy" class="ftext muted">{{briefWhy || briefHint}}</span><span class="fbtns"><button type="button" class="btn ghost" @click="cancelBrief($event)">Cancel</button><button type="button" class="pri" @click="submitBrief($event)" :aria-disabled="briefEmpty ? 'true' : 'false'">{{briefCta}}</button></span></div>
+</div>
+</div>
+
+<div v-if="modeBatch" style="display: contents">
+<div class="tray">
+<div class="sheet" style="padding: 26px 26px 22px; display: flex; flex-direction: column; gap: 22px">
+<div>
+<label for="btt" class="wide" style="display: block; font-size: 24px; line-height: 1.2; font-weight: 500">Which videos?</label>
+<p class="muted" style="margin: 6px 0 12px">One video per line, for example every lesson in a course. Or choose a course outline (.txt, .md or .csv).</p>
+<div class="btbox"><textarea id="btt" :aria-describedby="btText.trim() ? null : 'btcount'" :rows="(btRows)" :value="(btText)" @input="onBtText($event)" @change="onBtText($event)" placeholder="Create your whop&#10;Add the Courses app&#10;Plan your modules" class="inp"></textarea></div>
+<div style="display: flex; align-items: center; gap: 12px; margin-top: 10px; flex-wrap: wrap"><button type="button" class="btn sm" @click="pickFile($event)">Choose a file</button><input id="btfile" type="file" accept=".txt,.md,.csv,text/plain,text/markdown,text/csv" @change="onFile($event)" class="sr" tabindex="-1" aria-hidden="true"><span id="btcount" class="muted small btcount">{{btHasFile ? 'From ' + btFileName + '. ' : ''}}{{btLinesText}}</span></div>
+</div>
+<div>
+<h2 class="h-sec" style="margin-bottom: 4px">Shared settings</h2>
+<div class="srows">
+<div class="srow"><span class="sl"><label for="btn" class="slab">Batch name</label></span><input id="btn" class="inp sctl" type="text" :value="(btName)" @input="onBtName($event)" @change="onBtName($event)" :placeholder="(btNamePh)"></div>
+<div class="srow swrap"><span class="sl"><span class="slab">Site</span></span><div class="sctl2"><div class="chips" role="group" aria-label="Site"><span class="sitetrack"><div v-for="o in btSites" style="display: contents"><button type="button" :aria-pressed="(o.on)" @click="o.pick($event)">{{o.label}}</button></div></span><button type="button" id="btnewchip" class="newchip" :aria-expanded="btSiteNew ? 'true' : 'false'" @click="openBtNew($event)">+ New site</button></div><div v-if="btSiteNew" style="display: contents"><div class="fade" style="margin-top: 8px; width: 100%"><label for="btns" class="sr">New site address</label><input id="btns" class="inp" type="text" :value="(btNew)" @input="onBtNew($event)" @change="onBtNew($event)" placeholder="e.g. app.yourproduct.com" :aria-invalid="btNewBad ? 'true' : 'false'"><div class="small" :style="'margin-top: 6px; min-height: 20px; color: ' + (btNewBad ? 'var(--danger)' : 'var(--ink2)')">{{btNewBad ? 'That doesn’t look like a web address.' : 'You log in once before the batch starts.'}}</div></div></div></div></div>
+<div class="srow"><span class="sl"><span class="slab">Voice</span></span><div class="pills pillsfit" role="group" aria-label="Voice"><div v-for="o in btVoices" style="display: contents"><button type="button" :aria-pressed="(o.on)" @click="o.pick($event)">{{o.label}}</button></div></div></div>
+<div class="srow"><span class="sl"><span class="slab">Kind of demo</span><span class="muted small shelp shelp2">{{btKindHint}}</span></span><div class="pills pillsfit" role="group" aria-label="Kind of demo"><div v-for="o in btKinds" style="display: contents"><button type="button" :aria-pressed="(o.on)" @click="o.pick($event)"><span class="lg-only">{{o.label}}</span><span class="sm-only">{{o.ph}}</span></button></div></div></div>
+<div class="srow"><span class="sl"><span class="slab">Privacy</span><span class="muted small shelp shelp2">{{btPresetHint}}</span></span><div class="pills pillsfit" role="group" aria-label="Privacy"><div v-for="o in btPresets" style="display: contents"><button type="button" :aria-pressed="(o.on)" @click="o.pick($event)">{{o.label}}</button></div></div></div>
+<div class="srow"><span class="sl"><span class="slab">Export folder</span></span><div class="folderrow sctl" style="display: flex; align-items: center; gap: 8px"><button type="button" id="btf" class="inp" tabindex="-1" :title="(btFolderVal)" :aria-label="'Export folder: ' + btFolderVal + '. Change folder'" @click="chooseFolder($event)" style="flex: 1 1 auto; min-width: 0; display: block; line-height: 42px; padding: 0 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: left; cursor: pointer; direction: rtl"><span class="lg-only"><bdi dir="ltr">{{btFolderShort}}</bdi></span><span class="sm-only" dir="ltr" style="display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: left">{{btFolderTail}}</span></button><button type="button" class="btn" @click="chooseFolder($event)" aria-describedby="btf"><span class="lg-only">Change folder</span><span class="sm-only">Change</span></button></div></div>
+</div>
+</div>
+<div class="est" aria-live="polite">
+<div><span class="nw">{{btCountText}}</span> · <span class="nw">{{btMinText}}</span> · <span class="nw">{{btCostText}}</span></div>
+<p class="note small btcred" style="margin-top: 4px"><svg class="warnic" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" :style="btShort ? '' : 'visibility: hidden'"><path d="M12 3l9.5 17h-19z"></path><path d="M12 10v4M12 17.5v.01"></path></svg><span>{{btLine2}}</span></p>
+</div>
+</div>
+<div class="foot nfoot"><span class="ftext muted">{{btFootText}}</span><span class="fbtns"><button type="button" class="btn ghost" @click="cancelBrief($event)">Cancel</button><button type="button" class="pri" @click="submitBatch($event)" :aria-disabled="btEmpty ? 'true' : 'false'" style="min-width: 160px">{{btCta}}</button></span></div>
+</div>
+</div>
+</main>
+</div>
+
+<!-- BATCH SCREEN -->
+<div v-if="isBatch" style="display: contents">
+<main class="page fade demo-grid">
+<nav aria-label="Batch steps" class="tray stepnav batchrail">
+<div class="sheet brief" style="padding: 14px 14px 12px; margin-bottom: 6px">
+<div class="name" style="text-wrap: balance">{{bName}}</div>
+<div class="muted small" style="margin-top: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{bMeta1}}</div><div class="muted small" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{bMeta2}}</div>
+</div>
+<div class="sheet steplist" data-lc-scroll style="padding: 8px">
+<div v-for="s in bStages" style="display: contents">
+<div :class="(s.cls)" :aria-current="s.now ? 'step' : null"><span :class="(s.dotCls)">{{s.mark}}</span><span><span style="display: block; font-weight: 500">{{s.n}}</span><span class="sub muted small" style="display: flex; align-items: center; gap: 6px"><span v-if="s.busy" class="dot k-busy"></span>{{s.sub}}</span></span></div>
+</div>
+</div>
+</nav>
+<section class="tray" aria-labelledby="batch-h">
+<div class="sheet stepsheet" style="min-height: 0">
+<h1 id="batch-h" tabindex="-1" class="h-step">Your batch</h1>
+<p :class="bCreditSlot ? 'muted bsub brec' : 'muted bsub'" style="margin: 8px 0 0; max-width: 70ch">{{bHead}} {{bSub}}</p>
+<div :class="hasBPause ? 'bprog bprogp' : 'bprog'" style="display: flex; align-items: center; gap: 10px 16px; margin-top: 16px; flex-wrap: wrap">
+<span v-if="bRecLabel" class="muted small" style="white-space: nowrap">{{bRecLabel}}</span>
+<div class="bbar" style="flex: 1 1 100px; min-width: 80px; height: 6px; border-radius: 999px; background: var(--fill); overflow: hidden"><span :style="'display: block; height: 6px; background: var(--ink); width: ' + (bPct)"></span></div>
+<div v-if="bLive" class="bpause"><button type="button" class="btn sm" @click="bLiveToggle($event)" :aria-expanded="bLiveOpen ? 'true' : 'false'" aria-controls="blive" style="width: 140px">{{bLiveLabel}}</button></div>
+<div v-if="hasBPause" class="bpause"><button type="button" class="btn sm" @click="bPause($event)" style="width: 168px">{{bPauseLabel}}</button></div>
+</div>
+<div v-if="bLiveOpen" style="display: contents"><div id="blive" class="fade" style="margin-top: 12px"><img :src="bLiveSrc" alt="Live view of the video being recorded" style="display: block; width: 100%; max-width: 720px; aspect-ratio: 16 / 9; object-fit: contain; border-radius: 12px; background: var(--fill)"><p class="muted small" style="margin: 6px 0 0">Live, from NAVI’s own hidden browser. Private details are blurred already; the finished video is checked again.</p></div></div>
+<div v-if="bGo" style="display: contents"><div class="bgo" style="margin-top: 14px">
+<div v-for="l in bGoLogins" style="display: contents"><div class="row" style="padding: 6px 0; min-height: 0"><span :class="'dot ' + l.dot" aria-hidden="true"></span><span style="flex: 1 1 200px; min-width: 0">{{l.text}}</span><div v-if="l.needs" style="display: contents"><button type="button" class="btn sm strong" @click="l.login($event)">Log in</button></div></div></div>
+<p class="muted small" style="margin: 6px 0 0">{{bGoCost}}</p>
+<div v-if="hasBGoMac" style="display: contents"><p :class="bGoMacBusy ? 'note small' : 'muted small'" style="margin: 6px 0 0"><svg v-if="bGoMacBusy" class="warnic" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l9.5 17h-19z"></path><path d="M12 10v4M12 17.5v.01"></path></svg><span>{{bGoMac}}</span></p></div>
+<div v-if="bGoReason" style="display: contents"><p class="note small" style="margin: 6px 0 0">{{bGoReason}}</p></div>
+</div></div>
+<div v-if="bPick" style="display: contents"><div id="bpick" class="bpick fade">
+<h2 id="bpick-h" tabindex="-1" class="h-big" style="margin: 0">{{bPickTitle}}</h2>
+<p class="muted small" style="margin: 4px 0 0; max-width: 70ch">{{bPickSub}}</p>
+<div class="pickgrid">
+<div v-for="o in bPickOptions" style="display: contents">
+<div class="pickcard" role="group" :aria-label="'Version ' + o.letter">
+<div class="pickhead"><span class="pickletter" aria-hidden="true">{{o.letter}}</span><span class="muted small">{{o.meta}}</span></div>
+<div v-if="o.hasAudio" style="display: contents"><div class="pickplay"><button type="button" class="btn sm" @click="o.play($event)" :aria-label="(o.playAria)" style="width: 84px; flex: none">{{o.playLabel}}</button><div class="pickbar" aria-hidden="true"><span :style="'display: block; height: 4px; background: var(--ink); width: ' + (o.pct)"></span></div></div></div>
+<div class="picklines"><div v-for="l in o.lines" style="display: contents"><p style="margin: 0">{{l}}</p></div></div>
+<div v-if="o.hasMore" style="display: contents"><div><button type="button" class="link small" @click="o.toggle($event)" :aria-expanded="(o.openStr)">{{o.moreLabel}}</button></div></div>
+<button type="button" class="btn sm strong pickbtn" @click="o.pick($event)">{{o.pickLabel}}</button>
+</div>
+</div>
+</div>
+<p class="muted small" style="margin: 12px 0 0">{{bPickFoot}}</p>
+</div></div>
+<div v-if="bCreditSlot" style="display: contents"><p class="note small bnote" :style="bCreditHidden ? 'visibility: hidden' : ''"><svg class="warnic" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" :style="hasBCreditNote ? '' : 'visibility: hidden'"><path d="M12 3l9.5 17h-19z"></path><path d="M12 10v4M12 17.5v.01"></path></svg><span>{{bCreditNote}}</span></p></div>
+<div class="list btable" style="margin-top: 14px">
+<div v-if="bAbove" class="brow babove"><span aria-hidden="true"></span><span class="muted" style="display: inline-flex; align-items: center; gap: 8px; min-width: 0; white-space: nowrap"><span v-if="bAboveDone" class="pmark tick" aria-hidden="true"></span>{{bAboveText}}</span></div>
+<div v-for="it in bItems" style="display: contents">
+<div class="brow">
+<span class="muted">{{it.n}}</span>
+<span style="min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">{{it.t}}<div v-if="it.sub" style="display: contents"><span class="muted small bsubl">{{it.sub}}</span></div></span>
+<span class="muted bmin" style="text-align: right">{{it.min}}</span>
+<span class="bst small" style="display: inline-flex; align-items: center; gap: 6px; white-space: nowrap"><span :class="'dot lg-only k-' + it.dot"></span><span class="sm-only">{{it.min}} ·</span><span :class="'dot sm-only k-' + it.dot"></span>{{it.status}}</span>
+<span class="bacts">
+<div v-if="it.canOpen" style="display: contents"><button type="button" class="btn sm" :id="'bread-' + it.i" @click="it.toggle($event)" :aria-expanded="(it.openStr)">{{it.open ? 'Close' : 'Read'}}</button></div>
+<div v-if="it.canPick" style="display: contents"><button type="button" class="btn sm" :id="'bpick-' + it.i" @click="it.pick($event)" :aria-expanded="it.pickOpen ? 'true' : 'false'" aria-controls="bpick" :aria-label="'Listen to the versions of ' + it.t">{{it.pickOpen ? 'Close' : 'Listen'}}</button></div>
+<div v-if="it.canWatch" style="display: contents"><button type="button" class="btn sm" :id="'bwatch-' + it.i" @click="it.watch($event)" :aria-label="'Watch ' + it.t">Watch</button></div>
+<div v-if="it.noAct" style="display: contents"><span class="bnone" aria-hidden="true"></span></div>
+</span>
+</div>
+<div v-if="it.open" style="display: contents"><div class="fade" style="padding: 4px 0 14px 42px"><p style="margin: 0; font-size: 17px">“{{it.preview}}”</p><p class="muted small" style="margin: 6px 0 0">Want changes? Tell Claude in the bar below, e.g. “make lesson {{it.n}} shorter”.</p></div></div>
+</div>
+<div v-if="bShowToggle" class="bmore"><button type="button" class="link" @click="bShowAll($event)" :aria-expanded="bAllOpenRaw ? 'true' : 'false'">{{bShowAllLabel}}</button></div>
+</div>
+<div v-if="hasBReveal" style="display: contents"><div class="breveal"><h2 class="h-big" style="margin: 0 0 6px">What you picked</h2><div v-for="l in bReveal" style="display: contents"><p class="muted small" style="margin: 2px 0 0">{{l}}</p></div></div></div>
+</div>
+<div :class="bCfSlot ? 'foot bfoot bfcf' : 'foot bfoot'"><span v-if="bConfirm" class="ftext" style="color: var(--ink)"><span class="dot k-ready"></span><span class="bcf">{{bConfirmText}}</span></span><span v-if="bNotConfirm" class="ftext muted"><span id="bwhy"><span class="lg-only">{{bFooter}}</span><span class="sm-only">{{bFooterShort}}</span></span></span><span class="fbtns"><div v-if="bConfirm" style="display: contents"><button id="bcfno" type="button" class="btn" @click="bConfirmNo($event)">Cancel</button><button id="bcfyes" type="button" class="pri bprimary bapprove" @click="bConfirmYes($event)">Yes, record all</button></div><div v-if="bNotConfirm" style="display: contents"><div v-if="hasBSecondary" style="display: contents"><button type="button" class="btn bsecond" @click="bSecondary($event)" :aria-disabled="bSecondaryOff ? 'true' : 'false'"><span class="lg-only">{{bSecondaryLabel}}</span><span class="sm-only">{{bSecondaryShort}}</span></button></div><button type="button" :class="bCfSlot ? 'pri bprimary bapprove' : (bWatchBtn ? 'pri bprimary bwatch' : 'pri bprimary')" @click="bPrimary($event)" :aria-disabled="bPrimaryOff ? 'true' : 'false'" :aria-describedby="bPrimaryOff ? 'bwhy' : null"><span class="lg-only">{{bPrimaryLabel}}</span><span class="sm-only">{{bPrimaryShort}}</span></button></div></span></div>
+</section>
+</main>
+</div>
+
+<!-- SETTINGS -->
+<div v-if="isSettings" style="display: contents">
+<main class="page fade" style="max-width: 880px; margin: 0 auto; box-sizing: border-box">
+<h1 id="set-h" tabindex="-1" class="h-page" style="margin: 10px 4px 18px">Settings</h1>
+<div style="display: flex; flex-direction: column; gap: 14px">
+<div class="tray"><div class="sheet" style="padding: 18px 18px 8px">
+<h2 class="h-big" style="margin-bottom: 10px">Defaults</h2>
+<div class="list">
+<div class="row setrow" style="padding: 10px 0"><span style="flex: 1"><span style="display: block">Appearance</span><span class="muted small">Follows your Mac unless you pick one</span></span><div class="seg ctl" role="group" aria-label="Appearance" style="width: 360px"><div v-for="a in appear" style="display: contents"><button type="button" :aria-pressed="(a.on)" @click="a.pick($event)">{{a.label}}</button></div></div></div>
+<div class="row setrow" style="padding: 10px 0"><span style="flex: 1"><span style="display: block">Voice for new demos</span><span class="muted small">Add more in any demo’s Voice step</span></span><div class="seg ctl" role="group" aria-label="Default voice" style="width: 360px"><div v-for="a in defVoices" style="display: contents"><button type="button" :aria-pressed="(a.on)" @click="a.pick($event)">{{a.label}}</button></div></div></div>
+<div class="row setrow" style="padding: 10px 0"><span style="flex: 1"><span style="display: block">Captions</span><span class="muted small">You can change it per demo</span></span><div class="seg ctl" role="group" aria-label="Default captions" style="width: 360px"><div v-for="a in defCaps" style="display: contents"><button type="button" :aria-pressed="(a.on)" @click="a.pick($event)">{{a.label}}</button></div></div></div>
+<div class="row setrow" style="padding: 10px 0"><span style="flex: 1"><span style="display: block">Caption look</span><span class="muted small">For captions in the video</span></span><div class="seg ctl" role="group" aria-label="Default caption look" style="width: 360px"><div v-for="a in defLooks" style="display: contents"><button type="button" :aria-pressed="(a.on)" @click="a.pick($event)">{{a.label}}</button></div></div></div>
+<div class="row setrow" style="padding: 10px 0"><span style="flex: 1"><span style="display: block">Video style</span><span class="muted small">Casual: no zoom, no click effects. Recordly style: Recordly’s own look</span></span><div class="seg ctl" role="group" aria-label="Default video style" style="width: 360px"><div v-for="a in defStyles" style="display: contents"><button type="button" :aria-pressed="(a.on)" @click="a.pick($event)">{{a.label}}</button></div></div></div>
+<div class="row crow2" style="padding: 12px 0; flex-wrap: wrap"><span class="crow2l"><span><span id="dclbl" style="display: block">Corner label</span><span class="muted small">Your name or brand in a corner</span></span></span><button type="button" :class="(defCorner.cls)" role="switch" :aria-checked="(defCorner.onStr)" aria-labelledby="dclbl" @click="defCorner.toggle($event)"><span></span></button>
+<div v-if="defCorner.on" style="display: contents"><div class="fade" style="flex: 1 1 100%; display: grid; gap: 8px; padding-bottom: 4px"><label for="dct" class="sr">Label text</label><input id="dct" class="inp" type="text" :value="(defCornerText)" @input="onDefCornerText($event)" @change="onDefCornerText($event)" placeholder="Label text, e.g. your logo name"><div class="seg seg4" role="group" aria-label="Corner"><div v-for="o in defCorner.seg" style="display: contents"><button type="button" :aria-pressed="(o.on)" @click="o.pick($event)">{{o.label}}</button></div></div></div></div></div>
+<div class="row crow2" style="padding: 12px 0; flex-wrap: wrap"><span class="crow2l"><span><span id="dspdlbl" style="display: block">Sped-up copy</span><span class="muted small">Also export a faster copy, same voice pitch</span></span></span><button type="button" :class="(defSpeed.cls)" role="switch" :aria-checked="(defSpeed.onStr)" aria-labelledby="dspdlbl" @click="defSpeed.toggle($event)"><span></span></button>
+<div v-if="defSpeed.on" style="display: contents"><div class="fade dspd"><label for="dspd" class="small">Speed</label><input id="dspd" class="inp spdinp" type="number" inputmode="decimal" min="1.05" max="2" step="0.05" :value="(defSpeedVal)" @input="onDefSpeed($event)" @change="onDefSpeed($event)" :aria-invalid="defSpeedBad ? 'true' : null" aria-describedby="dspdhint"><span id="dspdhint" class="muted small" :style="defSpeedBad ? 'color: var(--danger)' : null">{{defSpeedHint}}</span></div></div></div>
+<div class="row crow2" style="padding: 12px 0; flex-wrap: wrap"><span class="crow2l"><span><label for="climit" style="display: block">Batch spending limit</label><span id="climhint" class="muted small" :style="limitBad ? 'color: var(--danger)' : null">{{limitBad ? 'A whole number of credits' : 'A batch that costs more asks first, on the Go screen'}}</span></span></span><span style="display: inline-flex; align-items: center; gap: 8px"><input id="climit" class="inp spdinp" type="text" inputmode="numeric" :value="(limitVal)" @input="onLimit($event)" @change="onLimit($event)" :aria-invalid="limitBad ? 'true' : null" aria-describedby="climhint" style="width: 110px"><span class="muted small">credits</span></span></div>
+<div class="row crow2" style="padding: 12px 0; flex-wrap: wrap"><span class="crow2l"><span><span id="autogolbl" style="display: block">Start batches without the Go click</span><span class="muted small">When every script is ready and the checks pass, it just starts</span></span></span><button type="button" :class="(autoGo.cls)" role="switch" :aria-checked="(autoGo.onStr)" aria-labelledby="autogolbl" @click="autoGo.toggle($event)"><span></span></button></div>
+</div>
+</div></div>
+
+<div v-if="hasJobs" style="display: contents"><div class="tray"><div class="sheet" style="padding: 18px 18px 12px">
+<h2 class="h-big" style="margin-bottom: 4px">Models</h2>
+<p class="muted small" style="margin: 0 0 6px">Which Claude model does each job, and how hard it thinks. To change one, ask Claude.</p>
+<div class="list">
+<div v-for="j in jobRows" style="display: contents"><div class="row setrow jobrow" style="padding: 10px 0"><span style="flex: 1 1 200px; min-width: 0"><span style="display: block">{{j.label}}</span><span class="muted small">{{j.sub}}</span></span><span class="jobval"><span style="display: block">{{j.val}}</span><span class="muted small">{{j.then}}</span></span></div></div>
+</div>
+<div v-if="hasJobWarnings" style="display: contents"><div v-for="w in jobWarnings" style="display: contents"><p class="note small" style="margin: 8px 0 0">{{w}}</p></div></div>
+</div></div></div>
+
+<div class="tray"><div class="sheet" style="padding: 18px 18px 8px">
+<h2 class="h-big" style="margin-bottom: 10px">ElevenLabs</h2>
+<div class="list"><div class="row setrow" style="padding: 10px 0"><span style="flex: 1 1 220px"><span style="display: block">API key</span><span :style="'font-size: 14px; color: ' + (keyRowColor)">{{keyRow}}</span></span><span style="display: flex; gap: 6px; margin-left: auto"><div v-if="keyOn" style="display: contents"><button id="keyremove" type="button" class="btn sm" @click="removeKey($event)" :disabled="(keyEdit)">Remove</button></div><button id="keytoggle" type="button" class="btn sm" @click="toggleKeyEdit($event)" :aria-expanded="(keyEdit)" style="width: 92px; padding: 0">{{keyEditLabel}}</button></span></div></div>
+<div v-if="keyEdit" style="display: contents">
+<div class="fade" style="padding: 4px 0 14px">
+<p class="muted small" style="margin: 0 0 8px">At elevenlabs.io, open Developers, then API keys. Create a key with Text to Speech turned on.</p>
+<div class="wfield" style="display: flex; gap: 8px"><label for="key2" class="sr">ElevenLabs API key</label><input id="key2" class="inp" aria-describedby="skeymsg" :aria-invalid="keyBad ? 'true' : null" :type="(keyType)" :value="(key)" @input="onKey($event)" @change="onKey($event)" @keydown="keyEnter($event)" placeholder="Paste your API key" autocomplete="off" spellcheck="false" style="flex: 1"><button type="button" class="btn" @click="toggleKeyType($event)" style="width: 76px">{{keyTypeLabel}}</button><button type="button" class="btn" @click="testKey($event)" :aria-busy="(keyBusy)">Test and save</button></div>
+<p id="skeymsg" role="status" class="keystat" :aria-busy="(keyBusy)" :style="'margin: 8px 0 0; color: ' + (keyMsgColor)"><span v-if="keyChecking" class="dot k-busy keyspin" aria-hidden="true"></span>{{keyMsg}}</p>
+</div>
+</div>
+<div style="height: 4px"></div>
+</div></div>
+
+<div class="tray"><div class="sheet" style="padding: 18px 18px 8px">
+<div style="display: flex; align-items: center; gap: 10px; min-height: 36px; margin-bottom: 10px"><h2 id="logins-h" tabindex="-1" class="h-big" style="flex: 1; margin: 0">Logins</h2><div v-if="!noSites" style="display: contents"><button type="button" class="btn sm" @click="checkLogins($event)" :aria-disabled="loginsChecking ? 'true' : 'false'">{{loginsChecking ? 'Checking…' : 'Check now'}}</button></div></div>
+<div class="list">
+<div v-for="s in sites" style="display: contents"><div class="row" style="flex-wrap: wrap; padding: 8px 0"><span :class="'dot ' + s.dot" aria-hidden="true"></span><span style="flex: 1 1 200px; min-width: 0"><span style="display: block">{{s.title}}</span><span class="muted small">{{s.note}}</span></span><span style="display: flex; gap: 6px; margin-left: auto"><div v-if="s.canForget" style="display: contents"><button type="button" class="btn sm" @click="s.forget($event)">Forget</button></div><button type="button" :class="s.needs ? 'btn sm strong' : 'btn sm'" @click="s.relog($event)">Log in</button></span></div></div>
+<div v-if="noSites" style="display: contents"><div id="nosites" tabindex="-1" class="row muted">No logins yet. Add a site below; a login window opens only when you click.</div></div>
+<div class="row addrow" style="padding: 8px 0 0; min-height: 0"><label for="addsite" class="sr">New site</label><input id="addsite" class="inp" type="text" :value="(siteDraft)" @input="onSiteDraft($event)" @change="onSiteDraft($event)" @keydown="siteKey($event)" :aria-invalid="siteBad ? 'true' : 'false'" aria-describedby="nserr" :style="'flex: 1; height: 40px' + (siteBad ? '; border-color: var(--danger)' : '')" placeholder="Add a site"><button type="button" class="btn sm" @click="addSite($event)" style="height: 40px">Add and log in</button></div>
+<p id="nserr" class="small" style="margin: 4px 0 0; min-height: 20px; color: var(--danger)">{{siteBadText}}</p>
+</div>
+</div></div>
+
+<div class="tray"><div class="sheet" style="padding: 18px 18px 8px">
+<h2 class="h-big" style="margin-bottom: 10px">Your data</h2>
+<div class="list">
+<div v-for="d in data" style="display: contents"><div class="row drow"><span><span style="display: block">{{d.n}}</span><span class="muted small">{{d.w}}</span></span><div v-if="d.can" style="display: contents"><button type="button" class="btn sm" @click="d.act($event)">{{d.l}}</button></div></div></div>
+<div class="row drow"><span><span style="display: block">First-time setup</span><span class="muted small">Walk through the key, tools and login again</span></span><button type="button" class="btn sm" @click="showWelcome($event)">Run again</button></div>
+<div id="wiperow" class="row" style="padding: 8px 0; flex-wrap: wrap"><span style="flex: 1 1 260px"><span style="display: block">Erase NAVI data</span><span class="muted small">Your key, logins and preferences. Your videos are kept.</span></span>
+<span style="display: flex; gap: 6px; margin-left: auto">
+<div v-if="notWipeConfirm" style="display: contents"><button id="wipebtn" type="button" class="btn sm danger" @click="askWipe($event)">Erase data</button></div>
+</span>
+<div v-if="wipeConfirm" style="display: contents"><div class="fade" style="flex: 1 1 100%; display: flex; justify-content: flex-end; align-items: center; gap: 8px; padding-top: 8px"><span class="small" style="margin-right: auto">This can’t be undone.</span><button id="wipecancel" type="button" class="btn sm" @click="cancelWipe($event)">Cancel</button><button type="button" class="btn sm" @click="doWipe($event)" style="background: var(--danger); color: #FFF">Yes, erase it</button></div></div></div>
+</div>
+</div></div>
+</div>
+</main>
+</div>
+
+<div :class="chatHidden ? 'chatwrap chatoff' : 'chatwrap'">
+<div class="chatband"></div>
+<div class="chatinner">
+<div v-if="chatOpen" style="display: contents">
+<div class="tray fade" style="margin-bottom: 8px; box-shadow: 0 18px 40px -18px rgba(0,0,0,0.35)">
+<div class="sheet" style="padding: 14px 16px; max-height: 300px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px">
+<div v-for="c in chat" style="display: contents">
+<div :style="'align-self: ' + (c.side) + '; max-width: 85%; background: ' + (c.bg) + '; color: ' + (c.fg) + '; padding: 9px 13px; border-radius: 14px'">{{c.text}}</div>
+</div>
+<div v-if="chatAction" style="display: contents"><button type="button" class="btn sm" @click="doChatAction($event)" style="align-self: flex-start">Open the new brief</button></div>
+</div>
+<div class="foot" style="padding: 8px 12px 6px"><span class="muted small">Claude sees which screen you’re on.</span><button type="button" class="link small" @click="closeChat($event)">Hide</button></div>
+</div>
+</div>
+<div class="tray chatpill" style="display: flex; align-items: center; gap: 8px; padding: 6px 6px 6px 18px; border-radius: 999px; box-shadow: 0 0 0 1px var(--line), 0 14px 34px -18px rgba(0,0,0,0.4)">
+<label for="chatin" class="sr">Message Claude</label>
+<input id="chatin" type="text" :value="(chatDraft)" @input="onChat($event)" @change="onChat($event)" @keydown="chatKey($event)" :placeholder="(chatPlaceholder)" style="flex: 1; min-width: 0; height: 44px; border: 0; background: transparent; font-size: 15px; outline: none !important">
+<button type="button" class="icon" @click="sendChat($event)" aria-label="Send to Claude" style="width: 44px; height: 44px; border-radius: 22px; background: var(--fill)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"></path></svg></button>
+</div>
+</div>
+</div>
+</div>
+
+<div v-if="libOpen" style="display: contents">
+<div style="position: fixed; inset: 0; background: rgba(0,0,0,0.32); z-index: 7" @click="closeLib($event)" aria-hidden="true"></div>
+<div id="libdlg" class="tray fade" role="dialog" aria-modal="true" aria-label="Voice library" style="position: fixed; right: 20px; top: 20px; bottom: 20px; width: 460px; max-width: calc(100% - 40px); z-index: 8; display: flex; flex-direction: column; box-shadow: 0 24px 60px -24px rgba(0,0,0,0.5)">
+<div class="sheet" style="padding: 20px 20px 8px; flex: 1; display: flex; flex-direction: column; min-height: 0">
+<div style="display: flex; justify-content: space-between; align-items: center"><span class="h-step" style="font-size: 22px">Voice library</span><button id="libclose" type="button" class="icon" @click="closeLib($event)" aria-label="Close"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button></div>
+<p class="muted small" style="margin: 4px 0 12px">Voices from your ElevenLabs account and its library. Hear one, then add it.</p>
+<div class="seg" role="group" aria-label="Filter" style="margin-bottom: 10px"><div v-for="k in libFilters" style="display: contents"><button type="button" :aria-pressed="(k.on)" @click="k.pick($event)">{{k.label}}</button></div></div>
+<div style="flex: 1; overflow-y: auto; min-height: 0">
+<div v-for="x in lib" style="display: contents">
+<div class="row" style="padding: 8px 0">
+<span :style="'width: 56px; height: 56px; border-radius: 14px; overflow: hidden; flex: none; background: ' + (x.c)"><img :src="(x.img)" alt="" style="width: 100%; height: 100%; object-fit: cover; object-position: 50% 30%"></span>
+<span style="flex: 1; min-width: 0"><span class="wide" style="display: block; font-size: 17px; line-height: 1.1">{{x.name}}</span><span class="muted small" style="display: block">{{x.desc}}</span></span>
+<button type="button" class="icon fill" @click="x.hear($event)" :aria-label="(x.hearAria)"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 4.5v15l12-7.5z"></path></svg></button>
+<div v-if="x.canAdd" style="display: contents"><button type="button" class="btn sm" @click="x.add($event)" style="width: 82px">Add</button></div>
+<div v-if="x.added" style="display: contents"><span class="muted" style="width: 82px; text-align: center">Added</span></div>
+</div>
+</div>
+</div>
+</div>
+<div class="foot"><span class="muted small">Hearing a voice costs about {{sampleCostText}} credits.</span><button type="button" class="pri" @click="closeLib($event)">Done</button></div>
+</div>
+</div>
+
+<div v-if="hasToast" style="display: contents">
+<div id="toast" role="status" :class="toastUndo || toastGo ? 'toast tact' : 'toast'" style="position: fixed; left: 50%; transform: translateX(-50%); background: var(--ink); color: var(--sheet); padding: 10px 10px 10px 18px; border-radius: 16px; display: flex; align-items: center; gap: 14px; box-shadow: 0 16px 36px -16px rgba(0,0,0,0.45); z-index: 9; max-width: calc(100% - 32px); box-sizing: border-box">
+<span style="flex: 1 1 auto; min-width: 0">{{toast}}</span>
+<div v-if="toastUndo" style="display: contents"><button type="button" @click="undoToast($event)" style="border: 0; background: rgba(128,128,128,0.28); color: inherit; height: 32px; padding: 0 12px; border-radius: 999px; flex: none">Undo</button></div>
+<div v-if="toastGo" style="display: contents"><button type="button" @click="goToast($event)" style="border: 0; background: rgba(128,128,128,0.28); color: inherit; height: 32px; padding: 0 12px; border-radius: 999px; flex: none">{{toastGoLabel}}</button></div>
+</div>
+</div>
+</div>
+</div>
+<script src="vendor/petite-vue.iife.js"></script>
+<script src="engine.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

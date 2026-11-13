@@ -1,0 +1,37 @@
+{
+ "name": "Ending test 2 for the last line of section 3 (Andy's wordings vs A)",
+ "takes": 2,
+ "voice_id": "hLygPNd2gK6Azddorc5W",
+ "experiments": {
+  "END3B": {
+   "about": "Same lead-in; A = 'up top' from the first test (takes reused), plus Andy's three wordings",
+   "kind": "line",
+   "variants": [
+    {
+     "id": "up-top",
+     "text": "[relaxed] And to clear out the finished ones there's, where is it, Clear completed, over on the right. So now there's just the two left up top.",
+     "model": "eleven_v4",
+     "stability": 0.7
+    },
+    {
+     "id": "two-left-now",
+     "text": "[relaxed] And to clear out the finished ones there's, where is it, Clear completed, over on the right. So now there's just the two left now.",
+     "model": "eleven_v4",
+     "stability": 0.7
+    },
+    {
+     "id": "okay-falling",
+     "text": "[relaxed] And to clear out the finished ones there's, where is it, Clear completed, over on the right. So now there's just the two left, okay.",
+     "model": "eleven_v4",
+     "stability": 0.7
+    },
+    {
+     "id": "now-so-yeah",
+     "text": "[relaxed] And to clear out the finished ones there's, where is it, Clear completed, over on the right. So now there's just the two left now, so yeah.",
+     "model": "eleven_v4",
+     "stability": 0.7
+    }
+   ]
+  }
+ }
+}

@@ -1,0 +1,138 @@
+{
+ "title": "Create a product on Whop",
+ "site": "whop.com",
+ "kind": "saas",
+ "voice_id": "hLygPNd2gK6Azddorc5W",
+ "sections": [
+  {
+   "name": "open",
+   "talk": "[relaxed] Okay, so this is the Products page in Whop, and to make a new one you hit Create product, the blue button top right.",
+   "caption": "This is the Products page in Whop. To make a new product, click Create product, the blue button at the top right.",
+   "actions": [
+    {
+     "on": "start",
+     "do": "goto",
+     "kind": "wait",
+     "target": "https://whop.com/dashboard/biz_NaviTest000001/products/"
+    },
+    {
+     "on": "Products",
+     "do": "hover",
+     "kind": "explain",
+     "target": "role=button[name='Products']"
+    },
+    {
+     "on": "Create",
+     "do": "click",
+     "kind": "click",
+     "target": "role=link[name='Create product']"
+    }
+   ]
+  },
+  {
+   "name": "name",
+   "talk": "[relaxed] Right, so up top you can describe it and let the AI draft the whole thing, but I'd rather just fill it in myself. The name goes in this box, and I'm just gonna give it a test name for now.",
+   "caption": "You can describe your product and let AI draft it, or fill it in yourself. The name goes in this box.",
+   "actions": [
+    {
+     "on": "describe",
+     "do": "hover",
+     "kind": "explain",
+     "target": "textarea"
+    },
+    {
+     "on": "myself",
+     "do": "hover",
+     "kind": "explain",
+     "target": "text=Or fill it in yourself"
+    },
+    {
+     "on": "box",
+     "do": "click",
+     "kind": "click",
+     "target": "placeholder=Basic access"
+    },
+    {
+     "on": "just",
+     "do": "type",
+     "kind": "click",
+     "text": "NAVI test 2"
+    }
+   ]
+  },
+  {
+   "name": "price",
+   "talk": "[relaxed] Okay. So now the price, which is this bit on the right, and there's a few quick amounts, so I'll just take fifty and hit Done. That's honestly all it needs for now, so Create product, bottom left.",
+   "caption": "Next, the price, on the right. There are a few quick amounts: pick $50 and click Done. That's all it needs for now, so click Create product at the bottom left.",
+   "actions": [
+    {
+     "on": "price",
+     "do": "hover",
+     "kind": "explain",
+     "target": "button:has-text('once')"
+    },
+    {
+     "on": "right",
+     "do": "click",
+     "kind": "click",
+     "target": "button:has-text('once')"
+    },
+    {
+     "on": "take",
+     "do": "click",
+     "kind": "click",
+     "target": "role=button[name='$50']"
+    },
+    {
+     "on": "Done",
+     "do": "click",
+     "kind": "click",
+     "target": "[role=dialog] button:has-text('Done')"
+    },
+    {
+     "on": "Create",
+     "do": "click",
+     "kind": "click",
+     "target": "role=button[name='Create product']"
+    }
+   ]
+  },
+  {
+   "name": "hide",
+   "talk": "[relaxed] It gives you a link to share straight away, but I don't want anyone seeing it yet, so Done. And while you're still setting it up, keep it hidden, so the, uh, three dots on the end of the row, Hide, and Hide again.",
+   "caption": "Whop gives you a link to share it. Click Done. While you're still setting it up, keep it hidden: click the three dots at the end of the row, then Hide, and Hide again to confirm.",
+   "actions": [
+    {
+     "on": "link",
+     "do": "hover",
+     "kind": "explain",
+     "target": "text=Copy link"
+    },
+    {
+     "on": "Done",
+     "do": "click",
+     "kind": "click",
+     "target": "[role=dialog] button:has-text('Done')"
+    },
+    {
+     "on": "dots",
+     "do": "click",
+     "kind": "click",
+     "target": "tr:has-text('Visible') button[aria-haspopup]"
+    },
+    {
+     "on": "Hide",
+     "do": "click",
+     "kind": "click",
+     "target": "role=menuitem[name='Hide']"
+    },
+    {
+     "on": "Hide",
+     "do": "click",
+     "kind": "click",
+     "target": "[role=alertdialog] button:has-text('Hide'), [role=dialog] button:has-text('Hide')"
+    }
+   ]
+  }
+ ]
+}

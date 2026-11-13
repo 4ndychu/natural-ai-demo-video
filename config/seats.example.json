@@ -1,0 +1,28 @@
+{
+ "_about": "Copy to $NAVI_DATA/seats.json and fill in. Seats are named saved logins per site; each one is logged in once, by the user, from Settings > Logins. A buyer's view is filmed with the owner seat on the member-facing pages. A business is a test only when the user lists it in $NAVI_DATA/test-businesses.json; every other business counts as real (the action guard blocks changes there that the job didn't ask for).",
+ "whop.com": {
+  "seats": {
+   "owner": {
+    "label": "Owner",
+    "account": "your-whop-username",
+    "home": "https://whop.com/dashboard/"
+   }
+  },
+  "businesses": {
+   "my-real-business": {
+    "name": "My Real Business",
+    "aliases": [
+     "MRB"
+    ],
+    "id": "biz_xxxxxxxxxxxxxx",
+    "seat": "owner"
+   },
+   "navi-test": {
+    "name": "NAVI Test",
+    "id": "biz_yyyyyyyyyyyyyy",
+    "pages": ["/navi-test/"],
+    "seat": "owner"
+   }
+  }
+ }
+}
