@@ -3,6 +3,7 @@ Explore the real pages for one video and write down exactly what is there, so th
 The video: "{title}" on {site}. Saved login: {seat}
 Its plan:
 {plan}
+If the plan has a "brief", it is the video's own row from the user's list: walk what it says, from its start to its end, and Read its lesson file ("lesson_copy") first for the exact prompts, links and steps the lesson gives. If the plan lists two or more "seats", one browser already holds every one of those logins: reach the other site with a {{"goto": "..."}} step.
 {known}
 How the explorer works:
 {explore_help}

@@ -249,7 +249,7 @@ def logins_checking():
 
 def check_logins(site=None, seat=None, wait=False):
     """Check every login live, headless (scripts/seats/check_logins.mjs). In the background unless `wait`."""
-    if logins_checking():
+    if logins_checking() and not wait:
         return {'checking': True}
     cmd = ['node', os.path.join(ROOT, 'scripts', 'seats', 'check_logins.mjs')]
     if site:
@@ -273,6 +273,8 @@ def logins():
         out.append({'site': s['site'], 'seat': s['seat'], 'label': s['label'], 'account': s['account'],
                     'businesses': s['businesses'], 'home': s['home'], 'saved': _saved(s['file']) if s['saved'] else None})
     for entry in sorted(os.listdir(d)) if os.path.isdir(d) else []:
+        if entry.startswith('_'):                      # _joined: sessions joined for two-login videos, not a site
+            continue
         p = os.path.join(d, entry)
         if entry.endswith('.json'):                    # a login saved before seats: the site's default seat
             site, seat, f = entry[:-5], seats.default_seat(entry[:-5]), p
@@ -284,11 +286,14 @@ def logins():
                 if f.endswith('.json') and (entry, f[:-5]) not in seen:
                     out.append({'site': entry, 'seat': f[:-5], 'label': f[:-5].title(), 'saved': _saved(os.path.join(p, f))})
     st = login_status()
+    windows = login_windows()
     for l in out:
         l.setdefault('businesses', [])
         l.setdefault('home', f"https://{l['site']}/")
         c = st.get(f"{l['site']}/{l['seat']}")
-        if not l['saved']:
+        if f"{l['site']}/{l['seat']}" in windows:     # its login window is still open: it's checked when it closes
+            l['status'], l['checked'] = 'window open', None
+        elif not l['saved']:
             l['status'], l['checked'] = 'needs login', None
         elif c and c.get('checked', 0) >= os.path.getmtime(login_file(l['site'], l['seat'])) - 1:
             l['status'], l['checked'] = c['status'], c['checked']   # a check older than the last login doesn't count
@@ -301,16 +306,55 @@ def _saved(path):
     return time.strftime('%d %b %Y', time.localtime(os.path.getmtime(path)))
 
 
+def _windows_file():
+    return os.path.join(data_dir(), 'login-windows.json')
+
+
+def _alive(pid):
+    try:
+        os.kill(pid, 0)
+        return True
+    except (OSError, TypeError):
+        return False
+
+
+def login_windows():
+    """The login windows still open: {"<site>/<seat>": pid}, only those whose process is alive."""
+    w = _read(_windows_file(), {}) or {}
+    return {k: v for k, v in w.items() if _alive(v.get('pid') if isinstance(v, dict) else v)}
+
+
 def start_login(url, seat=None):
-    """Open a visible browser on the site for the user to log in themselves (to the given seat). The session is saved
-    when they close it."""
-    site = site_of(url)
+    """Open a visible browser on the site for the user to log in themselves (to the given seat). It opens with the
+    session already saved (so it shows them logged in), saves whenever the session changes, and when they close it
+    the login is checked at once (Andy, 13 Nov 2026: logins looked unsaved because the windows were still open
+    behind other windows, kept rewriting the file, and a second click opened a second, logged-out window).
+    Only one window per login: a second click while it is open opens nothing and says so."""
+    site = seats.login_site(site_of(url))
+    seat = seat or seats.default_seat(site)
+    key = f'{site}/{seat}'
+    open_now = login_windows()
+    if key in open_now:
+        return {'site': site, 'seat': seat, 'already_open': True,
+                'message': f'The login window for {site} is already open (it may be behind other windows). Finish there and close it.'}
     path = login_file(site, seat)
     os.makedirs(os.path.dirname(path), mode=0o700, exist_ok=True)
     proc = subprocess.Popen(['node', os.path.join(ROOT, 'recorder', 'agent-screenplay', 'dist', 'cli.js'), 'login',
                              url if '://' in url else 'https://' + url, '--out', path],
                             stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-    return {'site': site, 'seat': seat or seats.default_seat(site), 'pid': proc.pid}
+    open_now[key] = {'pid': proc.pid, 'started': time.time()}
+    _write(_windows_file(), open_now)
+
+    def after_close():
+        proc.wait()
+        w = login_windows()
+        w.pop(key, None)
+        _write(_windows_file(), w)
+        if os.path.exists(path):          # checked straight away: no need to press "Check now"
+            check_logins(site, seat, wait=True)
+    import threading
+    threading.Thread(target=after_close, daemon=True).start()
+    return {'site': site, 'seat': seat, 'pid': proc.pid}
 
 
 def forget_login(site, seat=None):

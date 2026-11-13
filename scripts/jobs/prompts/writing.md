@@ -5,6 +5,7 @@ The rules. Follow them over your own instincts. Plain spoken register: no hooks,
 
 The video's plan:
 {plan}
+If the plan has a "brief", it is this video's own row from the user's list: what the video is for, start to end, what gets created and what must never show. Follow it, and take the facts the voice states (prices, steps, names, numbers) from its lesson file ("lesson_copy": Read it) and the explorer's notes, never from memory. Keep the draft files' "spelling", "never_name" and "seats" as they are: the checker holds the captions to that spelling and refuses any line that says a "never_name" word. If there are two or more "seats", give every section a "seat": the site whose login its steps use ("x.com", "google.com"); a section that moves to the other site opens it with a goto on "start".
 
 What the explorer found. This is the only source for button names, targets and positions:
 {notes}

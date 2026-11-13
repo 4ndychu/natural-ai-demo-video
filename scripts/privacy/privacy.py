@@ -88,7 +88,19 @@ def settings(script):
         if c in CATS:
             blur.add(c)
     hide = [w.strip() for w in p.get('hide_words', []) if w.strip()]
-    return {'preset': name, 'blur': sorted(blur), 'hide_words': hide, 'warnings': warnings,
+    # whole page parts to blur, by CSS selector: things that aren't text (a QR code, a chat list in a sidebar, a DM
+    # drawer). From the script ("privacy": {"blur_selectors": [...]}) and the site's own list (patterns.json
+    # "site_selectors", per site); blurred from the first paint like the rest.
+    sels = [x for x in p.get('blur_selectors', []) if isinstance(x, str) and x.strip()]
+    try:
+        sys.path.insert(0, os.path.join(ROOT, "scripts", "seats"))
+        import seats as _seats
+        sites = [x['site'] for x in _seats.for_script(script)['seats']] if script.get('sections') or script.get('site') else []
+    except Exception:
+        sites = []
+    for site in sites:
+        sels += [x for x in (P.get('site_selectors') or {}).get(site, []) if x not in sels]
+    return {'preset': name, 'blur': sorted(blur), 'hide_words': hide, 'blur_selectors': sels, 'warnings': warnings,
             'test_business': biz.get('name', biz['match']) if biz else None}
 
 
@@ -97,7 +109,19 @@ def init_script(s):
     cfg = {'typed': s.get('typed', []), 'patterns': P['patterns'], 'categories': CATS, 'blur': s['blur'], 'hideWords': s['hide_words'],
            'blurPx': CONFIG['blur_px'], 'elementHints': P['element_hints'], 'typingPrefixes': P['typing_prefixes'],
            'ignore': P['ignore'], 'sensitivePages': P.get('sensitive_pages'), 'sensitiveCats': P.get('sensitive_categories', [])}
-    return ('window.__NAVI_PRIVACY__ = ' + json.dumps(cfg) + ';\n' + open(os.path.join(HERE, 'blur.js')).read() + '\n' + hide_script())
+    return ('window.__NAVI_PRIVACY__ = ' + json.dumps(cfg) + ';\n' + open(os.path.join(HERE, 'blur.js')).read() + '\n' + hide_script()
+            + selector_blur_script(s.get('blur_selectors') or []))
+
+
+def selector_blur_script(sels):
+    """JavaScript that blurs whole page parts by CSS selector (privacy "blur_selectors"), from the first paint."""
+    if not sels:
+        return ''
+    css = ','.join(sels) + '{filter:blur(%dpx)!important}' % (CONFIG['blur_px'] * 2)
+    return ('\n(() => { const css = ' + json.dumps(css) + '; const add = () => { if (document.getElementById("navi-sel-blur")) return; '
+            'const st = document.createElement("style"); st.id = "navi-sel-blur"; st.textContent = css; '
+            '(document.head || document.documentElement).appendChild(st); }; add(); '
+            'new MutationObserver(add).observe(document.documentElement, {childList: true, subtree: true}); })();\n')
 
 
 def hide_script():
@@ -191,11 +215,11 @@ def typed(texts, s):
 
 
 # ---- layer 2: check the blur on the live page ------------------------------------------------------------------
-def check_page(url, s, out_png, viewport, storage_state=None, guard=None, extra_js=''):
+def check_page(url, s, out_png, viewport, storage_state=None, guard=None, extra_js='', device=None):
     """Open the start page with the blur, wait for it to settle, save a 2x screenshot and return what was blurred.
     guard: the action guard ({module, config}), so even this check can't change anything."""
     cfg = {'url': url, 'out': out_png, 'width': viewport[0], 'height': viewport[1], 'script': init_script(s) + ('\n' + extra_js if extra_js else ''),
-           'storageState': storage_state, 'guard': guard}
+           'storageState': storage_state, 'guard': guard, 'device': device}
     r = subprocess.run(['node', os.path.join(HERE, 'check_page.mjs')], input=json.dumps(cfg), capture_output=True, text=True)
     if r.returncode != 0:
         raise RuntimeError('The privacy page check failed: ' + (r.stdout + r.stderr)[-1500:])

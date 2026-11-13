@@ -5,6 +5,12 @@ paused if credits run low, a review queue, then export plus a list file. Nothing
                [--voice alex] [--privacy standard] [--export-to ~/Movies/NAVI] [--captions burn] [--speed 1.35]
       One demo per line of the list ("Title" or "Title | what to show"). Each demo gets script.template.json with the
       shared settings filled in; Claude writes each script.json from it (reference/script-writing.md).
+      Or a JSON list (a file starting with "["), one object per video, carrying everything its row says:
+        {"title", "what", "site" (its start page; else --site), "seats": [{"site", "seat"}] (two or more logins),
+         "length_min", "spelling" ("UK"/"US", captions), "never_name": [words never said or captioned],
+         "privacy": {"preset", "blur", "show", "hide_words", "blur_selectors"}, "lesson_file" (copied into the video's
+         folder for the explorer and the writer), "brief": {any other fields: what it's for, start to end, what gets
+         created, what must never show...}}
   batch.py write <batch>                plan the batch, then for each video in order: explore its pages, write three
                                         drafts and keep the best, and run the checks. Each of these is a subagent on
                                         the model and effort config/defaults.json names for that job ("jobs";
@@ -88,6 +94,13 @@ def log(b, text):
 
 
 def parse_list(text):
+    if text.lstrip().startswith('['):          # the rich list: one object per video
+        items = []
+        for it in json.loads(text):
+            if not isinstance(it, dict) or not str(it.get('title', '')).strip():
+                raise ValueError('Each video in a JSON list needs a "title".')
+            items.append({**it, 'title': it['title'].strip(), 'what': (it.get('what') or '').strip()})
+        return items
     items = []
     for line in text.splitlines():
         line = re.sub(r'^\s*(?:[-*•]|\d+[.)])\s*', '', line).strip()
@@ -110,11 +123,41 @@ def new(name, lines, site, no_blind=False, length_min=None, **shared):
     voice_id = CONFIG['voices'][s['voice']]['voice_id']
     styles = []
     for pos, it in enumerate(parse_list(lines)):
-        d = store.new_demo(it['title'], site=site, kind=s['kind'], what=it['what'], batch=bid, length_min=length_min,
+        isite = it.get('site') or site
+        d = store.new_demo(it['title'], site=isite, kind=s['kind'], what=it['what'], batch=bid, length_min=it.get('length_min') or length_min,
                            settings={k: s[k] for k in SHARED if k not in ('kind', 'voice')})
-        tmpl = {'title': it['title'], 'site': site, 'kind': s['kind'], 'voice_id': voice_id, 'what': it['what'],
-                'privacy': {'preset': s['privacy_preset'], 'hide_words': s['hide_words']},
+        ip = it.get('privacy') or {}
+        tmpl = {'title': it['title'], 'site': isite, 'kind': s['kind'], 'voice_id': voice_id, 'what': it['what'],
+                'privacy': {'preset': ip.get('preset') or s['privacy_preset'],
+                            'hide_words': list(s['hide_words'] or []) + [w for w in ip.get('hide_words', []) if w not in (s['hide_words'] or [])],
+                            **{k: ip[k] for k in ('blur', 'show', 'blur_selectors') if ip.get(k)}},
                 'captions': s['captions'], 'caption_look': s['caption_look'], 'sections': []}
+        # what the row says about this one video, carried into its script so every job sees it
+        for k in ('spelling', 'never_name', 'seats', 'brief', 'video_no', 'device'):
+            if it.get(k):
+                tmpl[k] = it[k]
+        if tmpl.get('seats'):     # each login's allowed changes, from the job's own words (the site pack's phrases)
+            import seats as seats_mod
+            job_words = f"{it['title']}. {it['what']}"
+            tmpl['seats'] = [dict(x, allow=x.get('allow') or seats_mod.guard_allow(x['site'], job_words)) for x in tmpl['seats']]
+        # the lesson file(s) the row names, copied into the video's folder (the jobs read nothing outside NAVI's
+        # folders); the first is the lesson, the rest (its live text, a planned fixed version) sit beside it
+        files = it.get('lesson_file') or []
+        for i, src in enumerate([files] if isinstance(files, str) else files):
+            src = os.path.expanduser(src)
+            br = tmpl.setdefault('brief', {})
+            if not os.path.exists(src):
+                br.setdefault('lesson_missing', []).append(src)
+                continue
+            name = 'lesson.md' if i == 0 else f"{i}-{os.path.basename(os.path.dirname(src))}-{os.path.basename(src)}"
+            dst = os.path.join(store.demo_dir(d['id']), 'brief', name)
+            os.makedirs(os.path.dirname(dst), exist_ok=True)
+            with open(src, encoding='utf-8') as f_in, open(dst, 'w', encoding='utf-8') as f_out:
+                f_out.write(f_in.read())
+            if i == 0:
+                br['lesson_copy'] = dst
+            else:
+                br.setdefault('lesson_also', []).append(dst)
         # the style of the day for this video, drawn away from the recent videos and the others in this batch
         # (scripts/script/style.py; Andy, 11 Nov 2026: every video sounded the same). The writer then drafts it three
         # times from three styles and keeps the best (scripts/script/drafts.py styles / pick), in batch order, so
@@ -122,7 +165,9 @@ def new(name, lines, site, no_blind=False, length_min=None, **shared):
         tmpl['batch'], tmpl['batch_pos'] = bid, pos
         tmpl['style'] = style_mod.draw(tmpl | {'sections': []}, variety.load_history(voice_id=voice_id), styles)
         styles.append(tmpl['style'])
-        if d.get('seat'):   # the seat picked from this line's own words (scripts/seats/seats.py)
+        if it.get('seat'):   # the seat the list names for this video
+            tmpl['seat'] = it['seat']
+        elif d.get('seat'):   # the seat picked from this line's own words (scripts/seats/seats.py)
             tmpl['seat'] = {k: d['seat'][k] for k in ('seat', 'view', 'business', 'allow', 'why', 'preview_as', 'preview_name') if k in d['seat']}
         store._write(os.path.join(store.demo_dir(d['id']), 'script.template.json'), tmpl)
         b['items'].append(d['id'])
@@ -176,12 +221,34 @@ def seat_words(tmpl):
     return seats.describe(tmpl)['label'] + ': ' + json.dumps(tmpl['seat'], ensure_ascii=False)
 
 
+def brief_words(t):
+    """The row's own brief for a video, for the planner (and, through the plan, the explorer and the writer)."""
+    out = []
+    br = t.get('brief') or {}
+    for k, v in br.items():
+        if k in ('lesson_copy', 'lesson_missing', 'lesson_also') or not v:
+            continue
+        out.append(f"{k.replace('_', ' ')}: {v}")
+    if br.get('lesson_copy'):
+        out.append(f"the lesson it belongs to (read it): {rel(br['lesson_copy'])}")
+    for f in br.get('lesson_also') or []:
+        out.append(f"also beside it: {rel(f)}")
+    if len(t.get('seats') or []) > 1:
+        out.append('logins: ' + ' + '.join(f"{x['site']} ({x.get('seat', 'owner')})" for x in t['seats'])
+                   + ' (one browser holds all of them; each section names the site whose login its steps use, as "seat")')
+    if t.get('spelling'):
+        out.append(f"captions in {'American' if t['spelling'].upper() == 'US' else 'British'} spelling")
+    if t.get('never_name'):
+        out.append('never say or caption: ' + ', '.join(t['never_name']))
+    return ('\n   ' + '\n   '.join(out)) if out else ''
+
+
 def videos_block(b):
     rows = []
     for i, did in enumerate(b['items'], 1):
         d, t = store.demo(did), template_of(did)
         rows.append(f"{i}. {did}: \"{d['title']}\"" + (f" | {d['what']}" if d.get('what') else '') + (f"; about {d['length_min']:g} minutes long" if d.get('length_min') else '')
-                    + f"; site {d.get('site') or b.get('site')}; login: {seat_words(t)}")
+                    + f"; site {d.get('site') or b.get('site')}; login: {seat_words(t)}" + brief_words(t))
     return '\n'.join(rows)
 
 
@@ -192,8 +259,14 @@ def explore_cmd(did, start_url, sub=None):
     s = seats.for_script(dict(t, sections=[{'actions': [{'do': 'goto', 'target': start_url}]}]))
     out = rel(os.path.join(store.demo_dir(did), 'explore', *([sub] if sub else [])))
     cmd = f"node scripts/explore/explore.mjs --url {start_url} --site {s['site']} --out {out}" + ('' if sub else f" --steps {out}/steps.json")
-    if s['login']:
+    if len(s['seats']) > 1:      # a video on two or more logins: one browser holding all of them
+        cmd += f" --seat {s['seat']} --seats " + ','.join(f"{x['site']}:{x['seat']}" for x in s['seats'])
+    elif s['seat'] == seats.LOGGED_OUT:
+        cmd += ' --logged-out'
+    elif s['login']:
         cmd += f" --seat {s['seat']}"
+    if t.get('device'):      # filmed on a phone: the explorer uses the same phone profile
+        cmd += f" --device '{t['device']}'"
     seat = t.get('seat') or {}
     if s['view'] == 'member' and s['business'] and seat.get('preview_as'):
         cmd += f" --member {s['business']['key']} --preview-as {seat['preview_as']}"
@@ -349,6 +422,13 @@ def write(bid):
         fr, tmpl = rel(folder), template_of(did)
         plan = plans.get(did) or {'goal': d.get('what') or d['title'], 'start_url': d.get('site') or b['site'],
                                   'note': 'no plan was made: work from the title and what to show'}
+        rules = {k: tmpl[k] for k in ('spelling', 'never_name', 'seats') if tmpl.get(k)}
+        if tmpl.get('brief') or rules:      # the row's own brief and rules, so the explorer and writer never guess
+            plan = dict(plan, brief={k: v for k, v in (tmpl.get('brief') or {}).items() if k != 'lesson_missing'}, **rules)
+            if (tmpl.get('brief') or {}).get('lesson_copy'):
+                plan['brief']['lesson_copy'] = rel(tmpl['brief']['lesson_copy'])
+            if (tmpl.get('brief') or {}).get('lesson_also'):
+                plan['brief']['lesson_also'] = [rel(x) for x in tmpl['brief']['lesson_also']]
         plan_txt = json.dumps(plan, indent=1, ensure_ascii=False)
         notes = os.path.join(folder, 'explore', 'notes.md')
         log(b, f"\"{d['title']}\" ({n} of {len(b['items'])})")
@@ -598,6 +678,19 @@ def start_page(sc):
     return next((a.get('target', '') for x in (sc or {}).get('sections', []) for a in x.get('actions', []) if a.get('do') == 'goto'), '')
 
 
+def first_page_on(sc, site):
+    """The first page a script opens on one of its logins (a section whose "seat" is that site), or None."""
+    import seats
+    for sec in (sc or {}).get('sections', []):
+        st = sec.get('seat')
+        st = st.get('site') if isinstance(st, dict) else st
+        if st and seats.login_site(seats.site_of(st)) == site:
+            for a in sec.get('actions', []):
+                if a.get('do') == 'goto':
+                    return a.get('target')
+    return None
+
+
 def plan(bid):
     """Everything the Go screen shows: each video with its seat, cost and start page; the logins the batch needs
     with their last live status; the total against the credits left and the spending limit."""
@@ -614,11 +707,18 @@ def plan(bid):
         login = None
         if sc:
             s = seats.for_script(sc)
-            if seats.config().get(s['site'], {}).get('seats') or s['login']:   # a site recorded logged out needs no login
-                login = f"{s['site']}/{s['seat']}"
-                need.setdefault(login, {'site': s['site'], 'seat': s['seat'], 'videos': 0})['videos'] += 1
+            # every login the video uses (two or more for a video on X and Google Sheets); a site recorded logged
+            # out needs none
+            pages = {}
+            for x in s['seats']:
+                if x['seat'] != seats.LOGGED_OUT and (seats.config().get(x['site'], {}).get('seats') or x['login']):
+                    key = f"{x['site']}/{x['seat']}"
+                    login = login or key
+                    need.setdefault(key, {'site': x['site'], 'seat': x['seat'], 'videos': 0})['videos'] += 1
+                    pages[key] = start_page(sc) if x is s['seats'][0] else first_page_on(sc, x['site'])
         videos.append({'id': did, 'title': d['title'], 'seat': seat['label'] if isinstance(seat, dict) and 'label' in seat else None,
                        'real': bool(isinstance(seat, dict) and '(real business)' in seat.get('label', '')), 'login': login,
+                       'logins': pages if sc else {},
                        'cost': credits_needed(did), 'start': start_page(sc), 'ready': bool(sc) and not errs,
                        'problem': None if sc and not errs else ('no script yet' if not sc and did not in b.get('written', {}) else
                                                                    (b['written'][did].get('why') or 'no script') if not sc else f'{len(errs)} checker errors'),
@@ -646,13 +746,18 @@ def preflight(bid):
     b = load(bid)
     by_login = {}
     for v in p['videos']:
-        if v['login'] and v['start'] and not v['done'] and v['ready']:
-            by_login.setdefault(v['login'], []).append(v['start'])
+        if v['done'] or not v['ready']:
+            continue
+        for key, page in (v.get('logins') or ({v['login']: v['start']} if v['login'] else {})).items():
+            # every login the video uses is checked, with the first page it opens on that login
+            by_login.setdefault(key, [])
+            if page:
+                by_login[key].append(page)
     res = {'logins': [], 'pages': [], 'checked': time.time()}
     for key, pages in by_login.items():
         site, seat = key.split('/', 1)
-        r = subprocess.run(['node', os.path.join(ROOT, 'scripts', 'seats', 'check_logins.mjs'), '--site', site, '--seat', seat,
-                            '--pages', ','.join(sorted(set(pages)))], capture_output=True, text=True)
+        r = subprocess.run(['node', os.path.join(ROOT, 'scripts', 'seats', 'check_logins.mjs'), '--site', site, '--seat', seat]
+                           + (['--pages', ','.join(sorted(set(pages)))] if pages else []), capture_output=True, text=True)
         try:
             out = json.loads(r.stdout.strip().splitlines()[-1])[0]
         except (ValueError, IndexError):

@@ -23,6 +23,13 @@ The seat picker (pick) chooses, from the job's own words:
   .venv/bin/python scripts/seats/seats.py pick whop.com "Open the Real Biz course and play the first lesson"
   .venv/bin/python scripts/seats/seats.py login whop.com owner
       (opens the one visible window, on the seat's home page, for the user to log in; saved when they close it)
+
+Two or more logins in one video (X and Google Sheets, Claude and Grok): the script lists them in "seats"
+([{"site": "x.com", "seat": "owner"}, {"site": "google.com", "seat": "owner"}]) and each section names the site whose
+login its steps use ("seat": "google.com"). The take runs in one browser holding every one of those logins (their
+saved sessions joined into one file, kept only for the run: cookies belong to their own sites, so neither login can
+act on the other's site), the action guard uses each site's own pack, and the batch preflight checks every login.
+A site in seats.json can cover others that share its login: "google.com": {"covers": ["docs.google.com", ...]}.
 """
 import json
 import os
@@ -72,15 +79,27 @@ def save_config(cfg):
     os.replace(tmp, path)
 
 
+def login_site(site):
+    """The site whose saved login a page uses: itself, or the seats.json site that covers it (docs.google.com and
+    mail.google.com use the google.com login)."""
+    cfg = config()
+    if site in cfg:
+        return site
+    for name, c in cfg.items():
+        if not name.startswith('_') and isinstance(c, dict) and site in (c.get('covers') or []):
+            return name
+    return site
+
+
 def default_seat(site):
-    seats = config().get(site, {}).get('seats', {})
+    seats = config().get(login_site(site), {}).get('seats', {})
     return 'owner' if 'owner' in seats or not seats else next(iter(seats))
 
 
 def login_file(site, seat=None):
     """The seat's saved session. A login saved before seats existed (logins/<site>.json) becomes the site's
     default seat (owner) the first time it's asked for."""
-    site = _name(site, 'site')
+    site = login_site(_name(site, 'site'))
     seat = _name(seat or default_seat(site), 'seat')
     path = os.path.join(data_dir(), 'logins', site, seat + '.json')
     legacy = os.path.join(data_dir(), 'logins', site + '.json')
@@ -131,12 +150,13 @@ def seats(site=None):
     """Every seat, per site: name, label, account, whether a login is saved, and the businesses it opens."""
     cfg = config()
     out = []
-    for s in sorted(cfg) if site is None else [site]:
+    for s in sorted(k for k in cfg if not k.startswith('_')) if site is None else [login_site(site)]:
         for name, seat in cfg.get(s, {}).get('seats', {}).items():
             path = login_file(s, name)
             biz = [b for b in businesses(s) if b.get('seat') == name]
             out.append({'site': s, 'seat': name, 'label': seat.get('label', name.title()), 'account': seat.get('account', ''),
                         'home': seat.get('home') or f'https://{s}/', 'saved': os.path.exists(path), 'file': path,
+                        'covers': cfg[s].get('covers') or [], 'note': seat.get('note', ''),
                         'businesses': [{'key': b['key'], 'name': b['name'], 'test': b['test']} for b in biz]})
     return out
 
@@ -148,7 +168,7 @@ def _hits(words, text):
 
 def pick(site, job):
     """Which seat (and business) a job runs in, from its own words. Returns {seat, business, label, why, allow}."""
-    site = site_of(site)
+    site = login_site(site_of(site))
     text = ' ' + re.sub(r'\s+', ' ', (job or '').lower()) + ' '
     cfg = config().get(site, {})
     seat_names = list(cfg.get('seats', {}))
@@ -170,7 +190,9 @@ def pick(site, job):
     buyer_score = len(buyer) + 5 * len(explicit_member)
 
     def done(seat, b, why, view='dashboard'):
-        allow = guard_allow(site, job) if b and b['real'] and view == 'dashboard' else []
+        # a real business, or the owner's own account on a site with no businesses (X, Claude): only the changes the
+        # job asks for, by the site pack's own phrases
+        allow = guard_allow(site, job) if view == 'dashboard' and ((b and b['real']) or (not b and not biz)) else []
         seat_label = cfg.get('seats', {}).get(seat, {}).get('label', (seat or '').title())
         label = f"{seat_label}, as a member of {b['name']}" if view == 'member' and b else \
             f"{seat_label}, as a member" if view == 'member' else f"{seat_label}{' in ' + b['name'] if b else ''}"
@@ -178,6 +200,10 @@ def pick(site, job):
                 'business_name': b['name'] if b else None, 'real': bool(b and b['real']), 'label': label,
                 'why': why, 'allow': allow, 'login_saved': os.path.exists(login_file(site, seat)) if seat in seat_names else False}
 
+    # a site with no businesses (X, Claude, Google): the owner's own account; buyer and member words ("lesson",
+    # "course") are about the video's subject there, not about whose view it is
+    if seat_names and not biz:
+        return done(default_seat(site), None, "the owner's own account (this site has no businesses)")
     # a buyer's view: the owner seat on the member-facing pages (the course, modules, lessons), never the dashboard;
     # no changes are allowed there (the guard treats pages outside a dashboard as the owner's real account)
     if seat_names and buyer_score > owner_score:
@@ -210,13 +236,17 @@ def describe(script):
             label += f" (previewing as a buyer of {chosen.get('preview_name') or chosen['preview_as']})"
     elif s['business']:
         label += f" in {s['business']['name']}" + kind
+    if len(s['seats']) > 1:     # a video on two or more logins: each one, and whether it is saved
+        label = ' + '.join(f"{x['site']} ({x['seat']}{'' if x['login'] else ', not logged in'})" for x in s['seats'])
     return {'seat': s['seat'], 'view': s['view'], 'business': s['business']['key'] if s['business'] else None, 'label': label,
             'why': chosen.get('why') or ('' if script.get('seat') else 'no seat picked: the site\'s default login'),
-            'allow': s['allow'], 'login_saved': bool(s['login']), 'site': s['site']}
+            'allow': s['allow'], 'login_saved': all(x['login'] for x in s['seats']) if len(s['seats']) > 1 else bool(s['login']),
+            'site': s['site'], 'seats': [{k: x[k] for k in ('site', 'seat')} | {'saved': bool(x['login'])} for x in s['seats']]}
 
 
 def guard_allow(site, job):
     """The changes a job explicitly asks for (by the guard pack's own phrases), allowed in a real business."""
+    site = login_site(site)
     pack_path = os.path.join(ROOT, 'config', 'guard', f'{site}.json')
     if not os.path.exists(pack_path):
         return []
@@ -227,9 +257,10 @@ def guard_allow(site, job):
 
 def for_script(script):
     """The seat a script records in: its "seat" field, or the site's default seat. Returns
-    {site, seat, business (dict or None), login (path or None), allow}."""
+    {site, seat, business (dict or None), login (path or None), allow, seats}. With more than one login ("seats"),
+    `login` is the joined session holding every one of them (merged_login) and `seats` lists each with its own."""
     start = next((a.get('target', '') for s in script.get('sections', []) for a in s.get('actions', []) if a.get('do') == 'goto'), '')
-    site = site_of(script.get('site') or start)
+    site = login_site(site_of(script.get('site') or start))
     seat_cfg = script.get('seat') or {}
     if isinstance(seat_cfg, str):
         seat_cfg = {'seat': seat_cfg}
@@ -238,20 +269,85 @@ def for_script(script):
     view = seat_cfg.get('view') or 'dashboard'
     if b is None:
         b = business_for_url(start)
-    path = login_file(site, seat) if re.fullmatch(r'[a-z0-9.-]+', site) else None
+    # "logged-out": a video that must show the public pages as a visitor sees them, even on a site with a saved login
+    path = login_file(site, seat) if re.fullmatch(r'[a-z0-9.-]+', site) and seat != LOGGED_OUT else None
+    login = path if path and os.path.exists(path) else None
     # a member view never carries an allowance: nothing may change on a buyer's pages
-    return {'site': site, 'seat': seat, 'view': view, 'business': b, 'login': path if path and os.path.exists(path) else None,
-            'allow': [] if view == 'member' else list(seat_cfg.get('allow', []))}
+    allow = [] if view == 'member' else list(seat_cfg.get('allow', []))
+    all_seats = script_seats(script, site, seat, login, allow)
+    if len(all_seats) > 1:
+        for x in all_seats[1:]:
+            allow += [a for a in x['allow'] if a not in allow]
+        joined = [x['login'] for x in all_seats if x['login']]
+        login = merged_login(joined) if len(joined) > 1 else (joined[0] if joined else None)
+    return {'site': site, 'seat': seat, 'view': view, 'business': b, 'login': login, 'allow': allow, 'seats': all_seats}
+
+
+LOGGED_OUT = 'logged-out'
+
+
+def script_seats(script, site=None, seat=None, login=None, allow=None):
+    """Every login a script uses: the main one first, then each one in its "seats" list (and any a section names),
+    once each: [{site, seat, login (path or None), allow}]."""
+    out = []
+    if site:
+        out.append({'site': site, 'seat': seat, 'login': login, 'allow': list(allow or [])})
+    extra = [x if isinstance(x, dict) else {'site': x} for x in (script.get('seats') or [])]
+    extra += [sec['seat'] if isinstance(sec.get('seat'), dict) else {'site': sec['seat']}
+              for sec in script.get('sections') or [] if sec.get('seat')]
+    for x in extra:
+        try:
+            s = login_site(site_of(x.get('site') or ''))
+        except ValueError:
+            continue
+        if not re.fullmatch(r'[a-z0-9][a-z0-9.-]*', s) or any(o['site'] == s for o in out):
+            continue
+        st = x.get('seat') or default_seat(s)
+        p = None if st == LOGGED_OUT else login_file(s, st)
+        out.append({'site': s, 'seat': st, 'login': p if p and os.path.exists(p) else None, 'allow': list(x.get('allow') or [])})
+    return out
+
+
+def merged_login(paths):
+    """One saved session holding several logins (one per site): every cookie and every page's storage of each, for a
+    video that uses two or more sites. Cookies stay on their own domains, so each login still only reaches its own
+    site. Written with only the user able to read it, next to the logins, named after what went in, and remade when a
+    login changes; never kept in a video's folder."""
+    import hashlib
+    key = hashlib.sha1('|'.join(f'{p}:{os.path.getmtime(p)}' for p in sorted(paths)).encode()).hexdigest()[:16]
+    d = os.path.join(data_dir(), 'logins', '_joined')
+    os.makedirs(d, mode=0o700, exist_ok=True)
+    out = os.path.join(d, key + '.json')
+    if os.path.exists(out):
+        return out
+    for old in os.listdir(d):         # older joins of logins that have since changed
+        if old.endswith('.json'):
+            os.remove(os.path.join(d, old))
+    cookies, origins = {}, {}
+    for p in paths:
+        st = _read(p, {}) or {}
+        for c in st.get('cookies', []):
+            cookies[(c.get('name'), c.get('domain'), c.get('path'))] = c
+        for o in st.get('origins', []):
+            origins[o.get('origin')] = o
+    tmp = out + '.part'
+    with open(os.open(tmp, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600), 'w') as f:
+        json.dump({'cookies': list(cookies.values()), 'origins': list(origins.values())}, f)
+    os.replace(tmp, out)
+    return out
 
 
 def guard_config(script, log, mode='enforce', allow_test_deletes=False):
     """The action guard's settings for a recording/explore of this script (scripts/guard/guard.mjs)."""
     s = for_script(script)
     return {'site': s['site'], 'seat': s['seat'], 'view': s['view'], 'business': s['business'], 'allow': s['allow'], 'mode': mode,
+            # every site whose login the video uses: the guard checks each request against its own site's pack
+            'sites': [x['site'] for x in s['seats']],
             'allowTestDeletes': allow_test_deletes, 'log': log,
             # 'pages': a business's own pages outside the dashboard (whop.com/navi-test/...: courses live there), so the
             # guard knows whose they are; without it the recorder took NAVI Test's course pages for the real account
-            'businesses': [dict({k: b[k] for k in ('key', 'name', 'id', 'test', 'real')}, pages=b.get('pages') or []) for b in businesses(s['site'])]}
+            'businesses': [dict({k: b[k] for k in ('key', 'name', 'id', 'test', 'real')}, pages=b.get('pages') or [])
+                           for x in s['seats'] for b in businesses(x['site'])]}
 
 
 def main():

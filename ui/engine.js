@@ -83,7 +83,7 @@
         credits: s.key.credits_left || 0, keyOn: !!s.key.works && !(this.pending && this.pending.key), keyStored: !!s.key.stored, keyProblem: s.key.problem || '',
         tools: s.tools_ready ? 'done' : (st.tools === 'busy' || st.tools === 'ask' ? st.tools : 'idle'),
         sites: s.logins.filter((l) => !(this.pending && this.pending['site:' + l.site + '/' + l.seat])).map((l) => ({ u: l.site, seat: l.seat, label: l.label, home: l.home, saved: !!l.saved, note: l.saved ? 'Saved ' + l.saved : '',
-          status: s.logins_checking && l.saved ? 'checking' : l.status, ago: l.checked ? this.ago(l.checked) : '',
+          status: s.logins_checking && l.saved && l.status !== 'window open' ? 'checking' : l.status, ago: l.checked ? this.ago(l.checked) : '',
           biz: (l.businesses || []).map((b) => b.name + (b.test ? ' (test)' : ' (real)')).join(' and ') })),
         loginsChecking: !!s.logins_checking,
         defVoice: st0.voice, defCap: st0.captions, defCorner: st0.corner_label, defCornerText: st0.corner_text,

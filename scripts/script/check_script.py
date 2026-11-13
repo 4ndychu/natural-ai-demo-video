@@ -225,6 +225,9 @@ def check(script, base=None, history=None, batch=None, variety_checks=True):
     import positions
     for level, sec, msg in positions.check(script, base):
         add(level, 'position', sec, msg)
+    import house_rules      # never_name, spelling, and a seat per section when a video uses two logins
+    for level, code, sec, msg in house_rules.check(script):
+        add(level, code, sec, msg)
     # NAVI_VARIETY_OFF: for tests that reuse one recorded script on purpose (test_batch.py) only; variety has its own
     # test (scripts/script/test_variety.py)
     if variety_checks and not os.environ.get('NAVI_VARIETY_OFF'):

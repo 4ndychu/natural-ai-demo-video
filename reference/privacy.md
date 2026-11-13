@@ -23,7 +23,7 @@ Known limits: plain names with no context (for example "Created by Remo H. Janse
 | Blurred unless allowed | Emails, phone numbers, real names and profile photos, addresses, revenue and money figures, customer details, follower and member counts | Yes, per demo |
 | Shown unless blurred | Usage stats (like token usage), prices on public pages, dates | Yes, per demo |
 
-Plus the user's own **hide words** (a client's name, their surname), always blurred.
+Plus the user's own **hide words** (a client's name, their surname), always blurred, and **page parts blurred whole by CSS selector** (`"privacy": {"blur_selectors": [...]}`, plus a site's own list in `patterns.json` → `site_selectors`) for what isn't text: a QR code, a chat list, a DM drawer.
 
 **Names in "Joined by …" lines and split member counts are blurred.** whop's member page shows "Joined by Charlie, Henry Lai, and 3 others" and "6 members" with each name or number as its own piece of text, so the normal patterns missed them. A capitalised name inside a "Joined by / Liked by / Followed by / Bought by" control, and a number next to "members", "followers" and the like, are now blurred, looking only at that control's own text (a page-wide look blurred the tabs too). *(Found in the buyer-view test video, 11 Nov 2026.)*
 
