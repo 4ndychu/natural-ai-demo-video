@@ -71,8 +71,7 @@ check('approval refused while no script exists', code != 0 and 'No script is rea
 approved = json.load(open(os.path.join(ROOT, 'examples', 'test-todo-b.json')))
 # The approved to-do script says "down at the bottom" for the bottom of the list, which the position check now
 # (rightly) refuses; the batch scripts say which, and carry the to-do explore data the check needs.
-sections = json.loads(json.dumps(approved['sections']).replace('down at the bottom', 'down at the bottom of the list')
-                      .replace('At the bottom', 'At the bottom of the list'))
+sections = json.loads(json.dumps(approved['sections']))
 for f in folders:
     t = json.load(open(os.path.join(f, 'script.template.json')))
     json.dump({**t, 'sections': sections, 'explore': os.path.join(ROOT, 'examples', 'explore-test-todo')},
