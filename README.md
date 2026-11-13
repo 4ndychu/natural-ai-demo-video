@@ -4,7 +4,7 @@
 
 <p align="center">
   <a href="LICENSE"><img alt="License: AGPL-3.0" src="https://img.shields.io/badge/license-AGPL--3.0-111111?style=flat-square"></a>
-  <img alt="Status: in development" src="https://img.shields.io/badge/status-in%20development-E0A100?style=flat-square">
+  <img alt="Status: early release, macOS" src="https://img.shields.io/badge/status-early%20release%20(macOS)-E0A100?style=flat-square">
   <img alt="Claude skill" src="https://img.shields.io/badge/Claude-skill-0000F2?style=flat-square">
   <img alt="ElevenLabs" src="https://img.shields.io/badge/voice-ElevenLabs-111111?style=flat-square">
   <img alt="Playwright" src="https://img.shields.io/badge/recording-Playwright-0B4F37?style=flat-square">
@@ -22,7 +22,7 @@ No face on camera. No microphone. No robot voice.
 </p>
 
 > [!NOTE]
-> **NAVI is in active development.** The local app in [`ui/`](ui) is a complete, clickable prototype: every screen and control works with sample data, so you can try the whole flow today. The recording engine behind it is being built now. See the [roadmap](#roadmap).
+> **NAVI works, and it's early.** The engine runs for real: one voice take per section, word timings, live recording to the voice, blur before and after recording, render and export, and batches that run by themselves. The local app is wired to it. It runs on a Mac (tested on Apple silicon). See the [roadmap](#roadmap) for what's still to come.
 
 ---
 
@@ -147,17 +147,24 @@ Every rule and default in NAVI goes back to something written down in this repo.
 
 ### What you need
 
-- [Claude Code](https://docs.claude.com/en/docs/claude-code/overview) on your own computer (terminal, IDE or the desktop app's Code tab)
+- A Mac (tested on Apple silicon, macOS 15 and later)
+- [Claude Code](https://docs.claude.com/en/docs/claude-code/overview) (terminal, IDE or the desktop app's Code tab)
 - An [ElevenLabs](https://elevenlabs.io) account (Starter plan or above) and an API key with text to speech access
-- macOS or Linux, Node.js 18+ and Python 3.10+ (NAVI installs Playwright, ffmpeg and the timing model for you after asking)
+- [Node.js](https://nodejs.org) 20 or newer, and Apple's free command line tools (`xcode-select --install`, for git and Swift)
 
-### Claude Code
+NAVI's own Python, the recorder, its browser and the word-timing model are installed for you, inside NAVI's folder, after you say yes. If [uv](https://docs.astral.sh/uv/) (which sets up that Python) isn't on your Mac yet, Claude shows you the one-line command first.
+
+### Install with Claude Code
 
 ```bash
-git clone https://github.com/4ndychu/natural-ai-demo-video.git ~/.claude/skills/natural-ai-demo-video
+git clone https://github.com/4ndychu/natural-ai-demo-video.git ~/Developer/natural-ai-demo-video
+cd ~/Developer/natural-ai-demo-video
+claude
 ```
 
-Start Claude Code and ask for a demo video. Claude picks up the skill on its own.
+Then tell Claude **"install this"**. Claude runs the readiness check, tells you what's missing and how big it is (about 500 MB in the folder plus about 1 GB of shared downloads), and after you agree runs `scripts/setup/install.sh`. That installs everything inside this folder and links `~/.claude/skills/natural-ai-demo-video` to it, so from then on Claude Code finds NAVI in any session. You can clone it anywhere else too: the folder you clone into is where NAVI lives.
+
+You store your ElevenLabs key yourself, never in the chat: run `sh scripts/setup/store-key.sh` in your own terminal (the paste stays hidden), or use the app's Settings. Then ask for a demo video. Before any voice is generated, NAVI shows what it will cost in credits.
 
 ### Why Claude Code, not a normal chat
 
@@ -179,7 +186,7 @@ Jump to a screen with `?start=home`, `?start=voice`, `?start=review` or `?start=
 
 ### Your ElevenLabs key
 
-NAVI asks for the key on first run and stores it in your system keychain (or a local file outside the repo on Linux). It is only ever sent to ElevenLabs. It is never written to this folder, never printed, and never committed. You can remove it any time from **Settings → Your data**.
+NAVI asks for the key on first run and stores it in your Mac's Keychain. It is only ever sent to ElevenLabs. It is never written to this folder, never printed, and never committed. You can remove it any time from **Settings → Your data**.
 
 ## Use it
 
@@ -272,9 +279,10 @@ natural-ai-demo-video/
 │   └── vendor/         petite-vue
 ├── recorder/           The browser recorder (agent-screenplay + NAVI's patch) and polish/
 │   └── polish/         Recordly's own renderer, pinned and unedited, for both video styles
+├── scripts/            The engine: voice, timing, recording, privacy, render, batches, setup/
 ├── reference/          Voice, recording and privacy rules from the listening tests
 ├── config/
-│   └── defaults.json   Slider ranges, presets, per-voice settings
+│   └── defaults.json   Slider ranges, presets, per-voice settings, each job's model
 ├── docs/
 │   ├── engine.md       How recording, timing and rendering work
 │   ├── banner.png
@@ -285,14 +293,17 @@ natural-ai-demo-video/
 
 ## Roadmap
 
-- [x] Voice research: five listening rounds, the one-take-per-section rule, slider ranges
+- [x] Voice research: listening rounds, the one-take-per-section rule, slider ranges
 - [x] Privacy model: three tiers, four layers
 - [x] Local app: every screen and control, light and dark mode
-- [ ] Engine: one continuous take per section, word timestamps, clicks scheduled to the word
-- [ ] Engine: pre-recording blur and post-recording frame scan
-- [ ] Engine: render and export (MP4, .srt, transcript, 720p preview)
-- [ ] Wire the local app to the engine (served locally, nothing on the web)
-- [ ] Keychain storage, saved logins, "Your data" controls
+- [x] Engine: one continuous take per section, word timestamps, clicks scheduled to the word
+- [x] Engine: pre-recording blur and post-recording frame scan
+- [x] Engine: render and export (MP4, .srt, transcript, 720p preview)
+- [x] Wire the local app to the engine (served locally, nothing on the web)
+- [x] Keychain storage, saved logins, "Your data" controls
+- [x] Batches: many videos in one go, running by themselves, with an action guard and a morning report
+- [x] One-command install from a fresh clone
+- [ ] Linux
 - [ ] Learning from review marks
 - [ ] First public example videos
 

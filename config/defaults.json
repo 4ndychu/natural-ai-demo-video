@@ -52,9 +52,9 @@
     ],
     "never_speed_up_after": true,
     "never_pass_next_text": true,
-    "rank_takes_by": "finality of the last sentence (scripts/audio/finality.py), or pace closest to reference_pace_wps when set; then the ear. measure_speech.py flags problems but must not pick takes: it disagreed with Andy on 4 of 7 experiments (2026-11-05)",
+    "rank_takes_by": "finality of the last sentence (scripts/audio/finality.py), or pace closest to reference_pace_wps when set; then the ear. measure_speech.py flags problems but must not pick takes: it disagreed with the listener's ear on 4 of 7 experiments",
     "reference_pace_wps": 3.16,
-    "reference_take": "output/test-todo-v4 (examples/test-todo-b.json, eleven_v4, Alex, approved by Andy 2026-11-05)"
+    "reference_take": "output/test-todo-v4 (examples/test-todo-b.json, eleven_v4, Alex, the approved test voice)"
   },
   "audio_edit": {
     "trim_after_sentence": false,
@@ -291,7 +291,7 @@
       "helvetica-square",
       "mona-rounded"
     ],
-    "caption_look_note": "Andy picked Mona Sans on slightly rounded boxes (Phase 5, 8 Nov 2026). Helvetica Neue on square boxes stays as an option",
+    "caption_look_note": "Mona Sans on slightly rounded boxes by default. Helvetica Neue on square boxes stays as an option",
     "corner_label": "off",
     "corner_options": [
       "off",
@@ -308,7 +308,7 @@
       1440,
       810
     ],
-    "viewport_note": "browser size; the video is always 1920x1080. 1440x810 makes a narrow app about a third bigger (Andy picked it, Phase 3)",
+    "viewport_note": "browser size; the video is always 1920x1080. 1440x810 makes a narrow app about a third bigger",
     "capture_scale": 2,
     "capture_scale_note": "the browser's frames are 2x (2880x1620), so the 1080p video is sharp and a Recordly zoom (1.8x) still isn't blown up. 3x drops the capture to ~25 frames a second",
     "style": "casual",
@@ -347,7 +347,7 @@
         "max_height": 160
       }
     ],
-    "hide_on_page_note": "Page parts taken off the page (hidden, not blurred) before every take, the live page check and rehearsal: a site's own nag banner that is never part of a lesson. The largest element around the text that still holds little else. Andy, 13 Nov 2026: Whop's yellow 'Confirm your tax details' banner."
+    "hide_on_page_note": "Page parts taken off the page (hidden, not blurred) before every take, the live page check and rehearsal: a site's own nag banner that is never part of a lesson. The largest element around the text that still holds little else. For example Whop's yellow 'Confirm your tax details' banner."
   },
   "export": {
     "video": "1080p mp4",
@@ -364,7 +364,7 @@
         1.05,
         2.0
       ],
-      "note": "off by default; when on, export both the normal file and a sped-up copy (Andy uses 1.35x for his course). The voice keeps its natural pitch (ffmpeg atempo)"
+      "note": "off by default; when on, export both the normal file and a sped-up copy (e.g. 1.35x for a course). The voice keeps its natural pitch (ffmpeg atempo)"
     }
   },
   "script": {
@@ -444,17 +444,13 @@
       "render_while_recording": false,
       "record_parallel": 1,
       "parallel_note": "the render of one video always runs while the next is voiced and timed. render_while_recording (also while the next is being recorded live) and record_parallel (2 or 3 live takes at once) are switched on only when scripts/focus/load_check.py shows a live take comes out the same that way on this Mac; a video that creates things in a test business is always recorded alone",
-      "heavy_apps": [
-        "Spotify",
-        "Roblox",
-        "Google Chrome"
-      ],
+      "heavy_apps": [],
       "heavy_cpu": 25,
-      "heavy_note": "before each batch the user is told to quit these when they are running, and any other app using more than heavy_cpu % of a core; the Go screen shows the Mac's load (Andy, 12 Nov 2026: a busy Mac made takes land late and renders slow)"
+      "heavy_note": "before each batch the user is told to quit any app using more than heavy_cpu % of a core (and any named in heavy_apps, empty by default); the Go screen shows the Mac's load (a busy Mac makes takes land late and renders slow)"
     }
   },
   "jobs": {
-    "_about": "Per-job models (Andy, 12 Nov 2026). Each job runs as its own headless Claude Code subagent (scripts/jobs/jobs.py) on the model and effort named here. Full model IDs only, never an alias. If a model is unavailable the next one in 'fallback' runs and the batch report says so. Every run is logged in the batch report with its model, effort, time and tokens.",
+    "_about": "Per-job models. Each job runs as its own headless Claude Code subagent (scripts/jobs/jobs.py) on the model and effort named here. Full model IDs only, never an alias. If a model is unavailable the next one in 'fallback' runs and the batch report says so. Every run is logged in the batch report with its model, effort, time and tokens.",
     "planning": {
       "model": "claude-fable-5-2",
       "effort": "high",
@@ -462,7 +458,7 @@
         "claude-opus-5-5"
       ],
       "blind_test": {
-        "enabled": true,
+        "enabled": false,
         "arms": [
           {
             "model": "claude-fable-5-2",
@@ -477,7 +473,7 @@
             "effort": "medium"
           }
         ],
-        "note": "while on, every real batch's outline is planned once per arm; the plans are shown unlabelled (A/B/C, shuffled) and Andy picks one before anything is explored or written"
+        "note": "while on, every real batch's outline is planned once per arm; the plans are shown unlabelled (A/B/C, shuffled) and the user picks one before anything is explored or written"
       }
     },
     "explore": {
@@ -506,7 +502,7 @@
             "effort": "low"
           }
         ],
-        "note": "for the first 2 videos (Andy, 12 Nov 2026: 2, not 5, to fit the credits) of a real batch: one draft per arm (same style of the day, same facts), each voiced once, shown as A/B/C shuffled with the arm hidden; Andy's pick is recorded ($NAVI_DATA/blind-picks.jsonl) and the picked take is the one that ships. An arm whose model is unavailable is left out, never swapped for another model. 13 Nov 2026: claude-opus-4-6 dropped (19 min a draft, too slow for production); only claude-opus-5-5 medium against low. 13 Nov 2026, test lessons 1 and 2: claude-opus-5-5 medium won both picks (2 of 2) and is locked in as the writing model; the writing test is off. Turn it back on (enabled: true) to compare again"
+        "note": "for the first 2 videos of a real batch (2 keeps the extra credits small): one draft per arm (same style of the day, same facts), each voiced once, shown as A/B/C shuffled with the arm hidden; the user's pick is recorded ($NAVI_DATA/blind-picks.jsonl) and the picked take is the one that ships. An arm whose model is unavailable is left out, never swapped for another model. 13 Nov 2026: claude-opus-4-6 dropped (19 min a draft, too slow for production); only claude-opus-5-5 medium against low. 13 Nov 2026, test lessons 1 and 2: claude-opus-5-5 medium won both picks (2 of 2) and is locked in as the writing model; the writing test is off. Turn it back on (enabled: true) to compare again"
       }
     },
     "checks": {
@@ -531,7 +527,7 @@
       {
         "model": "claude-opus-4-6",
         "after": "2027-01-15",
-        "why": "Andy's cut-off for this model"
+        "why": "the cut-off date set for this model"
       }
     ],
     "timeout_min": 30

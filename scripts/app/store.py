@@ -533,10 +533,10 @@ NOT_HEAVY = {'T3 Code (Beta)', 'T3 Code', 'Claude', 'Terminal', 'iTerm', 'Ghostt
 
 
 def mac_load():
-    """How busy the Mac is right now, for the Go screen and the warning before a batch (Andy, 12 Nov 2026):
+    """How busy the Mac is right now, for the Go screen and the warning before a batch:
     {load, cores, busy, quiet_under, heavy: [{app, cpu}], line}. `heavy`: apps the user runs that a recording
-    competes with: those named in config (Spotify, Roblox, Google Chrome) when they are open, and any other app
-    using more than heavy_cpu % of a core. NAVI's own browser and tools are never on it."""
+    competes with: any app using more than heavy_cpu % of a core (plus any named in config heavy_apps, empty by
+    default). NAVI's own browser and tools are never on it."""
     b = CONFIG['app']['batch']
     load1 = os.getloadavg()[0]
     try:
@@ -621,6 +621,8 @@ def plan_delete(what):
             items.append({'what': 'test_businesses', 'label': 'Which businesses are marked as test businesses'})
     if what in ('settings', 'everything') and os.path.exists(os.path.join(data_dir(), 'settings.json')):
         items.append({'what': 'settings', 'label': 'Your settings (back to the defaults)'})
+    if what in ('settings', 'everything') and os.path.exists(os.path.join(data_dir(), 'jobs.json')):
+        items.append({'what': 'jobs', 'label': 'Your own job settings (models, blind tests), back to the defaults'})
     if what in ('work', 'everything'):
         for d in demos():
             items.append({'what': 'demo', 'id': d['id'], 'label': f"Working files for \"{d['title']}\" (script, voice, recording)",
@@ -647,6 +649,9 @@ def confirm_delete(token):
             done.append(it['label'])
         elif it['what'] == 'settings':
             os.remove(os.path.join(data_dir(), 'settings.json'))
+            done.append(it['label'])
+        elif it['what'] == 'jobs':
+            os.remove(os.path.join(data_dir(), 'jobs.json'))
             done.append(it['label'])
         elif it['what'] == 'demo':
             folder = demo_dir(it['id'])

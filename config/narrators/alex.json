@@ -1,5 +1,5 @@
 {
- "_about": "Narrator card: who this voice is, and the few habits he keeps from one video to the next. Everything else (how a video opens, how steps start, which fillers go where, the slips, the endings, the phrases) changes from video to video: scripts/script/style.py draws it, scripts/script/variety.py checks it. These habits are the exception: the history check allows them to repeat across videos, at about the rate given, and never more than max_per_video in one video. Andy, 11 Nov 2026: one recognisable person on different days, not a different person each video.",
+ "_about": "Narrator card: who this voice is, and the few habits he keeps from one video to the next. Everything else (how a video opens, how steps start, which fillers go where, the slips, the endings, the phrases) changes from video to video: scripts/script/style.py draws it, scripts/script/variety.py checks it. These habits are the exception: the history check allows them to repeat across videos, at about the rate given, and never more than max_per_video in one video. One recognisable person on different days, not a different person each video.",
  "name": "Alex",
  "voice": "alex",
  "voice_id": "hLygPNd2gK6Azddorc5W",
@@ -27,7 +27,7 @@
    "id": "there-we-go",
    "kind": "reaction",
    "text": "there we go",
-   "what": "Said under his breath when something he did shows up, always inside a sentence with words before and after it: \"I hit save and there we go, it's on the list\". Never its own line, never the start or end of a sentence (Andy banned \"There we go.\" as a cheerful line; the checker refuses it). Rare: casual demos say it about once in nine minutes.",
+   "what": "Said under his breath when something he did shows up, always inside a sentence with words before and after it: \"I hit save and there we go, it's on the list\". Never its own line, never the start or end of a sentence (\"There we go.\" as a cheerful line of its own is banned; the checker refuses it). Rare: casual demos say it about once in nine minutes.",
    "rate": 0.1,
    "max_per_video": 1
   },

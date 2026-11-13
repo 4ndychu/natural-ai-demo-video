@@ -170,7 +170,7 @@
      "path": "/(delete|destroy|remove|archive)(/|$)"
     }
    ],
-   "test_delete_note": "NAVI's own \"NAVI test\" products, courses, chapters and lessons, deleted by scripts/cleanup/test_products.mjs in a business the user marked as a test (Andy, 13 Nov 2026: courses, chapters and lessons too); only that step may, never in a real business"
+   "test_delete_note": "NAVI's own \"NAVI test\" products, courses, chapters and lessons, deleted by scripts/cleanup/test_products.mjs in a business the user marked as a test (products, courses, chapters and lessons); only that step may, never in a real business"
   }
  ],
  "changes": [
@@ -258,7 +258,7 @@
   }
  ],
  "member_view": {
-  "_about": "A buyer's view filmed with the owner login (Andy, 11 Nov 2026: no second login). whop's own 'Preview as <product>' is set before the first frame with its cookie, so the page shows what that product's buyers can open; what still shows only to the owner is blurred (owner_only), and pages that only the owner sees as an editor are avoided (avoid: a take that opens one fails with the reason). Found on Real Biz's member pages, 11 Nov 2026.",
+  "_about": "A buyer's view filmed with the owner login (no second login needed). whop's own 'Preview as <product>' is set before the first frame with its cookie, so the page shows what that product's buyers can open; what still shows only to the owner is blurred (owner_only), and pages that only the owner sees as an editor are avoided (avoid: a take that opens one fails with the reason). Found on Real Biz's member pages, 11 Nov 2026.",
   "preview_cookie": "whop-core.preview-as-access-pass-{business_id}",
   "owner_only": [
    {

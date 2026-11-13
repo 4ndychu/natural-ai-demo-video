@@ -8,7 +8,9 @@ license: AGPL-3.0
 
 NAVI turns "make a demo of X" into a finished MP4 with captions: no face, no microphone, and a voice that sounds like a person explaining something, not reading it.
 
-> **Status:** in development. The engine (voice takes, timing, recording, blur, render, export, batch) runs for real, and the local app is wired to it: start it with `.venv/bin/python scripts/app/server.py --open`, then follow what the user does with `scripts/app/wait.py` (`docs/app-api.md`). Tell the user plainly if a step isn't available yet. Never pretend a step ran.
+> **Status:** the engine (voice takes, timing, recording, blur, render, export, batches) runs for real, and the local app is wired to it: start it with `.venv/bin/python scripts/app/server.py --open`, then follow what the user does with `scripts/app/wait.py` (`docs/app-api.md`). Tell the user plainly if a step fails. Never pretend a step ran.
+
+**Where NAVI lives:** the folder the user cloned it into (any folder; `~/Developer/natural-ai-demo-video` is a good choice). `scripts/setup/install.sh` installs everything inside that folder and links `~/.claude/skills/natural-ai-demo-video` to it, so Claude Code finds NAVI in any session. Run every command from that folder. NAVI's own data (settings, saved logins, the key's status) lives outside it, in `~/Library/Application Support/NAVI`.
 
 ## First: check where you're running
 
@@ -34,30 +36,36 @@ Not for: desktop apps, videos with a real person on camera, voice cloning.
 6. **Never pause or speed up the voice to fit the video.** The video holds or stretches instead.
 7. **Say plainly that blurring reduces risk, not to zero.** The user must watch before publishing.
 
-## When NAVI may interrupt the user (Andy, 11 Nov 2026)
+## When NAVI may interrupt the user
 
 Only for: the first login per account, a login the batch preflight found expired, a batch that would spend over the user's credit limit, and the Go click (which they can switch off in Settings). Everything else happens without them: a batch checks every login and page and the credits **before** it starts (`batch.py go`), then never asks anything; a video that breaks or is blocked by the action guard is skipped with the reason, and the morning report (`batch-report.md`, and the app's batch screen) says what's done, what was skipped and why. They can watch any recording live in the app (Watch live). For a batch: `batch.py write <batch>` writes every script (each with its seat) through the job subagents, then run `batch.py sheet <batch>`, then `batch.py go <batch> --auto`: it starts straight away when the user switched off the Go click and the preflight passes; otherwise the batch waits on the app's Go screen (videos, the seat for each, the cost, the logins needed, then Go).
 
-## Which model does which job (Andy, 12 Nov 2026)
+## Which model does which job
 
 Every job that needs a model runs as its own subagent, on the model and effort `config/defaults.json` names for it (`"jobs"`): **planning** claude-fable-5-2 / high, **explore** claude-haiku-5-5 / medium, **writing** claude-opus-5-5 / medium, **checks** claude-sonnet-5-5 / medium, **batch_qa** claude-opus-5-5 / high. Run one with `.venv/bin/python scripts/jobs/jobs.py run <job> --prompt-file <file>` (add `--attended` only when the user is at the session); `jobs.py show` lists them. Always full model IDs, never an alias. If a model is unavailable the job's next fallback runs and the batch report carries a warning; a run nobody is watching never falls back to Fable. For a batch, `batch.py write <batch>` does all of it: one plan, then for each video explore, three drafts and the pick, and the checks; `batch.py run` ends with the last check (`batch_qa`). The batch report (`batch-report.md`, "Models") lists every job run with its model, effort, time and tokens.
 
-## A started batch runs by itself (Andy, 12 Nov 2026)
+## A started batch runs by itself
 
-**Before every batch, check the Mac** (`.venv/bin/python scripts/batch/batch.py mac`) and tell the user in one line which apps to quit (Spotify, Roblox and Google Chrome when they're open, and anything else using more than a quarter of a core) and whether iCloud is busy syncing; the Go screen shows the same line with the Mac's load. A busy Mac makes takes land late and renders slow (12 Nov 2026). It never stops a batch.
+**Before every batch, check the Mac** (`.venv/bin/python scripts/batch/batch.py mac`) and tell the user in one line which apps to quit (any app using more than a quarter of a core) and whether iCloud is busy syncing; the Go screen shows the same line with the Mac's load. A busy Mac makes takes land late and renders slow. It never stops a batch.
 
 Start a batch with `.venv/bin/python scripts/batch/runner.py start <batch>` straight after `batch.py new` (the app's Go click does the same with `--go`). The batch then belongs to macOS, not to this session: it keeps going if T3 Code or Claude Code closes or the session times out, it keeps the Mac awake itself while it works (never ask the user to run caffeinate), and after a restart it carries on at the next login from where it stopped. It writes the scripts, waits for the plan pick and the Go click, records, waits for A/B/C picks and records each as it is picked. Don't run `batch.py write`, `go` or `run` by hand for a batch that has a runner. `runner.py status <batch>` says what it is doing; `stop` pauses it ("paused at video 7 of 30"), `resume` carries on. A video whose script can't be written, or still has checker errors, is skipped with its reason; it never blocks Go for the others. Before the user's first overnight batch, walk them through the 2-minute real-restart test (`docs/before-first-overnight-batch.md`).
 
-## Blind tests during real batches (Andy, 12 Nov 2026)
+## Blind tests (off by default)
 
-No separate test rounds: the comparison happens inside real work (`scripts/batch/blind.py`, settings in `config/defaults.json` → `jobs.<job>.blind_test`). **Planning:** a real batch's outline is planned once per arm (claude-fable-5-2 / high, claude-opus-5-5 / high, claude-opus-5-5 / medium); the user sees the plans as A, B, C, unlabelled, and picks one before anything is explored or written (`batch.py blind <batch>`, `batch.py pick-plan <batch> B`). **Writing:** for the first 2 videos of a real batch, each arm (claude-opus-5-5 / medium, claude-opus-5-5 / low, claude-opus-4-6 / medium) writes one draft to the same style and facts; each is voiced once; the user hears A, B and C, shuffled, the arm hidden, and picks (`batch.py pick <batch> <video> A`, or the app's review queue). The picked draft and its one take are what gets recorded. Never tell the user which model made which letter, and never look it up for them, until every pick in the batch is made; then the batch report shows it. Picks add up in `$NAVI_DATA/blind-picks.jsonl` (`batch.py blind-results`). A batch that isn't real work is made with `batch.py new --no-blind`.
+Blind tests compare models inside real work instead of separate test rounds (`scripts/batch/blind.py`). They are off by default. A user who wants them switches them on in their own `$NAVI_DATA/jobs.json` (outside the repo; it overrides `config/defaults.json` → `jobs`), e.g. `{"planning": {"blind_test": {"enabled": true}}}`. **Planning:** a real batch's outline is planned once per arm (the arms in `jobs.planning.blind_test`); the user sees the plans as A, B, C, unlabelled, and picks one before anything is explored or written (`batch.py blind <batch>`, `batch.py pick-plan <batch> B`). **Writing:** for the first videos of a real batch, each arm in `jobs.writing.blind_test` writes one draft to the same style and facts; each is voiced once (show the extra credits first); the user hears A, B, C, shuffled, the arm hidden, and picks (`batch.py pick <batch> <video> A`, or the app's review queue). The picked draft and its one take are what gets recorded. Never tell the user which model made which letter until every pick in the batch is made; then the batch report shows it. Picks add up in `$NAVI_DATA/blind-picks.jsonl` (`batch.py blind-results`). A batch that isn't real work is made with `batch.py new --no-blind`.
 
 ## The flow
 
 ### 0. First run (once)
 
-- Ask for the ElevenLabs API key (Starter plan or above, text to speech access). Test it and show the credits left. Store it in the system keychain (macOS) or a local file outside the skill folder (Linux), readable only by the user.
-- Check for Playwright, ffmpeg and the timing model. Ask, then install what's missing.
+When the user says "install this", or asks for a first demo:
+
+1. Run `python3 scripts/setup/check.py` from the NAVI folder (any python3 works; it changes nothing). Tell the user in plain words what's missing.
+2. Ask before installing, with the sizes: everything goes inside the NAVI folder, about 500 MB, plus about 1 GB of shared downloads (the recording browser and the word-timing model). Nothing system-wide, no password. Then run `sh scripts/setup/install.sh`.
+   - If it says **uv** is needed (it sets up NAVI's own Python 3.12), show the user the one-line command it prints, ask, run it, and run install.sh again in a new shell.
+   - If it says **Node.js** 20+ or **git** is needed, the user installs that themselves (nodejs.org; `xcode-select --install` for git and Swift on a Mac). Don't install system software for them.
+3. The ElevenLabs key (Starter plan or above, text to speech access): the user stores it themselves, never in chat. Either `sh scripts/setup/store-key.sh` in their own terminal (macOS Keychain; the paste is hidden), or the app's Settings › ElevenLabs. On Linux, `NAVI_ELEVENLABS_KEY` in their environment.
+4. Run the check again with `.venv/bin/python scripts/setup/check.py` until it says Ready, and show the credits left.
 - Ask which site they'll demo first. The user logs in from Settings › Logins (one row per site and seat, status checked live, one Log in button). The login window opens only when they click Log in, ticks "remember me" where offered, and is the only window NAVI ever shows. Save the session per site and seat.
 - Returning users skip all of this. Only the site changes per demo.
 
@@ -80,7 +88,7 @@ Split the video into short sections (about 15 to 35 seconds each). For each sect
 - **Talking version** (what the voice says): how a person actually explains it out loud. Small restarts, reactions and opinions where the screen earns them; very few fillers.
 - **Caption version** (what's shown): clean, short, no fillers.
 
-**Draft three, keep the best.** Draw three styles of the day (`.venv/bin/python scripts/script/drafts.py styles script.template.json`), write the video once to each (the same facts and actions; three different days of the same narrator), then score them and keep the best (`.venv/bin/python scripts/script/drafts.py pick <folder>/draft*.json --base <folder>`, which writes `script.json`). No two videos open, start their steps, hesitate or slip the same way (Andy, 11 Nov 2026: every video sounded the same; `reference/listening/2026-11-11-everything-sounds-the-same.md`), but the narrator stays recognisable: his few habits (`config/narrators/alex.json`) come out now and then, at their own rate. In a batch, write the videos in order so each is scored against the ones already picked. Follow `reference/voice-rules.md`, in the format and order in `reference/script-writing.md`. The checker refuses a script that repeats a recent video's openings, step starts, fillers, repairs, endings or phrases (`script-history.jsonl`), or another script in its batch. Every position ("top right", "at the bottom of the form") is checked against the explored page by the checker, so keep the explore folder next to the script. Run the checker (`scripts/script/check_script.py`) and fix every error. Then show both versions side by side (`scripts/script/show_script.py`) and get approval before spending any credits. The voice step refuses a script with checker errors.
+**Draft three, keep the best.** Draw three styles of the day (`.venv/bin/python scripts/script/drafts.py styles script.template.json`), write the video once to each (the same facts and actions; three different days of the same narrator), then score them and keep the best (`.venv/bin/python scripts/script/drafts.py pick <folder>/draft*.json --base <folder>`, which writes `script.json`). No two videos open, start their steps, hesitate or slip the same way (why: `reference/listening/2026-11-11-everything-sounds-the-same.md`), but the narrator stays recognisable: his few habits (`config/narrators/alex.json`) come out now and then, at their own rate. In a batch, write the videos in order so each is scored against the ones already picked. Follow `reference/voice-rules.md`, in the format and order in `reference/script-writing.md`. The checker refuses a script that repeats a recent video's openings, step starts, fillers, repairs, endings or phrases (`script-history.jsonl`), or another script in its batch. Every position ("top right", "at the bottom of the form") is checked against the explored page by the checker, so keep the explore folder next to the script. Run the checker (`scripts/script/check_script.py`) and fix every error. Then show both versions side by side (`scripts/script/show_script.py`) and get approval before spending any credits. The voice step refuses a script with checker errors.
 
 ### 4. Voice
 
@@ -115,7 +123,7 @@ Apply the demo's caption setting (burned in, separate .srt, or off) and corner l
 
 ## Your data
 
-From Settings the user can remove the key (remind them to revoke it at ElevenLabs too), forget saved logins, reset settings, or delete everything NAVI saved. Finished videos are never touched. Uninstalling means deleting this skill folder as well.
+From Settings the user can remove the key (remind them to revoke it at ElevenLabs too), forget saved logins, reset settings, or delete everything NAVI saved. Finished videos are never touched. Uninstalling means deleting the NAVI folder and the link `~/.claude/skills/natural-ai-demo-video`.
 
 ## Files
 

@@ -72,9 +72,28 @@ class JobError(Exception):
     pass
 
 
+def user_jobs_path():
+    """The user's own job settings, outside the repo: $NAVI_DATA/jobs.json. Anything in it overrides the same key in
+    config/defaults.json "jobs", e.g. {"planning": {"blind_test": {"enabled": true}}} to compare planning models."""
+    return os.path.join(os.path.expanduser(os.environ.get('NAVI_DATA') or '~/Library/Application Support/NAVI'), 'jobs.json')
+
+
+def _merge(base, over):
+    for k, v in over.items():
+        base[k] = _merge(dict(base[k]), v) if isinstance(v, dict) and isinstance(base.get(k), dict) else v
+    return base
+
+
 def config(path=None):
-    """The "jobs" block, checked: every job present, full model IDs, a known effort, a fallback list."""
+    """The "jobs" block, checked: every job present, full model IDs, a known effort, a fallback list. Without a path,
+    the user's own $NAVI_DATA/jobs.json is laid over config/defaults.json."""
     cfg = json.load(open(path or CONFIG_PATH)).get('jobs') or {}
+    if path is None and os.path.exists(user_jobs_path()):
+        try:
+            over = json.load(open(user_jobs_path()))
+        except ValueError as e:
+            raise JobError(f'{user_jobs_path()} is not valid JSON: {e}')
+        cfg = _merge(cfg, {k: v for k, v in over.items() if not k.startswith('_')})
     for job in JOBS:
         j = cfg.get(job)
         if not isinstance(j, dict):

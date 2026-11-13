@@ -18,6 +18,9 @@ import tempfile
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.abspath(os.path.join(HERE, '..', '..'))
+sys.path.insert(0, os.path.join(ROOT, 'scripts', 'setup'))
+import assets  # noqa: E402
+assets.need_todo_takes()          # the saved to-do takes (not in the repo); exits 77, skipped, when missing
 SRC = os.path.join(ROOT, 'output', 'test-todo-v4')
 work = os.path.join(ROOT, 'output', 'blind-test')
 shutil.rmtree(work, ignore_errors=True)
@@ -77,7 +80,8 @@ check('config: writing test off, claude-opus-5-5 medium locked in (13 Nov 2026: 
 # the rest checks the mechanics with three arms, one of which drops out of the second video
 write_arms = write_arms + [{'model': 'claude-opus-4-6', 'effort': 'medium'}]
 _cfg = blind.cfg
-blind.cfg = lambda job: dict(_cfg(job), arms=write_arms, enabled=True) if job == 'writing' else _cfg(job)   # turned on for the mechanics
+check('config: blind tests are off by default (a user turns them on in $NAVI_DATA/jobs.json)', not _cfg('planning').get('enabled') and not _cfg('writing').get('enabled'))
+blind.cfg = lambda job: dict(_cfg(job), arms=write_arms, enabled=True) if job == 'writing' else dict(_cfg(job), enabled=True) if job == 'planning' else _cfg(job)   # on for the mechanics
 check('config: planning arms as asked', [(a['model'], a['effort']) for a in plan_arms] == [('claude-fable-5-2', 'high'), ('claude-opus-5-5', 'high'), ('claude-opus-5-5', 'medium')])
 
 r = batch.write(bid)
