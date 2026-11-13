@@ -776,6 +776,12 @@ def preflight(bid):
     return res
 
 
+def credit_cap(b):
+    """The batch's own credit cap, or None: "credit_cap" on the batch, or credit_cap.json beside it ({"cap": 25000}),
+    which can be set while the batch's runner holds batch.json."""
+    return b.get('credit_cap') or (store._read(os.path.join(bdir(b['id']), 'credit_cap.json'), {}) or {}).get('cap')
+
+
 def go(bid, auto=False):
     """The Go click. Approves every script, runs the preflight, then the batch. Returns why it didn't start, if so:
     the only things that stop a batch are the ones Andy listed (a login to redo, spending over the limit, the Go
@@ -796,9 +802,12 @@ def go(bid, auto=False):
     if pf['unreachable']:
         why.append("these didn't open: " + ', '.join(pf['unreachable'][:3]))
     c = pf['credits']
-    if c['over_limit']:
+    # a batch with its own cap (credit_cap) is held to it video by video in run(), so it starts even when the whole
+    # list would cost more than the cap or the credits left: it records what fits, in order, and skips the rest
+    capped = bool(credit_cap(b))
+    if c['over_limit'] and not capped:
         why.append(f"it costs about {c['total']:,} credits, over your limit of {c['limit']:,}")
-    if c['short']:
+    if c['short'] and not (capped and c['left'] is not None):
         why.append(f"it needs about {c['total']:,} credits and {c['left']:,} are left" if c['left'] is not None else "the credits left can't be read")
     if why:
         b['state'], b['reason'] = 'needs you', '; '.join(why)
@@ -981,6 +990,17 @@ def run(bid):
             b['results'][did] = {'status': 'waiting', 'why': 'waiting for your pick'}
             continue
         left = sim if sim is not None else store.credits_left()
+        # a batch cap (Andy, 13 Nov 2026: "stop before spending more than 25,000 credits"): spending is counted from
+        # the credits left when the run began; a video that would take it past the cap is skipped, with that reason,
+        # and nothing of it is generated (videos after it are still tried: a shorter one may fit)
+        cap = credit_cap(b)
+        if cap and left is not None:
+            b.setdefault('credits_at_start', left)
+            spent = b['credits_at_start'] - left
+            if need and spent + need > cap:
+                skip(b, did, d, f"over the batch's {cap:,}-credit cap: about {spent:,} spent so far and this video needs about "
+                                f"{need:,}; nothing of it was generated")
+                continue
         if need and (left is None or left - need < B['credit_margin']):
             skip(b, did, d, (f"not enough credits: it needs about {need:,} and {left:,} are left (NAVI keeps {B['credit_margin']:,} spare); "
                              "nothing of it was generated") if left is not None else "the credits left couldn't be read, so nothing was spent")
