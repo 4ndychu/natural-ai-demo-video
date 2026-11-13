@@ -3,11 +3,14 @@
 // script, waits for it to settle, saves a screenshot, prints {hits, title} as JSON. Masked previews only.
 import fs from "node:fs"; import path from "node:path";
 const HERE = path.dirname(new URL(import.meta.url).pathname);
-const { chromium } = await import(path.join(HERE, "..", "..", "recorder", "agent-screenplay", "node_modules", "playwright-core", "index.mjs"));
+const { chromium, devices } = await import(path.join(HERE, "..", "..", "recorder", "agent-screenplay", "node_modules", "playwright-core", "index.mjs"));
 const cfg = JSON.parse(fs.readFileSync(0, "utf8"));
 const browser = await chromium.launch({ headless: true, args: ["--force-device-scale-factor=2", "--hide-scrollbars"] });
 try {
-  const context = await browser.newContext({ viewport: { width: cfg.width, height: cfg.height }, deviceScaleFactor: 2,
+  // cfg.device: a phone profile from Playwright's list ("iPhone 15"), as in the recording
+  const dev = cfg.device ? devices[cfg.device] : null;
+  const context = await browser.newContext({ viewport: dev ? dev.viewport : { width: cfg.width, height: cfg.height }, deviceScaleFactor: 2,
+    ...(dev ? { userAgent: dev.userAgent, isMobile: dev.isMobile, hasTouch: dev.hasTouch } : {}),
     storageState: cfg.storageState && fs.existsSync(cfg.storageState) ? cfg.storageState : undefined });
   await context.addInitScript({ content: cfg.script });
   if (cfg.guard) await (await import(cfg.guard.module)).installFromFile(context, cfg.guard.config, () => {});

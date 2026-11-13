@@ -106,8 +106,9 @@ def session_for(url, script=None):
 def guard_for(script, out):
     """The action guard's settings for this take (written to guard.json next to it), or None for a site without a
     guard pack. Blocked actions are logged to guard-log.jsonl."""
-    site = seats.for_script(script)['site']
-    if not os.path.exists(os.path.join(ROOT, 'config', 'guard', f'{site}.json')):
+    sites = [x['site'] for x in seats.for_script(script)['seats']]
+    # a video on two or more logins always runs guarded: a site without a pack has its changes blocked (guard.mjs)
+    if len(sites) < 2 and not any(os.path.exists(os.path.join(ROOT, 'config', 'guard', f'{s}.json')) for s in sites):
         return None
     cfg = seats.guard_config(script, os.path.join(out, 'guard-log.jsonl'))
     path = os.path.join(out, 'guard.json')
@@ -192,10 +193,16 @@ def build(script, timing, leads, viewport=None, style_name=None, private=None, g
             steps.append({'hover': f'at={round(vw * 0.5)},{round(vh * 0.42)}'})
             start_at.append(OPENING_DRIFT_S)
             land_at.append(None)
+    opened = False
     for a in timing['actions']:
-        if a['do'] == 'goto':
+        if a['do'] == 'goto' and not opened:      # the page the video opens on (the scenario's url)
+            opened = True
             continue
-        if a['do'] == 'click':
+        if a['do'] == 'goto':
+            # a later page, for example the second site of a video on two logins (X, then Google Sheets): opened at
+            # its word, in the same tab, with the same browser and every login it holds
+            st, kind = {'goto': a['target']}, 'goto'
+        elif a['do'] == 'click':
             st, kind = {'click': target(a['target'])}, 'click'
         elif a['do'] == 'type':
             st = {'type': a['text']}
@@ -211,7 +218,7 @@ def build(script, timing, leads, viewport=None, style_name=None, private=None, g
             st, kind = {'hover': target(a['target'])}, 'hover'
         else:
             sys.exit(f"Don't know how to record '{a['do']}'.")
-        lead = max(FIND_LEAD, leads.get(len(steps), 0)) if kind in LANDS else LEAD[kind]
+        lead = max(FIND_LEAD, leads.get(len(steps), 0)) if kind in LANDS else LEAD.get(kind, 0.0)
         steps.append(st)
         start_at.append(round(max(VOICE_START + a['t'] - lead, 0.0), 3))
         land_at.append(round(VOICE_START + a['t'], 3) if kind in LANDS else None)
@@ -226,6 +233,8 @@ def build(script, timing, leads, viewport=None, style_name=None, private=None, g
         start_at.append(round(VOICE_START + voice_end + END_AFTER_VOICE, 3))
         land_at.append(None)
     scenario = {'name': script.get('title', 'demo'), 'url': url, 'viewport': {'width': vw, 'height': vh},
+                # a video filmed on a phone ("device": "iPhone 15"): Playwright's phone profile, which sets the size
+                **({'device': script['device']} if script.get('device') else {}),
                 'realtime': True, 'startAt': start_at, 'landAt': land_at, 'typingSpeed': 1.3, 'scale': rc.get('capture_scale', 2),
                 'style': {**STYLE, 'maxZoom': ZOOM[style.get('zoom_on_click', 'none')]},
                 'initScript': privacy.init_script(private or privacy.settings(script)) + ('\n' + member['js'] if member else ''),
@@ -476,6 +485,11 @@ def main():
     session = seat['login']
     where = f" in {seat['business']['name']}" if seat['business'] else ''
     print(f"seat: {seat['seat']}{where}; login: {'saved' if session else 'none (logged out)'}", flush=True)
+    if len(seat['seats']) > 1:
+        missing = [x['site'] for x in seat['seats'] if not x['login']]
+        print('logins: ' + ' + '.join(f"{x['site']} ({x['seat']})" for x in seat['seats']) + ', in one browser', flush=True)
+        if missing:
+            sys.exit('Not logged in: ' + ', '.join(missing) + '. Log in from Settings > Logins first.')
     guard = None if a.finish else guard_for(script, out)
     member = None if a.finish else member_view(script, out)
     if member:
@@ -487,7 +501,8 @@ def main():
         _T[0] = time.time()
     else:
         check = privacy.check_page(start, private, os.path.join(out, 'privacy-check.png'), viewport or CONFIG['recording']['viewport'],
-                                   member['session'] if member else session, guard=guard, extra_js=member['js'] if member else '')
+                                   member['session'] if member else session, guard=guard, extra_js=member['js'] if member else '',
+                                   device=script.get('device'))
         if guard_blocks(out):
             fail_blocked(out, guard_blocks(out)[0], script)
         print(f"privacy: start page checked, {len(check['hits'])} blurred (privacy-check.png)", flush=True)

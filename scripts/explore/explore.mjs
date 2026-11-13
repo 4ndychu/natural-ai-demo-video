@@ -6,6 +6,8 @@
 //
 //   node scripts/explore/explore.mjs --url https://whop.com/dashboard --site whop.com [--seat owner] --out <folder> [--steps steps.json]
 //
+// --seats x.com:owner,google.com:owner: a video on two or more logins (X and Google Sheets, Claude and Grok): one
+// browser holding every one of them (scripts/seats/seats.py merged_login); the guard checks each site with its own pack.
 // --seat picks which saved login to use (scripts/seats/seats.py; default: the site's default seat). The action guard
 // (scripts/guard/guard.mjs) runs on every page: a blocked action stops the explore with the reason (exit code 3).
 // In a real business the privacy blur runs too, so the screenshots never keep real numbers.
@@ -34,7 +36,7 @@ const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, "..", "..");
 const AS = path.join(ROOT, "recorder", "agent-screenplay");
 const { launchBrowser, realUserAgent, botCheck } = await import(path.join(AS, "dist", "drivers", "browser.js"));
-const { sessionFile, guardConfig, businesses } = await import(path.join(ROOT, "scripts", "seats", "seats.mjs"));
+const { sessionFile, guardConfig, businesses, joinedSession, loginSite } = await import(path.join(ROOT, "scripts", "seats", "seats.mjs"));
 const { installGuard, loadPack, businessFor } = await import(path.join(ROOT, "scripts", "guard", "guard.mjs"));
 
 const argv = process.argv.slice(2);
@@ -60,9 +62,22 @@ if ((outAbs === ROOT || outAbs.startsWith(ROOT + path.sep)) && !outAbs.startsWit
 const dataDir = process.env.NAVI_DATA || path.join(os.homedir(), "Library", "Application Support", "NAVI");
 const site = opt("site");
 const seat = opt("seat");
-let session = opt("session") || (site ? sessionFile(site, seat) : undefined);
+// --seats: every login the video uses, the main one (--site/--seat) first
+const pairs = (opt("seats") || "").split(",").filter(Boolean).map((x) => x.split(":"));
+if (site && pairs.length && !pairs.some(([s]) => loginSite(s) === loginSite(site))) pairs.unshift([site, seat]);
+let session;
+try {
+  // --logged-out (or the seat "logged-out"): the public pages as a visitor sees them, even with a saved login
+  session = argv.includes("--logged-out") || seat === "logged-out" ? undefined
+    : opt("session") || (pairs.length > 1 ? joinedSession(pairs) : site ? sessionFile(site, seat) : undefined);
+} catch (e) {
+  console.error(e.message);
+  process.exit(2);
+}
+if (pairs.length > 1) console.log(`logins: ${pairs.map(([s, st]) => `${loginSite(s)} (${st || "owner"})`).join(" + ")}, in one browser`);
 if (opt("session") && !fs.existsSync(session)) throw new Error(`No saved session at ${session}.`);
-if (site && !session) {
+if (site && !session && (argv.includes("--logged-out") || seat === "logged-out")) console.log("logged out: the pages as a visitor sees them");
+else if (site && !session) {
   if (seat) {
     console.error(`The ${seat} seat on ${site} isn't logged in. Log it in from Settings > Logins first.`);
     process.exit(2);
@@ -72,22 +87,30 @@ if (site && !session) {
 void dataDir;
 const steps = opt("steps") ? JSON.parse(fs.readFileSync(opt("steps"), "utf8")) : [];
 const defaults = JSON.parse(fs.readFileSync(path.join(ROOT, "config", "defaults.json"), "utf8"));
-const [vw, vh] = defaults.recording?.viewport ?? [1440, 810];
+// --device "iPhone 15": the phone profile the recording uses (Playwright's device list): size, user agent, touch
+const { devices } = await import(path.join(AS, "node_modules", "playwright-core", "index.mjs"));
+const device = opt("device") ? devices[opt("device")] : null;
+if (opt("device") && !device) {
+  console.error(`Unknown device "${opt("device")}" (Playwright's device list, e.g. "iPhone 15").`);
+  process.exit(2);
+}
+const [vw, vh] = device ? [device.viewport.width, device.viewport.height] : defaults.recording?.viewport ?? [1440, 810];
 
 fs.mkdirSync(out, { recursive: true });
 const browser = await launchBrowser({ headless: true });
 const context = await browser.newContext({
-  userAgent: await realUserAgent(browser),
+  userAgent: device ? device.userAgent : await realUserAgent(browser),
   viewport: { width: vw, height: vh },
+  ...(device ? { isMobile: device.isMobile, hasTouch: device.hasTouch } : {}),
   storageState: session,
 });
 // the action guard, on every page of every seat; a blocked action ends the explore with the reason
 const guardSite = site || new URL(url).hostname.replace(/^www\./, "");
 let blocked;
 const guardCfg = guardConfig({ site: guardSite, seat, mode: argv.includes("--learn") ? "learn" : "enforce",
-  log: path.join(outAbs, "guard-log.jsonl") });
+  log: path.join(outAbs, "guard-log.jsonl"), sites: pairs.map(([s]) => s) });
 guardCfg.logAll = argv.includes("--log-writes"); // log every change the guard lets through too
-const guard = loadPack(guardSite)
+const guard = guardCfg.sites.some((x) => loadPack(x)) || guardCfg.sites.length > 1 || argv.includes("--learn")
   ? await installGuard(context, { ...guardCfg, onBlock: (e) => (blocked = e) })
   : null;
 // a real business: blur before paint, so screenshots keep no real numbers (the same blur as the recording)

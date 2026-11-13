@@ -26,8 +26,10 @@ const SIGN_IN_URL = /\/(login|log-in|signin|sign-in|sign_in|auth|sso|oauth|sessi
 
 const cfg = config();
 const wanted = [];
+const { loginSite } = await import(path.join(ROOT, "scripts", "seats", "seats.mjs"));
 for (const [site, s] of Object.entries(cfg)) {
-  if (opt("site") && site !== opt("site")) continue;
+  if (site.startsWith("_") || !s || typeof s !== "object") continue;
+  if (opt("site") && site !== loginSite(opt("site"))) continue;
   for (const [seat, info] of Object.entries(s.seats || {})) {
     if (opt("seat") && seat !== opt("seat")) continue;
     wanted.push({ site, seat, home: info.home || `https://${site}/` });

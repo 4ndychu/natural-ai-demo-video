@@ -145,7 +145,25 @@ export async function installGuard(context, cfg) {
   const browser = context.browser();
   if (!browser?.newBrowserCDPSession) throw new Error("The action guard needs Chromium (Chrome's own interception).");
   if (installed.has(browser)) throw new Error("The action guard is already on in this browser.");
-  const pack = cfg.pack ?? loadPack(cfg.site);
+  // one pack per site whose login the browser holds (a video on X and Google Sheets uses both); each request is
+  // checked against the pack of the site it goes to, else the pack of the page it comes from, else the main site's
+  const sites = [...new Set([cfg.site, ...(cfg.sites || [])].filter(Boolean))];
+  const packs = cfg.pack ? [[cfg.site, cfg.pack]] : sites.map((s) => [s, loadPack(s)]);
+  const hostOf = (u) => {
+    try {
+      return new URL(u).host;
+    } catch {
+      return "";
+    }
+  };
+  const onSite = (host, site) => host === site || host.endsWith("." + site);
+  const packFor = (host, pageUrl) => {
+    const own = (h) => packs.find(([, p]) => p?.own_hosts && rx(p.own_hosts).test(h));
+    const hit = own(host) || own(hostOf(pageUrl));
+    if (hit) return { site: hit[0], pack: hit[1] };
+    const site = sites.find((x) => onSite(host, x)) || sites.find((x) => onSite(hostOf(pageUrl), x)) || cfg.site;
+    return { site, pack: (packs.find(([x]) => x === site) || [])[1] ?? null };
+  };
   const mode = cfg.mode || "enforce";
   const state = { blocked: [], writes: [], stopped: false };
   installed.set(browser, state);
@@ -168,7 +186,14 @@ export async function installGuard(context, cfg) {
     const req = describeRequest(method, e.request.url, headers, bodyOf(e.request));
     const pageUrl = await pageUrlFor(e);
     const business = businessFor(cfg, pageUrl);
+    const { site: reqSite, pack } = packFor(req.host, pageUrl);
     let res = classify(req, pack, { ...cfg, business });
+    // a site the browser is logged in to, with no rules written for it yet: its changes are blocked (default deny),
+    // so a real account is never changed by a site the guard can't read (the old "no pack: allow" only ever applied
+    // to single-site runs, where record.py doesn't start the guard without a pack)
+    if (!pack && sites.length > 1 && sites.some((x) => onSite(req.host, x)))
+      res = { verdict: "block", category: "unknown", why: `no guard rules for ${reqSite} yet: changes on that logged-in account are blocked` };
+    if (res.verdict === "allow" && res.why === "change outside a real business") res.why += ` (${reqSite})`;
     if (mode === "learn" && res.verdict === "allow" && !/^(read|ignored)/.test(res.why)) {
       res = { verdict: "block", category: "learn", why: "learning run: every change is blocked" };
     }

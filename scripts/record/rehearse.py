@@ -39,7 +39,8 @@ def rehearse(script_path):
         scenario, plan = record.build(script, {'actions': actions, 'words': []}, {}, None, None, private, guard, member)
         for k in ('startAt', 'landAt', 'realtime'):      # as fast as the pages allow
             scenario.pop(k, None)
-        by_step = {p['step']: a for p, a in zip(plan, [x for x in actions if x['do'] != 'goto'])}
+        first = next((i for i, x in enumerate(actions) if x['do'] == 'goto'), None)   # the start page; later gotos are steps
+        by_step = {p['step']: a for p, a in zip(plan, [x for i, x in enumerate(actions) if i != first])}
         path = os.path.join(out, 'scenario.json')
         json.dump(scenario, open(path, 'w'))
         record.cleanup(script)

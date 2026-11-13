@@ -43,10 +43,21 @@ index 6a6a89f..bf5abb0 100644
          "url": "https://github.com/sponsors/colinhacks"
        }
 diff --git a/schema/scenario.schema.json b/schema/scenario.schema.json
-index cb9aab3..54f0791 100644
+index cb9aab3..3c2b4fd 100644
 --- a/schema/scenario.schema.json
 +++ b/schema/scenario.schema.json
-@@ -80,6 +80,65 @@
+@@ -52,6 +52,10 @@
+       "minimum": 1,
+       "maximum": 3
+     },
++    "device": {
++      "description": "Web: emulate a phone or tablet from Playwright's device list, e.g. \"iPhone 15\": its screen size, user agent, touch and mobile layout (the capture keeps `scale`). Overrides `viewport`.",
++      "type": "string"
++    },
+     "colorScheme": {
+       "type": "string",
+       "enum": [
+@@ -80,6 +84,65 @@
        "description": "Web: hide scrollbars (default true).",
        "type": "boolean"
      },
@@ -112,7 +123,7 @@ index cb9aab3..54f0791 100644
      "typingSpeed": {
        "description": "Typing speed multiplier (default 1, about 14 characters/second).",
        "type": "number",
-@@ -419,6 +478,18 @@
+@@ -419,6 +482,18 @@
                "double": {
                  "type": "boolean"
                },
@@ -271,17 +282,26 @@ index 02c08a3..9966539 100644
    if (explicit) {
      if (!fs.existsSync(explicit)) throw new Error(`SCREENPLAY_CHROME points to a missing file: ${explicit}`);
 diff --git a/src/drivers/web.ts b/src/drivers/web.ts
-index 7857c45..822317c 100644
+index 7857c45..8b40540 100644
 --- a/src/drivers/web.ts
 +++ b/src/drivers/web.ts
-@@ -1,5 +1,6 @@
+@@ -1,5 +1,7 @@
  import fs from "node:fs";
  import path from "node:path";
 +import { pathToFileURL } from "node:url";
++import { devices as playwrightDevices } from "playwright-core";
  import type { BrowserContext, CDPSession, Locator, Page } from "playwright-core";
  import type { LoadedScenario } from "../scenario/load.js";
  import { describeStep, stepKind, type Step } from "../scenario/schema.js";
-@@ -64,7 +65,7 @@ export async function runWeb(loaded: LoadedScenario, opts: WebRunOptions): Promi
+@@ -60,11 +62,14 @@ export async function runWeb(loaded: LoadedScenario, opts: WebRunOptions): Promi
+   const { scenario } = loaded;
+   const record = opts.mode === "record";
+   const log = opts.log ?? (() => {});
+-  const viewport = scenario.viewport ?? defaultViewport(scenario.output);
++  // NAVI: a phone (Playwright's device profile): its screen size, user agent, touch and mobile layout
++  const device = scenario.device ? playwrightDevices[scenario.device] : undefined;
++  if (scenario.device && !device) throw new Error(`Unknown device "${scenario.device}" (Playwright's device list, e.g. "iPhone 15").`);
++  const viewport = device ? device.viewport : scenario.viewport ?? defaultViewport(scenario.output);
    const scale = record ? (scenario.scale ?? 2) : 1;
    const baseUrl = scenario.url!;
  
@@ -290,7 +310,19 @@ index 7857c45..822317c 100644
    let context: BrowserContext | undefined;
    const takeDir = loaded.takeDir;
    const framesDir = path.join(takeDir, "frames");
-@@ -99,6 +100,36 @@ export async function runWeb(loaded: LoadedScenario, opts: WebRunOptions): Promi
+@@ -79,9 +84,10 @@ export async function runWeb(loaded: LoadedScenario, opts: WebRunOptions): Promi
+       throw new Error(`Session file not found: ${storageState}. Run \`npx agent-screenplay login <url>\` to create it.`);
+     }
+     context = await browser.newContext({
+-      userAgent: await realUserAgent(browser),
++      userAgent: device ? device.userAgent : await realUserAgent(browser),
+       viewport,
+       deviceScaleFactor: scale,
++      ...(device ? { isMobile: device.isMobile, hasTouch: device.hasTouch } : {}),
+       colorScheme: scenario.colorScheme,
+       locale: scenario.locale,
+       storageState,
+@@ -99,6 +105,36 @@ export async function runWeb(loaded: LoadedScenario, opts: WebRunOptions): Promi
          else add();
        });
      }
@@ -327,7 +359,7 @@ index 7857c45..822317c 100644
      const page = await context.newPage();
      page.setDefaultTimeout(ACTION_TIMEOUT_MS);
  
-@@ -151,7 +182,9 @@ export async function runWeb(loaded: LoadedScenario, opts: WebRunOptions): Promi
+@@ -151,7 +187,9 @@ export async function runWeb(loaded: LoadedScenario, opts: WebRunOptions): Promi
      const checks: CheckStepResult[] = [];
      await sleepIf(0.6);
  
@@ -337,7 +369,7 @@ index 7857c45..822317c 100644
        const step = scenario.steps[i];
        const kind = stepKind(step);
        const label = describeStep(step);
-@@ -159,6 +192,21 @@ export async function runWeb(loaded: LoadedScenario, opts: WebRunOptions): Promi
+@@ -159,6 +197,21 @@ export async function runWeb(loaded: LoadedScenario, opts: WebRunOptions): Promi
        navigated = false;
        const ts: TakeStep = { index: i, kind, label, start: now(), end: 0, waits: [] };
        const minDuration = opts.minDurations?.[i] ?? 0;
@@ -359,7 +391,7 @@ index 7857c45..822317c 100644
        try {
          cursor = await runStep(page, step, ts, cursor, {
            record,
-@@ -166,8 +214,11 @@ export async function runWeb(loaded: LoadedScenario, opts: WebRunOptions): Promi
+@@ -166,8 +219,11 @@ export async function runWeb(loaded: LoadedScenario, opts: WebRunOptions): Promi
            baseUrl,
            sleepIf,
            minDuration,
@@ -371,7 +403,7 @@ index 7857c45..822317c 100644
          });
        } catch (e) {
          const err = e instanceof StepError ? e : new StepError(i, label, (e as Error).message);
-@@ -186,7 +237,9 @@ export async function runWeb(loaded: LoadedScenario, opts: WebRunOptions): Promi
+@@ -186,7 +242,9 @@ export async function runWeb(loaded: LoadedScenario, opts: WebRunOptions): Promi
        if (navigated) ts.navigated = true;
        if (!ts.card && record) {
          // Let the result of the action show, and give the narration time to finish.
@@ -382,7 +414,7 @@ index 7857c45..822317c 100644
          await sleepIf(hold);
          const elapsed = now() - ts.start;
          if (elapsed < minDuration) await sleepIf(minDuration - elapsed);
-@@ -202,6 +255,7 @@ export async function runWeb(loaded: LoadedScenario, opts: WebRunOptions): Promi
+@@ -202,6 +260,7 @@ export async function runWeb(loaded: LoadedScenario, opts: WebRunOptions): Promi
      const duration = now();
      await cdp!.send("Page.stopScreencast").catch(() => {});
      await Promise.all(writes);
@@ -390,7 +422,7 @@ index 7857c45..822317c 100644
      frames.sort((a, b) => a[0] - b[0]);
      if (frames.length === 0) throw new Error("The browser produced no frames. Is the page blank?");
  
-@@ -218,6 +272,7 @@ export async function runWeb(loaded: LoadedScenario, opts: WebRunOptions): Promi
+@@ -218,6 +277,7 @@ export async function runWeb(loaded: LoadedScenario, opts: WebRunOptions): Promi
        cursorStart,
        source: { kind: "frames", dir: "frames", frames },
        steps,
@@ -398,7 +430,7 @@ index 7857c45..822317c 100644
      };
      return { take };
    } finally {
-@@ -238,15 +293,71 @@ interface StepCtx {
+@@ -238,15 +298,71 @@ interface StepCtx {
    minDuration: number;
    typingSpeed: number;
    seed: number;
@@ -470,7 +502,7 @@ index 7857c45..822317c 100644
      await page.mouse.move(point.x, point.y);
      ts.point = point;
      ts.box = box;
-@@ -308,6 +419,32 @@ async function runStep(page: Page, step: Step, ts: TakeStep, cursor: Point, ctx:
+@@ -308,6 +424,32 @@ async function runStep(page: Page, step: Step, ts: TakeStep, cursor: Point, ctx:
        const { box, point } = await resolve(s.click);
        const p = await travelTo(box, point);
        ts.actionAt = now();
@@ -503,7 +535,7 @@ index 7857c45..822317c 100644
        await page.mouse.click(p.x, p.y, { button: s.button ?? "left", clickCount: s.double ? 2 : 1 });
        await settleAfterAction(page, ts, now, record);
        return p;
-@@ -495,10 +632,14 @@ async function clickablePoint(locator: Locator, box: Box, ts: TakeStep, target:
+@@ -495,10 +637,14 @@ async function clickablePoint(locator: Locator, box: Box, ts: TakeStep, target:
  }
  
  /** After a click or a key: wait for a navigation or network burst, and mark the time as waiting. */
@@ -520,13 +552,23 @@ index 7857c45..822317c 100644
    if (waited > 0.6) ts.waits.push([w0, now()]);
  }
 diff --git a/src/login.ts b/src/login.ts
-index a7e65c6..65cd4a0 100644
+index a7e65c6..8dece39 100644
 --- a/src/login.ts
 +++ b/src/login.ts
-@@ -22,14 +22,69 @@ export async function login(url: string, out: string, log: (msg: string) => void
+@@ -20,20 +20,88 @@ export async function login(url: string, out: string, log: (msg: string) => void
+   }
+   const file = path.resolve(out);
    fs.mkdirSync(path.dirname(file), { recursive: true });
-   const browser = await launchBrowser({ headless: false });
-   const context = await browser.newContext({ viewport: null });
+-  const browser = await launchBrowser({ headless: false });
+-  const context = await browser.newContext({ viewport: null });
++  // NAVI_LOGIN_HEADLESS / NAVI_LOGIN_CLOSE_AFTER (ms): tests only. The page closes by itself after that long, as if
++  // the person had closed the window, so the whole flow can be checked without a window or a password.
++  const testClose = Number(process.env.NAVI_LOGIN_CLOSE_AFTER || 0);
++  const browser = await launchBrowser({ headless: !!process.env.NAVI_LOGIN_HEADLESS });
++  // NAVI: start from the session already saved for this login, so "Log in" again shows the person still logged in,
++  // and a second window can't replace a good session with a logged-out one (Andy, 13 Nov 2026).
++  const existing = fs.existsSync(file) ? JSON.parse(fs.readFileSync(file, "utf8")) : undefined;
++  const context = await browser.newContext({ viewport: null, storageState: existing });
 +  // NAVI: tick "remember me" wherever the site offers it (Andy, 11 Nov 2026), so a saved login lasts as long as the
 +  // site allows. Only a checkbox whose own label says so, only once (if the person unticks it, it stays unticked);
 +  // nothing is typed or submitted.
@@ -556,11 +598,13 @@ index a7e65c6..65cd4a0 100644
    const page = await context.newPage();
  
    let saved = false;
++  let lastWritten = existing ? JSON.stringify(existing, null, 2) : "";
 +  // NAVI: never use context.storageState() here. For any site visited earlier whose tab has moved on, Playwright
 +  // opens a helper tab to read its storage; in this visible browser that tab is real, so macOS brings the browser to
 +  // the front on every save (every 2 seconds), taking over the Mac. Instead read cookies from the browser and each
 +  // open frame's localStorage, keeping what earlier pages had, which never opens anything.
 +  const storage = new Map<string, { name: string; value: string }[]>();
++  for (const o of existing?.origins ?? []) storage.set(o.origin, o.localStorage);   // keep what was saved before
 +  const readStorage = async () => {
 +    for (const p of context.pages()) {
 +      for (const f of p.frames()) {
@@ -593,9 +637,35 @@ index a7e65c6..65cd4a0 100644
 +        snapshot(),
          new Promise<never>((_, reject) => setTimeout(() => reject(new Error("timeout")), 3000)),
        ]);
-       fs.writeFileSync(`${file}.part`, JSON.stringify(state, null, 2), { mode: 0o600 });
+-      fs.writeFileSync(`${file}.part`, JSON.stringify(state, null, 2), { mode: 0o600 });
+-      fs.renameSync(`${file}.part`, file);
++      // NAVI: write only when something changed, so a login left open doesn't keep the file "newer" than every check
++      const json = JSON.stringify(state, null, 2);
++      if (json !== lastWritten) {
++        fs.writeFileSync(`${file}.part`, json, { mode: 0o600 });
++        fs.renameSync(`${file}.part`, file);
++        lastWritten = json;
++      }
+       saved = true;
+     } catch {
+       /* the window is closing: keep the last saved state */
+@@ -72,8 +140,13 @@ export async function login(url: string, out: string, log: (msg: string) => void
+   await Promise.race([page.goto(url).catch(() => {}), finished]);
+   log("In the browser window: sign in, or pass the check if the site asks for one. Then close the window (or press Enter here).");
+   await save();
+-  const poll = setInterval(save, 2000);
++  const poll = setInterval(() => {
++    void save();
++    // NAVI: belt and braces: no page left open (whatever events fired) ends the login
++    if (context.pages().every((p) => p.isClosed())) done();
++  }, 2000);
+   if (context.pages().length === 0) done();
++  if (testClose) setTimeout(() => void page.close().catch(() => {}), testClose);
+   await finished;
+   clearInterval(poll);
+   await save();
 diff --git a/src/scenario/schema.ts b/src/scenario/schema.ts
-index d9193de..6ad3fb1 100644
+index d9193de..2154607 100644
 --- a/src/scenario/schema.ts
 +++ b/src/scenario/schema.ts
 @@ -69,6 +69,11 @@ const Click = z
@@ -610,7 +680,18 @@ index d9193de..6ad3fb1 100644
      ...Common,
    })
    .strict();
-@@ -270,6 +275,31 @@ export const Scenario = z
+@@ -264,12 +269,42 @@ export const Scenario = z
+       .optional()
+       .describe("Web: browser size in CSS pixels (default: the video's shape with a longer side of 1440, such as 1440x810 for 16:9, so the page fills the frame when padding is 0)."),
+     scale: z.number().min(1).max(3).optional().describe("Web: device pixel ratio of the capture (default 2, Retina)."),
++    // NAVI: phone emulation (Playwright's own device profiles), for videos filmed "on a phone"
++    device: z
++      .string()
++      .optional()
++      .describe("Web: emulate a phone or tablet from Playwright's device list, e.g. \"iPhone 15\": its screen size, user agent, touch and mobile layout (the capture keeps `scale`). Overrides `viewport`."),
+     colorScheme: z.enum(["light", "dark"]).optional(),
+     locale: z.string().optional().describe("Web: browser locale, e.g. fr-FR."),
+     auth: z
        .object({ storageState: z.string().describe("Path to a session saved by `screenplay login`.") })
        .optional(),
      hideScrollbars: z.boolean().optional().describe("Web: hide scrollbars (default true)."),

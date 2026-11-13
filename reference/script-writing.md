@@ -60,11 +60,14 @@ the batch (`--batch`). A repeat of a recent video is an error like any other. Re
 }
 ```
 
-- `do` is one of `goto` (first section, `"on": "start"`), `click`, `type` (with `text`, and `into` for a field to click first), `press` (with `key`), `hover`, or `highlight` (the cursor goes there; NAVI never adds a spotlight).
+- `do` is one of `goto` (first section, `"on": "start"`; a later section may open another page or site with a `goto` on its `"start"`), `click`, `type` (with `text`, and `into` for a field to click first), `press` (with `key`), `hover`, or `highlight` (the cursor goes there; NAVI never adds a spotlight).
 - `target` uses the recorder's way of naming things: `text=…`, `placeholder=…`, `role=button[name='…']`, `label=…`, `testid=…`, or a CSS selector.
 - Optional settings: `privacy` (see `privacy.md`), `captions` (`burn`, `file` or `off`), `corner_label` + `corner_text`, `caption_look`, `speed_copy` (for example `1.35`), `export_to` (the folder for the files).
 - This is one script, not the pattern: the next one must not open this way (voice-rules.md, Variety). `examples/test-todo-b.json` was recorded and approved before the variety rules and is written to the old recipe ("Right, so,", "Okay. So now,"); `examples/variety/` holds it and three others next to their rewrites.
 - `"style"` is the style of the day (`scripts/script/style.py`); the checker and the voice step read it.
+- **Two or more logins in one video** (X and Google Sheets, Claude and Grok): `"seats": [{"site": "x.com", "seat": "owner"}, {"site": "google.com", "seat": "owner"}]`, and every section names the site whose login its steps use (`"seat": "google.com"`). One browser holds every login (`scripts/seats/seats.py` merged_login), the action guard checks each site with its own pack, and the batch preflight checks every login. The checker refuses a section with no seat, or one that opens the other login's site. A video that must show public pages as a visitor uses the seat `"logged-out"`.
+- **House rules** (`scripts/script/house_rules.py`): `"never_name"` lists words the voice and captions must never say (a course that never names the tools its videos are made with); `"spelling": "UK"` or `"US"` holds the captions to one spelling.
+- **A batch from a rich list** (`batch.py new --list videos.json`): one object per video with its own start page, logins, privacy, length, spelling, never_name, lesson file (copied into the video's folder) and brief (what it's for, start to end, what gets created, what never shows); the planner, explorer and writer all get the brief.
 
 ## What the checker can't judge
 

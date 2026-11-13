@@ -1,0 +1,105 @@
+{
+ "site": "claude.ai",
+ "_about": "The action guard's pack for claude.ai (scripts/guard/guard.mjs). First draft 13 Nov 2026, for videos on the owner's REAL Claude account. Claude sends changes as REST calls under /api/. Chats are allowed only when the job asks for a prompt; billing, plan changes, API keys, members and invites, connectors, settings and deleting are blocked; everything else is blocked by default. To be completed from logged runs (explore.mjs --learn). Note: what Claude does THROUGH a connector (the Whop MCP) leaves from Anthropic's servers, not this browser, so no guard here can see it.",
+ "own_hosts": "(^|\\.)(claude\\.ai|anthropic\\.com|claude\\.com)$",
+ "ignore": [
+  {
+   "label": "analytics and client events",
+   "path": "/(api/)?(event_logging|events?|telemetry|metrics|statsig|segment|v1/t|v1/rgstr|track)(/|$)"
+  },
+  {
+   "label": "analytics hosts",
+   "host": "(^|\\.)(statsig\\.com|statsigapi\\.net|segment\\.io|segment\\.com|sentry\\.io|intercom\\.io|google-analytics\\.com|featureassets\\.org|prodregistryv2\\.org)$"
+  }
+ ],
+ "reads": [],
+ "read_requests": [],
+ "dangerous": [
+  {
+   "category": "pay",
+   "reason": "paying, upgrading or changing the plan (a real charge)",
+   "match": [
+    {
+     "host": "(^|\\.)(stripe\\.com|stripe\\.network|paypal\\.com)$",
+     "method": "POST"
+    },
+    {
+     "path": "(billing|subscription|checkout|payment|upgrade|invoice|purchase|plan)",
+     "method": "POST|PUT|PATCH|DELETE"
+    }
+   ]
+  },
+  {
+   "category": "secret",
+   "reason": "creating or revealing API keys",
+   "match": [
+    {
+     "path": "(api_keys?|apikeys?|/keys)(/|$)",
+     "method": "POST|PUT|PATCH|DELETE"
+    }
+   ]
+  },
+  {
+   "category": "team",
+   "reason": "changing members, invites or the organisation",
+   "match": [
+    {
+     "path": "/(members|invites?|invitations|roles)(/|$)",
+     "method": "POST|PUT|PATCH|DELETE"
+    }
+   ]
+  },
+  {
+   "category": "connectors",
+   "reason": "adding, removing or authorising connectors",
+   "match": [
+    {
+     "path": "(mcp|integration|connector|oauth|remote_servers?|sync)",
+     "method": "POST|PUT|PATCH|DELETE"
+    }
+   ]
+  },
+  {
+   "category": "account",
+   "reason": "changing the account, its profile, memory or settings",
+   "match": [
+    {
+     "path": "/(account|profile|settings|preferences|memory|email|phone|password)(/|$|_)",
+     "method": "POST|PUT|PATCH|DELETE"
+    }
+   ]
+  },
+  {
+   "category": "delete",
+   "reason": "deleting anything in Claude",
+   "match": [
+    {
+     "method": "DELETE"
+    }
+   ]
+  },
+  {
+   "category": "share",
+   "reason": "sharing or publishing a chat or an artifact",
+   "match": [
+    {
+     "path": "(share|publish|snapshot)",
+     "method": "POST|PUT|PATCH"
+    }
+   ]
+  }
+ ],
+ "changes": [
+  {
+   "id": "claude-message",
+   "label": "starting a chat and sending a prompt to Claude",
+   "asked_by": "\\b(claude)\\b.{0,80}\\b(prompt|ask|paste|sort|chat|message|run)|\\b(prompt|paste|ask)\\b.{0,80}\\bclaude\\b",
+   "match": [
+    {
+     "path": "^/api/organizations/[^/]+/chat_conversations(/[^/]+)?(/completion|/retry_completion|/title)?/?$",
+     "method": "POST|PUT"
+    }
+   ]
+  }
+ ]
+}
