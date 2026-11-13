@@ -17,7 +17,7 @@ import { fileURLToPath } from "node:url";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
 const { launchBrowser, realUserAgent } = await import(path.join(ROOT, "recorder", "agent-screenplay", "dist", "drivers", "browser.js"));
-const { config, sessionFile, guardConfig, dataDir } = await import(path.join(ROOT, "scripts", "seats", "seats.mjs"));
+const { config, sessionFile, guardConfig, dataDir, defaultSeat } = await import(path.join(ROOT, "scripts", "seats", "seats.mjs"));
 const { installGuard, loadPack } = await import(path.join(ROOT, "scripts", "guard", "guard.mjs"));
 
 const argv = process.argv.slice(2);
@@ -33,6 +33,20 @@ for (const [site, s] of Object.entries(cfg)) {
   for (const [seat, info] of Object.entries(s.seats || {})) {
     if (opt("seat") && seat !== opt("seat")) continue;
     wanted.push({ site, seat, home: info.home || `https://${site}/` });
+  }
+}
+// every other saved login too (a login file with no seats.json entry: saved before seats, or by hand), so no saved
+// login is left "Not checked yet" for good; its home is the site's front page
+const loginsDir = path.join(dataDir(), "logins");
+for (const entry of fs.existsSync(loginsDir) ? fs.readdirSync(loginsDir) : []) {
+  if (entry.startsWith("_") || entry.startsWith(".")) continue;
+  const p = path.join(loginsDir, entry);
+  const found = entry.endsWith(".json") ? [[entry.slice(0, -5), defaultSeat(entry.slice(0, -5))]]
+    : fs.statSync(p).isDirectory() ? fs.readdirSync(p).filter((f) => f.endsWith(".json")).map((f) => [entry, f.slice(0, -5)]) : [];
+  for (const [site, seat] of found) {
+    if (opt("site") && site !== loginSite(opt("site"))) continue;
+    if (opt("seat") && seat !== opt("seat")) continue;
+    if (!wanted.some((w) => w.site === site && w.seat === seat)) wanted.push({ site, seat, home: `https://${site}/` });
   }
 }
 const pages = (opt("pages") || "").split(",").filter(Boolean);
@@ -90,5 +104,14 @@ for (const w of wanted) {
   all[`${w.site}/${w.seat}`] = r;
 }
 fs.mkdirSync(path.dirname(statusFile), { recursive: true });
-fs.writeFileSync(statusFile, JSON.stringify(all, null, 1), { mode: 0o600 });
+// two checks can run at once (the one after a login window closes, and "Check now"): keep whichever result is newer
+// for each login, so a slower check never puts back an older one
+try {
+  const now = JSON.parse(fs.readFileSync(statusFile, "utf8"));
+  for (const [k, v] of Object.entries(now)) if (!all[k] || (v?.checked ?? 0) > (all[k].checked ?? 0)) all[k] = v;
+} catch {
+  /* first check */
+}
+fs.writeFileSync(`${statusFile}.part`, JSON.stringify(all, null, 1), { mode: 0o600 });
+fs.renameSync(`${statusFile}.part`, statusFile);
 console.log(JSON.stringify(results));
