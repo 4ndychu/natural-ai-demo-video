@@ -339,8 +339,16 @@ def start_login(url, seat=None):
                 'message': f'The login window for {site} is already open (it may be behind other windows). Finish there and close it.'}
     path = login_file(site, seat)
     os.makedirs(os.path.dirname(path), mode=0o700, exist_ok=True)
+    url = url if '://' in url else 'https://' + url
+    # a site added from Settings > Logins ("Add a site") gets its seat in seats.json, with the page it was logged in
+    # on as its home, so "Check now" and the check after the window closes check it like every other login (before,
+    # only seats.json sites were checked: an added site stayed "Not checked yet" for good)
+    cfg = seats.config()
+    if site not in cfg:
+        cfg[site] = {'seats': {seat: {'label': seat.title(), 'home': url}}}
+        seats.save_config(cfg)
     proc = subprocess.Popen(['node', os.path.join(ROOT, 'recorder', 'agent-screenplay', 'dist', 'cli.js'), 'login',
-                             url if '://' in url else 'https://' + url, '--out', path],
+                             url, '--out', path],
                             stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     open_now[key] = {'pid': proc.pid, 'started': time.time()}
     _write(_windows_file(), open_now)
