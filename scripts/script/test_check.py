@@ -24,18 +24,22 @@ for sec in bad['sections']:
     good = got == want
     ok &= good
     rows.append(f"| {sec['name']} | {', '.join(want) or 'no error'} | {', '.join(got) or 'no error'} | {'pass' if good else '**FAIL**'} |")
-all_approved = [i for i in check(json.load(open(os.path.join(ROOT, 'examples', 'test-todo-b.json'))), os.path.join(ROOT, 'examples'), history=[])
-                if i['level'] == 'error']
-# test-todo-b was approved before positions were checked (Andy, 2026-11-10): its "down at the bottom" is the bottom of
-# the to-do list, not of the screen. The position check must catch exactly that. It was also written to the old
-# recipe ("Right, so," then "Okay. So now,"), which the variety check now refuses (Andy, 11 Nov 2026: every video
-# sounded the same): exactly that start-marker error, and nothing else may fail.
-approved = [i for i in all_approved if i['code'] not in ('position', 'start-marker')]
-pos = [i for i in all_approved if i['code'] == 'position']
-good = not approved and len(pos) == 2 and all('bottom' in i['message'] for i in pos) and any(i['code'] == 'start-marker' for i in all_approved)
+todo = json.load(open(os.path.join(ROOT, 'examples', 'test-todo-b.json')))
+shipped = [i for i in check(todo, os.path.join(ROOT, 'examples'), history=[]) if i['level'] == 'error']
+ok &= not shipped
+rows.append(f"| the to-do example as shipped (test-todo-b) | no error | {', '.join(i['code'] for i in shipped) or 'no error'} | {'pass' if not shipped else '**FAIL**'} |")
+# The same example as first approved, before positions and starts were checked: "down at the bottom" (the bottom of
+# the to-do list, not of the screen) twice, and the old recipe's starts ("Right, so," then "Okay. So now,"). The
+# position check must catch exactly those two, the variety check that start-marker, and nothing else may fail.
+old = json.loads(json.dumps(todo).replace('Now down at the bottom of the list you can', 'Okay. So now, down at the bottom you can')
+                 .replace('At the bottom of the list, switch', 'At the bottom, switch'))
+all_old = [i for i in check(old, os.path.join(ROOT, 'examples'), history=[]) if i['level'] == 'error']
+others = [i for i in all_old if i['code'] not in ('position', 'start-marker')]
+pos = [i for i in all_old if i['code'] == 'position']
+good = not others and len(pos) == 2 and all('bottom' in i['message'] for i in pos) and any(i['code'] == 'start-marker' for i in all_old)
 ok &= good
-rows.append(f"| approved script (test-todo-b) | its 2 known position errors and the old recipe's start-marker | "
-            f"{', '.join(i['code'] for i in all_approved) or 'no error'} | {'pass' if good else '**FAIL**'} |")
+rows.append(f"| the to-do example as first approved | its 2 position errors and the old recipe's start-marker | "
+            f"{', '.join(i['code'] for i in all_old) or 'no error'} | {'pass' if good else '**FAIL**'} |")
 whop = json.load(open(os.path.join(ROOT, 'examples', 'script-checker', 'position-whop.json')))
 got = [i['message'] for i in check(whop, os.path.join(ROOT, 'examples', 'script-checker')) if i['code'] == 'position']
 good = len(got) == 2 and all('bottom right' in m for m in got)
