@@ -1,5 +1,7 @@
 # Moving the repo out of iCloud (after `production-ready` merges)
 
+**Done 13 Nov 2026.** The repo lives in `~/Developer/natural-ai-demo-video`; `output` is a plain git-ignored folder there. Kept below as the record of how it was done.
+
 **Why:** `~/Documents` is synced by iCloud (Desktop & Documents is on; checked 12 Nov 2026). iCloud made 23 " 2" copies of
 repo files in one afternoon, and it uploads everything in `output/` and `.venv/` (about 2 GB) for nothing. The repo
 moves to `~/Developer/natural-ai-demo-video`, which iCloud doesn't touch. NAVI's own data

@@ -22,6 +22,5 @@ profiles/
 recorder/polish/dist/
 # the script history (scripts/script/variety.py) lives in $NAVI_DATA, outside the repo; never commit one
 script-history*.jsonl
-# the work folder is kept out of iCloud sync while the repo lives in ~/Documents: output -> output.nosync
+# the work folder: recordings, takes and test runs stay on this Mac
 output
-output.nosync/

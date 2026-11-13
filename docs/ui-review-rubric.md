@@ -92,7 +92,7 @@ A candidate change stays only if it wins the majority of reviewers' comparisons 
 > You are the {LENS} reviewer for NAVI, a desktop app that turns a typed brief into a narrated screen-recording demo video. Read `docs/UI_BRIEF.md`, `docs/ui-review-rubric.md` and `docs/ui-review-calibration.md` in {REPO} first. Use only your lens's criteria and the overdesign guard.
 > Part A, the blind comparisons: in {AB_DIR}, each screen has `{screen}__X.png` and `{screen}__Y.png` (light 1440, dark 1440, and 390 where present). For each screen, say which is better (X, Y or same), why (1–2 concrete reasons), and any guard hits. You don't know which is old.
 > Part B, the scores: score every screen in {NEW_DIR} on the rubric scale against the calibration anchors, with up to 5 located fixes per screen, most important first.
-> {Q only: Part C: run the flows listed in the rubric with Playwright (`require('/Users/andychu/Documents/natural-ai-demo-video/recorder/agent-screenplay/node_modules/playwright-core')`) against `file://{REPO}/ui/index.html`, and report each problem with the exact steps to reproduce.}
+> {Q only: Part C: run the flows listed in the rubric with Playwright (`require('<repo>/recorder/agent-screenplay/node_modules/playwright-core')`) against `file://{REPO}/ui/index.html`, and report each problem with the exact steps to reproduce.}
 > Write `{OUT}` with a section "A/B" (a table: screen | better | why | guard), a section "Scores" (a table: screen | score), and "Fixes". Final reply: the A/B table and the score table only.
 
 ### Judge prompt

@@ -1,6 +1,6 @@
 # NAVI build brief (for Claude Code / T3 Code)
 
-You're building **NAVI**, a Claude skill that makes natural-sounding, faceless demo videos. The repo is `~/Documents/natural-ai-demo-video` (GitHub: `4ndychu/natural-ai-demo-video`, public). Andy owns it and judges every output by ear and eye. He is new to the terminal: explain anything he has to do in plain words, one step at a time.
+You're building **NAVI**, a Claude skill that makes natural-sounding, faceless demo videos. The repo is `~/Developer/natural-ai-demo-video` (GitHub: `4ndychu/natural-ai-demo-video`, public). Andy owns it and judges every output by ear and eye. He is new to the terminal: explain anything he has to do in plain words, one step at a time.
 
 ## Read first, in this order
 

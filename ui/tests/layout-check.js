@@ -15,7 +15,7 @@
 // Two attributes mark deliberate cases: data-lc-layers (children drawn in layers, like a slider's fill under its label)
 // and data-lc-scroll (a strip meant to be swiped sideways, like the step strip on phones).
 // Playwright comes from the recorder's install, so nothing new is installed. Set PLAYWRIGHT to point elsewhere.
-const PW = process.env.PLAYWRIGHT || '/Users/andychu/Documents/natural-ai-demo-video/recorder/agent-screenplay/node_modules/playwright-core';
+const PW = process.env.PLAYWRIGHT || require('path').join(__dirname, '..', '..', 'recorder', 'agent-screenplay', 'node_modules', 'playwright-core');
 const { chromium } = require(PW);
 const path = require('path'); const fs = require('fs');
 const UI = 'file://' + path.resolve(process.env.UI_DIR || path.join(__dirname, '..')) + '/index.html';

@@ -2,8 +2,9 @@
 import glob, json, os, subprocess, sys, time
 from crisperwhisper import CrisperWhisperModel
 CAP, K = int(sys.argv[1]), int(sys.argv[2])
-ROOT = os.path.expanduser('~/Documents/natural-ai-demo-video/output/research')
-FF = os.path.expanduser('~/Documents/natural-ai-demo-video/.venv/bin/ffmpeg')
+REPO = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..'))
+ROOT = os.path.join(REPO, 'output', 'research')
+FF = os.path.join(REPO, '.venv', 'bin', 'ffmpeg')
 files = sorted(glob.glob(f'{ROOT}/demos/casual/*.m4a')) + sorted(glob.glob(f'{ROOT}/demos/polished/*.m4a'))
 todo = [p for p in files if not os.path.exists(f"{ROOT}/transcripts/{p.split('/')[-2]}__{os.path.basename(p)[:-4]}.json")]
 mine = todo[K::2]
