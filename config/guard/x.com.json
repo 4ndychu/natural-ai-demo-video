@@ -13,6 +13,11 @@
    "path": "/(1\\.1/)?jot/|/client_event|/scribe|/i/jot"
   },
   {
+   "label": "X's ad-click tracking and the page's own failed-script reports (seen logged out and on Cloudflare checks)",
+   "method": "POST",
+   "path": "^/i/(adsctp|script-load-failure)$"
+  },
+  {
    "label": "live counts on the posts in view (which posts to send like and repost counts for)",
    "path": "^/(i/api/)?1\\.1/live_pipeline/update_subscriptions$"
   },

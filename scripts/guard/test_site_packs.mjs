@@ -61,6 +61,8 @@ both("x.com", "link the X account to a Grok account", rest("POST", "https://grok
 check("x.com", "Grok intro 'Not now', job asks for Grok", bare("PutClientEducationFlag"), ["grok-intro"], "allow");
 check("x.com", "Grok intro 'Not now', job doesn't", bare("PutClientEducationFlag"), [], "block");
 check("x.com", "timeline read sent by POST", bare("HomeTimeline"), [], "allow");
+check("x.com", "ad-click tracking (logged out)", rest("POST", "https://x.com/i/adsctp", "x"), [], "allow");
+check("x.com", "the page's failed-script report", rest("POST", "https://x.com/i/script-load-failure", "failedScript=api"), [], "allow");
 check("x.com", "Grok prompt (grok.x.com), job asks for Grok", rest("POST", "https://grok.x.com/2/grok/add_response.json", "{}"), ["grok-message"], "allow");
 check("x.com", "Grok prompt, job asks for Grok", rest("POST", "https://x.com/i/api/2/grok/add_response.json", '{"message":"hi"}'), ["grok-message"], "allow");
 check("x.com", "Grok prompt, job doesn't ask", rest("POST", "https://x.com/i/api/2/grok/add_response.json", '{"message":"hi"}'), [], "block");
