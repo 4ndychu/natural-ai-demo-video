@@ -68,7 +68,7 @@ b = batch.new('Runner check', 'Adding your first task\nAdding a few more\nA page
 bid = b['id']
 d1, d2, d3 = b['items']
 approved = json.load(open(os.path.join(ROOT, 'examples', 'test-todo-b.json')))
-sections = json.loads(json.dumps(approved['sections']).replace('down at the bottom', 'down at the bottom of the list').replace('At the bottom', 'At the bottom of the list'))
+sections = json.loads(json.dumps(approved['sections']))
 for d in (d1, d2):
     f = store.demo_dir(d)
     t = json.load(open(os.path.join(f, 'script.template.json')))

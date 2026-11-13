@@ -35,9 +35,7 @@ import store  # noqa: E402
 
 ok, rows, calls = True, [], []
 APPROVED = json.load(open(os.path.join(ROOT, 'examples', 'test-todo-b.json')))
-# as in test_batch.py: the approved script's "down at the bottom" is said as the position check wants it
-APPROVED['sections'] = json.loads(json.dumps(APPROVED['sections']).replace('down at the bottom', 'down at the bottom of the list')
-                                  .replace('At the bottom', 'At the bottom of the list'))
+APPROVED['sections'] = json.loads(json.dumps(APPROVED['sections']))
 
 
 def check(name, cond, detail=''):

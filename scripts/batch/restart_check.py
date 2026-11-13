@@ -42,7 +42,7 @@ def start():
         sys.exit("The saved test takes aren't here (output/test-todo-v4), so the practice batch can't be made without spending credits.")
     b = batch.new('Restart check', 'Practice video one\nPractice video two\n', 'https://demo.playwright.dev/todomvc', export_to=os.path.expanduser('~/Movies/NAVI/Restart check'))   # never used: the practice batch exports nothing
     approved = json.load(open(os.path.join(ROOT, 'examples', 'test-todo-b.json')))
-    sections = json.loads(json.dumps(approved['sections']).replace('down at the bottom', 'down at the bottom of the list').replace('At the bottom', 'At the bottom of the list'))
+    sections = json.loads(json.dumps(approved['sections']))
     for d in b['items']:
         f = store.demo_dir(d)
         t = json.load(open(os.path.join(f, 'script.template.json')))
