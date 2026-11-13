@@ -1,20 +1,79 @@
 {
  "site": "x.com",
- "_about": "The action guard's pack for x.com (X and Grok; scripts/guard/guard.mjs). First draft 13 Nov 2026 from X's known operation names, for videos on the owner's REAL X account (Andy, 13 Nov 2026: real accounts, the guard blocks posting, payments and anything risky). X sends changes as GraphQL mutations (POST /i/api/graphql/<id>/<Operation>) and a few REST calls (/i/api/1.1/...). The owner's X is a real account, so every change not listed under 'changes' and asked for by the job is blocked (default deny). To be completed from logged runs (explore.mjs --learn).",
+ "_about": "The action guard's pack for x.com (X and Grok; scripts/guard/guard.mjs), for videos on the owner's REAL X account (@ecomchigga; Andy, 13 Nov 2026: real accounts, the guard blocks posting, payments and anything risky). First draft from X's operation names; ignore, reads and the Grok rules from logged runs on 13 Nov 2026 (output/guard-learn/x.com*, explore.mjs --learn: home, a profile, search, Grok, Premium sign-up). X sends changes as GraphQL mutations (POST /i/api/graphql/<id>/<Operation>) and REST calls (/i/api/1.1/...). Every change not listed under 'changes' and asked for by the job is blocked (default deny). X often sends an operation without its name in the body, so every operation rule is matched by its address too.",
  "own_hosts": "(^|\\.)(x|twitter)\\.com$",
  "ignore": [
   {
+   "label": "X's own analytics, client events and error logs (log= bodies)",
+   "path": "^/i/api/1\\.1/(flow/timeline\\.json|graphql/(viewer_context|app_context)\\.json|promoted_content/log\\.json)$",
+   "body": "(^|&)(log|event)="
+  },
+  {
    "label": "X's own analytics and client events",
-   "path": "/(1\\.1/)?jot/|/client_event|/scribe|/i/api/1\\.1/live_pipeline/|/i/jot"
+   "path": "/(1\\.1/)?jot/|/client_event|/scribe|/i/jot"
+  },
+  {
+   "label": "live counts on the posts in view (which posts to send like and repost counts for)",
+   "path": "^/(i/api/)?1\\.1/live_pipeline/update_subscriptions$"
+  },
+  {
+   "label": "the browser's own security reports",
+   "path": "^/i/csp_report$"
+  },
+  {
+   "label": "Cloudflare's bot check",
+   "path": "^/cdn-cgi/challenge-platform/"
+  },
+  {
+   "label": "this browser's notification permission, recorded per device",
+   "method": "PUT",
+   "path": "^/i/api/1\\.1/strato/column/None/[^/]+,pushNotifications/clients/permissionsState$"
   },
   {
    "label": "analytics hosts",
    "host": "(^|\\.)(ads-api\\.x\\.com|analytics\\.x\\.com|t\\.co|google-analytics\\.com|doubleclick\\.net|sentry\\.io)$"
   }
  ],
- "reads": [],
- "read_requests": [],
+ "reads": [
+  "^(HomeTimeline|HomeLatestTimeline|SearchTimeline|UserTweets|UserTweetsAndReplies|UserMedia|UserByScreenName|UserByRestId|TweetDetail|TweetResultByRestId|ExplorePage|GenericTimelineById)$"
+ ],
+ "read_requests": [
+  {
+   "label": "timelines, profiles, posts and search (reads sent by POST, named only in the address)",
+   "method": "POST",
+   "path": "^/i/api/graphql/[^/]+/(HomeTimeline|HomeLatestTimeline|SearchTimeline|UserTweets|UserTweetsAndReplies|UserMedia|UserByScreenName|UserByRestId|TweetDetail|TweetResultByRestId|ExplorePage|GenericTimelineById)$"
+  }
+ ],
  "dangerous": [
+  {
+   "category": "pay",
+   "quiet": true,
+   "reason": "X preparing a Premium checkout by itself on every page (refused; no charge; the video carries on)",
+   "match": [
+    {
+     "host": "(^|\\.)grok\\.com$",
+     "path": "PrePurchaseService/CreateCheckoutSession"
+    }
+   ]
+  },
+  {
+   "category": "account",
+   "reason": "linking the X account to a Grok account (an account change)",
+   "match": [
+    {
+     "path": "(link|Link)",
+     "host": "(^|\\.)(x\\.com|grok\\.com|x\\.ai)$",
+     "method": "POST|PUT|PATCH"
+    },
+    {
+     "op": "(Link|link).*(Account|account)|AccountLink",
+     "kind": "mutation|server-action|persisted"
+    },
+    {
+     "path": "^/i/api/graphql/[^/]+/[^/?]*(?:(Link|link).*(Account|account)|AccountLink)[^/?]*$"
+    }
+   ]
+  },
   {
    "category": "post",
    "reason": "posting, replying, quoting or reposting on X",
@@ -22,6 +81,9 @@
     {
      "op": "^(CreateTweet|CreateNoteTweet|CreateScheduledTweet|CreateDraftTweet|EditDraftTweet|CreateRetweet|DeleteRetweet|PinTweet|UnpinTweet|CreateCommunityNote.*|PostTweet.*)$",
      "kind": "mutation|server-action|persisted"
+    },
+    {
+     "path": "^/i/api/graphql/[^/]+/(?:(CreateTweet|CreateNoteTweet|CreateScheduledTweet|CreateDraftTweet|EditDraftTweet|CreateRetweet|DeleteRetweet|PinTweet|UnpinTweet|CreateCommunityNote.*|PostTweet.*))$"
     },
     {
      "path": "/i/api/1\\.1/statuses/(update|retweet)",
@@ -42,6 +104,9 @@
      "kind": "mutation|server-action|persisted"
     },
     {
+     "path": "^/i/api/graphql/[^/]+/(?:(FavoriteTweet|UnfavoriteTweet|CreateBookmark|DeleteBookmark|ListAddMember|ListRemoveMember|CreateList|.*Follow.*|.*Block.*|.*Mute.*))$"
+    },
+    {
      "path": "/i/api/1\\.1/(friendships|blocks|mutes)/",
      "method": "POST"
     }
@@ -58,6 +123,9 @@
     {
      "op": "(DM|DirectMessage|SendMessage)",
      "kind": "mutation|server-action|persisted"
+    },
+    {
+     "path": "^/i/api/graphql/[^/]+/[^/?]*(?:(DM|DirectMessage|SendMessage))[^/?]*$"
     }
    ]
   },
@@ -74,6 +142,9 @@
      "kind": "mutation|server-action|persisted"
     },
     {
+     "path": "^/i/api/graphql/[^/]+/[^/?]*(?:(Subscri|Checkout|Payment|Purchase|Billing|Order|Upgrade|Premium|Tip))[^/?]*$"
+    },
+    {
      "path": "(subscri|checkout|payment|purchase|billing|premium)",
      "method": "POST|PUT|PATCH"
     }
@@ -88,6 +159,9 @@
      "kind": "mutation|server-action|persisted"
     },
     {
+     "path": "^/i/api/graphql/[^/]+/[^/?]*(?:(Profile|Password|TwoFactor|LoginVerification|Email|Phone|Username|Account|Deactivat|Settings|Verification|Backup))[^/?]*$"
+    },
+    {
      "path": "/i/api/1\\.1/account/",
      "method": "POST"
     }
@@ -100,6 +174,9 @@
     {
      "op": "^Delete",
      "kind": "mutation|server-action|persisted"
+    },
+    {
+     "path": "^/i/api/graphql/[^/]+/(?:Delete)[^/?]*$"
     },
     {
      "method": "DELETE"
@@ -124,12 +201,34 @@
    "asked_by": "\\bgrok\\b",
    "match": [
     {
-     "path": "/i/api/2/grok/",
-     "method": "POST"
+     "path": "^/(i/api/)?2/grok/",
+     "method": "POST",
+     "host": "^(grok\\.)?x\\.com$|^api\\.x\\.com$"
     },
     {
      "op": "Grok",
      "kind": "mutation|server-action|persisted"
+    },
+    {
+     "path": "^/i/api/graphql/[^/]+/[^/?]*(?:Grok)[^/?]*$"
+    },
+    {
+     "host": "(^|\\.)grok\\.com$",
+     "path": "^/rest/app-chat/conversations",
+     "method": "POST"
+    }
+   ]
+  },
+  {
+   "id": "grok-intro",
+   "label": "closing Grok's intro box (\"Not now\": saves that its tips were seen)",
+   "asked_by": "\\bgrok\\b",
+   "match": [
+    {
+     "op": "^PutClientEducationFlag$"
+    },
+    {
+     "path": "^/i/api/graphql/[^/]+/(?:PutClientEducationFlag)$"
     }
    ]
   }

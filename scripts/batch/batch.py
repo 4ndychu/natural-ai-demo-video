@@ -265,6 +265,8 @@ def explore_cmd(did, start_url, sub=None):
         cmd += ' --logged-out'
     elif s['login']:
         cmd += f" --seat {s['seat']}"
+    if s['allow'] and s['view'] != 'member':      # the changes the job asks for (a Grok or Claude prompt), as in the take
+        cmd += ' --allow ' + ','.join(s['allow'])
     if t.get('device'):      # filmed on a phone: the explorer uses the same phone profile
         cmd += f" --device '{t['device']}'"
     seat = t.get('seat') or {}

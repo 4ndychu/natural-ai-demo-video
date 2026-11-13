@@ -6,6 +6,7 @@
 //
 //   node scripts/explore/explore.mjs --url https://whop.com/dashboard --site whop.com [--seat owner] --out <folder> [--steps steps.json]
 //
+// --allow a,b: the changes the video's job asks for (the script's seat "allow"; on a real account nothing else changes).
 // --seats x.com:owner,google.com:owner: a video on two or more logins (X and Google Sheets, Claude and Grok): one
 // browser holding every one of them (scripts/seats/seats.py merged_login); the guard checks each site with its own pack.
 // --seat picks which saved login to use (scripts/seats/seats.py; default: the site's default seat). The action guard
@@ -108,7 +109,9 @@ const context = await browser.newContext({
 const guardSite = site || new URL(url).hostname.replace(/^www\./, "");
 let blocked;
 const guardCfg = guardConfig({ site: guardSite, seat, mode: argv.includes("--learn") ? "learn" : "enforce",
-  log: path.join(outAbs, "guard-log.jsonl"), sites: pairs.map(([s]) => s) });
+  log: path.join(outAbs, "guard-log.jsonl"), sites: pairs.map(([s]) => s),
+  // --allow grok-message,claude-message: the changes this video's job asks for (its seat's "allow"), as in the take
+  allow: (opt("allow") || "").split(",").filter(Boolean) });
 guardCfg.logAll = argv.includes("--log-writes"); // log every change the guard lets through too
 const guard = guardCfg.sites.some((x) => loadPack(x)) || guardCfg.sites.length > 1 || argv.includes("--learn")
   ? await installGuard(context, { ...guardCfg, onBlock: (e) => (blocked = e) })

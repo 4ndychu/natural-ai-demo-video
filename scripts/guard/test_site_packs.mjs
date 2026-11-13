@@ -44,6 +44,24 @@ both("x.com", "security: password reset protection", rest("POST", "https://x.com
 both("x.com", "delete: DeleteTweet", persisted("x.com", "DeleteTweet"));
 both("x.com", "delete: any DELETE", rest("DELETE", "https://x.com/i/api/1.1/whatever/1"));
 both("x.com", "API keys: developer portal", rest("POST", "https://developer.x.com/api/apps/new", "{}"));
+// X often names the operation only in the address ({"variables", "queryId"} bodies): still caught by name
+const bare = (op) => describeRequest("POST", `https://x.com/i/api/graphql/AbC123/${op}`, { "content-type": "application/json" },
+  JSON.stringify({ variables: {}, queryId: "AbC123" }));
+for (const [op, cat] of [["CreateTweet", "post"], ["CreateRetweet", "post"], ["FavoriteTweet", "engage"], ["CreateBookmark", "engage"],
+  ["DeleteTweet", "delete"], ["useSendMessageMutation", "dm"]]) {
+  const res = classify(bare(op), loadPack("x.com"), { ...own, allow: ["grok-message", "grok-intro"] });
+  const ok = res.verdict === "block" && res.category === cat && !res.quiet;
+  if (!ok) fails++;
+  console.log(`${ok ? "ok  " : "FAIL"}  x.com: ${op} named only in the address -> ${res.verdict} (${res.category})`);
+}
+const quiet = classify(rest("POST", "https://grok.com/commerce.prepurchase.v1.PrePurchaseService/CreateCheckoutSession", "x"), loadPack("x.com"), { ...own, allow: [] });
+if (!(quiet.verdict === "block" && quiet.quiet)) fails++;
+console.log(`${quiet.verdict === "block" && quiet.quiet ? "ok  " : "FAIL"}  x.com: X's background checkout prefetch -> refused quietly, the run carries on`);
+both("x.com", "link the X account to a Grok account", rest("POST", "https://grok.com/rest/auth/link-account", "{}"));
+check("x.com", "Grok intro 'Not now', job asks for Grok", bare("PutClientEducationFlag"), ["grok-intro"], "allow");
+check("x.com", "Grok intro 'Not now', job doesn't", bare("PutClientEducationFlag"), [], "block");
+check("x.com", "timeline read sent by POST", bare("HomeTimeline"), [], "allow");
+check("x.com", "Grok prompt (grok.x.com), job asks for Grok", rest("POST", "https://grok.x.com/2/grok/add_response.json", "{}"), ["grok-message"], "allow");
 check("x.com", "Grok prompt, job asks for Grok", rest("POST", "https://x.com/i/api/2/grok/add_response.json", '{"message":"hi"}'), ["grok-message"], "allow");
 check("x.com", "Grok prompt, job doesn't ask", rest("POST", "https://x.com/i/api/2/grok/add_response.json", '{"message":"hi"}'), [], "block");
 check("x.com", "a change the pack can't name", persisted("x.com", "SomethingNew"), ["grok-message"], "block");
@@ -67,6 +85,18 @@ check("claude.ai", "new chat, job asks for a Claude prompt", rest("POST", `${org
 check("claude.ai", "send prompt, job asks", rest("POST", `${org}/chat_conversations/abc/completion`, '{"prompt":"hi"}'), ["claude-message"], "allow");
 check("claude.ai", "send prompt, job doesn't ask", rest("POST", `${org}/chat_conversations/abc/completion`, '{"prompt":"hi"}'), [], "block");
 check("claude.ai", "a change the pack can't name", rest("POST", `${org}/projects`, "{}"), ["claude-message"], "block");
+
+// claude.ai's real addresses (logged 13 Nov 2026)
+const rpc = (m, body) => rest("POST", `https://claude.ai/claudeai-rpc/anthropic.bard.api.v1alpha.ConversationService/${m}`, body);
+const mcp = (method) => rest("POST", "https://claude.ai/v1/toolbox/shttp/mcp/fe145411-913f-4102-a4f3-2b31dfa86e67", JSON.stringify({ jsonrpc: "2.0", id: 1, method, params: {} }));
+check("claude.ai", "connector discovery on page load", mcp("server/discover"), [], "allow");
+check("claude.ai", "connector initialize on page load", mcp("initialize"), [], "allow");
+both("claude.ai", "a connector action sent from the page (tools/call)", mcp("tools/call"));
+check("claude.ai", "reading the conversation (StreamTimeline)", rpc("StreamTimeline", "x"), [], "allow");
+check("claude.ai", "sending a prompt (PerformAction), job asks", rpc("PerformAction", "Say hello claude-opus-5-5"), ["claude-message"], "allow");
+check("claude.ai", "sending a prompt (PerformAction), job doesn't ask", rpc("PerformAction", "Say hello claude-opus-5-5"), [], "block");
+check("claude.ai", "another PerformAction (no model in it)", rpc("PerformAction", "rename"), ["claude-message"], "block");
+check("claude.ai", "page-speed reports", rest("POST", "https://claude.ai/api/v2/rum", "x"), [], "allow");
 
 console.log(fails ? `\n${fails} FAILED` : "\nall site-pack checks passed");
 process.exit(fails ? 1 : 0);

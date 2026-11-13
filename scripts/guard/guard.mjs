@@ -13,6 +13,9 @@
 //                                                                                            allowed that change
 //   - any other change in the test business                                               -> allowed
 //   - a change the pack can't name, in a real business                                    -> blocked (default deny)
+//   - a dangerous rule marked "quiet" (a site's own background call, e.g. X preparing a
+//     Premium checkout on every page load)                                                -> refused and logged,
+//                                                                                            the run carries on
 // A blocked request is aborted, written to the guard log (one JSON line each) and, in enforce mode, the run is
 // stopped: the caller fails that video with the reason. Nothing ever asks the user mid-run.
 //
@@ -87,7 +90,9 @@ export function classify(req, pack, opts) {
     if (!(d.match || []).some(dangerMatch)) continue;
     if (d.category === "delete" && allowTestDeletes && business?.test && (d.test_delete_ok || []).some((k) => text.includes(k)))
       return { verdict: "allow", why: `deleting NAVI's own test item in the test business ${business.name}` };
-    return { verdict: "block", category: d.category, why: d.reason };
+    // quiet: something the site sends by itself in the background (X preparing a checkout on every page): refused,
+    // logged, and the run carries on, since nothing the video does asked for it
+    return { verdict: "block", category: d.category, why: d.reason, ...(d.quiet ? { quiet: true } : {}) };
   }
   // 3. reads that happen to use POST (GraphQL queries, read-only server actions): allowed
   const reads = req.ops.length && req.ops.every((o) => o.kind === "query" || (pack.reads || []).some((r) => rx(r).test(o.name)));
@@ -200,6 +205,10 @@ export async function installGuard(context, cfg) {
     const entry = { seat: cfg.seat, business: business?.name ?? null, page: pageUrl.slice(0, 200), ...req, ...res };
     if (mode === "learn" || cfg.logAll) write({ kind: "write", ...entry });
     if (res.verdict === "allow") return true;
+    if (res.quiet && mode !== "learn") {
+      write({ kind: "refused", ...entry });
+      return false;
+    }
     state.blocked.push(entry);
     if (mode !== "learn") write({ kind: "blocked", ...entry });
     if (mode === "enforce" && !state.stopped) {

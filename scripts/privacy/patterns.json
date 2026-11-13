@@ -66,5 +66,9 @@
     "card": "\\d{8}"
   },
   "sensitive_pages": "(payout|balance|billing|bank|wallet|withdraw|ledger|finance|invoices?|tax|cards?(/|$)|api[-_]?keys?|developer|webhooks?|tokens?|secrets?|credentials|subaccounts|settings=(billing|payouts?|tax|api|developer|banking|wallet))",
-  "sensitive_categories": ["email", "phone", "name", "photo", "address", "money", "count", "price", "usage", "date"]
+  "sensitive_categories": ["email", "phone", "name", "photo", "address", "money", "count", "price", "usage", "date"],
+ "_about_site_selectors": "Page parts blurred whole on one site's pages only (privacy.py site_blur): claude.ai's sidebar holds the chat history, projects, the name, avatar and plan; its new-chat page shows recent artifacts with readable previews (Andy, 13 Nov 2026).",
+ "site_selectors": {
+  "claude.ai": ["aside", "nav[aria-label*='sidebar' i]", "a[href*='artifact']", "section:has(a[href*='artifact'])", "[data-testid*='user-menu' i]", "[data-testid*='plan' i]", "button[aria-haspopup='menu'][data-testid*='user' i]"]
+ }
 }

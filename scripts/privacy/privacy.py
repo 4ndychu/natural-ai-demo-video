@@ -98,9 +98,9 @@ def settings(script):
         sites = [x['site'] for x in _seats.for_script(script)['seats']] if script.get('sections') or script.get('site') else []
     except Exception:
         sites = []
-    for site in sites:
-        sels += [x for x in (P.get('site_selectors') or {}).get(site, []) if x not in sels]
-    return {'preset': name, 'blur': sorted(blur), 'hide_words': hide, 'blur_selectors': sels, 'warnings': warnings,
+    # the site's own list applies on that site's pages only (claude.ai's sidebar rule must not blur X's menus)
+    site_blur = {site: (P.get('site_selectors') or {})[site] for site in sites if (P.get('site_selectors') or {}).get(site)}
+    return {'preset': name, 'blur': sorted(blur), 'hide_words': hide, 'blur_selectors': sels, 'site_blur': site_blur, 'warnings': warnings,
             'test_business': biz.get('name', biz['match']) if biz else None}
 
 
@@ -110,18 +110,25 @@ def init_script(s):
            'blurPx': CONFIG['blur_px'], 'elementHints': P['element_hints'], 'typingPrefixes': P['typing_prefixes'],
            'ignore': P['ignore'], 'sensitivePages': P.get('sensitive_pages'), 'sensitiveCats': P.get('sensitive_categories', [])}
     return ('window.__NAVI_PRIVACY__ = ' + json.dumps(cfg) + ';\n' + open(os.path.join(HERE, 'blur.js')).read() + '\n' + hide_script()
-            + selector_blur_script(s.get('blur_selectors') or []))
+            + selector_blur_script(s.get('blur_selectors') or [], s.get('site_blur') or {}))
 
 
-def selector_blur_script(sels):
-    """JavaScript that blurs whole page parts by CSS selector (privacy "blur_selectors"), from the first paint."""
-    if not sels:
+def selector_blur_script(sels, site_blur=None):
+    """JavaScript that blurs whole page parts by CSS selector, from the first paint: privacy "blur_selectors" on every
+    page, and each site's own list ("site_blur") only on that site's pages."""
+    site_blur = site_blur or {}
+    if not sels and not site_blur:
         return ''
-    css = ','.join(sels) + '{filter:blur(%dpx)!important}' % (CONFIG['blur_px'] * 2)
-    return ('\n(() => { const css = ' + json.dumps(css) + '; const add = () => { if (document.getElementById("navi-sel-blur")) return; '
-            'const st = document.createElement("style"); st.id = "navi-sel-blur"; st.textContent = css; '
-            '(document.head || document.documentElement).appendChild(st); }; add(); '
-            'new MutationObserver(add).observe(document.documentElement, {childList: true, subtree: true}); })();\n')
+    rule = '{filter:blur(%dpx)!important}' % (CONFIG['blur_px'] * 2)
+    return ('\n(() => { const h = location.hostname.replace(/^www\\./, ""); const per = ' + json.dumps({k: ','.join(v) for k, v in site_blur.items()})
+            + '; const mine = Object.keys(per).filter((k) => h === k || h.endsWith("." + k)).map((k) => per[k]); '
+            + 'const all = ' + json.dumps(','.join(sels)) + '; const list = [all, ...mine].filter(Boolean).join(","); if (!list) return; '
+            + 'const css = list + ' + json.dumps(rule) + '; const add = () => { if (document.getElementById("navi-sel-blur")) return; '
+            'const host = document.head || document.documentElement; if (!host) return; '
+            'const st = document.createElement("style"); st.id = "navi-sel-blur"; st.textContent = css; host.appendChild(st); }; add(); '
+            # apps that rebuild <head> or <html> as they load (claude.ai) drop the style: watch the whole document and
+            # check again twice a second
+            'new MutationObserver(add).observe(document, {childList: true, subtree: true}); setInterval(add, 400); })();\n')
 
 
 def hide_script():
