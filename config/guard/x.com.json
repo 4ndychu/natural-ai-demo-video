@@ -5,7 +5,7 @@
  "ignore": [
   {
    "label": "X's own analytics, client events and error logs (log= bodies)",
-   "path": "^/i/api/1\\.1/(flow/timeline\\.json|graphql/(viewer_context|app_context)\\.json|promoted_content/log\\.json)$",
+   "path": "^/(i/api/)?1\\.1/(flow/(timeline|viewer)\\.json|graphql/(viewer_context|app_context)\\.json|promoted_content/log\\.json)$",
    "body": "(^|&)(log|event)="
   },
   {
