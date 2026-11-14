@@ -119,6 +119,9 @@ export function classify(req, pack, opts) {
 // a login acts on the user's own (real) account (this includes a buyer's view on the member-facing pages), so
 // unknown changes are blocked there too.
 export function businessFor(cfg, pageUrl) {
+  // logged out: no saved login is in the browser, so no account of the user's can be changed; unknown changes are
+  // still blocked by default, but the reason must not suggest a login was used (FG08, 14 Nov 2026)
+  if (cfg.seat === "logged-out") return { name: "no account (logged out)", real: true };
   const u = (pageUrl || "").toLowerCase();
   const hit = (cfg.businesses || []).find((b) => b.id && u.includes(b.id.toLowerCase()));
   if (hit) return hit;

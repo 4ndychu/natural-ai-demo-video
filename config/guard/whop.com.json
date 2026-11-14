@@ -37,6 +37,12 @@
   {
    "label": "read receipts and unread badges",
    "op": "^(chatMarkMessageAsViewed|MarkFeedPostsAsViewed|HubMarkExperienceRead|coreMarkAiChatAsRead|chatResetDmsFeedUnreadBadge|coreAcknowledgeRecommendedActionsAnnouncement)$"
+  },
+  {
+   "label": "a store page working out which affiliate link a visitor came from (attribution; changes nothing)",
+   "host": "^whop\\.com$",
+   "method": "POST",
+   "path": "^/api/affiliate/resolve-tracking/?$"
   }
  ],
  "reads": [
