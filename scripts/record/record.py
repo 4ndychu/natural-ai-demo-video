@@ -486,7 +486,8 @@ def main():
     where = f" in {seat['business']['name']}" if seat['business'] else ''
     print(f"seat: {seat['seat']}{where}; login: {'saved' if session else 'none (logged out)'}", flush=True)
     if len(seat['seats']) > 1:
-        missing = [x['site'] for x in seat['seats'] if not x['login']]
+        # a site the video shows logged out on purpose (seat "logged-out") needs no login
+        missing = [x['site'] for x in seat['seats'] if not x['login'] and x['seat'] != seats.LOGGED_OUT]
         print('logins: ' + ' + '.join(f"{x['site']} ({x['seat']})" for x in seat['seats']) + ', in one browser', flush=True)
         if missing:
             sys.exit('Not logged in: ' + ', '.join(missing) + '. Log in from Settings > Logins first.')
