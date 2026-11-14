@@ -231,13 +231,15 @@ class Runner:
             batch.log(b, f"Carrying on from where it stopped ({self.state['phase']}).")
             batch.save(b)
         # 1. every script
-        while any(not batch.script_of(d) and d not in b.get('written', {}) for d in b['items']):
+        # a video counts as written once it has been through the checks and the rehearsals (it has a "written" entry),
+        # not just because a script file exists (14 Nov 2026: hand-fixed scripts went straight to Go)
+        while any(d not in b.get('written', {}) for d in b['items']):
             if (b.get('blind') or {}).get('plan', {}).get('status') == 'waiting':
                 self.wait_user('your pick of a plan (A, B or C)', lambda x: (x.get('blind') or {}).get('plan', {}).get('status') != 'waiting')
             self.work('writing', 'writing the scripts')
             batch.write(bid)
             b = batch.load(bid)
-            if (b.get('blind') or {}).get('plan', {}).get('status') != 'waiting' and all(batch.script_of(d) or d in b.get('written', {}) for d in b['items']):
+            if (b.get('blind') or {}).get('plan', {}).get('status') != 'waiting' and all(d in b.get('written', {}) for d in b['items']):
                 break
         # 2. the list of scripts, and Go
         b = batch.load(bid)

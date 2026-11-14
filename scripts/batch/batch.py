@@ -342,6 +342,12 @@ def check_one(b, did, sp, notes):
     full = [os.path.join(ROOT, o) if not os.path.isabs(o) else o for o in others]
     cmd = f'.venv/bin/python scripts/script/check_script.py {rel(sp)}' + (' --batch ' + ' '.join(others) if others else '')
     _, out = step([PY, os.path.join(ROOT, 'scripts', 'script', 'check_script.py'), sp] + (['--batch'] + full if others else []))
+    if os.path.exists(os.path.join(folder, 'voice.json')):
+        # its voice is already paid for: the model's read-through may reword lines, which would only cost a new voice;
+        # the checker alone decides (14 Nov 2026)
+        sc = store._read(sp, None)
+        errs = [x for x in check(dict(sc, batch_pos=b['items'].index(did)), os.path.dirname(sp)) if x['level'] == 'error'] if sc else [{'level': 'error'}]
+        return errs, 'voiced already: checker only, no rewording'
     e = job(b, 'checks', did, script_path=rel(sp), script=jobs.attach(sp, rel(sp)), check_out=out.strip(), check_cmd=cmd,
             notes=jobs.attach(notes, rel(notes)), rules=jobs.doc('reference/voice-rules.md', ('Lines to avoid', 'Fillers')))
     sc = store._read(sp, None)
@@ -653,6 +659,8 @@ def not_ready(bid):
                 out[did] = f"its script still has {n} checker error{'s' if n != 1 else ''}"
             elif w.get('why') and not w.get('checked'):       # for example a step the rehearsal couldn't do
                 out[did] = w['why']
+            elif not w.get('checked'):     # a script nobody has checked and rehearsed yet is never recorded (14 Nov 2026)
+                out[did] = "its script hasn't been checked and rehearsed yet"
     return out
 
 
