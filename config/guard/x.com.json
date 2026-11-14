@@ -145,10 +145,6 @@
    "reason": "paying or subscribing (a real charge)",
    "match": [
     {
-     "host": "(^|\\.)(stripe\\.com|stripe\\.network|paypal\\.com|apple\\.com|braintreegateway\\.com)$",
-     "method": "POST"
-    },
-    {
      "op": "(Subscri|Checkout|Payment|Purchase|Billing|Order|Upgrade|Premium|Tip)",
      "kind": "mutation|server-action|persisted"
     },
@@ -156,10 +152,12 @@
      "path": "^/i/api/graphql/[^/]+/[^/?]*(?:(Subscri|Checkout|Payment|Purchase|Billing|Order|Upgrade|Premium|Tip))[^/?]*$"
     },
     {
+     "host": "(^|\\.)(x|twitter|grok)\\.com$",
      "path": "(subscri|checkout|payment|purchase|billing|premium)",
      "method": "POST|PUT|PATCH"
     }
-   ]
+   ],
+   "note": "Card processors (Stripe, PayPal, Braintree, Apple Pay...) are blocked for every site in config/guard/_payments.json; these are this site's own ways of paying."
   },
   {
    "category": "account",

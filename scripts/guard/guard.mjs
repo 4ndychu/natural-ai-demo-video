@@ -5,6 +5,7 @@
 // Every request that can change something (any method but GET, HEAD and OPTIONS) is classified against the site's
 // guard pack (config/guard/<site>.json) before it leaves the browser:
 //   - a known read (a GraphQL query, a listed read-only operation)                        -> allowed
+//   - paying, saving a card or subscribing, on EVERY site, with or without a pack (config/guard/_payments.json) -> blocked
 //   - a dangerous action (withdraw, transfer, refund, bank/payout details, API keys, team
 //     or ownership, deleting anything), in every seat and every business                  -> blocked
 //       except deleting NAVI's own "NAVI test" products in a test business, when the
@@ -38,6 +39,9 @@ export function loadPack(site) {
 }
 
 const rx = (s) => (s ? new RegExp(s, "i") : null);
+
+// Paying, on every site (config/guard/_payments.json): checked before a site's own pack, and on sites with no pack.
+export const PAYMENTS = loadPack("_payments");
 
 // What a request is trying to do: its operations (GraphQL names, server-action ids) and a short text to match.
 export function describeRequest(method, url, headers, body) {
@@ -82,6 +86,11 @@ export function classify(req, pack, opts) {
   // the rules that name a reading operation outright (revealing a key) apply, never an address that mentions refunds.
   const queryOnly = req.ops.length > 0 && req.ops.every((o) => o.kind === "query");
   const dangerMatch = (m) => (queryOnly ? m.op && !m.kind && matches(m) : matches(m));
+  // 0. paying, saving a card or subscribing: blocked on every site, with or without a pack, before the pack's own
+  //    ignore list (a site's telemetry rule can never let a payment through)
+  const shared = opts.payments === undefined ? PAYMENTS : opts.payments;
+  if (shared && !(shared.ignore || []).some(matches))
+    for (const d of shared.dangerous || []) if ((d.match || []).some(dangerMatch)) return { verdict: "block", category: d.category, why: d.reason };
   if (!pack) return { verdict: "allow", why: "no guard pack for this site" };
   // 1. ignored traffic (analytics, error reporting, telemetry): never a change to the user's account
   for (const m of pack.ignore || []) if (matches(m)) return { verdict: "allow", why: `ignored: ${m.label || "telemetry"}` };

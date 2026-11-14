@@ -62,14 +62,11 @@
    "reason": "paying with a card (a real charge)",
    "match": [
     {
-     "host": "(^|\\.)stripe\\.com$",
-     "path": "^/v1/(payment_intents|setup_intents|payment_methods|tokens|sources|confirmation_tokens|charges)(/|$)"
-    },
-    {
      "op": "billingCreatePaymentToken|processCheckout|createPaymentToken|chargeSavedCard|manualCharge|createLineItem|CreateAiCreditsCheckout",
      "kind": "mutation|server-action|persisted"
     }
-   ]
+   ],
+   "note": "Card processors (Stripe, PayPal, Braintree, Apple Pay...) are blocked for every site in config/guard/_payments.json; these are this site's own ways of paying."
   },
   {
    "category": "withdraw",

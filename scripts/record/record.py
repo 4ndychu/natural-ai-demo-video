@@ -104,12 +104,9 @@ def session_for(url, script=None):
 
 
 def guard_for(script, out):
-    """The action guard's settings for this take (written to guard.json next to it), or None for a site without a
-    guard pack. Blocked actions are logged to guard-log.jsonl."""
-    sites = [x['site'] for x in seats.for_script(script)['seats']]
-    # a video on two or more logins always runs guarded: a site without a pack has its changes blocked (guard.mjs)
-    if len(sites) < 2 and not any(os.path.exists(os.path.join(ROOT, 'config', 'guard', f'{s}.json')) for s in sites):
-        return None
+    """The action guard's settings for this take (written to guard.json next to it). On every site: one without a
+    guard pack still gets the payment rules (config/guard/_payments.json), and on a video with two or more logins
+    its changes are blocked (guard.mjs). Blocked actions are logged to guard-log.jsonl."""
     cfg = seats.guard_config(script, os.path.join(out, 'guard-log.jsonl'))
     path = os.path.join(out, 'guard.json')
     json.dump(cfg, open(path, 'w'), indent=1)
@@ -506,7 +503,9 @@ def main():
     member = None if a.finish else member_view(script, out)
     if member:
         print(f"member view: previewing as a buyer of {member['preview']}; owner-only controls blurred", flush=True)
-    print(f"action guard: {'on (' + seat['site'] + ')' if guard else 'no guard pack for ' + seat['site']}", flush=True)
+    if guard:
+        packs = [x['site'] for x in seat['seats'] if os.path.exists(os.path.join(ROOT, 'config', 'guard', f"{x['site']}.json"))]
+        print(f"action guard: on ({', '.join(packs) or 'payments only: no guard pack for ' + seat['site']})", flush=True)
     cap = os.path.join(out, 'capture.json')
     if a.finish and os.path.exists(cap):      # the start page was checked when the take was captured
         check = {'hits': [None] * json.load(open(cap)).get('check_hits', 0)}

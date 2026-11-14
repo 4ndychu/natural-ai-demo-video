@@ -23,7 +23,7 @@ import { fileURLToPath } from "node:url";
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
 const { launchBrowser, realUserAgent } = await import(path.join(ROOT, "recorder", "agent-screenplay", "dist", "drivers", "browser.js"));
 const { sessionFile, guardConfig, businesses } = await import(path.join(ROOT, "scripts", "seats", "seats.mjs"));
-const { installGuard, loadPack } = await import(path.join(ROOT, "scripts", "guard", "guard.mjs"));
+const { installGuard } = await import(path.join(ROOT, "scripts", "guard", "guard.mjs"));
 const argv = process.argv.slice(2);
 const opt = (k) => (argv.includes(`--${k}`) ? argv[argv.indexOf(`--${k}`) + 1] : undefined);
 const dry = argv.includes("--dry-run");
@@ -53,11 +53,9 @@ const pages = (businesses(biz.site).find((x) => x.id && biz.match.includes(x.id)
 try {
   const c = await b.newContext({ userAgent: await realUserAgent(b), viewport: { width: 1440, height: 810 }, storageState: session });
   let blocked;
-  if (loadPack(biz.site)) {
-    const g = guardConfig({ site: biz.site, seat: "owner", allowTestDeletes: true, log: opt("guard-log") });
-    g.logAll = Boolean(opt("guard-log"));
-    await installGuard(c, { ...g, onBlock: (e) => (blocked = e) });
-  }
+  const g = guardConfig({ site: biz.site, seat: "owner", allowTestDeletes: true, log: opt("guard-log") });
+  g.logAll = Boolean(opt("guard-log"));
+  await installGuard(c, { ...g, onBlock: (e) => (blocked = e) });
   const guardStop = () => {
     if (blocked) throw new Error(`Stopped by the action guard: ${blocked.why}`);
   };

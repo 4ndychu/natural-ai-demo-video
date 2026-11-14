@@ -18,7 +18,7 @@ import { fileURLToPath } from "node:url";
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
 const { launchBrowser, realUserAgent } = await import(path.join(ROOT, "recorder", "agent-screenplay", "dist", "drivers", "browser.js"));
 const { config, sessionFile, guardConfig, dataDir, defaultSeat, LOGGED_OUT } = await import(path.join(ROOT, "scripts", "seats", "seats.mjs"));
-const { installGuard, loadPack } = await import(path.join(ROOT, "scripts", "guard", "guard.mjs"));
+const { installGuard } = await import(path.join(ROOT, "scripts", "guard", "guard.mjs"));
 
 const argv = process.argv.slice(2);
 const opt = (k) => (argv.includes(`--${k}`) ? argv[argv.indexOf(`--${k}`) + 1] : undefined);
@@ -65,7 +65,7 @@ async function check({ site, seat, home }) {
   const b = await launchBrowser({ headless: true });
   try {
     const c = await b.newContext({ userAgent: await realUserAgent(b), viewport: { width: 1440, height: 810 }, storageState: session });
-    if (loadPack(site)) await installGuard(c, guardConfig({ site, seat }));
+    await installGuard(c, guardConfig({ site, seat })); // every site: at least the payment rules (config/guard/_payments.json)
     const p = await c.newPage();
     const loggedIn = async (url) => {
       const r = await p.goto(url, { waitUntil: "domcontentloaded", timeout: 45000 }).catch((e) => ({ error: e }));

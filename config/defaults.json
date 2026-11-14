@@ -363,6 +363,12 @@
         "text": "We Value Your Privacy",
         "max_chars": 800,
         "max_height": 320
+      },
+      {
+        "site": "whop.com",
+        "text": "We use cookies to keep Whop running",
+        "max_chars": 400,
+        "max_height": 220
       }
     ],
     "hide_on_page_note": "Page parts taken off the page (hidden, not blurred) before every take, the live page check and rehearsal: a site's own nag banner that is never part of a lesson. The largest element around the text that still holds little else. For example Whop's yellow 'Confirm your tax details' banner."

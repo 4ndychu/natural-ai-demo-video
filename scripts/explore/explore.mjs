@@ -113,12 +113,11 @@ const guardCfg = guardConfig({ site: guardSite, seat, mode: argv.includes("--lea
   // --allow grok-message,claude-message: the changes this video's job asks for (its seat's "allow"), as in the take
   allow: (opt("allow") || "").split(",").filter(Boolean) });
 guardCfg.logAll = argv.includes("--log-writes"); // log every change the guard lets through too
-const guard = guardCfg.sites.some((x) => loadPack(x)) || guardCfg.sites.length > 1 || argv.includes("--learn")
-  ? await installGuard(context, { ...guardCfg, onBlock: (e) => (blocked = e) })
-  : null;
+// on every site: a site without a pack still gets the payment rules (config/guard/_payments.json)
+const guard = await installGuard(context, { ...guardCfg, onBlock: (e) => (blocked = e) });
 // a real business: blur before paint, so screenshots keep no real numbers (the same blur as the recording)
 const biz = businessFor(guardCfg, url);
-if (guard && biz?.real && biz.name !== "your own account (the owner login)") {
+if (biz?.real && !/^(your own account|no account)/.test(biz.name)) {
   const { execFileSync } = await import("node:child_process");
   const js = execFileSync(path.join(ROOT, ".venv", "bin", "python"), ["-c",
     "import sys,json;sys.path.insert(0,'scripts/privacy');import privacy;print(privacy.init_script(privacy.settings({})))"],

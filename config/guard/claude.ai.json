@@ -45,14 +45,12 @@
    "reason": "paying, upgrading or changing the plan (a real charge)",
    "match": [
     {
-     "host": "(^|\\.)(stripe\\.com|stripe\\.network|paypal\\.com)$",
-     "method": "POST"
-    },
-    {
+     "host": "(^|\\.)(claude\\.ai|anthropic\\.com|claude\\.com)$",
      "path": "(billing|subscription|checkout|payment|upgrade|invoice|purchase|plan)",
      "method": "POST|PUT|PATCH|DELETE"
     }
-   ]
+   ],
+   "note": "Card processors (Stripe, PayPal, Braintree, Apple Pay...) are blocked for every site in config/guard/_payments.json; these are this site's own ways of paying."
   },
   {
    "category": "secret",

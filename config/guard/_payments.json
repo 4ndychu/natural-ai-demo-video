@@ -1,0 +1,69 @@
+{
+ "_about": "The action guard's payment rules for EVERY site (scripts/guard/guard.mjs), checked before a site's own pack and also on sites that have no pack, in every browser NAVI opens (recording, rehearsal, the off-camera ready state, the explorer, the start-page check, login checks). A site's pack adds its own ways of paying (X's Premium operations, Whop's processCheckout...). Payment processors are matched on the addresses that pay, save a card or change a subscription, not on every request to them: Stripe's own background reports (q.stripe.com/csp-report, m.stripe.com, r.stripe.com) stopped FG08 on Whop's checkout page on 14 Nov 2026 when every POST to Stripe was blocked. A match is a regex on host, path, method, op (operation name), kind or body; all given parts must match. Only requests that can change something (not GET, HEAD, OPTIONS) are checked.",
+ "ignore": [
+  {
+   "label": "PayPal's button logs (a page showing a PayPal button)",
+   "host": "(^|\\.)paypal\\.com$",
+   "path": "^/xoplatform/logger/"
+  }
+ ],
+ "dangerous": [
+  {
+   "category": "pay",
+   "reason": "paying, saving a card or subscribing (a real charge)",
+   "match": [
+    {
+     "label": "Stripe: a payment, a card, a subscription, an invoice or the billing portal",
+     "host": "(^|\\.)(stripe\\.com|stripe\\.network)$",
+     "path": "^/v1/(payment_intents|setup_intents|payment_methods|tokens|sources|confirmation_tokens|charges|checkout/sessions|subscriptions|subscription_items|subscription_schedules|invoices|billing_portal)(/|$)"
+    },
+    {
+     "label": "Stripe: confirming, paying or capturing anything (Stripe Checkout's /v1/payment_pages/<id>/confirm)",
+     "host": "(^|\\.)(stripe\\.com|stripe\\.network)$",
+     "path": "/(confirm|pay|capture|approve|authorize)/?$"
+    },
+    {
+     "label": "PayPal, Venmo and Braintree: any change",
+     "host": "(^|\\.)(paypal\\.com|venmo\\.com|braintreegateway\\.com|braintree-api\\.com)$"
+    },
+    {
+     "label": "Apple: an address that pays, buys or subscribes",
+     "host": "(^|\\.)apple\\.com$",
+     "path": "(pay|purchase|checkout|buy|order|subscri)"
+    },
+    {
+     "label": "Apple: Apple Pay and store hosts (apple-pay-gateway, buy.itunes...)",
+     "host": "(^|\\.)[a-z0-9-]*(pay|buy|commerce|store)[a-z0-9-]*\\.([a-z0-9-]+\\.)*apple\\.com$"
+    },
+    {
+     "label": "Google Pay",
+     "host": "^(pay|payments)\\.google\\.com$",
+     "path": "(buyflow|purchase|checkout|confirm|submit|instrument|pay)"
+    },
+    {
+     "label": "Shopify's card vault (only ever used to pay)",
+     "host": "(^|\\.)shopifycs\\.com$"
+    },
+    {
+     "label": "Adyen, Checkout.com and Square: a payment, a card or a session payment",
+     "host": "(^|\\.)(adyen\\.com|adyenpayments\\.com|checkout\\.com|squareup\\.com|squareupsandbox\\.com)$",
+     "path": "(payments?|tokens?|card-nonce|nonce|orders?)(/|$)"
+    },
+    {
+     "label": "Paddle, Lemon Squeezy and pay-later services: paying or approving",
+     "host": "(^|\\.)(paddle\\.com|lemonsqueezy\\.com|klarna\\.com|affirm\\.com|afterpay\\.com|clearpay\\.co\\.uk)$",
+     "path": "(pay|checkout|purchase|transaction|subscri|authori[sz]e|approve|confirm|order)"
+    },
+    {
+     "label": "any site: an address that places an order or pays",
+     "path": "/(pay|pay[-_]?now|purchase|place[-_]?order|submit[-_]?order|complete[-_]?(order|checkout|purchase|payment)|confirm[-_]?(order|payment|purchase)|checkout/(complete|confirm|submit|pay|processing))/?$"
+    },
+    {
+     "label": "any site: an operation that places an order or pays",
+     "op": "^(placeOrder|submitOrder|confirmPayment|completeCheckout|completePurchase|purchase|checkoutComplete|chargeCard|payNow|processPayment|createPayment|submitPayment)$",
+     "kind": "mutation|server-action|persisted"
+    }
+   ]
+  }
+ ]
+}

@@ -84,6 +84,15 @@ sheet = open(os.path.join(work, 'batches', bid, 'batch-scripts.md')).read()
 check('every script in one list', code == 0 and sheet.count('Talking version') == 3 and f'about {NEW_CREDITS:,}' in sheet,
       f'batch-scripts.md: 3 scripts side by side; about {NEW_CREDITS:,} credits (only video 2 needs new takes)')
 code, out = batch('approve', bid)
+check('a script file alone is never approved: it must be checked and rehearsed first',
+      code != 0 and "hasn't been checked and rehearsed yet" in out, 'scripts put in by hand, not through the checks and rehearsals')
+# What `batch.py write` records once a script has passed the checker and both rehearsals (batch.py check_one and
+# rehearse, model jobs and a real browser). These three are the approved to-do script, so they stand in for that here.
+bj = os.path.join(work, 'batches', bid, 'batch.json')
+b = json.load(open(bj))
+b.setdefault('written', {}).update({did: {'checked': True, 'errors': 0, 'note': 'the approved to-do script'} for did in b['items']})
+json.dump(b, open(bj, 'w'), indent=1)
+code, out = batch('approve', bid)
 check('all approved at once', code == 0 and "'approved'" in out)
 
 code, out = batch('plan', bid, credits=1500)
