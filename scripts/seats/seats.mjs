@@ -27,6 +27,9 @@ export function loginSite(site) {
   return site;
 }
 
+// the seat of a video that shows the public pages as a visitor sees them (seats.py LOGGED_OUT)
+export const LOGGED_OUT = "logged-out";
+
 export function defaultSeat(site) {
   site = loginSite(site);
   const seats = Object.keys(config()[site]?.seats ?? {});
@@ -37,6 +40,8 @@ export function defaultSeat(site) {
 // (logins/<site>.json) still counts as the default seat's until seats.py moves it.
 export function sessionFile(site, seat) {
   if (!NAME.test(site)) return undefined;
+  // the logged-out seat never holds a login, even if a file was once saved under its name (FG08, 14 Nov 2026)
+  if (seat === LOGGED_OUT) return undefined;
   site = loginSite(site);
   const s = seat || defaultSeat(site);
   if (!NAME.test(s)) throw new Error(`Not a seat name: ${s}`);
@@ -59,6 +64,8 @@ export function businesses(site) {
 // Several logins in one browser (a video on X and Google Sheets): every cookie and page storage of each seat's
 // session in one file, as seats.py merged_login (same folder and naming, readable only by the user). pairs: [[site, seat]].
 export function joinedSession(pairs) {
+  pairs = pairs.filter(([, seat]) => seat !== LOGGED_OUT);     // a site shown logged out adds no login
+  if (!pairs.length) return undefined;
   const files = pairs.map(([site, seat]) => {
     const f = sessionFile(site, seat);
     if (!f) throw new Error(`The ${seat || defaultSeat(site)} seat on ${loginSite(site)} isn't logged in. Log it in from Settings > Logins first.`);

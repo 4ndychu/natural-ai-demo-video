@@ -124,8 +124,11 @@ def new(name, lines, site, no_blind=False, length_min=None, **shared):
     styles = []
     for pos, it in enumerate(parse_list(lines)):
         isite = it.get('site') or site
+        # the seat the row names is the video's own seat too (FG08, 14 Nov 2026: the row said logged out, the video
+        # kept the seat guessed from its words, the owner's X login)
+        row_seat = {'seat': it['seat']} if isinstance(it.get('seat'), str) else it.get('seat')
         d = store.new_demo(it['title'], site=isite, kind=s['kind'], what=it['what'], batch=bid, length_min=it.get('length_min') or length_min,
-                           settings={k: s[k] for k in SHARED if k not in ('kind', 'voice')})
+                           settings={k: s[k] for k in SHARED if k not in ('kind', 'voice')}, **({'seat': row_seat} if row_seat else {}))
         ip = it.get('privacy') or {}
         tmpl = {'title': it['title'], 'site': isite, 'kind': s['kind'], 'voice_id': voice_id, 'what': it['what'],
                 'privacy': {'preset': ip.get('preset') or s['privacy_preset'],
@@ -842,16 +845,19 @@ def go(bid, auto=False):
 
 def wait_quiet(b):
     """Live recording drifts on a busy Mac (11 Nov 2026: a game at 200% CPU put clicks seconds off their words). Wait
-    a while for the 1-minute load average to drop; then record anyway, and say so."""
+    a while for the other apps to go quiet (store.mac_load: a 30-second average, NAVI's own work and the apps the user
+    keeps open not counted); then record anyway, and say so."""
     if os.environ.get('NAVI_NO_QUIET_WAIT'):
         return None
     start = time.time()
-    while time.time() - start < B['quiet_wait_min'] * 60:
-        load1 = os.getloadavg()[0]
-        if load1 < B['quiet_load']:
+    while True:
+        mac = store.mac_load()
+        if not mac['busy']:
             return None if time.time() - start < 5 else f"waited {int((time.time() - start) / 60)} min for a quiet Mac"
+        if time.time() - start >= B['quiet_wait_min'] * 60:
+            return (f"the Mac stayed busy (other apps used about {max(round(mac['others']), 1)} cores"
+                    + (f"; {', '.join(h['app'] for h in mac['heavy'])}" if mac['heavy'] else '') + "), so it recorded anyway: check the timing")
         time.sleep(30)
-    return f"the Mac stayed busy (load {os.getloadavg()[0]:.0f}), so it recorded anyway: check the timing"
 
 
 def took(b, did, what, t0):
@@ -1297,8 +1303,11 @@ def main():
         elif a.cmd == 'mac':
             m = store.mac_load()
             print(m['line'])
+            print(f"  other apps: {m['others']} cores, NAVI's own: {m['navi']}, averaged over {m['seconds']} s (1-minute load average {m['load']})")
             for h in m['heavy']:
                 print(f"  {h['app']}: {h['cpu']}% of a core")
+            for h in m['kept']:
+                print(f"  {h['app']}: {h['cpu']}% of a core (you keep it open: never named, not counted)")
         elif a.cmd == 'blind-results':
             for kind, rows in blind.tally().items():
                 print(('Plans' if kind == 'planning' else 'Scripts') + ': ' + '; '.join(f"{r['arm']} picked {r['picked']} of {r['shown']}" for r in rows))

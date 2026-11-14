@@ -18,6 +18,9 @@ The seat picker (pick) chooses, from the job's own words:
                          business the job names (or the test business), not the dashboard; no changes allowed
   owner in the test biz  "how to build X" demos (the default for an owner job)
   owner in a real biz    only when the job names that business AND needs the owner dashboard
+  logged-out             "no login", "logged out", "public pages" (config/seats.json logged_out_phrases): no saved
+                         login at all, on every site, even one with a saved login. It never holds a login:
+                         Settings > Logins never offers it, and a file saved under that name is never loaded
 
   .venv/bin/python scripts/seats/seats.py list [--site whop.com]
   .venv/bin/python scripts/seats/seats.py pick whop.com "Open the Real Biz course and play the first lesson"
@@ -38,6 +41,9 @@ import shutil
 import sys
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
+# the seat of a video that shows the public pages as a visitor sees them: no login, whatever is saved for the site
+LOGGED_OUT = 'logged-out'
+LOGGED_OUT_LABEL = 'Logged out (public pages, no login)'
 RULES = json.load(open(os.path.join(ROOT, 'config', 'seats.json')))
 
 
@@ -183,6 +189,7 @@ def pick(site, job):
             text = re.sub(r'(?<![a-z])' + re.escape(n.lower()) + r'(?![a-z])', ' ', text)
     explicit_member = _hits(p['member_phrases'], text)
     explicit_owner = _hits(p['owner_phrases'], text)
+    logged_out = _hits(p.get('logged_out_phrases', []), text)
     buyer = _hits(p['buyer_words'], text)
     owner = _hits(p['owner_words'], text)
     build = _hits(p['builder_phrases'], text)
@@ -192,13 +199,19 @@ def pick(site, job):
     def done(seat, b, why, view='dashboard'):
         # a real business, or the owner's own account on a site with no businesses (X, Claude): only the changes the
         # job asks for, by the site pack's own phrases
-        allow = guard_allow(site, job) if view == 'dashboard' and ((b and b['real']) or (not b and not biz)) else []
-        seat_label = cfg.get('seats', {}).get(seat, {}).get('label', (seat or '').title())
+        allow = guard_allow(site, job) if seat != LOGGED_OUT and view == 'dashboard' and ((b and b['real']) or (not b and not biz)) else []
+        seat_label = LOGGED_OUT_LABEL if seat == LOGGED_OUT else cfg.get('seats', {}).get(seat, {}).get('label', (seat or '').title())
         label = f"{seat_label}, as a member of {b['name']}" if view == 'member' and b else \
             f"{seat_label}, as a member" if view == 'member' else f"{seat_label}{' in ' + b['name'] if b else ''}"
         return {'site': site, 'seat': seat, 'view': view, 'business': b['key'] if b else None,
                 'business_name': b['name'] if b else None, 'real': bool(b and b['real']), 'label': label,
-                'why': why, 'allow': allow, 'login_saved': os.path.exists(login_file(site, seat)) if seat in seat_names else False}
+                'why': why, 'allow': allow,
+                'login_saved': True if seat == LOGGED_OUT else os.path.exists(login_file(site, seat)) if seat in seat_names else False}
+
+    # "no login / public pages": the logged-out seat, on any site (FG08, 14 Nov 2026: a public-pages video on a phone
+    # was given the owner's X login), unless the job also says it needs the owner
+    if logged_out and not explicit_owner:
+        return done(LOGGED_OUT, None, 'the job says ' + ', '.join(f'"{w}"' for w in logged_out[:2]) + ': no login, the pages as a visitor sees them')
 
     # a site with no businesses (X, Claude, Google): the owner's own account; buyer and member words ("lesson",
     # "course") are about the video's subject there, not about whose view it is
@@ -228,7 +241,7 @@ def describe(script):
     s = for_script(script)
     chosen = script.get('seat') if isinstance(script.get('seat'), dict) else {}
     seat_cfg = config().get(s['site'], {}).get('seats', {}).get(s['seat'], {})
-    label = seat_cfg.get('label', (s['seat'] or 'logged out').title())
+    label = LOGGED_OUT_LABEL if s['seat'] == LOGGED_OUT else seat_cfg.get('label', (s['seat'] or 'logged out').title())
     kind = (' (real business)' if s['business']['real'] else ' (test business)') if s['business'] else ''
     if s['view'] == 'member':
         label += (f", as a member of {s['business']['name']}" if s['business'] else ', as a member') + kind + ': member pages, not the dashboard'
@@ -237,11 +250,13 @@ def describe(script):
     elif s['business']:
         label += f" in {s['business']['name']}" + kind
     if len(s['seats']) > 1:     # a video on two or more logins: each one, and whether it is saved
-        label = ' + '.join(f"{x['site']} ({x['seat']}{'' if x['login'] else ', not logged in'})" for x in s['seats'])
+        label = ' + '.join(f"{x['site']} (" + ('logged out, no login' if x['seat'] == LOGGED_OUT else x['seat'] + ('' if x['login'] else ', not logged in')) + ')'
+                           for x in s['seats'])
     return {'seat': s['seat'], 'view': s['view'], 'business': s['business']['key'] if s['business'] else None, 'label': label,
             'why': chosen.get('why') or ('' if script.get('seat') else 'no seat picked: the site\'s default login'),
-            'allow': s['allow'], 'login_saved': all(x['login'] for x in s['seats']) if len(s['seats']) > 1 else bool(s['login']),
-            'site': s['site'], 'seats': [{k: x[k] for k in ('site', 'seat')} | {'saved': bool(x['login'])} for x in s['seats']]}
+            # a logged-out seat needs no login, so it never reads "not logged in yet"
+            'allow': s['allow'], 'login_saved': all(x['login'] or x['seat'] == LOGGED_OUT for x in s['seats']),
+            'site': s['site'], 'seats': [{k: x[k] for k in ('site', 'seat')} | {'saved': bool(x['login']) or x['seat'] == LOGGED_OUT} for x in s['seats']]}
 
 
 def guard_allow(site, job):
@@ -282,8 +297,6 @@ def for_script(script):
         login = merged_login(joined) if len(joined) > 1 else (joined[0] if joined else None)
     return {'site': site, 'seat': seat, 'view': view, 'business': b, 'login': login, 'allow': allow, 'seats': all_seats}
 
-
-LOGGED_OUT = 'logged-out'
 
 
 def script_seats(script, site=None, seat=None, login=None, allow=None):
@@ -357,6 +370,8 @@ def main():
         print(json.dumps(seats(site), indent=1))
     elif a[:1] == ['login'] and len(a) == 3:
         site, seat = site_of(a[1]), _name(a[2], 'seat')
+        if seat == LOGGED_OUT:
+            sys.exit('The logged-out seat never holds a login: a video in it shows the pages as a visitor sees them.')
         home = config().get(site, {}).get('seats', {}).get(seat, {}).get('home') or f'https://{site}/'
         path = login_file(site, seat)
         os.makedirs(os.path.dirname(path), mode=0o700, exist_ok=True)

@@ -88,7 +88,7 @@
         loginsChecking: !!s.logins_checking,
         defVoice: st0.voice, defCap: st0.captions, defCorner: st0.corner_label, defCornerText: st0.corner_text,
         defStyle: st0.video_style, defLook: st0.caption_look, defSpeed: st0.speed_copy || null,
-        creditLimit: st0.credit_limit, autoGo: !!st0.auto_go,
+        creditLimit: st0.credit_limit, autoGo: !!st0.auto_go, keepApps: Array.isArray(st0.keep_apps) ? st0.keep_apps.slice() : st.keepApps,
         jobs: (s.jobs || []).map((j) => ({ label: j.label, model: j.model, effort: j.effort, then: (j.fallback || []).join(', ') })), jobWarnings: s.job_warnings || []
       };
       if (st0.speed_copy) patch.defSpeedDraft = String(st0.speed_copy);
@@ -192,7 +192,7 @@
       this.lastLocal = this.localOf(this.state);
     },
     // ---- what the user changed, sent on -----------------------------------------------------------------------
-    settingsOf(st) { return { voice: st.defVoice, captions: st.defCap, corner_label: st.defCorner, corner_text: st.defCornerText, video_style: st.defStyle, caption_look: st.defLook, speed_copy: st.defSpeed || null, credit_limit: st.creditLimit, auto_go: !!st.autoGo }; },
+    settingsOf(st) { return { voice: st.defVoice, captions: st.defCap, corner_label: st.defCorner, corner_text: st.defCornerText, video_style: st.defStyle, caption_look: st.defLook, speed_copy: st.defSpeed || null, credit_limit: st.creditLimit, auto_go: !!st.autoGo, keep_apps: (st.keepApps || []).slice() }; },
     localOf(st) { const preset = this.presetOf(st.shown); return { privacy_preset: PRESET_OUT[preset] || 'standard', privacy_custom: preset === 'custom' ? Object.assign({}, st.shown) : {}, hide_words: st.hide.slice(), sliders: Object.assign({}, st.vals) }; },
     watchLocal() {
       if (!this.live || this.applying || this.state.loading) return;

@@ -65,7 +65,9 @@ def defaults():
             'preview_720p': ex.get('preview_720p', False), 'speed_copy': ex['speed_copy']['speed'] if ex['speed_copy']['on'] else None,
             'voice_model': 'v4', 'sliders': {}, 'privacy_custom': {},
             # batches: the most one may spend without asking, and whether it starts without the Go click
-            'credit_limit': CONFIG['app']['batch']['credit_limit'], 'auto_go': False}
+            'credit_limit': CONFIG['app']['batch']['credit_limit'], 'auto_go': False,
+            # apps the busy-Mac check never asks the user to quit (Andy, 14 Nov 2026: Google Chrome and Wispr Flow)
+            'keep_apps': list(CONFIG['app']['batch'].get('keep_apps', []))}
 
 
 CHOICES = {'kind': ['saas', 'course', 'tour'], 'privacy_preset': list(CONFIG['privacy']['presets']),
@@ -97,6 +99,8 @@ def check_setting(k, v):
             raise ValueError("Exports can't go inside NAVI's own folder.")
     if k == 'credit_limit' and not (isinstance(v, int) and not isinstance(v, bool) and 0 <= v <= 10_000_000):
         raise ValueError('credit_limit must be a whole number of credits.')
+    if k == 'keep_apps' and not (isinstance(v, list) and len(v) <= 50 and all(isinstance(x, str) and 0 < len(x.strip()) <= 80 for x in v)):
+        raise ValueError('keep_apps must be a list of app names.')
     if k == 'auto_go' and not isinstance(v, bool):
         raise ValueError('auto_go must be true or false.')
     if k == 'voice' and v not in CONFIG['voices']:
@@ -283,7 +287,8 @@ def logins():
                 seen.add((site, seat))
         elif os.path.isdir(p):
             for f in sorted(os.listdir(p)):
-                if f.endswith('.json') and (entry, f[:-5]) not in seen:
+                # a file saved under the logged-out seat's name is never a login (it is never loaded either)
+                if f.endswith('.json') and f[:-5] != seats.LOGGED_OUT and (entry, f[:-5]) not in seen:
                     out.append({'site': entry, 'seat': f[:-5], 'label': f[:-5].title(), 'saved': _saved(os.path.join(p, f))})
     st = login_status()
     windows = login_windows()
@@ -332,6 +337,8 @@ def start_login(url, seat=None):
     Only one window per login: a second click while it is open opens nothing and says so."""
     site = seats.login_site(site_of(url))
     seat = seat or seats.default_seat(site)
+    if seat == seats.LOGGED_OUT:      # FG08, 14 Nov 2026: a real X login got saved under this name
+        raise ValueError('The logged-out seat never holds a login: videos in it show the pages as a visitor sees them.')
     key = f'{site}/{seat}'
     open_now = login_windows()
     if key in open_now:
@@ -580,52 +587,171 @@ def tools_ready():
     return all(os.path.exists(os.path.join(ROOT, p)) for p in ('.venv/bin/python', '.venv/bin/ffmpeg', 'recorder/agent-screenplay/dist/cli.js'))
 
 
-# The apps that are NAVI's own tools or the system, never named as something to quit
-NOT_HEAVY = {'T3 Code (Beta)', 'T3 Code', 'Claude', 'Terminal', 'iTerm', 'Ghostty', 'Finder', 'Activity Monitor'}
+# ---- how busy the Mac is -----------------------------------------------------------------------------------------
+# Apps that are the user's tools or the system: never named as something to quit (their CPU still counts)
+NOT_HEAVY = {'T3 Code (Beta)', 'T3 Code', 'Claude', 'Terminal', 'iTerm', 'iTerm2', 'Ghostty', 'Finder', 'Activity Monitor'}
+# NAVI's own processes, never counted as load: anything run from NAVI's folder, its recording browser (Chrome for
+# Testing, from Playwright's cache) and renderer, ffmpeg from NAVI's .venv, NAVI's scripts started with a relative path,
+# and everything any of them started (the app server, batch runners, the jobs they run)
+NAVI_CMD = re.compile(r'/ms-playwright/|(?:^|/)\.venv/bin/\S+\s+(?:\S*/)?scripts/[a-z]+/\w+\.(?:py|mjs)|'
+                      r'(?:^|/)node\s+(?:\S*/)?(?:scripts/[a-z]+/\w+\.mjs|recorder/)')
+APP_OF = re.compile(r'^(?:/System)?(?:/Users/[^/]+)?/Applications/(?:[^/]+/)*?([^/]+)\.app/')
+ICLOUD = re.compile(r'^/\S*/(?:fileproviderd|bird|cloudd)(?:\s|$)')
+
+
+def _cpu_secs(t):
+    """ps's cumulative CPU time ("9:43.04", "1:02:03.45", "2-03:04:05") in seconds."""
+    days, _, t = t.rpartition('-')
+    secs = 0.0
+    for part in t.split(':'):
+        secs = secs * 60 + float(part)
+    return (int(days) if days else 0) * 86400 + secs
+
+
+def _processes():
+    """{pid: (ppid, CPU seconds used so far, command line)} for every process."""
+    try:
+        out = subprocess.run(['ps', '-Ao', 'pid=,ppid=,time=,command='], capture_output=True, text=True, timeout=5).stdout
+    except (OSError, subprocess.TimeoutExpired):
+        return {}
+    procs = {}
+    for line in out.splitlines():
+        m = re.match(r'\s*(\d+)\s+(\d+)\s+(\S+)\s+(.*)$', line)
+        if m:
+            try:
+                procs[int(m.group(1))] = (int(m.group(2)), _cpu_secs(m.group(3)), m.group(4))
+            except ValueError:
+                continue
+    return procs
+
+
+def _navi_pids(procs):
+    """NAVI's own processes (NAVI_CMD, this process) and every process they started."""
+    kids = {}
+    for pid, (ppid, _, _) in procs.items():
+        kids.setdefault(ppid, []).append(pid)
+    todo = [os.getpid()] + [pid for pid, (_, _, cmd) in procs.items() if ROOT + os.sep in cmd or NAVI_CMD.search(cmd)]
+    navi = set()
+    while todo:
+        pid = todo.pop()
+        if pid not in navi and pid > 1:
+            navi.add(pid)
+            todo += kids.get(pid, [])
+    return navi
+
+
+def _mac_file():
+    return os.path.join(data_dir(), 'mac-cpu.json')
+
+
+def mac_sample(procs=None):
+    """One reading of every process's CPU time so far, kept for a few windows in $NAVI_DATA/mac-cpu.json, so the app
+    and a batch average over the same readings. The app server takes one every few seconds; mac_load takes one too.
+    Returns (readings, the processes just read)."""
+    win = CONFIG['app']['batch'].get('load_seconds', 30)
+    procs = procs if procs is not None else _processes()
+    now = time.time()
+    st = _read(_mac_file(), {}) or {}
+    readings = [r for r in st.get('readings', []) if isinstance(r, dict) and 0 <= now - r.get('t', 0) < win * 3]
+    if procs and (not readings or now - readings[-1]['t'] >= 2):
+        readings.append({'t': now, 'cpu': {str(pid): round(p[1], 2) for pid, p in procs.items()}})
+        st['readings'] = readings
+        try:
+            _write(_mac_file(), st)
+        except OSError:
+            pass
+    return st, readings, procs
+
+
+def _keeps(name, keep):
+    n = name.lower()
+    return any(k == n or (len(k) >= 3 and k in n) for k in keep)
 
 
 def mac_load():
-    """How busy the Mac is right now, for the Go screen and the warning before a batch:
-    {load, cores, busy, quiet_under, heavy: [{app, cpu}], line}. `heavy`: apps the user runs that a recording
-    competes with: any app using more than heavy_cpu % of a core (plus any named in config heavy_apps, empty by
-    default). NAVI's own browser and tools are never on it."""
+    """How busy the Mac is, for the Go screen, the warning before a batch and the wait before each take:
+    {others, navi, seconds, load, cores, busy, quiet_under, heavy: [{app, cpu}], kept: [{app, cpu}], icloud_syncing,
+    line}. Averaged over the last load_seconds (30 s), not one moment, so it doesn't change with every refresh.
+    `others`: cores' worth of CPU used by everything except NAVI's own processes and the apps the user keeps open
+    (Settings: keep_apps, Google Chrome and Wispr Flow by default). `heavy`: apps to quit, only those averaging at
+    least heavy_cpu % of a core, never a kept app or one of the user's tools. Busy from quiet_cores up, and it stays
+    busy until a quarter under, so it doesn't flicker at the line."""
     b = CONFIG['app']['batch']
-    load1 = os.getloadavg()[0]
+    win = b.get('load_seconds', 30)
+    heavy_at = b.get('heavy_cpu', 50)
+    quiet = b.get('quiet_cores', 2.0)
+    keep = [k.strip().lower() for k in settings().get('keep_apps', []) if isinstance(k, str) and k.strip()]
     try:
         cores = int(subprocess.run(['sysctl', '-n', 'hw.ncpu'], capture_output=True, text=True).stdout.strip() or 8)
     except (OSError, ValueError):
         cores = os.cpu_count() or 8
-    cpu = {}
-    try:
-        out = subprocess.run(['ps', '-Ao', 'pcpu=,comm='], capture_output=True, text=True, timeout=5).stdout
-    except (OSError, subprocess.TimeoutExpired):
-        out = ''
-    sync = 0.0
-    for line in out.splitlines():
-        m = re.match(r'\s*([\d.]+)\s+(.*)$', line)
-        if not m:
+    st, readings, procs = mac_sample()
+    now = readings[-1]['t'] if readings else time.time()
+    older = [r for r in readings if r['t'] <= now - win]
+    base = older[-1] if older else (readings[0] if readings else None)
+    if base is None or now - base['t'] < 1.5:      # the first reading NAVI has: a short one now, the full window after
+        time.sleep(2.2)
+        st, readings, procs = mac_sample(_processes())
+        now = readings[-1]['t'] if readings else time.time()
+        base = base or (readings[0] if readings else None)
+    span = max(now - base['t'], 0.5) if base else 0.5
+    cur = readings[-1]['cpu'] if readings else {}
+    navi_pids = _navi_pids(procs)
+    others = navi = sync = 0.0
+    apps, kept = {}, {}
+    for pid, (_, _, cmd) in procs.items():
+        used = cur.get(str(pid))
+        if used is None or base is None:
             continue
-        if re.search(r'/(fileproviderd|bird|cloudd)$', m.group(2)):      # iCloud Drive syncing: can't be quit, only waited for
-            sync += float(m.group(1))
+        before = base['cpu'].get(str(pid), 0.0)
+        cpu = max(used - before if used >= before else used, 0.0) / span * 100      # % of one core, on average
+        if pid in navi_pids:
+            navi += cpu
             continue
-        a = re.search(r'(?:^|/)Applications/(?:[^/]+/)*?([^/]+)\.app(?:/|$)', m.group(2))
+        if ICLOUD.search(cmd):                      # iCloud Drive syncing: can't be quit, only waited for
+            sync += cpu
+            continue
+        a = APP_OF.search(cmd)
+        if a and _keeps(a.group(1), keep):
+            kept[a.group(1)] = kept.get(a.group(1), 0.0) + cpu
+            continue
+        others += cpu
         if a and a.group(1) not in NOT_HEAVY:
-            cpu[a.group(1)] = cpu.get(a.group(1), 0.0) + float(m.group(1))
-    named = [n for n in b.get('heavy_apps', []) if n in cpu]
-    busy_apps = [n for n, v in cpu.items() if v >= b.get('heavy_cpu', 25) and n not in named]
-    heavy = [{'app': n, 'cpu': round(cpu[n])} for n in sorted(named + busy_apps, key=lambda n: -cpu[n])]
-    quiet = b['quiet_load']
-    busy = load1 >= quiet
-    names = [h['app'] for h in heavy]
+            apps[a.group(1)] = apps.get(a.group(1), 0.0) + cpu
+    others /= 100
+    was_busy, was_named = bool(st.get('busy')), set(st.get('named') or [])
+    busy = others >= (quiet * 0.75 if was_busy else quiet)
+    names = sorted((n for n, v in apps.items() if v >= heavy_at or (n in was_named and v >= heavy_at * 0.6)), key=lambda n: -apps[n])
+    if (busy, names) != (was_busy, sorted(was_named)) and readings:
+        st.update(busy=busy, named=names)
+        try:
+            _write(_mac_file(), st)
+        except OSError:
+            pass
+    heavy = [{'app': n, 'cpu': round(apps[n])} for n in names]
     lst = (', '.join(names[:-1]) + ' and ' + names[-1]) if len(names) > 1 else (names[0] if names else '')
-    syncing = sync >= b.get('heavy_cpu', 25)
+    syncing = sync >= heavy_at
     sync_line = ' iCloud Drive is busy syncing too: let it finish first.' if syncing else ''
+    over = f'the last {round(win)} seconds' if span >= win - 5 else f'the last {max(int(span), 1)} seconds'
     if busy:
-        line = (f"Your Mac is busy (load {load1:.0f}; recordings come out best under {quiet:g})."
-                + (f" Quit {lst} before Go." if lst else '' if syncing else ' Close what you can before Go.') + sync_line)
+        line = (f"Your Mac is busy: other apps used about {max(round(others), 1)} of its {cores} cores over {over} "
+                f"(recordings come out best under {quiet:g})." + (f" Quit {lst} before Go." if lst else '') + sync_line)
     else:
-        line = f"Your Mac is quiet (load {load1:.1f})." + (f" Still, quit {lst} before Go: they slow a recording down when they wake up." if lst else '') + sync_line
-    return {'load': round(load1, 1), 'cores': cores, 'busy': busy, 'quiet_under': quiet, 'heavy': heavy, 'icloud_syncing': syncing, 'line': line}
+        line = "Your Mac is quiet." + (f" Still, quit {lst} before Go: {'they slow' if len(names) > 1 else 'it slows'} a recording down." if lst else '') + sync_line
+    return {'others': round(others, 1), 'navi': round(navi / 100, 1), 'seconds': round(span), 'load': round(os.getloadavg()[0], 1),
+            'cores': cores, 'busy': busy, 'quiet_under': quiet, 'heavy': heavy,
+            'kept': [{'app': n, 'cpu': round(v)} for n, v in sorted(kept.items(), key=lambda x: -x[1]) if v >= 1],
+            'icloud_syncing': syncing, 'line': line}
+
+
+def mac_sampler(every=5):
+    """The app server's background reading of the Mac's CPU (mac_sample), so mac_load always has a full window."""
+    while True:
+        try:
+            mac_sample()
+        except Exception:      # never take the server down over a reading
+            pass
+        time.sleep(every)
 
 
 def jobs_state():

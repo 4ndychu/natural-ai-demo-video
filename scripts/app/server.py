@@ -317,6 +317,8 @@ def serve(port=4747, open_browser=False):
     httpd = ThreadingHTTPServer(('127.0.0.1', port), H)
     url = f'http://127.0.0.1:{httpd.server_address[1]}/'
     print(f'NAVI is running at {url} (this Mac only). Stop it with Ctrl+C.', flush=True)
+    # the Mac's CPU, read every few seconds, so the busy-Mac line is a 30-second average from the first look
+    threading.Thread(target=store.mac_sampler, daemon=True).start()
     if open_browser:
         import webbrowser
         webbrowser.open(url)

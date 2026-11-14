@@ -1,6 +1,22 @@
 {
  "_about": "The seat picker's words (scripts/seats/seats.py pick). A job reads as a buyer's view (filmed with the owner seat on the member-facing pages, not the dashboard) or an owner's how-to from these; a real business is used only when the job names it AND needs the owner dashboard. The user's own seats and businesses live in $NAVI_DATA/seats.json (example: config/seats.example.json).",
  "picker": {
+  "logged_out_phrases": [
+   "no login",
+   "logged out",
+   "logged-out",
+   "not logged in",
+   "without logging in",
+   "without a login",
+   "without an account",
+   "signed out",
+   "not signed in",
+   "public pages",
+   "public pages only",
+   "as a visitor",
+   "a visitor's view"
+  ],
+  "logged_out_note": "a job that says any of these is recorded in the logged-out seat (no saved login, the pages as a visitor sees them), on every site, unless it also says it needs the owner (owner_phrases)",
   "member_phrases": [
    "as a student",
    "as a buyer",

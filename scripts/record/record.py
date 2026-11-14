@@ -262,6 +262,17 @@ def cleanup(script):
     print(f"cleanup in {res['business']}: deleted {len(res['deleted'])} test product(s)", flush=True)
 
 
+def seat_args(s):
+    """The explorer's login arguments for a seat (seats.for_script): every login of a two-login video, --logged-out
+    for a video shown logged out, the seat's own login otherwise. Without one of these the explorer falls back to the
+    site's default (owner) login, so a logged-out video must always say so."""
+    if len(s['seats']) > 1:
+        return ['--seat', s['seat'], '--seats', ','.join(f"{x['site']}:{x['seat']}" for x in s['seats'])]
+    if s['seat'] == seats.LOGGED_OUT or not s['login']:
+        return ['--logged-out']
+    return ['--seat', s['seat']]
+
+
 def prepare(script, folder):
     """The video's ready state, made off camera (<folder>/prepare.json: a start page and explore-style steps), after
     the cleanup and before every take, so a video that needs something to exist starts from it without depending on
@@ -276,7 +287,7 @@ def prepare(script, folder):
     os.makedirs(out)
     json.dump(p['steps'], open(os.path.join(out, 'steps.json'), 'w'))
     cmd = ['node', os.path.join(ROOT, 'scripts', 'explore', 'explore.mjs'), '--url', p['url'], '--site', s['site'], '--out', out,
-           '--steps', os.path.join(out, 'steps.json')] + (['--seat', s['seat']] if s['login'] else [])
+           '--steps', os.path.join(out, 'steps.json')] + seat_args(s)
     r = subprocess.run(cmd, capture_output=True, text=True)
     ex = json.load(open(os.path.join(out, 'explore.json'))) if os.path.exists(os.path.join(out, 'explore.json')) else {}
     bad = [x for x in ex.get('screens', []) if x.get('error')]

@@ -455,16 +455,17 @@
       "credit_margin_note": "a video is never part-generated: if finishing it would leave fewer credits than this, it's skipped with that reason",
       "credit_limit": 10000,
       "credit_limit_note": "the most a batch may spend without asking (Settings: batch spending limit); over it, the Go screen asks first",
-      "quiet_load": 4.0,
+      "quiet_cores": 2.0,
+      "load_seconds": 30,
       "quiet_wait_min": 20,
-      "quiet_note": "live recording drifts on a busy Mac: before each recording the batch waits (up to quiet_wait_min minutes) until the 1-minute load average is under quiet_load, then records anyway and says so in the report",
+      "quiet_note": "live recording drifts on a busy Mac. Busy = other apps (everything except NAVI's own processes, i.e. its folder's scripts, Chrome for Testing, the renderer, ffmpeg and what they start, and except the keep_apps the user keeps open) use quiet_cores or more cores on average over the last load_seconds; it stays busy until a quarter under. Before each recording the batch waits (up to quiet_wait_min minutes) for it to be quiet, then records anyway and says so in the report",
       "takes": 2,
       "render_while_recording": false,
       "record_parallel": 1,
       "parallel_note": "the render of one video always runs while the next is voiced and timed. render_while_recording (also while the next is being recorded live) and record_parallel (2 or 3 live takes at once) are switched on only when scripts/focus/load_check.py shows a live take comes out the same that way on this Mac; a video that creates things in a test business is always recorded alone",
-      "heavy_apps": [],
-      "heavy_cpu": 25,
-      "heavy_note": "before each batch the user is told to quit any app using more than heavy_cpu % of a core (and any named in heavy_apps, empty by default); the Go screen shows the Mac's load (a busy Mac makes takes land late and renders slow)"
+      "heavy_cpu": 50,
+      "keep_apps": ["Google Chrome", "Wispr Flow"],
+      "heavy_note": "the Go screen names an app to quit only when it averages heavy_cpu % of a core or more over load_seconds (Roblox, Spotify's stuck helper), never one of keep_apps (Settings > Apps to keep open; these are the defaults) and never the user's own tools (T3 Code, Claude, Terminal)"
     }
   },
   "jobs": {

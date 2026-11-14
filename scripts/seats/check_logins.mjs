@@ -17,7 +17,7 @@ import { fileURLToPath } from "node:url";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
 const { launchBrowser, realUserAgent } = await import(path.join(ROOT, "recorder", "agent-screenplay", "dist", "drivers", "browser.js"));
-const { config, sessionFile, guardConfig, dataDir, defaultSeat } = await import(path.join(ROOT, "scripts", "seats", "seats.mjs"));
+const { config, sessionFile, guardConfig, dataDir, defaultSeat, LOGGED_OUT } = await import(path.join(ROOT, "scripts", "seats", "seats.mjs"));
 const { installGuard, loadPack } = await import(path.join(ROOT, "scripts", "guard", "guard.mjs"));
 
 const argv = process.argv.slice(2);
@@ -42,7 +42,7 @@ for (const entry of fs.existsSync(loginsDir) ? fs.readdirSync(loginsDir) : []) {
   if (entry.startsWith("_") || entry.startsWith(".")) continue;
   const p = path.join(loginsDir, entry);
   const found = entry.endsWith(".json") ? [[entry.slice(0, -5), defaultSeat(entry.slice(0, -5))]]
-    : fs.statSync(p).isDirectory() ? fs.readdirSync(p).filter((f) => f.endsWith(".json")).map((f) => [entry, f.slice(0, -5)]) : [];
+    : fs.statSync(p).isDirectory() ? fs.readdirSync(p).filter((f) => f.endsWith(".json") && f !== `${LOGGED_OUT}.json`).map((f) => [entry, f.slice(0, -5)]) : [];
   for (const [site, seat] of found) {
     if (opt("site") && site !== loginSite(opt("site"))) continue;
     if (opt("seat") && seat !== opt("seat")) continue;

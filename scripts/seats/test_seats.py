@@ -109,8 +109,64 @@ def main():
     row = next(l for l in store.logins() if l['seat'] == 'helper')
     check('app: a seat never logged in needs login', row['status'] == 'needs login' and not row['saved'], row)
 
+    logged_out_checks(tmp, seats, store)
     print(f'\n{len(FAILS)} FAILED' if FAILS else '\nall seat checks passed')
     sys.exit(1 if FAILS else 0)
+
+
+def logged_out_checks(tmp, seats, store):
+    """A video marked "no login / public pages" uses the logged-out seat, everywhere (FG08, 14 Nov 2026: its row said
+    public pages, logged out, on a phone; the video was given the owner's X login, and a real X session ended up saved
+    under the name "logged-out")."""
+    import subprocess
+    sys.path.insert(0, os.path.join(HERE, '..', 'record'))
+    s = json.load(open(os.path.join(tmp, 'seats.json')))
+    s['x.com'] = {'seats': {'owner': {'label': 'Owner (your real X account)'}}}
+    json.dump(s, open(os.path.join(tmp, 'seats.json'), 'w'))
+    for site, job in [('x.com', 'FG08 What a funnel is. The @0xROAS funnel walked on a phone, logged out, from his X bio to the checkout'),
+                      ('x.com', 'Eight sellers: no login / public pages'),
+                      ('whop.com', 'Open the Real Biz store page as a visitor, not logged in'),
+                      ('whop.com', 'The checkout, public pages only')]:
+        p = seats.pick(site, job)
+        check(f'"{job[:50]}" on {site} -> logged-out seat, nothing allowed, no login needed',
+              p['seat'] == seats.LOGGED_OUT and p['allow'] == [] and p['login_saved'] and p['business'] is None, p)
+    p = seats.pick('whop.com', 'As the owner, show the Real Biz dashboard while logged out of X')
+    check('an owner phrase wins over "logged out"', p['seat'] == 'owner', p)
+    check('a plain X job still uses the owner login', seats.pick('x.com', 'Ask Grok for five post ideas')['seat'] == 'owner')
+
+    # a real login saved under the logged-out seat's name is never loaded, listed or checked
+    os.makedirs(os.path.join(tmp, 'logins', 'x.com'), exist_ok=True)
+    for name in ('owner', seats.LOGGED_OUT):
+        json.dump({'cookies': [{'name': 'auth_token', 'value': name, 'domain': '.x.com', 'path': '/'}], 'origins': []},
+                  open(os.path.join(tmp, 'logins', 'x.com', name + '.json'), 'w'))
+    script = {'site': 'https://x.com/', 'seat': {'seat': seats.LOGGED_OUT},
+              'seats': [{'site': 'x.com', 'seat': seats.LOGGED_OUT}, {'site': 'whop.com', 'seat': seats.LOGGED_OUT}],
+              'sections': [{'actions': [{'do': 'goto', 'target': 'https://x.com/0xROAS'}]}]}
+    f = seats.for_script(script)
+    check('a two-site logged-out video holds no login at all', f['login'] is None and all(x['login'] is None for x in f['seats']), f)
+    d = seats.describe(script)
+    check('a logged-out video never says "not logged in yet"', d['login_saved'] and 'not logged in' not in d['label'], d['label'])
+    one = dict(script, seats=[])
+    check('a one-site logged-out video holds no login', seats.for_script(one)['login'] is None)
+    check('its preview label says logged out', seats.describe(one)['label'] == seats.LOGGED_OUT_LABEL, seats.describe(one)['label'])
+    import record
+    check('the off-camera ready state runs a logged-out video logged out', record.seat_args(seats.for_script(one)) == ['--logged-out'])
+    check('the off-camera ready state passes every seat of a two-site video',
+          record.seat_args(f) == ['--seat', 'logged-out', '--seats', 'x.com:logged-out,whop.com:logged-out'], record.seat_args(f))
+    js = ("const s = await import(process.argv[1]); console.log(JSON.stringify([s.sessionFile('x.com', 'logged-out') ?? null, "
+          "s.joinedSession([['x.com', 'logged-out'], ['whop.com', 'logged-out']]) ?? null, "
+          "(s.joinedSession([['x.com', 'owner'], ['whop.com', 'logged-out']]) || '').endsWith('owner.json')]))")
+    r = subprocess.run(['node', '--input-type=module', '-e', js, os.path.join(HERE, 'seats.mjs')], capture_output=True, text=True, env=dict(os.environ))
+    out = json.loads(r.stdout.strip() or 'null')
+    check('seats.mjs: the logged-out seat loads no file, even one saved under its name', out and out[0] is None and out[1] is None, r.stdout + r.stderr)
+    check('seats.mjs: a logged-out site adds nothing to a joined login', out and out[2] is True, r.stdout + r.stderr)
+    check('app: a file under the logged-out name is not listed as a login',
+          not any(l['seat'] == seats.LOGGED_OUT for l in store.logins()), [l['seat'] for l in store.logins()])
+    try:
+        store.start_login('https://x.com/', seats.LOGGED_OUT)
+        check('app: the logged-out seat cannot be logged in', False)
+    except ValueError:
+        check('app: the logged-out seat cannot be logged in', True)
 
 
 if __name__ == '__main__':
