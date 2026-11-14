@@ -147,6 +147,7 @@
       });
     },
     toAppBatch(b, byId) {
+      const firstLine = (secs) => { const t = ((secs || [])[0] || {}).v || ''; const m = t.match(/^.+?[.!?…](?=\s|$)/); return (m ? m[0] : t).trim(); };
       // blind A/B/C picks, by letter only (the engine never sends which model made which before every pick is made)
       const bv = b.blind_view || {}; const bl = { lessons: {}, plan: null, revealed: bv.revealed || null };
       (bv.lessons || []).forEach((l) => { bl.lessons[l.demo] = { status: l.status, picked: l.picked || '', options: (l.options || []).map((o) => ({ letter: o.letter, audio: o.audio ? '/media/' + l.demo + '/' + o.audio : '', seconds: o.seconds || 0, lines: (o.sections || []).map((x) => x.talk) })) }; });
@@ -159,7 +160,9 @@
         const noScript = !D.written && (b.written || {})[id] && (b.written || {})[id].why;   // its script couldn't be written: skipped, never blocking the rest
         const st = pk && pk.status === 'waiting' ? 'pick' : noScript ? 'skipped' : !D.written ? 'writing' : D.exported ? 'exported' : D.review === 'approved' ? 'approved' : D.recorded ? 'recorded' : res.status === 'skipped' ? 'skipped' : (D.progress && BUSY.test(D.progress)) ? 'recording' : b.state === 'writing' || b.state === 'approve' || b.state === 'ready' || b.state === 'needs you' ? 'script' : 'waiting';
         return { t: D.title || id, lesson: 'Lesson ' + (i + 1), min: (this.engineState.demos.find((x) => x.id === id) || {}).length_min || 3, st: st, did: id,
-          seat: D.seat || '', seatKey: D.seatKey || '', cost: D.cost || 0, why: res.why || (noScript ? 'No script: ' + noScript : '') };
+          seat: D.seat || '', seatKey: D.seatKey || '', cost: D.cost || 0, why: res.why || (noScript ? 'No script: ' + noScript : ''),
+          // the first sentence the video actually says (script.json's first "talk", voice tags taken out by the engine); empty without a script
+          preview: firstLine(this.scripts[id]) };
       });
       // the Go screen: the logins this batch needs, with their live status
       const logins = [];

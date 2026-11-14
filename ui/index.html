@@ -1389,7 +1389,7 @@ textarea{resize:none}
 <div v-if="it.noAct" style="display: contents"><span class="bnone" aria-hidden="true"></span></div>
 </span>
 </div>
-<div v-if="it.open" style="display: contents"><div class="fade" style="padding: 4px 0 14px 42px"><p style="margin: 0; font-size: 17px">“{{it.preview}}”</p><p class="muted small" style="margin: 6px 0 0">Want changes? Tell Claude in the bar below, e.g. “make lesson {{it.n}} shorter”.</p></div></div>
+<div v-if="it.open" style="display: contents"><div class="fade" style="padding: 4px 0 14px 42px"><p v-if="it.preview" style="margin: 0 0 6px; font-size: 17px">“{{it.preview}}”</p><p class="muted small" style="margin: 0">Want changes? Tell Claude in the bar below, e.g. “make lesson {{it.n}} shorter”.</p></div></div>
 </div>
 <div v-if="bShowToggle" class="bmore"><button type="button" class="link" @click="bShowAll($event)" :aria-expanded="bAllOpenRaw ? 'true' : 'false'">{{bShowAllLabel}}</button></div>
 </div>
