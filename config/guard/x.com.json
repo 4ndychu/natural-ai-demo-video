@@ -18,6 +18,12 @@
    "path": "^/i/(adsctp|script-load-failure)$"
   },
   {
+   "label": "X's page-speed reports (client event spans)",
+   "method": "POST",
+   "path": "^/i/api/1\\.1/graphql/ces/p\\d+$",
+   "body": "\"events\""
+  },
+  {
    "label": "live counts on the posts in view (which posts to send like and repost counts for)",
    "path": "^/(i/api/)?1\\.1/live_pipeline/update_subscriptions$"
   },
