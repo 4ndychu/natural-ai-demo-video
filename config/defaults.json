@@ -345,6 +345,24 @@
         "text": "Confirm your tax details",
         "max_chars": 400,
         "max_height": 160
+      },
+      {
+        "site": "x.com",
+        "text": "Did someone say",
+        "max_chars": 600,
+        "max_height": 320
+      },
+      {
+        "site": "x.com",
+        "text": "Scan to get the app",
+        "max_chars": 80,
+        "max_height": 260
+      },
+      {
+        "site": "linktr.ee",
+        "text": "We Value Your Privacy",
+        "max_chars": 800,
+        "max_height": 320
       }
     ],
     "hide_on_page_note": "Page parts taken off the page (hidden, not blurred) before every take, the live page check and rehearsal: a site's own nag banner that is never part of a lesson. The largest element around the text that still holds little else. For example Whop's yellow 'Confirm your tax details' banner."

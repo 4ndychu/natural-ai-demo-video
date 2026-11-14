@@ -351,38 +351,47 @@ def check_one(b, did, sp, notes):
     return errs, (e['text'].strip().splitlines() or [''])[-1][:200]
 
 
-def rehearse(b, did, sp, notes):
-    """Play the script's actions once in the recorder's own browser, before any credits are spent (scripts/record/
-    rehearse.py); what can't be done goes to the checks model to repair, and is rehearsed again. Returns '' when every
-    step can be done, else why not. NAVI_NO_REHEARSAL=1 skips it (tests on saved scripts)."""
+def rehearse(b, did, sp, notes, retries=2):
+    """Before any credits are spent: play the script's actions in the recorder's own browser, first quickly
+    (scripts/record/rehearse.py), then at real-time speed, on the take's own clock, with hovers, pop-ups and page
+    loads behaving as they will on camera (rehearse.py --realtime; Andy, 14 Nov 2026: "only voice a video once its
+    real-time rehearsal passes"). When either fails, the checks model repairs the script from what the page offered
+    and it is rehearsed again, at most `retries` times; then the video is skipped with the reason. Returns '' when it
+    passes, else why not. NAVI_NO_REHEARSAL=1 skips it (tests on saved scripts)."""
     if os.environ.get('NAVI_NO_REHEARSAL'):
         return ''
-    cmd = [PY, os.path.join(ROOT, 'scripts', 'record', 'rehearse.py'), sp]
-    t0 = time.time()
-    code, out = step(cmd)
-    took(b, did, 'rehearsal', t0)
-    if code == 0:
-        log(b, '  rehearsal: every step can be done')
-        return ''
-    log(b, '  rehearsal: ' + (out.strip().splitlines() or ['failed'])[-2 if len(out.strip().splitlines()) > 1 else -1][:200])
     folder = store.demo_dir(did)
     voiced = os.path.exists(os.path.join(folder, 'voice.json'))
-    try:
-        job(b, 'checks', did, prompt='repair', script_path=rel(sp), script=jobs.attach(sp, rel(sp)), report=out.strip()[-3000:],
-            notes=jobs.attach(notes, rel(notes)), digest_cmd=f".venv/bin/python scripts/explore/digest.py {rel(os.path.join(folder, 'explore'))}",
-            rehearse_cmd=f'.venv/bin/python scripts/record/rehearse.py {rel(sp)}', check_cmd=f'.venv/bin/python scripts/script/check_script.py {rel(sp)}',
-            talk_rule=("The voice for this script is already recorded: do not change any \"talk\" or caption, or any cue word (\"on\"). Only targets."
-                       if voiced else "Keep the talk and the captions as they are. Only if a step truly can't be done as written, change the fewest words so the voice and the screen agree, and keep every cue word (\"on\") in its talk line."))
-    except jobs.JobError as err:
-        return f"the rehearsal found a step that can't be done, and the repair didn't run ({err})"
-    t0 = time.time()
-    code, out = step(cmd)
-    took(b, did, 'rehearsal (after the repair)', t0)
-    if code == 0:
-        log(b, '  rehearsal: every step can be done now')
-        return ''
-    why = next((l for l in out.strip().splitlines() if l.startswith('- ')), 'a step still could not be done')[2:200]
-    return 'the rehearsal still fails: ' + why
+    why = ''
+    for attempt in range(retries + 1):
+        again = ' (after repair %d)' % attempt if attempt else ''
+        for mode in ('quick', 'realtime'):
+            cmd = [PY, os.path.join(ROOT, 'scripts', 'record', 'rehearse.py'), sp] + (['--realtime'] if mode == 'realtime' else [])
+            t0 = time.time()
+            code, out = step(cmd)
+            took(b, did, ('rehearsal' if mode == 'quick' else 'real-time rehearsal') + again, t0)
+            lines = out.strip().splitlines() or ['failed']
+            if code != 0:
+                log(b, f"  {'real-time ' if mode == 'realtime' else ''}rehearsal{again}: " + (lines[-2] if len(lines) > 1 else lines[-1])[:200])
+                why = next((l for l in lines if l.startswith('- ')), lines[-1])[2:300]
+                why = ('in real time: ' if mode == 'realtime' else '') + why
+                break
+            log(b, f"  {'real-time ' if mode == 'realtime' else ''}rehearsal{again}: every step can be done")
+        else:
+            return ''
+        if attempt == retries:
+            break
+        try:
+            job(b, 'checks', did, prompt='repair', script_path=rel(sp), script=jobs.attach(sp, rel(sp)), report=out.strip()[-3000:],
+                notes=jobs.attach(notes, rel(notes)), digest_cmd=f".venv/bin/python scripts/explore/digest.py {rel(os.path.join(folder, 'explore'))}",
+                rehearse_cmd=f'.venv/bin/python scripts/record/rehearse.py {rel(sp)}', check_cmd=f'.venv/bin/python scripts/script/check_script.py {rel(sp)}',
+                talk_rule=("The voice for this script is already recorded: do not change any \"talk\" or caption, or any cue word (\"on\"). Only targets."
+                           if voiced else "Keep the talk and the captions as they are. Only if a step truly can't be done as written, change the fewest words so the voice and the screen agree, and keep every cue word (\"on\") in its talk line.")
+                + (" This failure happened at real-time speed, as on camera: a hover card, tooltip, pop-up or slow load got in the way. Prefer targets nothing pops up over, don't point at the same thing twice in a row, and leave more words between pointing actions."
+                   if mode == 'realtime' else ''))
+        except jobs.JobError as err:
+            return f"the rehearsal found a step that can't be done, and the repair didn't run ({err})"
+    return f'the rehearsal still fails after {retries} repairs: ' + why
 
 
 WRITER_RULES = ('Voice rules', '1. The talking script', '5. Kind of demo', '6. Fillers that follow the screen')
